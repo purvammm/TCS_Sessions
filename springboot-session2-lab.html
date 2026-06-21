@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 2 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session2-theory.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* HTTP verb badge in summaries */
+    .verb-badge {
+      font-family: var(--mac-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .verb-badge.get { background: #61affe; }
+    .verb-badge.post { background: #49cc90; }
+    .verb-badge.put { background: #fca130; }
+    .verb-badge.del { background: #f93e3e; }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session2-lab.html — Spring Boot Session 2</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🔗</div>
+        <div>
+          <h1>Spring Boot — Session 2 Hands-on Lab</h1>
+          <p class="section-intro">Build a complete Student CRUD REST API, endpoint by endpoint. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Spring Boot Session 2 — the theory stays on the main screen while
+          you build here on your machine. We'll write the Student CRUD API one endpoint at a time: write a method,
+          run it, test it, then move on. Click a lab heading to expand it, use the <strong>Copy</strong> button on
+          any snippet instead of retyping, and tick each checkbox as you go. The progress bar at the top fills as
+          you complete steps. If you fall behind, the <strong>Complete Controller Reference</strong> at the bottom
+          has the whole file — paste it, run it, and you're back with the group.
+        </div>
+      </section>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Project created</strong> — new project from Spring Initializr with Web, DevTools &amp; Swagger.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · Student bean done</strong> — the <code>Student</code> model class compiles.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · First GET works</strong> — single hardcoded student returned as JSON.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · List GET works</strong> — a JSON array of students comes back.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · PathVariable works</strong> — <code>/students/{id}</code> returns one student.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · RequestParam works</strong> — <code>/students/search?name=</code> filters the list.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · POST works</strong> — sending JSON creates a student, returns 201.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · PUT/DELETE works</strong> — update and remove a student by ID.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. Tick it once the check passes — the "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A Spring Boot project</strong> — either your Session 1 <code>springboot-demo</code>, or a fresh one (we create a fresh one in Setup below)
+                <span class="verify">If reusing Session 1's project, you only need to add the Swagger dependency.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Postman installed</strong> (or you'll use Swagger in the browser)
+                <span class="verify">Postman is free from postman.com. Swagger needs no install — it comes from a dependency.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>DevTools dependency added</strong> — gives you auto-restart on save
+                <span class="verify">Verify: edit a file and save while the app runs — the console should show a quick restart.</span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Why DevTools matters today</span>
+              We're going to edit the controller many times. With <code>spring-boot-devtools</code> on the classpath,
+              Spring Boot <strong>auto-restarts</strong> the app every time you save — no more stop/run between each
+              endpoint. It only triggers on classpath changes, so it's fast.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PROJECT SETUP ===== -->
+      <div class="section-band">Project setup</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Create the project + enable Swagger</summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li><strong>Go to Spring Initializr</strong> at <code>https://start.spring.io</code> (or reuse Session 1's project).</li>
+              <li><strong>Fill in the fields:</strong>
+                <ul>
+                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code> &nbsp;·&nbsp; Java: <code>17</code></li>
+                  <li>Group: <code>com.tcs.training</code> &nbsp;·&nbsp; Artifact: <code>student-api</code></li>
+                </ul>
+              </li>
+              <li><strong>Add these dependencies:</strong>
+                <ul>
+                  <li><code>Spring Web</code> (<code>spring-boot-starter-web</code>)</li>
+                  <li><code>Spring Boot DevTools</code> (<code>spring-boot-devtools</code>)</li>
+                  <li>Swagger is <em>not</em> in Initializr — add it to <code>pom.xml</code> manually (next step).</li>
+                </ul>
+              </li>
+              <li><strong>Add the Swagger (springdoc) dependency to <code>pom.xml</code></strong> — freshers often mistype the artifact ID, so copy it exactly:
+                <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.6.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+              </li>
+              <li><strong>(Optional) set a friendly Swagger path</strong> in <code>src/main/resources/application.properties</code>:
+                <div class="codewrap"><pre><code>springdoc.swagger-ui.path=/swagger-ui.html</code></pre></div>
+                The default UI is always available at <code>/swagger-ui/index.html</code> too.
+              </li>
+              <li><strong>Run the app</strong> and open the empty Swagger UI in your browser:
+                <div class="codewrap"><pre><code>http://localhost:8080/swagger-ui/index.html</code></pre></div>
+              </li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected — before any endpoints</span>
+              Swagger UI loads and shows the page title and an empty (or near-empty) list of operations. Once you
+              add controller methods, refresh this page and they'll appear automatically.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Project runs and the Swagger UI page loads at <code>/swagger-ui/index.html</code>.</span></label>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Swagger UI shows 404</td>
+                  <td>Wrong artifact ID, or the dependency didn't download.</td>
+                  <td>Check the artifact is exactly <code>springdoc-openapi-starter-webmvc-ui</code>, then reload Maven and restart.</td>
+                </tr>
+                <tr>
+                  <td>Maven can't find the springdoc version</td>
+                  <td>Version mismatch with your Spring Boot version.</td>
+                  <td>Use a 2.x springdoc version for Spring Boot 3.x. Try <code>2.6.0</code> or check Maven Central for a compatible one.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== THE LABS ===== -->
+      <div class="section-band">The labs — build the API</div>
+
+      <!-- ===== LAB 1: STUDENT BEAN ===== -->
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create the Student Bean</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              A <strong>bean</strong> here just means a plain Java class that holds data — our <code>Student</code>.
+              It has private fields, a constructor, and getters/setters. Spring's Jackson library uses the getters
+              to turn a <code>Student</code> into JSON, and the setters to turn incoming JSON back into a
+              <code>Student</code>.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.model</code>.</li>
+              <li><strong>Create a class</strong> <code>Student.java</code> inside it with the code below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.model;
+
+public class Student {
+
+    private int id;
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    // No-arg constructor (Jackson needs this to build objects from JSON)
+    public Student() {
+    }
+
+    // Parameterized constructor (handy for hardcoding test data)
+    public Student(int id, String firstName, String lastName, String email) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
+    // Getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
+    public String getFirstName() { return firstName; }
+    public void setFirstName(String firstName) { this.firstName = firstName; }
+
+    public String getLastName() { return lastName; }
+    public void setLastName(String lastName) { this.lastName = lastName; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Why we write getters/setters by hand</span>
+              You <em>could</em> use Lombok's <code>@Data</code> to generate these automatically — but we're writing
+              them manually today so you see exactly what they do. Jackson calls <code>getFirstName()</code> to
+              produce the <code>"firstName"</code> JSON key. The names matter.
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              The class compiles with no errors. There's nothing to run yet — the controller in Lab 2 will use it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Student.java</code> created in <code>com.tcs.training.model</code> and compiles.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 2: CONTROLLER + FIRST GET ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Controller + Your First GET Endpoint</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@RestController</code> marks this class as a REST handler whose return values become JSON.
+              <code>@RequestMapping("/students")</code> at the <strong>class level</strong> means every method's URL
+              starts with <code>/students</code> — you don't repeat it on each method.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
+              <li><strong>Create</strong> <code>StudentController.java</code> with the code below.</li>
+              <li><strong>Run the app</strong> and open <code>http://localhost:8080/students</code> in your browser.</li>
+              <li><strong>Open Swagger</strong> at <code>/swagger-ui/index.html</code> and confirm the endpoint is now listed.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.model.Student;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/students")   // class-level prefix: every method starts with /students
+public class StudentController {
+
+    @GetMapping   // maps GET /students
+    public Student getStudent() {
+        return new Student(1, "Ravi", "Sharma", "ravi@tcs.com");
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected response — GET /students</span>
+              <div class="codewrap"><pre><code>{
+  "id": 1,
+  "firstName": "Ravi",
+  "lastName": "Sharma",
+  "email": "ravi@tcs.com"
+}</code></pre></div>
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Browser shows an error page / "Whitelabel Error"</td>
+                  <td>Forgot <code>@RestController</code>, so Spring doesn't register the class.</td>
+                  <td>Add <code>@RestController</code> above the class and re-run.</td>
+                </tr>
+                <tr>
+                  <td>404 at <code>/students</code></td>
+                  <td>Controller is outside <code>com.tcs.training</code>, so component scanning misses it.</td>
+                  <td>Move it into a sub-package of the main class's package.</td>
+                </tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>GET /students</code> returns the Ravi Sharma JSON, and it appears in Swagger.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: GET ALL ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> GET All Students (a JSON array)</summary>
+          <div class="exp-body">
+            <p>Now return a <code>List&lt;Student&gt;</code>. We'll keep a shared list as a field on the controller so
+            the later POST/PUT/DELETE labs can modify the same data.</p>
+            <ol class="steps">
+              <li><strong>Add a field-level list</strong> of students at the top of the class (we'll reuse it everywhere).</li>
+              <li><strong>Add a GET method</strong> mapped to <code>/students/all</code> that returns the list.</li>
+              <li><strong>Run and test</strong> <code>http://localhost:8080/students/all</code>.</li>
+            </ol>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+// ...inside the class, add this field:
+private List&lt;Student&gt; students = new ArrayList&lt;&gt;(Arrays.asList(
+        new Student(1, "Ravi", "Sharma", "ravi@tcs.com"),
+        new Student(2, "Anita", "Verma", "anita@tcs.com"),
+        new Student(3, "Karan", "Patel", "karan@tcs.com")
+));
+
+@GetMapping("/all")   // maps GET /students/all
+public List&lt;Student&gt; getAllStudents() {
+    return students;
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected response — GET /students/all</span>
+              <div class="codewrap"><pre><code>[
+  { "id": 1, "firstName": "Ravi",  "lastName": "Sharma", "email": "ravi@tcs.com" },
+  { "id": 2, "firstName": "Anita", "lastName": "Verma",  "email": "anita@tcs.com" },
+  { "id": 3, "firstName": "Karan", "lastName": "Patel",  "email": "karan@tcs.com" }
+]</code></pre></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Observation</span>
+              You returned a Java <code>List</code> and the client received a <strong>JSON array</strong>. You wrote
+              no conversion code — <strong>Jackson</strong> serialized it automatically. That's the auto-magic of
+              <code>@RestController</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>GET /students/all</code> returns a JSON array of three students.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4: GET BY ID (PathVariable) ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> GET by ID with @PathVariable</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@PathVariable</code> pulls a value out of the URL path. In <code>/students/{id}</code> the
+              <code>{id}</code> placeholder is bound to the method's <code>int id</code> parameter. So
+              <code>/students/2</code> calls the method with <code>id = 2</code>.
+            </div>
+            <ol class="steps">
+              <li><strong>Add a method</strong> mapped to <code>/students/{id}</code> that loops the list to find a match.</li>
+              <li><strong>Test</strong> <code>http://localhost:8080/students/1</code> and <code>/students/2</code>.</li>
+            </ol>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PathVariable;
+
+@GetMapping("/{id}")   // maps GET /students/{id}
+public Student getStudentById(@PathVariable int id) {
+    for (Student s : students) {
+        if (s.getId() == id) {
+            return s;
+        }
+    }
+    return null;   // (Session 3: we'll return a proper 404 instead)
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected — GET /students/2</span>
+              <div class="codewrap"><pre><code>{ "id": 2, "firstName": "Anita", "lastName": "Verma", "email": "anita@tcs.com" }</code></pre></div>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Add a second endpoint <code>@GetMapping("/name/{firstName}")</code> that finds a student by first name.
+              Bind it with <code>@PathVariable String firstName</code> and compare with <code>equalsIgnoreCase</code>.
+              Expected: <code>/students/name/Karan</code> returns Karan's record.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>GET /students/{id}</code> returns the matching student.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: RequestParam ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Search with @RequestParam</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@RequestParam</code> reads a <strong>query parameter</strong> — the part of the URL after the
+              <code>?</code>. In <code>/students/search?name=Ravi</code>, the <code>name</code> query value is bound
+              to the method parameter.
+            </div>
+            <ol class="steps">
+              <li><strong>Add a search method</strong> mapped to <code>/students/search</code> with a <code>name</code> query param.</li>
+              <li><strong>Test</strong> <code>http://localhost:8080/students/search?name=Ravi</code>.</li>
+            </ol>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.RequestParam;
+
+@GetMapping("/search")   // maps GET /students/search?name=...
+public List&lt;Student&gt; searchByName(@RequestParam String name) {
+    List&lt;Student&gt; result = new ArrayList&lt;&gt;();
+    for (Student s : students) {
+        if (s.getFirstName().equalsIgnoreCase(name)) {
+            result.add(s);
+        }
+    }
+    return result;
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected — GET /students/search?name=Ravi</span>
+              <div class="codewrap"><pre><code>[ { "id": 1, "firstName": "Ravi", "lastName": "Sharma", "email": "ravi@tcs.com" } ]</code></pre></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">PathVariable vs RequestParam — when to use which</span>
+              Use <strong>@PathVariable</strong> for identifying a specific resource — it's part of the resource's
+              identity: <code>/students/1</code>. Use <strong>@RequestParam</strong> for filtering, searching, or
+              optional criteria: <code>/students/search?name=Ravi</code>. Rule of thumb: identity in the path,
+              filters in the query.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>GET /students/search?name=Ravi</code> returns the matching student(s).</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: POST ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge post">POST</span><span class="chevron">▶</span> Create with @RequestBody (201 Created)</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@RequestBody</code> maps the incoming JSON in the request body straight into a Java
+              <code>Student</code> object — Jackson deserializes it. <code>@ResponseStatus(HttpStatus.CREATED)</code>
+              makes the endpoint return <strong>201 Created</strong> instead of the default 200.
+            </div>
+            <ol class="steps">
+              <li><strong>Add a POST method</strong> that takes a <code>@RequestBody Student</code>, adds it to the list, and is annotated with <code>@ResponseStatus(HttpStatus.CREATED)</code>.</li>
+              <li><strong>Test in Postman:</strong> method <code>POST</code>, URL <code>http://localhost:8080/students</code>, Body → <em>raw</em> → <em>JSON</em>, and set <code>Content-Type: application/json</code>.</li>
+            </ol>
+            <div class="codewrap"><pre><code>import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@PostMapping                              // maps POST /students
+@ResponseStatus(HttpStatus.CREATED)       // returns 201 instead of 200
+public String addStudent(@RequestBody Student student) {
+    students.add(student);
+    return "Student created with id " + student.getId();
+}</code></pre></div>
+            <p><strong>Exact JSON to paste into the Postman body:</strong></p>
+            <div class="codewrap"><pre><code>{
+  "id": 4,
+  "firstName": "Priya",
+  "lastName": "Mehta",
+  "email": "priya@tcs.com"
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              Postman's response panel shows status <strong>201 Created</strong> and the body
+              <code>Student created with id 4</code>. Call <code>GET /students/all</code> again — Priya is now in the list.
+            </div>
+            <div class="observe">
+              <span class="lbl">Also try it in Swagger</span>
+              Expand the <code>POST /students</code> operation, click <strong>Try it out</strong>, paste the same JSON
+              into the request body box, and hit <strong>Execute</strong>. Swagger shows the 201 response — no Postman needed.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>POST /students</code> with JSON body returns 201 and adds the student.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 7: PUT + DELETE ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Update &amp; Delete by ID</summary>
+          <div class="exp-body">
+            <h3 style="margin-top:0;">PUT — update an existing student</h3>
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@PutMapping("/{id}")</code> combines both ideas: <code>@PathVariable</code> tells us <em>which</em>
+              student to update, and <code>@RequestBody</code> carries the new data.
+            </div>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PutMapping;
+
+@PutMapping("/{id}")   // maps PUT /students/{id}
+public Student updateStudent(@PathVariable int id, @RequestBody Student updated) {
+    for (int i = 0; i &lt; students.size(); i++) {
+        if (students.get(i).getId() == id) {
+            updated.setId(id);          // keep the id from the URL
+            students.set(i, updated);   // replace the old record
+            return updated;
+        }
+    }
+    return null;   // (Session 3: return a proper 404)
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Test in Postman — PUT</span>
+              Method <code>PUT</code>, URL <code>http://localhost:8080/students/2</code>, Body → raw → JSON:
+              <code>{ "firstName": "Anita", "lastName": "Singh", "email": "anita.singh@tcs.com" }</code>. The response
+              shows the updated record; <code>GET /students/all</code> confirms student 2 changed.
+            </div>
+
+            <h3 style="margin-top:24px;">DELETE — remove a student</h3>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.DeleteMapping;
+
+@DeleteMapping("/{id}")   // maps DELETE /students/{id}
+public String deleteStudent(@PathVariable int id) {
+    students.removeIf(s -&gt; s.getId() == id);
+    return "Student " + id + " deleted";
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Test in Postman — DELETE</span>
+              Method <code>DELETE</code>, URL <code>http://localhost:8080/students/3</code>. Response:
+              <code>Student 3 deleted</code>. Call <code>GET /students/all</code> — Karan is gone.
+            </div>
+            <div class="expected">
+              <span class="lbl">Alternative: 204 No Content</span>
+              Instead of returning a string, you can return <code>void</code> and annotate the method with
+              <code>@ResponseStatus(HttpStatus.NO_CONTENT)</code> to send a clean <strong>204</strong> — the
+              conventional REST response for a successful delete with no body.
+            </div>
+            <div class="warnbox" style="border-left:4px solid var(--tl-yellow); background:rgba(254,188,46,0.1); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0;">
+              <span style="font-weight:700; color:#b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;">Important</span>
+              These changes only persist <strong>while the app is running</strong>. Restart it and your edits are gone —
+              the data lives in an in-memory list. In <strong>Session 3</strong> we connect to a real database so changes survive.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>PUT</code> updates a student and <code>DELETE</code> removes one by ID.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== BONUS: ResponseEntity ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> ResponseEntity — do this if you finish early</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>ResponseEntity&lt;T&gt;</code> lets you control the full HTTP response — status code, headers and
+              body. Here we refactor "GET by ID" to return <strong>200 OK</strong> when the student exists and a clean
+              <strong>404 Not Found</strong> when it doesn't. This previews Session 3's exception handling without going deep.
+            </div>
+            <div class="codewrap"><pre><code>import org.springframework.http.ResponseEntity;
+
+@GetMapping("/entity/{id}")   // a ResponseEntity version of GET by id
+public ResponseEntity&lt;Student&gt; getByIdEntity(@PathVariable int id) {
+    for (Student s : students) {
+        if (s.getId() == id) {
+            return ResponseEntity.ok(s);          // 200 + the student
+        }
+    }
+    return ResponseEntity.notFound().build();     // 404, no body
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              <code>/students/entity/1</code> → status <strong>200</strong> with the student JSON.
+              <code>/students/entity/999</code> → status <strong>404 Not Found</strong> with an empty body — far
+              cleaner than the <code>null</code> our earlier method returned.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Bonus: a <code>ResponseEntity</code> endpoint returns 200 for a valid ID and 404 for an invalid one.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE CONTROLLER REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete StudentController.java (end-of-lab)</summary>
+          <div class="exp-body">
+            <p>The entire controller as it looks after all the labs. If you fell behind, paste this, run it, and
+            you're caught up with the group.</p>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.model.Student;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+
+    private List&lt;Student&gt; students = new ArrayList&lt;&gt;(Arrays.asList(
+            new Student(1, "Ravi", "Sharma", "ravi@tcs.com"),
+            new Student(2, "Anita", "Verma", "anita@tcs.com"),
+            new Student(3, "Karan", "Patel", "karan@tcs.com")
+    ));
+
+    // Lab 2 — single hardcoded student
+    @GetMapping("/first")
+    public Student getStudent() {
+        return new Student(1, "Ravi", "Sharma", "ravi@tcs.com");
+    }
+
+    // Lab 3 — all students
+    @GetMapping("/all")
+    public List&lt;Student&gt; getAllStudents() {
+        return students;
+    }
+
+    // Lab 4 — by id
+    @GetMapping("/{id}")
+    public Student getStudentById(@PathVariable int id) {
+        for (Student s : students) {
+            if (s.getId() == id) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    // Lab 5 — search by first name
+    @GetMapping("/search")
+    public List&lt;Student&gt; searchByName(@RequestParam String name) {
+        List&lt;Student&gt; result = new ArrayList&lt;&gt;();
+        for (Student s : students) {
+            if (s.getFirstName().equalsIgnoreCase(name)) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
+    // Lab 6 — create
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addStudent(@RequestBody Student student) {
+        students.add(student);
+        return "Student created with id " + student.getId();
+    }
+
+    // Lab 7 — update
+    @PutMapping("/{id}")
+    public Student updateStudent(@PathVariable int id, @RequestBody Student updated) {
+        for (int i = 0; i &lt; students.size(); i++) {
+            if (students.get(i).getId() == id) {
+                updated.setId(id);
+                students.set(i, updated);
+                return updated;
+            }
+        }
+        return null;
+    }
+
+    // Lab 7 — delete
+    @DeleteMapping("/{id}")
+    public String deleteStudent(@PathVariable int id) {
+        students.removeIf(s -&gt; s.getId() == id);
+        return "Student " + id + " deleted";
+    }
+
+    // Bonus — ResponseEntity
+    @GetMapping("/entity/{id}")
+    public ResponseEntity&lt;Student&gt; getByIdEntity(@PathVariable int id) {
+        for (Student s : students) {
+            if (s.getId() == id) {
+                return ResponseEntity.ok(s);
+            }
+        }
+        return ResponseEntity.notFound().build();
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Note on URL collisions</span>
+              In this combined reference the single-student demo from Lab 2 is mapped to <code>/students/first</code>
+              so it doesn't clash with <code>GET /students/{id}</code>. When two GET mappings would match the same
+              path, Spring needs them to be distinct — a good thing to be aware of.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference — annotation cheatsheet</h2>
+          <table>
+            <thead><tr><th>Annotation</th><th>Where it goes</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>@RestController</code></td><td>Class</td><td>Marks a REST controller; auto-serializes return values to JSON</td></tr>
+              <tr><td><code>@RequestMapping</code></td><td>Class or Method</td><td>Defines a URI prefix (class) or path (method)</td></tr>
+              <tr><td><code>@GetMapping</code></td><td>Method</td><td>Maps HTTP GET requests</td></tr>
+              <tr><td><code>@PostMapping</code></td><td>Method</td><td>Maps HTTP POST requests</td></tr>
+              <tr><td><code>@PutMapping</code></td><td>Method</td><td>Maps HTTP PUT requests</td></tr>
+              <tr><td><code>@DeleteMapping</code></td><td>Method</td><td>Maps HTTP DELETE requests</td></tr>
+              <tr><td><code>@PathVariable</code></td><td>Parameter</td><td>Binds a URI path segment to a method parameter</td></tr>
+              <tr><td><code>@RequestParam</code></td><td>Parameter</td><td>Binds a query parameter to a method parameter</td></tr>
+              <tr><td><code>@RequestBody</code></td><td>Parameter</td><td>Deserializes request-body JSON into a Java object</td></tr>
+              <tr><td><code>@ResponseStatus</code></td><td>Method</td><td>Sets the response HTTP status code</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 3</span>
+          You'll make this API production-shaped. We'll add proper <strong>exception handling</strong> with
+          <code>@ControllerAdvice</code> (clean 404s when a student ID isn't found), then swap the in-memory list for
+          a real <strong>H2 database</strong> using Spring Data JPA — mapping <code>Student</code> to a table with
+          <code>@Entity</code> and doing real CRUD through a <code>@Repository</code>. Bring today's
+          <code>student-api</code> project; we build straight on top of it.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Spring Boot — Session 2 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

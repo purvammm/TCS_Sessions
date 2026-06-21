@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 2 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session2-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Two-column diagram comparison (web app vs web service) */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Annotation unpack */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Annotation grid (preview + recap) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 15px; font-weight: 700; color: var(--mac-accent); }
+    .anno-cell .ac-def { font-size: 14.5px; color: var(--mac-text-muted); }
+    .anno-grid.preview { grid-template-columns: repeat(2, 1fr); }
+    .anno-grid.preview .anno-cell { text-align: center; align-items: center; }
+
+    /* Status code badges */
+    .status-list { display: grid; gap: 12px; margin-top: 16px; }
+    .status-row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: center; }
+    .status-badge {
+      font-family: var(--mac-mono);
+      font-weight: 700;
+      font-size: 17px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      text-align: center;
+      color: #fff;
+    }
+    .status-badge.s2 { background: #28c840; }
+    .status-badge.s4 { background: #ff9f0a; }
+    .status-badge.s5 { background: var(--tl-red); }
+    .status-row .sd { font-size: 16px; }
+    .status-row .sd strong { color: var(--mac-text); }
+
+    /* JSON color coding */
+    .json-key { color: #8fd3ff; }
+    .json-str { color: #a6e22e; }
+    .json-num { color: #fd9353; }
+    .json-bool { color: #ff6188; }
+    .json-punc { color: #f8f8f2; }
+
+    /* Flash cards (recap) */
+    .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
+    .flash {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      background: #fafafc;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+    .flash:hover { background: #f0f6ff; }
+    .flash .q { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .flash .q .tap { font-size: 13px; font-weight: 600; color: var(--mac-accent); margin-left: auto; }
+    .flash .a {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--mac-border);
+      font-size: 16.5px;
+      line-height: 1.55;
+    }
+    .flash.revealed .a { display: block; }
+    .flash.revealed .tap { display: none; }
+
+    /* Swagger UI mockup */
+    .swagger-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .swagger-mock .sm-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .swagger-mock .sm-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-bottom: 1px solid var(--mac-border);
+    }
+    .swagger-mock .verb {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px; min-width: 64px; text-align: center;
+    }
+    .verb.get { background: #61affe; }
+    .verb.post { background: #49cc90; }
+    .verb.put { background: #fca130; }
+    .verb.del { background: #f93e3e; }
+    .swagger-mock .path { font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session2-theory.html — Spring Boot Session 2</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 2 of the Spring Boot Series</span>
+            <h1>Spring Boot</h1>
+            <div class="sub">REST Web Services — building a complete Student CRUD API, endpoint by endpoint.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Session 1 got an app running. Today we make it <em>talk</em> — we turn it into a REST web service that exchanges JSON data with any client. The theory is shorter than last time because the real weight of this session is the hands-on lab, where you'll build a full CRUD API yourself.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Quick Session 1 recap — three warm-up questions</li>
+            <li><span class="num">2</span> Web services &amp; JSON — exchanging data, not web pages</li>
+            <li><span class="num">3</span> REST vs SOAP, HTTP methods &amp; status codes</li>
+            <li><span class="num">4</span> URI design + the annotations you'll use today</li>
+            <li><span class="num">5</span> Project setup with DevTools &amp; Swagger</li>
+            <li><span class="num">6</span> Hands-on lab: build the Student CRUD API live</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic, so you can revise from these slides alone. By the end you'll be able to explain what a REST API is and build one from scratch with the standard Spring Boot annotations.
+          </div>
+        </section>
+
+        <!-- 3. SESSION 1 RECAP (flash cards) -->
+        <section class="slide">
+          <p class="eyebrow">Before we start something new</p>
+          <h2>Session 1 recap</h2>
+          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q1 · What does <code>@SpringBootApplication</code> do? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">It's a single annotation that combines three: <code>@Configuration</code> (declares config), <code>@EnableAutoConfiguration</code> (turns on auto-configuration based on the classpath), and <code>@ComponentScan</code> (discovers your controllers, services and other beans in this package and below). It marks the main class — the entry point that boots the whole application.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q2 · What is <code>@RestController</code>? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">An annotation that marks a class as a web request handler whose return values are written <em>directly</em> into the HTTP response body (as JSON or text), rather than being treated as the name of a view/HTML page to render. It's what makes a class serve data to API clients.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q3 · What port does Spring Boot start on by default? <span class="tap">click to reveal ▸</span></div>
+              <div class="a"><strong>Port 8080.</strong> The embedded Tomcat server starts there automatically — you saw the line "Tomcat started on port 8080" in your console. You can change it with <code>server.port=</code> in <code>application.properties</code>.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. WHAT IS A WEB SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">The core idea of today</p>
+          <h2>What is a web service?</h2>
+          <p class="deep">A <strong>web service</strong> is a way for two applications to exchange data over a network, regardless of what language or platform either one is written in. The key word is <strong>data</strong> — a web service does not return a web page for a human to look at. It returns raw, structured data (usually JSON) for <em>another program</em> to read and use.</p>
+          <div class="keybox">
+            <span class="lbl">The one distinction that matters</span>
+            A traditional web app returns <strong>HTML</strong> — a page meant for a human's eyes in a browser. A web service returns <strong>data</strong> (JSON/XML) — meant for another application to consume. Same server technology underneath, completely different audience.
+          </div>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Traditional Web App</h3>
+              <div class="flow vert" style="margin-top:6px;">
+                <div class="flow-box">Browser</div>
+                <span class="flow-arrow">▼ request</span>
+                <div class="flow-box alt">Server</div>
+                <span class="flow-arrow">▼ returns</span>
+                <div class="flow-box warn">HTML page <span class="sm">for human eyes</span></div>
+              </div>
+            </div>
+            <div class="colbox b">
+              <h3>Web Service</h3>
+              <div class="flow vert" style="margin-top:6px;">
+                <div class="flow-box">App / Mobile / Frontend</div>
+                <span class="flow-arrow">▼ request</span>
+                <div class="flow-box alt">Server</div>
+                <span class="flow-arrow">▼ returns</span>
+                <div class="flow-box green">JSON / XML data <span class="sm">for a program</span></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. JSON SYNTAX -->
+        <section class="slide">
+          <p class="eyebrow">The language of modern APIs</p>
+          <h2>JSON syntax</h2>
+          <p class="deep"><strong>JSON</strong> (JavaScript Object Notation) is the format your API will send and receive. It's lightweight, human-readable, and every language can parse it. You'll be looking at exactly this in Postman in about 20 minutes — so let's make it land now. A single Student looks like this:</p>
+          <pre><code>{
+  <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">1</span><span class="json-punc">,</span>
+  <span class="json-key">"firstName"</span><span class="json-punc">:</span> <span class="json-str">"Ravi"</span><span class="json-punc">,</span>
+  <span class="json-key">"lastName"</span><span class="json-punc">:</span> <span class="json-str">"Sharma"</span><span class="json-punc">,</span>
+  <span class="json-key">"email"</span><span class="json-punc">:</span> <span class="json-str">"ravi@tcs.com"</span><span class="json-punc">,</span>
+  <span class="json-key">"active"</span><span class="json-punc">:</span> <span class="json-bool">true</span>
+}</code></pre>
+          <ul>
+            <li><strong>Curly braces <code>{ }</code></strong> wrap an object — one record, like one student.</li>
+            <li><strong>Key–value pairs</strong> — the <span class="json-key">"key"</span> (always a quoted string) is followed by a <strong>colon</strong> <code>:</code> then the value.</li>
+            <li><strong>Commas</strong> separate the pairs — every pair except the last one ends with a comma.</li>
+            <li><strong>Value types:</strong> <span class="json-str">strings</span> in quotes, <span class="json-num">numbers</span> bare, <span class="json-bool">booleans</span> as <code>true</code>/<code>false</code>.</li>
+          </ul>
+          <p class="deep">Square brackets <code>[ ]</code> make an <strong>array</strong> — an ordered list. A response with several students is an array of objects:</p>
+          <pre><code><span class="json-punc">[</span>
+  { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Ravi"</span>,  <span class="json-key">"lastName"</span>: <span class="json-str">"Sharma"</span> }<span class="json-punc">,</span>
+  { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Anita"</span>, <span class="json-key">"lastName"</span>: <span class="json-str">"Verma"</span> }<span class="json-punc">,</span>
+  { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Karan"</span>, <span class="json-key">"lastName"</span>: <span class="json-str">"Patel"</span> }
+<span class="json-punc">]</span></code></pre>
+          <div class="note">
+            <span class="lbl">You won't write this by hand</span>
+            Spring Boot uses a library called <strong>Jackson</strong> to automatically convert your Java <code>Student</code> objects into JSON on the way out, and JSON back into Java objects on the way in. You return a <code>Student</code>; the client receives JSON. That conversion is called <span class="term">serialization</span>.
+          </div>
+        </section>
+
+        <!-- 6. KEY TERMINOLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Vocabulary you'll hear all the time</p>
+          <h2>Key web service terminology</h2>
+          <p class="deep">Four terms come up constantly when people talk about services. Each is simple — here's the one-line definition plus an everyday analogy so it sticks.</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🍽️</div>
+              <h3>Service Provider</h3>
+              <p>The application that <strong>offers</strong> the service and answers requests. <em>Analogy: the kitchen that cooks the food.</em> Your Spring Boot API is the provider today.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📱</div>
+              <h3>Service Consumer</h3>
+              <p>The application that <strong>calls</strong> the service and uses its data. <em>Analogy: the customer who orders.</em> Postman, a browser, or a mobile app are consumers.</p>
+            </div>
+            <div class="card">
+              <div class="ic">⏳</div>
+              <h3>Synchronous</h3>
+              <p>The consumer <strong>waits</strong> for the response before doing anything else. <em>Analogy: standing at the counter until your order is handed over.</em></p>
+            </div>
+            <div class="card">
+              <div class="ic">🔔</div>
+              <h3>Asynchronous</h3>
+              <p>The consumer <strong>doesn't wait</strong> — it carries on and is notified later. <em>Analogy: taking a buzzer and sitting down until it goes off.</em></p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Loose coupling — the superpower</span>
+            Because the two sides only agree on the <strong>data format and the URLs</strong>, neither cares what language the other is written in. A Python app, a React frontend and an Android phone can all call the same Java API. Change one side's internals and the other doesn't break. That independence is called <span class="term">loose coupling</span>, and it's why web services scale across teams and technologies.
+          </div>
+        </section>
+
+        <!-- 7. REST vs SOAP -->
+        <section class="slide">
+          <p class="eyebrow">Two styles of web service</p>
+          <h2>REST vs SOAP</h2>
+          <p class="deep">There are two main ways to build web services. <strong>SOAP</strong> is the older, heavier, XML-based standard. <strong>REST</strong> is the lighter, more flexible style that dominates modern APIs — and the one you'll use today. SOAP isn't the villain; it's just from an earlier era.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Aspect</th><th>SOAP</th><th class="hl">REST</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td>A strict <em>protocol</em> with rigid rules</td><td class="hl">An <em>architectural style</em> with guidelines</td></tr>
+              <tr><td><strong>Data format</strong></td><td>XML only</td><td class="hl">JSON (usually), XML, others</td></tr>
+              <tr><td><strong>Speed / weight</strong></td><td>Heavier, more verbose</td><td class="hl">Lightweight and fast</td></tr>
+              <tr><td><strong>Complexity</strong></td><td>Higher — lots of ceremony</td><td class="hl">Lower — easy to learn</td></tr>
+              <tr><td><strong>Contract (WSDL)</strong></td><td>Required — a formal WSDL file</td><td class="hl">Not required</td></tr>
+              <tr><td><strong>Transport</strong></td><td>Uses plain HTTP verbs over standard URLs</td><td class="hl">Uses HTTP methods (GET/POST/PUT/DELETE) fully</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Where each lives today</span>
+            In industry, <strong>REST is the standard for modern APIs</strong> — web, mobile, microservices. SOAP still exists in legacy banking, payments and large enterprise/government systems where its strict contracts and built-in security were valued. You'll meet REST everywhere; you'll meet SOAP occasionally in older codebases.
+          </div>
+        </section>
+
+        <!-- 8. REST PRINCIPLES -->
+        <section class="slide">
+          <p class="eyebrow">What makes an API "RESTful"</p>
+          <h2>The six REST principles</h2>
+          <p class="deep">REST is defined by a set of constraints. You don't need to memorise all six today, but knowing they exist helps you understand <em>why</em> REST APIs are built the way they are.</p>
+          <ul>
+            <li><strong>Stateless</strong> — every request carries everything the server needs to handle it. The server keeps <em>no memory</em> of previous requests. This is the big one: it's why REST scales so well, because any server can handle any request.</li>
+            <li><strong>Client–Server</strong> — the client (UI) and server (data) are separate and evolve independently. Neither needs to know the other's internals.</li>
+            <li><strong>Uniform Interface</strong> — a consistent, predictable way to access resources: same URL patterns, same HTTP methods, every time.</li>
+            <li><strong>Cacheable</strong> — responses can declare whether they may be stored and reused, reducing repeated work.</li>
+            <li><strong>Layered System</strong> — there can be intermediaries (load balancers, gateways, caches) between client and server without either side knowing.</li>
+            <li><strong>Code on Demand</strong> <span class="muted">(optional)</span> — the server may send executable code to the client. Rarely used; the only optional constraint.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">If you remember one thing</span>
+            <strong>Stateless.</strong> Each request stands alone — the server doesn't remember who you are between calls. That's the principle that shapes how REST APIs are designed and why they handle huge traffic gracefully.
+          </div>
+        </section>
+
+        <!-- 9. HTTP METHODS -> CRUD -->
+        <section class="slide">
+          <p class="eyebrow">Verbs that map to actions</p>
+          <h2>HTTP methods → CRUD</h2>
+          <p class="deep">REST uses the standard HTTP methods as <strong>verbs</strong> that describe what you want to do to a resource. The four you'll use map directly onto the four database operations known as <strong>CRUD</strong> — Create, Read, Update, Delete.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>HTTP method</th><th>CRUD operation</th><th>Meaning</th><th>Student API example</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><code>GET</code></td><td><strong>Read</strong></td><td>Fetch existing data</td><td><code>GET /students</code> — list all students</td></tr>
+              <tr><td class="hl"><code>POST</code></td><td><strong>Create</strong></td><td>Add new data</td><td><code>POST /students</code> — add a new student</td></tr>
+              <tr><td class="hl"><code>PUT</code></td><td><strong>Update</strong></td><td>Modify existing data</td><td><code>PUT /students/{id}</code> — update student 1</td></tr>
+              <tr><td class="hl"><code>DELETE</code></td><td><strong>Delete</strong></td><td>Remove data</td><td><code>DELETE /students/{id}</code> — remove student 1</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Real-world framing</span>
+            Think of a student record: you <strong>GET</strong> it to view, <strong>POST</strong> a new one when a student enrols, <strong>PUT</strong> to fix their email, and <strong>DELETE</strong> when they leave. Same noun (<code>/students</code>), different verb for each action. That's the whole mental model of a REST API.
+          </div>
+        </section>
+
+        <!-- 10. HTTP STATUS CODES -->
+        <section class="slide">
+          <p class="eyebrow">How the server reports the outcome</p>
+          <h2>HTTP status codes</h2>
+          <p class="deep">Every HTTP response carries a numeric <strong>status code</strong> telling the client what happened. There are dozens, but you only need these five for today's work. They're grouped: <strong>2xx</strong> = success, <strong>4xx</strong> = the client made a mistake, <strong>5xx</strong> = the server broke.</p>
+          <div class="status-list">
+            <div class="status-row">
+              <div class="status-badge s2">200<br>OK</div>
+              <div class="sd"><strong>Success.</strong> The request worked. Spring Boot returns this by default for a successful GET that returns data.</div>
+            </div>
+            <div class="status-row">
+              <div class="status-badge s2">201<br>Created</div>
+              <div class="sd"><strong>Resource created.</strong> Used after a successful POST. You'll set it yourself with <code>@ResponseStatus(HttpStatus.CREATED)</code> in the lab.</div>
+            </div>
+            <div class="status-row">
+              <div class="status-badge s4">400<br>Bad Request</div>
+              <div class="sd"><strong>Client error.</strong> The request was malformed — e.g. invalid JSON in the body. Spring returns this when it can't parse what you sent.</div>
+            </div>
+            <div class="status-row">
+              <div class="status-badge s4">404<br>Not Found</div>
+              <div class="sd"><strong>Not found.</strong> The URL or resource doesn't exist — e.g. asking for a student ID that isn't there.</div>
+            </div>
+            <div class="status-row">
+              <div class="status-badge s5">500<br>Server Error</div>
+              <div class="sd"><strong>Server crashed.</strong> Something threw an unhandled exception inside your code. We'll learn to handle these gracefully in Session 3.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11. URI DESIGN -->
+        <section class="slide">
+          <p class="eyebrow">What makes a good endpoint</p>
+          <h2>URI design principles</h2>
+          <p class="deep">A <strong>URI</strong> (the path part of a URL) names a <em>resource</em>. The golden rule of REST: <strong>URIs are nouns, HTTP methods are verbs.</strong> Don't put the action in the URL — let the HTTP method (GET/POST/PUT/DELETE) say what you're doing. The URL just names <em>what</em> you're acting on.</p>
+          <div class="ba">
+            <div class="ba-col after">
+              <h3>✓ Good (nouns)</h3>
+              <ul>
+                <li><code>/students</code> — the collection</li>
+                <li><code>/students/{id}</code> — one student by ID</li>
+                <li><code>/students?name=John</code> — filter with a query parameter</li>
+              </ul>
+            </div>
+            <div class="ba-mid">vs</div>
+            <div class="ba-col before">
+              <h3>✗ Bad (verbs in URL)</h3>
+              <ul>
+                <li><code>/getStudent</code> — verb belongs in the method</li>
+                <li><code>/deleteStudentById</code> — redundant &amp; clumsy</li>
+                <li><code>/student/fetch</code> — action in the path</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The pattern to internalise</span>
+            Use <strong>plural nouns</strong> for collections (<code>/students</code>), a <strong>path segment</strong> to identify one item (<code>/students/5</code>), and <strong>query parameters</strong> for filtering or optional criteria (<code>?name=John</code>). The verb is never in the URL — it's the HTTP method.
+          </div>
+        </section>
+
+        <!-- 12. ANNOTATIONS OVERVIEW (preview grid) -->
+        <section class="slide">
+          <p class="eyebrow">Your toolkit for the lab</p>
+          <h2>Annotations you'll use today</h2>
+          <p class="deep">Here's everything you'll write in the hands-on lab, all in one place. Don't worry about the details yet — we'll unpack the important ones over the next few slides, and you'll use each one in code. Just know what's coming.</p>
+          <div class="anno-grid preview">
+            <div class="anno-cell"><span class="ac-tag">@RestController</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestMapping</span></div>
+            <div class="anno-cell"><span class="ac-tag">@GetMapping</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PostMapping</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PutMapping</span></div>
+            <div class="anno-cell"><span class="ac-tag">@DeleteMapping</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PathVariable</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestParam</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestBody</span></div>
+            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span></div>
+          </div>
+          <p class="muted" style="margin-top:16px;">Ten annotations — that's the entire surface area of building a REST controller. You already know <code>@RestController</code> from Session 1.</p>
+        </section>
+
+        <!-- 13. @RestController unpacked -->
+        <section class="slide">
+          <p class="eyebrow">A closer look</p>
+          <h2>@RestController unpacked</h2>
+          <p class="deep">You used <code>@RestController</code> in Session 1, but here's what it actually <em>is</em> under the hood. It's a convenience annotation that bundles two others together:</p>
+          <div class="anno-map">
+            <div class="anno-row">
+              <div class="anno-tag">@RestController</div>
+              <div>= <strong>@Controller</strong> &nbsp;+&nbsp; <strong>@ResponseBody</strong></div>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:18px;"><code>@ResponseBody</code> is the important half: it tells Spring to take whatever your method returns and write it <strong>directly into the HTTP response body as JSON</strong> (via Jackson), instead of treating the return value as the name of an HTML page to render. With a plain <code>@Controller</code> you'd have to add <code>@ResponseBody</code> to every single method:</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Plain @Controller</h3>
+              <pre><code>@Controller
+public class StudentController {
+
+    @GetMapping("/students")
+    @ResponseBody  // needed on
+    public List&lt;Student&gt; all() {
+        return students;
+    }
+    // ...and on every
+    // other method too
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ @RestController</h3>
+              <pre><code>@RestController
+public class StudentController {
+
+    @GetMapping("/students")
+    // no @ResponseBody needed
+    public List&lt;Student&gt; all() {
+        return students;
+    }
+    // applies to ALL methods
+    // automatically
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 14. @RequestMapping at class level -->
+        <section class="slide">
+          <p class="eyebrow">Keeping URLs DRY</p>
+          <h2>@RequestMapping at class level</h2>
+          <p class="deep">Putting <code>@RequestMapping("/students")</code> on the <strong>class</strong> sets a common URL prefix for every method inside. Each method's mapping is then <em>relative</em> to that prefix. This keeps your code clean and your URLs consistent — you write <code>/students</code> once instead of repeating it everywhere.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Without class-level mapping</h3>
+              <pre style="margin:0;"><code>@GetMapping("/students")
+@GetMapping("/students/all")
+@GetMapping("/students/{id}")
+@PostMapping("/students")
+@PutMapping("/students/{id}")</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>With @RequestMapping("/students")</h3>
+              <pre style="margin:0;"><code>// class: @RequestMapping("/students")
+@GetMapping
+@GetMapping("/all")
+@GetMapping("/{id}")
+@PostMapping
+@PutMapping("/{id}")</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">How the URL is assembled</span>
+            Spring joins the class prefix and the method path: class <code>/students</code> + method <code>/{id}</code> = the full endpoint <code>/students/{id}</code>. Change the prefix in one place and every endpoint moves with it.
+          </div>
+        </section>
+
+        <!-- 15. TESTING TOOLS -->
+        <section class="slide">
+          <p class="eyebrow">How you'll call your API</p>
+          <h2>Testing tools: Postman + Swagger</h2>
+          <p class="deep">You can't easily test a POST or PUT from a browser address bar — browsers only do GET. So we use proper API testing tools. You'll use both today; they complement each other.</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🚀</div>
+              <h3>Postman</h3>
+              <p>A dedicated desktop app for calling APIs. Full control: pick the HTTP method, set headers, paste a JSON body. This is the industry-standard tool teams use daily. Best for testing POST/PUT/DELETE with custom bodies.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📖</div>
+              <h3>Swagger UI</h3>
+              <p>A browser-based tester that is <strong>auto-generated from your annotations</strong> — zero setup. Add one dependency and Spring builds a live, interactive page listing every endpoint with "Try it out" buttons. Great for quick checks and sharing.</p>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:14px;">Once the Swagger dependency is added, you reach the UI at:</p>
+          <pre><code>http://localhost:8080/swagger-ui/index.html</code></pre>
+          <div class="swagger-mock">
+            <div class="sm-top">📖 Swagger UI — student-controller</div>
+            <div class="sm-row"><span class="verb get">GET</span><span class="path">/students/all</span></div>
+            <div class="sm-row"><span class="verb get">GET</span><span class="path">/students/{id}</span></div>
+            <div class="sm-row"><span class="verb post">POST</span><span class="path">/students</span></div>
+            <div class="sm-row"><span class="verb put">PUT</span><span class="path">/students/{id}</span></div>
+            <div class="sm-row" style="border-bottom:none;"><span class="verb del">DELETE</span><span class="path">/students/{id}</span></div>
+          </div>
+          <p class="muted" style="margin-top:10px;">This list builds itself from your controller — no manual documentation needed.</p>
+        </section>
+
+        <!-- 16. RESPONSEENTITY -->
+        <section class="slide">
+          <p class="eyebrow">Taking control of the response</p>
+          <h2>ResponseEntity</h2>
+          <p class="deep">By default, when you return a <code>Student</code> from a method, Spring sends it back with status <strong>200 OK</strong>. But sometimes you need control over the <em>full</em> HTTP response — the status code, the headers, and the body. That's what <code>ResponseEntity&lt;T&gt;</code> gives you: it's a wrapper around the entire response.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>Raw return (always 200)</h3>
+              <pre><code>@GetMapping("/{id}")
+public Student getById(
+        @PathVariable int id) {
+    return findStudent(id);
+    // status is always 200,
+    // even if not found
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>ResponseEntity (you choose)</h3>
+              <pre><code>@GetMapping("/{id}")
+public ResponseEntity&lt;Student&gt; getById(
+        @PathVariable int id) {
+    Student s = findStudent(id);
+    if (s != null)
+        return ResponseEntity.ok(s);   // 200
+    return ResponseEntity
+            .notFound().build();        // 404
+}</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">When to reach for it</span>
+            Use <code>ResponseEntity</code> when you need to return different status codes depending on the outcome — <strong>201 Created</strong> after a POST, <strong>404 Not Found</strong> when something's missing, or to attach custom headers. It's the professional way to build precise REST responses.
+          </div>
+        </section>
+
+        <!-- 17. RESTTEMPLATE -->
+        <section class="slide">
+          <p class="eyebrow">Calling another service (trainer demo)</p>
+          <h2>RestTemplate</h2>
+          <p class="deep">So far your app is the <em>provider</em> — it answers requests. But sometimes a Spring Boot app needs to be a <em>consumer</em> too, calling <strong>another</strong> REST API from inside its own code. <code>RestTemplate</code> is Spring's classic synchronous client for exactly that.</p>
+          <pre><code>RestTemplate restTemplate = new RestTemplate();
+
+// Call another service and map its JSON straight into a Student
+Student student = restTemplate.getForObject(
+        "http://localhost:8080/students/1",
+        Student.class);
+
+System.out.println(student.getFirstName());</code></pre>
+          <ul>
+            <li><code>getForObject(url, Type.class)</code> sends a GET request and converts the JSON response directly into a Java object.</li>
+            <li>It's <strong>synchronous</strong> — your code waits for the response before continuing.</li>
+            <li>There are matching methods: <code>postForObject</code>, <code>put</code>, <code>delete</code>, and more.</li>
+          </ul>
+          <div class="warnbox">
+            <span class="lbl">Trainer demo only — don't code this today</span>
+            We'll see this in action as a quick demonstration. It becomes far more relevant in a <strong>microservices</strong> context, where many small services call each other — a topic for a later session. For now, just understand what it's <em>for</em>.
+          </div>
+        </section>
+
+        <!-- 18. SESSION 3 PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed next</p>
+          <h2>Coming up in Session 3</h2>
+          <p class="deep">Today's data lives in a list in memory — it vanishes when the app stops, and asking for a missing ID just returns nothing useful. Session 3 fixes both:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🛡️</div><h3>Exception handling</h3><p>What happens when a student ID isn't found? With <code>@ControllerAdvice</code> and custom error responses, you'll return clean <strong>404</strong> messages instead of ugly stack traces.</p></div>
+            <div class="card"><div class="ic">🗄️</div><h3>JPA + H2 database</h3><p>Swap the in-memory list for a real database. Your data survives restarts — proper persistence with Spring Data JPA and an H2 database.</p></div>
+            <div class="card"><div class="ic">🏷️</div><h3>@Entity</h3><p>Map your <code>Student</code> class straight to a database table with a single annotation.</p></div>
+            <div class="card"><div class="ic">🔗</div><h3>@Repository</h3><p>Real CRUD with persistence and almost no boilerplate — Spring writes the SQL for you.</p></div>
+          </div>
+          <p class="muted" style="margin-top:14px;">Everything you build today carries forward — Session 3 upgrades it from a demo into a real, persistent application.</p>
+        </section>
+
+        <!-- 19. ANNOTATIONS RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Your closing cheatsheet</p>
+          <h2>Annotations recap</h2>
+          <p class="deep">The same ten annotations from the preview — now with a one-line definition next to each. Keep this slide as your revision anchor; this is the entire vocabulary of building a REST controller in Spring Boot.</p>
+          <div class="anno-grid">
+            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">Marks a REST controller; auto-serializes return values to JSON.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestMapping</span><span class="ac-def">Sets a URL prefix (on a class) or path (on a method).</span></div>
+            <div class="anno-cell"><span class="ac-tag">@GetMapping</span><span class="ac-def">Maps HTTP GET requests — read data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PostMapping</span><span class="ac-def">Maps HTTP POST requests — create data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PutMapping</span><span class="ac-def">Maps HTTP PUT requests — update data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@DeleteMapping</span><span class="ac-def">Maps HTTP DELETE requests — remove data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PathVariable</span><span class="ac-def">Binds a URL path segment (e.g. <code>{id}</code>) to a parameter.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestParam</span><span class="ac-def">Binds a query parameter (e.g. <code>?name=</code>) to a parameter.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestBody</span><span class="ac-def">Deserializes the request body JSON into a Java object.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span><span class="ac-def">Sets the HTTP status code the method returns (e.g. 201).</span></div>
+          </div>
+        </section>
+
+        <!-- 20. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 2 Theory</span>
+            <h1>Let's build it.</h1>
+            <div class="sub">Open the lab sheet and we'll write the Student CRUD API together, endpoint by endpoint.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — exception handling, JPA &amp; a real database.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Spring Boot · Session 2</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 20</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    /* ============================================================
+       Flash cards (Session 1 recap) — click to reveal the answer.
+       ============================================================ */
+    function initFlashCards() {
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          card.classList.toggle('revealed');
+        });
+      });
+    }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      initFlashCards();
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

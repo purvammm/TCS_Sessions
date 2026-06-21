@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 1 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session1-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation (Req 6.2). Reduced-motion fallback below (Req 6.4). */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #f3f8ff;
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* IoC container visual */
+    .ioc {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 22px;
+      background: #f6faff;
+      position: relative;
+    }
+    .ioc::before {
+      content: "Spring IoC Container";
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .ioc-beans { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .bean {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 13px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .bean .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .bean .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .ioc-inject { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 150px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #0a84ff; }
+    .stack-row.l2 { border-left-color: #5e5ce6; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Annotation unpack */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session1-theory.html — Spring Boot Session 1</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 1 of the Spring Boot Series</span>
+            <h1>Spring Boot</h1>
+            <div class="sub">From zero to a running REST API — understanding the framework that powers most modern Java backends.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">We move from <em>why</em> Spring Boot exists, to <em>how</em> it works internally, to <em>writing</em> real code in the hands-on lab. By the end you'll be able to explain what Spring Boot does for you and create a running REST API from scratch.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Why Spring Boot exists — the pain of traditional Spring</li>
+            <li><span class="num">2</span> What Spring Boot is, where it sits, and how it works</li>
+            <li><span class="num">3</span> The request architecture &amp; the four layers</li>
+            <li><span class="num">4</span> @SpringBootApplication and how a Boot app starts</li>
+            <li><span class="num">5</span> Dependency Injection &amp; the IoC container</li>
+            <li><span class="num">6</span> The project: Initializr, structure, pom.xml, properties</li>
+            <li><span class="num">7</span> Hands-on labs + a look ahead to Session 2</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic, so you can revise from these slides alone. Spring is a large ecosystem — today is the foundation that everything else (data access, security, microservices) builds on.
+          </div>
+        </section>
+
+        <!-- 3. LIFE BEFORE SPRING BOOT -->
+        <section class="slide">
+          <p class="eyebrow">The "before" picture</p>
+          <h2>Life before Spring Boot</h2>
+          <p class="deep">The <strong>Spring Framework</strong> arrived in 2003 and changed Java backend development for the better — it introduced dependency injection and a clean way to structure applications. But while Spring made well-organised code possible, <strong>starting and assembling</strong> a Spring project remained slow and error-prone. Before you could write a single line of business logic, you had to do a great deal of manual plumbing:</p>
+          <ul>
+            <li><strong>Write reams of XML</strong> to declare every object (bean) and describe how they connect to one another.</li>
+            <li><strong>Manually wire dependencies</strong> — explicitly tell Spring which object should be handed to which other object.</li>
+            <li><strong>Install and configure an external Tomcat</strong> server, then build a WAR file and deploy it into that server.</li>
+            <li><strong>Hand-pick compatible library versions</strong> — Spring MVC, Jackson, the logging library, the servlet API — and hope they all agreed with each other.</li>
+            <li><strong>Copy the same boilerplate</strong> setup into every new project, every single time.</li>
+          </ul>
+          <div class="warnbox">
+            <span class="lbl">The real cost</span>
+            Teams routinely spent a day or more just getting an <em>empty</em> project to start up correctly. The framework was powerful, but the <strong>setup ceremony</strong> stood between developers and the actual work of building features. Spring Boot was created in 2014 to eliminate exactly this friction.
+          </div>
+        </section>
+
+        <!-- 4. XML HELL -->
+        <section class="slide">
+          <p class="eyebrow">Pain point #1 — configuration</p>
+          <h2>XML configuration hell</h2>
+          <p class="deep">In classic Spring, the container had no way to discover your objects automatically — you described every one of them in an XML file. Even a tiny application's configuration looked like this:</p>
+          <pre><code>&lt;beans xmlns="http://www.springframework.org/schema/beans"&gt;
+    &lt;bean id="greetingService" class="com.example.GreetingServiceImpl" /&gt;
+
+    &lt;bean id="helloController" class="com.example.HelloController"&gt;
+        &lt;property name="greetingService" ref="greetingService" /&gt;
+    &lt;/bean&gt;
+
+    &lt;bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"&gt;
+        &lt;property name="prefix" value="/WEB-INF/views/" /&gt;
+        &lt;property name="suffix" value=".jsp" /&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;</code></pre>
+          <ul>
+            <li>Every new class meant another <code>&lt;bean&gt;</code> entry, added and maintained <strong>by hand</strong>.</li>
+            <li>A typo in a class name or a <code>ref</code> wasn't caught by the compiler — it failed only at <strong>runtime</strong>, often deep into startup.</li>
+            <li>On real projects the XML grew into hundreds of lines, frequently larger and harder to maintain than the Java it was wiring together.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Why this matters</span>
+            Spring Boot replaces nearly all of this with <strong>annotations</strong> and <strong>auto-configuration</strong>. The XML above becomes a couple of <code>@Service</code> / <code>@RestController</code> annotations the framework discovers automatically — which is exactly what you'll write in the lab.
+          </div>
+        </section>
+
+        <!-- 5. MANUAL WIRING + NO SERVER + VERSIONS -->
+        <section class="slide">
+          <p class="eyebrow">Pain points #2, #3 &amp; #4</p>
+          <h2>Wiring, servers &amp; version juggling</h2>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🔌</div>
+              <h3>Manual wiring</h3>
+              <p>You connected every dependency yourself in XML. Forget one and you discovered it only when the app crashed at runtime, not at compile time.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🖥️</div>
+              <h3>No embedded server</h3>
+              <p>Build a WAR → install Tomcat → configure it → deploy the WAR into it. Four slow, manual steps before the app would even respond.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧩</div>
+              <h3>Version conflicts</h3>
+              <p>You aligned versions of Spring, Jackson, logging and the servlet API by hand. Mismatches caused cryptic errors — the infamous "dependency hell."</p>
+            </div>
+            <div class="card">
+              <div class="ic">📝</div>
+              <h3>Repeated boilerplate</h3>
+              <p>The same scaffolding was copied into every project before any feature work could begin — wasted, repetitive effort.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">The pattern behind all four</span>
+            Every one of these is <strong>configuration work that is the same for almost every project</strong>. Spring Boot's insight was simple but powerful: if 95% of projects configure these things the same way, the framework should do it for you by default and let you override only the 5% that's different. That idea is called <span class="term">convention over configuration</span>, and it's the heart of Spring Boot.
+          </div>
+        </section>
+
+        <!-- 6. WHAT IS SPRING BOOT + WHERE IT SITS -->
+        <section class="slide">
+          <p class="eyebrow">The solution</p>
+          <h2>What is Spring Boot?</h2>
+          <p class="deep"><strong>Spring Boot is a layer built on top of the Spring Framework</strong> that makes it easy to create stand-alone, production-grade applications you can simply <em>run</em>. The crucial point: it does <strong>not</strong> replace Spring. You still write Spring beans, controllers and services exactly as before — Boot simply removes the manual setup that used to surround them.</p>
+          <div class="flow vert" style="max-width:600px;">
+            <div class="flow-box green">Your Application <span class="sm">controllers, services, business logic</span></div>
+            <span class="flow-arrow">▼ runs on</span>
+            <div class="flow-box">Spring Boot <span class="sm">auto-config · embedded server · starters · Actuator</span></div>
+            <span class="flow-arrow">▼ built on</span>
+            <div class="flow-box alt">Spring Framework <span class="sm">IoC container · MVC · data access · AOP</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Mental model</span>
+            Spring is the <strong>engine</strong>; Spring Boot is the <strong>ignition and auto-tuning</strong> that gets the engine running instantly. Everything you learn about core Spring — beans, dependency injection, MVC — still applies. Boot just means you spend your time on features instead of setup.
+          </div>
+        </section>
+
+        <!-- 7. THE FOUR PILLARS -->
+        <section class="slide">
+          <p class="eyebrow">What Spring Boot gives you</p>
+          <h2>The four things Boot provides</h2>
+          <p class="deep">Everything Spring Boot does can be grouped into four capabilities. Understanding these four is understanding Spring Boot itself — we'll examine each in detail over the next slides.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">⚙️</div><h3>1 · Auto-configuration</h3><p>Inspects your classpath and configures sensible beans automatically — replacing the old XML entirely.</p></div>
+            <div class="card"><div class="ic">🚀</div><h3>2 · Embedded server</h3><p>Tomcat is built into the application. Run it as an ordinary Java program; no external server to install.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>3 · Starter dependencies</h3><p>One curated dependency brings in everything needed for a capability, with versions guaranteed to fit together.</p></div>
+            <div class="card"><div class="ic">📊</div><h3>4 · Production-ready</h3><p>Health checks, metrics and monitoring are available out of the box through Actuator.</p></div>
+          </div>
+          <p class="muted">Together these turn "a day of setup" into "run the main method."</p>
+        </section>
+
+        <!-- 8. CONVENTION OVER CONFIGURATION -->
+        <section class="slide">
+          <p class="eyebrow">The guiding principle</p>
+          <h2>Convention over configuration</h2>
+          <p class="deep">This is the philosophy that makes everything else possible. Rather than forcing you to describe every detail, Spring Boot assumes the <strong>most common, sensible setup</strong> (the "convention") and lets you override only the parts that are genuinely different for your project (the "configuration"). The framework makes intelligent guesses based on what it can see:</p>
+          <ul>
+            <li>Sees <span class="pill">spring-boot-starter-web</span> on the classpath → assumes you're building a web app and starts an embedded Tomcat listening on port <strong>8080</strong>.</li>
+            <li>Sees an H2 database driver → assumes an in-memory database and auto-configures a <code>DataSource</code> connection for you.</li>
+            <li>Finds a class annotated <span class="pill">@RestController</span> → registers it automatically to handle incoming web requests.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">What this means for you day to day</span>
+            You write configuration <em>only</em> when your needs differ from the convention — for example, adding <code>server.port=9090</code> to <code>application.properties</code> to change the port. If you're happy with the defaults (and usually you are), you write nothing at all. Less code to write, less code to get wrong.
+          </div>
+        </section>
+
+        <!-- 9. AUTO-CONFIGURATION DEEP DIVE -->
+        <section class="slide">
+          <p class="eyebrow">How auto-configuration works</p>
+          <h2>Auto-configuration, step by step</h2>
+          <p class="deep">Auto-configuration is the mechanism that replaced XML. At startup, Spring Boot runs a decision process across <strong>hundreds</strong> of pre-written configuration classes, each one asking "should I activate, given this particular project?"</p>
+          <div class="flow">
+            <div class="flow-box">Scan classpath <span class="sm">which jars are present?</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Check conditions <span class="sm">@ConditionalOnClass / OnMissingBean</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Configure beans <span class="sm">only what's needed</span></div>
+          </div>
+          <ul>
+            <li>Each auto-configuration is <strong>conditional</strong>: it activates only if the relevant library is actually on the classpath (<code>@ConditionalOnClass</code>) and you haven't already defined that bean yourself (<code>@ConditionalOnMissingBean</code>).</li>
+            <li>This is why simply <em>adding</em> a starter is enough to get working features — the matching auto-configuration detects it and wires everything up.</li>
+            <li>If you define your own bean of the same type, Boot detects it and <strong>backs off</strong>, using yours instead. You're never locked in.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Debugging tip for later</span>
+            Run the app with <code>--debug</code> and Spring Boot prints an "auto-configuration report" listing every configuration it considered, which ones matched, and why. This is invaluable when something isn't being configured the way you expect.
+          </div>
+        </section>
+
+        <!-- 10. EMBEDDED SERVER -->
+        <section class="slide">
+          <p class="eyebrow">Run it like any Java program</p>
+          <h2>The embedded server</h2>
+          <p class="deep">Traditionally a Java web app was a <strong>WAR</strong> file deployed into a separately-installed server. Spring Boot flips this around: the web server is packaged <strong>inside</strong> your application, so there is nothing external to install, configure, or deploy into.</p>
+          <ul>
+            <li>Running the <code>main</code> method starts your application <em>and</em> its own web server in one step.</li>
+            <li>Everything packages into a single <strong>executable "fat" JAR</strong> — your code, all its dependencies, and the server together in one file.</li>
+            <li>You deploy by copying that one file to any machine with Java and running <span class="pill">java -jar app.jar</span>.</li>
+            <li>Tomcat is the default; switching to Jetty or Undertow is a one-dependency change.</li>
+          </ul>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Traditional</h3>
+              <ul><li>Build a WAR</li><li>Install Tomcat</li><li>Configure it</li><li>Deploy into it</li></ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ Spring Boot</h3>
+              <ul><li>Build one JAR</li><li>Server is inside it</li><li><code>java -jar app.jar</code></li><li>Done</li></ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11. STARTERS -->
+        <section class="slide">
+          <p class="eyebrow">One line, many dependencies</p>
+          <h2>Starter dependencies</h2>
+          <p class="deep">A <strong>starter</strong> is a curated, ready-made bundle of dependencies for one capability. Instead of researching and version-matching a dozen separate libraries, you declare a single starter and trust Spring Boot to bring in everything that belongs together:</p>
+          <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+          <div class="flow">
+            <div class="flow-box">starter-web <span class="sm">1 line</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Spring MVC</div>
+            <div class="flow-box green">Jackson (JSON)</div>
+            <div class="flow-box green">Validation</div>
+            <div class="flow-box green">Embedded Tomcat</div>
+          </div>
+          <div class="note">
+            <span class="lbl">Why this ends "dependency hell"</span>
+            The versions inside a starter are chosen and tested by the Spring team to be mutually compatible. You don't specify versions at all — they're inherited from the Spring Boot parent. Upgrade Boot's version once and every managed library moves together, safely.
+          </div>
+        </section>
+
+        <!-- 12. COMMON STARTERS TABLE -->
+        <section class="slide">
+          <p class="eyebrow">The starters you'll meet most</p>
+          <h2>Common Spring Boot starters</h2>
+          <p class="deep">There are dozens of official starters, all following the naming pattern <code>spring-boot-starter-*</code>. These are the ones you'll encounter most often:</p>
+          <table class="cmp">
+            <thead><tr><th>Starter</th><th>What it pulls in / what it's for</th></tr></thead>
+            <tbody>
+              <tr><td><code>spring-boot-starter-web</code></td><td>Spring MVC, REST, embedded Tomcat, JSON — build web apps &amp; APIs</td></tr>
+              <tr><td><code>spring-boot-starter-data-jpa</code></td><td>Spring Data JPA + Hibernate for database access (Session 2)</td></tr>
+              <tr><td><code>spring-boot-starter-security</code></td><td>Authentication and authorization</td></tr>
+              <tr><td><code>spring-boot-starter-test</code></td><td>JUnit, Mockito, Spring Test — the testing toolkit (added automatically)</td></tr>
+              <tr><td><code>spring-boot-starter-thymeleaf</code></td><td>Thymeleaf templating for server-rendered HTML pages</td></tr>
+              <tr><td><code>spring-boot-starter-validation</code></td><td>Bean Validation (Hibernate Validator) for input checking</td></tr>
+            </tbody>
+          </table>
+          <p class="muted">Today we use only <span class="pill">spring-boot-starter-web</span>. You add starters as your app grows — need a database in Session 2? Add the JPA starter.</p>
+        </section>
+
+        <!-- 13. PRODUCTION-READY / ACTUATOR -->
+        <section class="slide">
+          <p class="eyebrow">The fourth pillar</p>
+          <h2>Production-ready features</h2>
+          <p class="deep">Building an app is only half the job — in production you must be able to <strong>observe and manage</strong> it: is it healthy, how much memory is it using, how many requests is it handling? Spring Boot's <strong>Actuator</strong> module adds these management endpoints with almost no effort on your part.</p>
+          <ul>
+            <li><span class="pill">/actuator/health</span> — reports whether the app and its dependencies (database, etc.) are healthy. Load balancers poll this to decide whether to send traffic.</li>
+            <li><span class="pill">/actuator/metrics</span> — memory, CPU, garbage collection, request counts and timings.</li>
+            <li><span class="pill">/actuator/info</span> — build version and custom application details.</li>
+            <li>These feed monitoring dashboards and alerting tools (Prometheus, Grafana) that ops teams rely on.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Today's takeaway</span>
+            We won't configure Actuator today — it's covered in Session 3. The important point for now is <em>conceptual</em>: production concerns are <strong>built into</strong> Spring Boot, not bolted on later. This is what "production-grade" in the definition really means.
+          </div>
+        </section>
+
+        <!-- 14. ARCHITECTURE DIAGRAM -->
+        <section class="slide">
+          <p class="eyebrow">The most important picture today</p>
+          <h2>How a request flows</h2>
+          <div id="archContainer">
+            <div class="arch">
+              <div class="arch-node"><div class="t">Browser</div><div class="d">Client sends HTTP</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">HTTP Request</div><div class="d">GET /hello</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">DispatcherServlet</div><div class="d">Front controller</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">Controller</div><div class="d">@RestController</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">Service</div><div class="d">Business logic</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">Repository</div><div class="d">Data access</div></div>
+              <span class="arch-arrow">→</span>
+              <div class="arch-node"><div class="t">Database</div><div class="d">Stores data</div></div>
+            </div>
+            <div class="arch-fallback">
+              Request flow: Browser → HTTP Request → DispatcherServlet → Controller → Service → Repository → Database.
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The key idea — read this carefully</span>
+            One central <strong>DispatcherServlet</strong> (Spring's "front controller") receives <em>every</em> incoming request and routes it to the correct controller method based on the URL. The controller calls a service for the business logic; the service calls a repository for data; the repository talks to the database. The response then travels back along the same path. Each box has exactly one job — this is called <span class="term">separation of concerns</span>, and it's what keeps applications testable and easy to change.
+          </div>
+        </section>
+
+        <!-- 15. THE FOUR LAYERS -->
+        <section class="slide">
+          <p class="eyebrow">Separation of concerns</p>
+          <h2>Responsibilities by layer</h2>
+          <p class="deep">Spring applications are organised into <strong>layers</strong>, each with a single, well-defined responsibility. This structure isn't enforced by the framework — it's a convention that keeps every part small, focused, and independently testable. A request passes down through the layers and the response comes back up.</p>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">🌐 Controller</span><span class="desc">Receives the HTTP request, reads input (path, query, body), calls a service, returns a response. Knows about the web — but contains no business rules.</span></div>
+            <div class="stack-row l2"><span class="layer">🧠 Service</span><span class="desc">The brains of the app: business logic, calculations, validation, decisions. Knows nothing about HTTP or how data is stored.</span></div>
+            <div class="stack-row l3"><span class="layer">🗃️ Repository</span><span class="desc">Talks to the database — save, find, update, delete. Pure data access, no business logic.</span></div>
+            <div class="stack-row l4"><span class="layer">💽 Database</span><span class="desc">Stores the data persistently so it survives restarts.</span></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Why split it up?</span>
+            Because each layer talks only to the one directly below it, you can change one without breaking the others. Swap the database, redesign the web API, or unit-test the service in isolation — the boundaries protect you. Today's lab builds the Controller and Service layers; the Repository and Database arrive in Session 2.
+          </div>
+        </section>
+
+        <!-- 16. @SpringBootApplication -->
+        <section class="slide">
+          <p class="eyebrow">The entry point</p>
+          <h2>@SpringBootApplication</h2>
+          <p class="deep">Every Spring Boot application has exactly one <strong>main class</strong> carrying this annotation. Running its ordinary Java <code>main</code> method is what boots the entire application into life:</p>
+          <pre><code>@SpringBootApplication
+public class SpringbootDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringbootDemoApplication.class, args);
+    }
+}</code></pre>
+          <p class="deep">The single line <code>SpringApplication.run(...)</code> does a remarkable amount of work behind the scenes, in order:</p>
+          <ul>
+            <li>Creates the <strong>IoC container</strong> (the application context).</li>
+            <li>Runs <strong>auto-configuration</strong> based on the classpath.</li>
+            <li><strong>Scans</strong> your packages for components and registers them as beans.</li>
+            <li>Starts the <strong>embedded Tomcat</strong> server.</li>
+          </ul>
+          <p class="muted">By the time <code>main</code> returns, your API is live and listening on port 8080.</p>
+        </section>
+
+        <!-- 17. @SpringBootApplication UNPACKED -->
+        <section class="slide">
+          <p class="eyebrow">Three annotations in one</p>
+          <h2>@SpringBootApplication, unpacked</h2>
+          <p class="deep">It looks like magic, but <code>@SpringBootApplication</code> is simply a convenience annotation that bundles <strong>three</strong> others together. Knowing what each does removes the mystery:</p>
+          <div class="anno-map">
+            <div class="anno-row">
+              <div class="anno-tag">@Configuration</div>
+              <div>Marks the class as a source of bean definitions — Spring can read configuration and define beans from it.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">@EnableAutoConfiguration</div>
+              <div>Switches on Spring Boot's auto-configuration mechanism, based on what libraries are on the classpath.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">@ComponentScan</div>
+              <div>Scans this class's package and all sub-packages for components (controllers, services, repositories) and registers them as beans.</div>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Why package placement matters (remember this!)</span>
+            Because <code>@ComponentScan</code> starts scanning from the main class's package downward, your controllers and services <strong>must</strong> live in that package or a sub-package of it. Put a controller in an unrelated package and Spring will never find it — your endpoint silently returns 404 with no error. This is one of the most common beginner bugs.
+          </div>
+        </section>
+
+        <!-- 18. DI - THE WHY -->
+        <section class="slide">
+          <p class="eyebrow">A core Spring idea</p>
+          <h2>Dependency Injection: the why</h2>
+          <p class="deep">Almost every object needs <em>other</em> objects to do its job — a controller needs a service, a service needs a repository. The question is: who creates those collaborators? <strong>Dependency Injection (DI)</strong> says an object should <em>not</em> create its own collaborators. Instead, they are created elsewhere and "injected" (handed in) from outside.</p>
+          <ul>
+            <li><strong>Looser coupling</strong> — a class depends on <em>what</em> it needs (an interface or type), not on <em>how</em> that thing is constructed. It doesn't care which concrete implementation it receives.</li>
+            <li><strong>Easier testing</strong> — in a unit test you can inject a fake or mock dependency instead of the real one, testing your class in isolation.</li>
+            <li><strong>Less plumbing</strong> — Spring's IoC container creates the objects (beans) and supplies them automatically, so you write far less wiring code.</li>
+            <li><strong>Single responsibility</strong> — a class focuses on its own job rather than also managing the lifecycle of its dependencies.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">One-line definition</span>
+            "Don't call us, we'll call you." Your class simply declares what it needs; the framework is responsible for providing it. This reversal of who's in control is exactly what "Inversion of Control" means.
+          </div>
+        </section>
+
+        <!-- 19. TIGHT VS LOOSE COUPLING -->
+        <section class="slide">
+          <p class="eyebrow">The difference DI makes</p>
+          <h2>Tight vs loose coupling</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Tight coupling (new)</h3>
+              <pre><code>public class HelloController {
+    private GreetingService svc =
+        new GreetingService();
+    // hard-wired to ONE class:
+    // can't swap or mock it
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Loose coupling (injected)</h3>
+              <pre><code>public class HelloController {
+    @Autowired
+    private GreetingService svc;
+    // Spring supplies it:
+    // swappable & testable
+}</code></pre>
+            </div>
+          </div>
+          <p class="deep">When the controller writes <span class="pill">new GreetingService()</span>, it is permanently glued to that one exact class — you can never substitute a different implementation, a mock for testing, or an enhanced version, without editing the controller's source code. When the service is <strong>injected</strong> instead, the controller simply asks for "a GreetingService" and Spring decides what to provide. You can swap implementations, wrap them, or mock them freely — the controller never changes.</p>
+          <div class="note">
+            <span class="lbl">Real-world payoff</span>
+            Imagine you later need to log every greeting, or fetch greetings from a database. With loose coupling you just provide a different bean — no controller changes. With <code>new</code>, you'd be editing every class that created the service. Loose coupling is what makes large codebases maintainable.
+          </div>
+        </section>
+
+        <!-- 20. @Component / @Autowired + STEREOTYPES -->
+        <section class="slide">
+          <p class="eyebrow">The vocabulary</p>
+          <h2>Components, stereotypes &amp; @Autowired</h2>
+          <p class="deep">For Spring to inject a bean, it must first <em>know about</em> that bean. You tell it by annotating your classes. There are two halves to the story — registering a bean, and requesting one:</p>
+          <ul>
+            <li><span class="pill">@Component</span> — "Spring, please create and manage an instance of this class." During component scanning it becomes a bean held in the container.</li>
+            <li><span class="pill">@Autowired</span> — "Spring, inject a matching managed bean right here." Spring finds a bean of the required type and supplies it.</li>
+          </ul>
+          <p class="deep">The <strong>stereotype</strong> annotations below are all specialised forms of <code>@Component</code>. They behave the same way for registration, but each signals the class's <em>role</em>, which makes code self-documenting (and some add extra behaviour):</p>
+          <table class="cmp">
+            <thead><tr><th>Annotation</th><th>Layer</th><th>Use it for</th></tr></thead>
+            <tbody>
+              <tr><td><code>@RestController</code></td><td>Web</td><td>Handling HTTP requests and returning data directly</td></tr>
+              <tr><td><code>@Service</code></td><td>Business</td><td>Business logic &amp; rules</td></tr>
+              <tr><td><code>@Repository</code></td><td>Data</td><td>Database access (also translates DB exceptions)</td></tr>
+              <tr><td><code>@Component</code></td><td>Generic</td><td>Anything else Spring should manage</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 21. IoC CONTAINER -->
+        <section class="slide">
+          <p class="eyebrow">Who does the wiring?</p>
+          <h2>The IoC container</h2>
+          <p class="deep"><strong>Inversion of Control (IoC)</strong> is the principle; the <strong>IoC container</strong> (also called the <em>application context</em>) is the part of Spring that implements it. Instead of your code controlling when and how objects are created, you hand that responsibility to the container. At startup it scans for your annotated components, creates one instance of each (a <strong>singleton</strong> by default), works out what each one depends on, and injects those dependencies automatically.</p>
+          <div class="ioc">
+            <div class="ioc-beans">
+              <div class="bean"><div class="bn">@RestController</div><div class="bd">HelloController</div></div>
+              <div class="bean"><div class="bn">@Service</div><div class="bd">GreetingService</div></div>
+              <div class="bean"><div class="bn">@Repository</div><div class="bd">DataRepository</div></div>
+            </div>
+            <div class="ioc-inject">↑ Spring creates each bean once and injects it wherever <span class="pill">@Autowired</span> asks for that type</div>
+          </div>
+          <p class="deep">So in our app, the container creates the <code>GreetingService</code> bean once, sees that <code>HelloController</code> needs a <code>GreetingService</code>, and hands the same instance over. You never wrote <code>new</code> — that's "inversion": the framework calls and assembles your code, rather than your code assembling the framework.</p>
+        </section>
+
+        <!-- 22. INJECTION STYLES -->
+        <section class="slide">
+          <p class="eyebrow">Three ways to inject</p>
+          <h2>Field, constructor &amp; setter injection</h2>
+          <div class="panels">
+            <div class="panel good">
+              <h3>✓ Constructor (recommended)</h3>
+              <pre><code>private final GreetingService svc;
+
+public HelloController(
+        GreetingService svc) {
+    this.svc = svc;
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Field (simplest)</h3>
+              <pre><code>@Autowired
+private GreetingService svc;</code></pre>
+            </div>
+          </div>
+          <p class="deep">Spring can inject a dependency in three places, and it's worth knowing the trade-offs:</p>
+          <ul>
+            <li><strong>Constructor injection</strong> — the dependency is passed into the constructor and stored in a <code>final</code> field. It can never be null and never change after construction, the class is easy to instantiate in tests, and required dependencies are obvious. This is the <strong>modern best practice</strong>. (With one constructor, <code>@Autowired</code> is even optional.)</li>
+            <li><strong>Field injection</strong> — the shortest to write; Spring sets the field directly. We use it in today's lab purely for clarity, but it's harder to test and hides required dependencies.</li>
+            <li><strong>Setter injection</strong> — Spring calls a setter method. Best for <em>optional</em> dependencies that can be changed after the object is built.</li>
+          </ul>
+        </section>
+
+        <!-- 23. WHAT IS REST -->
+        <section class="slide">
+          <p class="eyebrow">The style behind our endpoints</p>
+          <h2>What is REST?</h2>
+          <p class="deep"><strong>REST</strong> (REpresentational State Transfer) is the dominant architectural style for web APIs. The core idea is to model your application as a set of <strong>resources</strong> — nouns — each addressable by a URL, and to act on them using the standard HTTP methods — verbs.</p>
+          <ul>
+            <li>A <strong>resource</strong> is a thing: a user, an order, a product, a greeting. It lives at a URL such as <span class="pill">/users/42</span>.</li>
+            <li>You <strong>act</strong> on a resource with an HTTP verb — GET to read, POST to create, PUT to update, DELETE to remove.</li>
+            <li>Each request is <strong>stateless</strong> — it carries everything the server needs, so the server keeps no memory of previous requests. This is what makes REST APIs easy to scale.</li>
+            <li>Responses are usually JSON; today we return plain text to keep the first example simple.</li>
+          </ul>
+          <div class="flow">
+            <div class="flow-box">Client <span class="sm">browser / app</span></div>
+            <span class="flow-arrow">→ GET /hello →</span>
+            <div class="flow-box alt">Your API <span class="sm">@RestController</span></div>
+            <span class="flow-arrow">← response ←</span>
+            <div class="flow-box green">"Hello!" <span class="sm">text / JSON</span></div>
+          </div>
+        </section>
+
+        <!-- 24. HTTP METHODS & MAPPINGS -->
+        <section class="slide">
+          <p class="eyebrow">Verbs and their annotations</p>
+          <h2>HTTP methods &amp; mappings</h2>
+          <p class="deep">Every interaction with a REST API uses an HTTP method that expresses <em>intent</em>. Spring gives each verb a dedicated annotation that maps a URL to one of your Java methods. Choosing the right verb is part of designing a clean API — for instance, a GET must never modify data, so it's safe to retry or cache.</p>
+          <table class="cmp">
+            <thead><tr><th>HTTP method</th><th>Purpose</th><th>Spring annotation</th></tr></thead>
+            <tbody>
+              <tr><td>GET</td><td>Read data — safe, makes no changes</td><td><code>@GetMapping</code></td></tr>
+              <tr><td>POST</td><td>Create new data</td><td><code>@PostMapping</code></td></tr>
+              <tr><td>PUT</td><td>Update / replace existing data</td><td><code>@PutMapping</code></td></tr>
+              <tr><td>DELETE</td><td>Remove data</td><td><code>@DeleteMapping</code></td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Today vs Session 2</span>
+            Today's lab uses only <span class="pill">@GetMapping</span> because reading data is the simplest case — you test it just by visiting a URL in your browser. The other three verbs (which change data) come together with the database in Session 2, when we build full <strong>CRUD</strong>: Create, Read, Update, Delete.
+          </div>
+        </section>
+
+        <!-- 25. SPRING INITIALIZR -->
+        <section class="slide">
+          <p class="eyebrow">Where every project starts</p>
+          <h2>Spring Initializr — start.spring.io</h2>
+          <p class="deep">You never start a Spring Boot project from an empty folder. <strong>Spring Initializr</strong> is an official web tool (also built into IntelliJ and other IDEs) that generates a complete, ready-to-run project skeleton with the correct structure, build file, and dependencies. Here's what each field on the form means and what we'll choose today:</p>
+          <table class="cmp">
+            <thead><tr><th>Field</th><th>What it means / what we'll choose</th></tr></thead>
+            <tbody>
+              <tr><td>Project</td><td>Build tool — <strong>Maven</strong> (manages dependencies &amp; builds the project). The alternative is Gradle.</td></tr>
+              <tr><td>Language</td><td><strong>Java</strong> (Kotlin and Groovy are also offered)</td></tr>
+              <tr><td>Spring Boot</td><td>Latest stable (non-SNAPSHOT, non-RC) version</td></tr>
+              <tr><td>Group</td><td><code>com.tcs.training</code> — reverse-domain package root identifying your org</td></tr>
+              <tr><td>Artifact</td><td><code>springboot-demo</code> — the project name and resulting JAR name</td></tr>
+              <tr><td>Packaging</td><td><strong>Jar</strong> (executable, self-contained) — not War</td></tr>
+              <tr><td>Java</td><td><strong>17</strong> (a long-term-support version)</td></tr>
+              <tr><td>Dependencies</td><td><code>spring-boot-starter-web</code> only, for now</td></tr>
+            </tbody>
+          </table>
+          <p class="muted">Clicking "Generate" downloads a ZIP — that's your starting project, which you then import into the IDE.</p>
+        </section>
+
+        <!-- 26. PROJECT STRUCTURE -->
+        <section class="slide">
+          <p class="eyebrow">Tour of the generated project</p>
+          <h2>Project structure</h2>
+          <p class="deep">When you unzip the generated project you'll find this layout. It follows the standard Maven convention — once you know it, every Spring Boot project looks familiar:</p>
+          <div class="tree">springboot-demo/
+├── src/main/java/          <span class="c"># your application code</span>
+│   └── com/tcs/training/
+│       └── SpringbootDemoApplication.java   <span class="c"># entry point (main)</span>
+├── src/main/resources/     <span class="c"># config &amp; static files</span>
+│   └── application.properties   <span class="c"># runtime config</span>
+├── src/test/java/          <span class="c"># tests</span>
+├── pom.xml                 <span class="c"># dependencies &amp; build</span>
+├── mvnw / mvnw.cmd         <span class="c"># Maven wrapper — run Maven w/o installing</span>
+└── .gitignore</div>
+          <ul>
+            <li><code>src/main/java</code> holds your code; <code>src/main/resources</code> holds configuration and static assets; <code>src/test/java</code> holds tests — a clean separation.</li>
+            <li>The <strong>main class</strong> sits at the top of your package so component scanning reaches everything beneath it.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Notice what's missing</span>
+            There's no <code>web.xml</code>, no <code>tomcat/</code> folder, and no XML configuration files anywhere. The server is embedded and configuration is automatic — that absence <em>is</em> Spring Boot's value, made visible.
+          </div>
+        </section>
+
+        <!-- 27. pom.xml ANATOMY -->
+        <section class="slide">
+          <p class="eyebrow">The build file</p>
+          <h2>pom.xml anatomy</h2>
+          <p class="deep">The <code>pom.xml</code> (Project Object Model) is Maven's build file — it declares what your project depends on and how it's built. A Spring Boot pom has three parts worth knowing:</p>
+          <pre><code>&lt;parent&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-parent&lt;/artifactId&gt;
+    &lt;version&gt;3.x.x&lt;/version&gt;
+&lt;/parent&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;build&gt;&lt;plugins&gt;
+    &lt;plugin&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+    &lt;/plugin&gt;
+&lt;/plugins&gt;&lt;/build&gt;</code></pre>
+          <ul>
+            <li><strong>parent</strong> — your project inherits from <code>spring-boot-starter-parent</code>, which supplies tested, compatible versions for every Spring library. This is why your dependencies need no <code>&lt;version&gt;</code> tags.</li>
+            <li><strong>dependencies</strong> — the starters you've added. Each one is a single entry that pulls in many libraries behind the scenes.</li>
+            <li><strong>plugin</strong> — the <code>spring-boot-maven-plugin</code> packages your compiled code, its dependencies, and the embedded server into the single runnable "fat" JAR.</li>
+          </ul>
+        </section>
+
+        <!-- 28. application.properties -->
+        <section class="slide">
+          <p class="eyebrow">Runtime configuration</p>
+          <h2>application.properties</h2>
+          <p class="deep">This file lives in <span class="pill">src/main/resources</span> and is the standard place to <strong>override Spring Boot's defaults</strong>. Spring Boot reads it automatically at startup — you never have to load it yourself. Each line is a <code>key=value</code> pair:</p>
+          <pre><code># Change the server port (default is 8080)
+server.port=8081
+
+# Name the application (appears in logs)
+spring.application.name=springboot-demo
+
+# Database connection (used in Session 2)
+spring.datasource.url=jdbc:h2:mem:testdb
+
+# Show generated SQL in the console
+spring.jpa.show-sql=true
+
+# Logging level
+logging.level.org.springframework=INFO</code></pre>
+          <ul>
+            <li>You only add the keys you want to change — everything else keeps Boot's sensible defaults.</li>
+            <li>The same configuration can be written in YAML form as <code>application.yml</code> if you prefer its nested style.</li>
+            <li>Spring Boot also supports per-environment profiles (e.g. <code>application-dev.properties</code>) — useful later for separating dev and production settings.</li>
+          </ul>
+          <p class="muted">For Lab 1 you leave this file empty — the defaults cover everything you need to run.</p>
+        </section>
+
+        <!-- 29. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Save yourself some debugging</p>
+          <h2>Common beginner mistakes</h2>
+          <p class="deep">You'll likely hit one or two of these in the lab — and that's a good thing, because recognising them is part of learning. Here's what each looks like and why it happens:</p>
+          <ul>
+            <li><strong>Controller in the wrong package</strong> — if it's outside the main class's package, component scanning never finds it, so the bean is never created and the endpoint returns <strong>404 Not Found</strong> with no obvious error.</li>
+            <li><strong>Forgetting <span class="pill">@Service</span> / <span class="pill">@RestController</span></strong> — without the annotation Spring doesn't manage the class, so any attempt to inject it fails at startup with "required a bean … that could not be found."</li>
+            <li><strong>Port 8080 already in use</strong> — a previous run is still holding the port. Stop that process, or set <code>server.port</code> to a free value in <code>application.properties</code>.</li>
+            <li><strong>Typo or wrong case in the URL</strong> — <span class="pill">/Hello</span> is not the same as <span class="pill">/hello</span>. URL paths are case-sensitive, so a mismatch gives a 404.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to read errors</span>
+            When startup fails, scroll to the <strong>first</strong> red exception in the console — later errors are usually consequences of that one. The first line almost always names the real problem (a missing bean, a busy port, a syntax error).
+          </div>
+        </section>
+
+        <!-- 30. LAB PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Now it's your turn</p>
+          <h2>Hands-on lab preview</h2>
+          <p>Open the lab sheet on your own machine and follow along. Four progressive labs:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">①</div><h3>Create &amp; run</h3><p>Generate the project and watch the embedded Tomcat start on 8080.</p></div>
+            <div class="card"><div class="ic">②</div><h3>Explore</h3><p>Open pom.xml, the main class, and application.properties.</p></div>
+            <div class="card"><div class="ic">③</div><h3>REST endpoint</h3><p>Write a <code>@RestController</code> serving <span class="pill">/hello</span>.</p></div>
+            <div class="card"><div class="ic">④</div><h3>Inject a service</h3><p>Wire a <code>@Service</code> in with <code>@Autowired</code> — the DI "aha" moment.</p></div>
+          </div>
+          <p class="muted">The theory stays on this screen while you code — switch tabs as needed.</p>
+        </section>
+
+        <!-- 31. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Lock it in</p>
+          <h2>Quick recap</h2>
+          <ul class="checklist">
+            <li>Spring Boot solves traditional Spring's setup pain with <strong>convention over configuration</strong></li>
+            <li>Its four pillars: <strong>auto-configuration, embedded server, starters,</strong> and production-ready features</li>
+            <li><strong>@SpringBootApplication</strong> = @Configuration + @EnableAutoConfiguration + @ComponentScan</li>
+            <li><strong>Dependency Injection</strong> via @Component / @Service / @Autowired gives loose coupling through the IoC container</li>
+            <li>A request flows Browser → DispatcherServlet → Controller → Service → Repository → Database</li>
+          </ul>
+        </section>
+
+        <!-- 32. SESSION 2 PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed</p>
+          <h2>Coming up in Session 2</h2>
+          <p>We'll connect the app to a database and build full CRUD on top of today's project:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🗄️</div><h3>Spring Data JPA</h3><p>Map Java objects to database tables with <code>@Entity</code>.</p></div>
+            <div class="card"><div class="ic">💾</div><h3>H2 in-memory DB</h3><p>A zero-setup database to develop against.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>CRUD operations</h3><p>Create, read, update, delete using all the HTTP verbs.</p></div>
+            <div class="card"><div class="ic">🔗</div><h3>Repositories</h3><p>Data access with almost no boilerplate.</p></div>
+          </div>
+        </section>
+
+        <!-- 33. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 1</span>
+            <h1>Questions?</h1>
+            <div class="sub">Then open the lab sheet and let's build something that runs.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 2 — JPA, H2, and real CRUD.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls (Req 3.1) -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Spring Boot · Session 1</span>
+        </div>
+
+        <!-- Slide counter (Req 4.1) -->
+        <div class="slide-counter" id="slideCounter">1 of 33</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      // Architecture diagram resilience: only reveal the text fallback if the
+      // diagram element is genuinely absent (never measure width — slides are
+      // hidden at init and would report zero width, falsely triggering it).
+      try {
+        var container = document.getElementById('archContainer');
+        if (container && !container.querySelector('.arch')) {
+          container.classList.add('arch-failed');
+        }
+      } catch (e) { /* leave the CSS diagram in place */ }
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

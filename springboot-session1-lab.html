@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 1 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session1-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections (Req 9) === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items (Req 8.3, 11.2) === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button (Req 10, 17.1, 17.3, 17.4) */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session1-lab.html — Spring Boot Session 1</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🌱</div>
+        <div>
+          <h1>Spring Boot — Session 1 Hands-on Lab</h1>
+          <p class="section-intro">Your step-by-step companion. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Spring Boot Session 1 — the theory stays on the main screen while
+          you work here on your machine. Click a lab heading to expand it, use the <strong>Copy</strong> button
+          on any snippet instead of retyping, and tick each checkbox as you go. The progress bar at the top fills
+          as you complete steps — aim for 100%. Read the "Expected output" boxes to confirm you're on track, and
+          raise your hand if you get stuck.
+        </div>
+      </section>
+
+      <!-- ===== SECTION 2: PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. Tick it once the verification passes — the "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17 or higher</strong> installed
+                <span class="verify">Verify: run <code>java -version</code> → expect version 17 or higher. If the command isn't found, the JDK isn't on your PATH.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>java -version
+# Expected (example):
+# openjdk version "17.0.10" 2024-01-16</code></pre></div>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>An IDE</strong> ready (IntelliJ IDEA, Eclipse/STS, or VS Code)
+                <span class="verify">IntelliJ Community Edition is free and recommended for beginners.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Maven 3.6+</strong> available (standalone or bundled with the IDE)
+                <span class="verify">Verify: run <code>mvn -version</code>. Spring Boot also ships a wrapper (<code>mvnw</code>), so a global install is optional.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>mvn -version
+# Expected (example):
+# Apache Maven 3.9.6</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Don't have a JDK yet?</span>
+              Install Temurin 17 from Adoptium (or your package manager), then re-open your terminal so the new
+              PATH takes effect. On Windows, check <code>JAVA_HOME</code> points to the JDK 17 folder.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 3: LAB 1 ===== -->
+      <div class="section-band">The four labs</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create &amp; Run Your First Spring Boot Project</summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li>
+                <strong>Go to Spring Initializr.</strong> Open <code>https://start.spring.io</code> in your browser.
+              </li>
+              <li>
+                <strong>Fill in the fields exactly:</strong>
+                <ul>
+                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code></li>
+                  <li>Group: <code>com.tcs.training</code></li>
+                  <li>Artifact: <code>springboot-demo</code></li>
+                  <li>Packaging: <code>Jar</code> &nbsp;·&nbsp; Java: <code>17</code></li>
+                </ul>
+              </li>
+              <li>
+                <strong>Add one dependency:</strong> click "Add Dependencies" and choose
+                <code>Spring Web</code> (<code>spring-boot-starter-web</code>). Nothing else for now.
+              </li>
+              <li>
+                <strong>Generate &amp; extract.</strong> Click <em>Generate</em> to download the ZIP, then unzip it
+                to a folder you'll remember.
+              </li>
+              <li>
+                <strong>Import into your IDE:</strong>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext"><strong>IntelliJ IDEA:</strong> File → Open → select the project's <code>pom.xml</code> → "Open as Project". Wait until the Maven tool window shows resolved dependencies and there are no red unresolved markers.</span>
+                </label>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext"><strong>Eclipse / STS:</strong> File → Import → Maven → "Existing Maven Projects" → select the project folder → Finish. Wait until the project tree appears with dependencies resolved.</span>
+                </label>
+              </li>
+              <li>
+                <strong>Run the application — method A (IDE):</strong> open
+                <code>SpringbootDemoApplication.java</code> and run its <code>main</code> method.
+              </li>
+              <li>
+                <strong>Run the application — method B (Maven):</strong> from the project root run:
+                <div class="codewrap"><pre><code>mvn spring-boot:run</code></pre></div>
+              </li>
+            </ol>
+
+            <div class="expected">
+              <span class="lbl">Expected console output</span>
+              <div class="codewrap"><pre><code>  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+Tomcat started on port 8080 (http) with context path ''
+Started SpringbootDemoApplication in 1.842 seconds (process running for 2.1)</code></pre></div>
+            </div>
+
+            <h3 style="margin-top:18px;">Common issues</h3>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>Startup fails with <code>Port 8080 was already in use</code></td>
+                  <td>Another process (or a previous run) is holding port 8080.</td>
+                  <td>Stop the other process, OR add <code>server.port=8081</code> to <code>application.properties</code> and re-run.</td>
+                </tr>
+                <tr>
+                  <td>Maven can't download dependencies / build hangs</td>
+                  <td>No internet, or a corporate proxy is blocking Maven Central.</td>
+                  <td>Check your connection; configure the proxy in <code>~/.m2/settings.xml</code>; then re-run the build.</td>
+                </tr>
+                <tr>
+                  <td>IDE shows the project as plain files (not a Maven project)</td>
+                  <td>The project wasn't imported as Maven.</td>
+                  <td>Re-import: IntelliJ → right-click <code>pom.xml</code> → "Add as Maven Project"; Eclipse → right-click → Maven → "Update Project".</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="expected">
+              <span class="lbl">What just happened?</span>
+              You generated a fully-configured Spring Boot project, imported it, and started an embedded Tomcat
+              server — with zero XML and no separate server install. The "Tomcat started on port 8080" line means
+              your app is live and listening for requests.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Stretch goal</span>
+              Add <code>server.port=9090</code> to <code>application.properties</code>, re-run, and confirm the
+              console now says the server started on port 9090. Then remove it to go back to the default.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 4: LAB 2 ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> Explore the Project Structure</summary>
+          <div class="exp-body">
+            <p>No coding here — just open each file and read it. This builds familiarity with what Spring Boot generated.</p>
+            <ol class="steps">
+              <li>
+                <strong>Open <code>pom.xml</code>.</strong> This file declares your project's
+                <strong>dependencies and build configuration</strong>. Find three things:
+                <ul>
+                  <li>the <code>&lt;parent&gt;</code> block → <code>spring-boot-starter-parent</code> (manages versions)</li>
+                  <li>the <code>&lt;dependencies&gt;</code> section → <code>spring-boot-starter-web</code></li>
+                  <li>the <code>&lt;build&gt;</code> plugin → <code>spring-boot-maven-plugin</code> (builds the runnable JAR)</li>
+                </ul>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">I found the parent, the web starter, and the build plugin in <code>pom.xml</code>.</span>
+                </label>
+              </li>
+              <li>
+                <strong>Open the main class</strong> <code>SpringbootDemoApplication.java</code>. This is your
+                <strong>application's entry point</strong> — the class that starts everything. Identify:
+                <ul>
+                  <li>the <code>@SpringBootApplication</code> annotation on the class</li>
+                  <li>the <code>SpringApplication.run(...)</code> call inside <code>main</code></li>
+                </ul>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">I found <code>@SpringBootApplication</code> and <code>SpringApplication.run(...)</code>.</span>
+                </label>
+              </li>
+              <li>
+                <strong>Open <code>src/main/resources/application.properties</code>.</strong> This file holds your
+                <strong>configurable application settings</strong>. It's currently empty — and that's perfectly
+                fine. Spring Boot's defaults are doing the work.
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">I opened <code>application.properties</code> and confirmed it's empty (defaults apply).</span>
+                </label>
+              </li>
+            </ol>
+            <p>Here is what the generated main class looks like — read it line by line:</p>
+            <div class="codewrap"><pre><code>package com.tcs.training;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SpringbootDemoApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringbootDemoApplication.class, args);
+    }
+}</code></pre></div>
+            <div class="concept">
+              <span class="lbl">Why the package matters</span>
+              The main class sits in <code>com.tcs.training</code>. Because <code>@SpringBootApplication</code>
+              triggers component scanning of <em>this package and everything below it</em>, your controllers and
+              services must live in sub-packages like <code>com.tcs.training.controller</code> — otherwise Spring
+              won't find them.
+            </div>
+            <table class="issues">
+              <thead><tr><th>File / folder</th><th>What it's for</th></tr></thead>
+              <tbody>
+                <tr><td><code>src/main/java</code></td><td>Your application code</td></tr>
+                <tr><td><code>src/main/resources</code></td><td>Config &amp; static files (<code>application.properties</code>)</td></tr>
+                <tr><td><code>src/test/java</code></td><td>Your tests</td></tr>
+                <tr><td><code>pom.xml</code></td><td>Dependencies &amp; build configuration</td></tr>
+                <tr><td><code>mvnw</code> / <code>mvnw.cmd</code></td><td>Maven wrapper — run Maven without installing it</td></tr>
+                <tr><td><code>.gitignore</code></td><td>Files Git should ignore (target/, IDE files)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 5: LAB 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="chevron">▶</span> Your First REST Controller</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@RestController</code> tells Spring this class handles web requests and returns the response
+              body directly (not a view name). <code>@GetMapping("/hello")</code> maps HTTP GET requests for the
+              <code>/hello</code> path to a method.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
+              <li><strong>Create a class</strong> <code>HelloController.java</code> inside it.</li>
+              <li><strong>Add this code:</strong>
+                <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello from Spring Boot!";
+    }
+}</code></pre></div>
+              </li>
+              <li><strong>Run the app</strong> and open the endpoint in your browser.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              Request: <code>GET http://localhost:8080/hello</code><br>
+              Response body (plain text): <code>Hello from Spring Boot!</code>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              <ol style="margin:6px 0 0; padding-left:18px;">
+                <li>Change the returned string to your own message and re-run. Expected: the browser shows your new text.</li>
+                <li>Add a second endpoint <code>@GetMapping("/welcome")</code> returning <code>"Welcome!"</code>. Expected: <code>http://localhost:8080/welcome</code> shows <code>Welcome!</code>.</li>
+                <li>Add a path that takes input: <code>@GetMapping("/hello/{name}")</code> with a <code>@PathVariable String name</code> parameter, returning <code>"Hello, " + name</code>. Expected: <code>/hello/Purvam</code> shows <code>Hello, Purvam</code>.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>@GetMapping("/hello/{name}")
+public String helloName(@PathVariable String name) {
+    return "Hello, " + name + "!";
+}</code></pre></div>
+            <div class="concept">
+              <span class="lbl">What happens under the hood</span>
+              Your browser sends <code>GET /hello</code> → the embedded Tomcat hands it to Spring's
+              <code>DispatcherServlet</code> → which routes it to your <code>sayHello()</code> method →
+              whose return value becomes the HTTP response body. That's the request flow from the slides, live.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My <code>/hello</code> endpoint returns the expected text in the browser.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I added a second endpoint and saw it respond at its own URL.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 6: LAB 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Dependency Injection in Action</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              <code>@Service</code> marks a class as a Spring-managed bean (a kind of <code>@Component</code>).
+              <code>@Autowired</code> asks Spring to inject that bean where it's needed — so the controller never
+              calls <code>new</code> on the service.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.service</code>.</li>
+              <li><strong>Create</strong> <code>GreetingService.java</code> with a <code>@Service</code> annotation and a public method:
+                <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class GreetingService {
+
+    public String getGreeting() {
+        return "Hello from the GreetingService bean!";
+    }
+}</code></pre></div>
+              </li>
+              <li><strong>Inject it</strong> into <code>HelloController</code> with <code>@Autowired</code> and call it:
+                <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.service.GreetingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @Autowired
+    private GreetingService greetingService;
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return greetingService.getGreeting();
+    }
+}</code></pre></div>
+              </li>
+              <li><strong>Run the app</strong> and reload <code>http://localhost:8080/hello</code>.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <code>GET http://localhost:8080/hello</code> now returns:
+              <code>Hello from the GreetingService bean!</code>
+            </div>
+            <div class="observe">
+              <span class="lbl">Observation question</span>
+              Remove the <code>@Service</code> annotation from <code>GreetingService</code> and re-run.
+              What happens? Write down the behavior you see. <em>(Expected: the app fails to start with an
+              "unsatisfied dependency" / "required a bean of type GreetingService that could not be found"
+              error — because without <code>@Service</code>, Spring no longer manages the bean to inject.)</em>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My controller uses the injected service, and I observed the startup failure when <code>@Service</code> was removed.</span>
+            </label>
+            <div class="concept">
+              <span class="lbl">The "aha" moment</span>
+              You never wrote <code>new GreetingService()</code>. Spring created the bean, stored it in its IoC
+              container, and handed it to your controller. That's dependency injection — and it's what makes
+              Spring apps so easy to test and change. Swap the service for a different implementation and the
+              controller doesn't change at all.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Stretch goal</span>
+              Add a second method to <code>GreetingService</code>, e.g. <code>getFarewell()</code> returning
+              <code>"Goodbye!"</code>, and a new controller endpoint <code>/bye</code> that calls it. Expected:
+              <code>/bye</code> returns <code>Goodbye!</code> using the same injected bean.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 6b: BONUS LAB ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Return JSON instead of plain text</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              When a <code>@RestController</code> method returns an object (not a String), Spring Boot
+              automatically serializes it to <strong>JSON</strong> using Jackson — which came in with the web
+              starter. This is the first step toward building real APIs.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a simple record</strong> in <code>com.tcs.training.controller</code>:
+                <div class="codewrap"><pre><code>public record Greeting(String message, String from) { }</code></pre></div>
+              </li>
+              <li><strong>Add an endpoint</strong> that returns it:
+                <div class="codewrap"><pre><code>@GetMapping("/api/greeting")
+public Greeting greetingJson() {
+    return new Greeting("Hello from Spring Boot!", "GreetingService");
+}</code></pre></div>
+              </li>
+              <li><strong>Run and open</strong> <code>http://localhost:8080/api/greeting</code>.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected output (JSON)</span>
+              <div class="codewrap"><pre><code>{
+  "message": "Hello from Spring Boot!",
+  "from": "GreetingService"
+}</code></pre></div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My <code>/api/greeting</code> endpoint returns JSON in the browser.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 6c: TROUBLESHOOTING ===== -->
+      <div class="section-band">Reference material</div>
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Troubleshooting Guide</summary>
+          <div class="exp-body">
+            <p>The most common things that trip up freshers in Session 1, and how to fix each one.</p>
+            <table class="issues">
+              <thead><tr><th>Problem</th><th>Likely cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Endpoint returns 404 Not Found</td><td>Controller is outside the main class's package, or the path has a typo</td><td>Move the controller under <code>com.tcs.training.*</code>; check the exact path and case</td></tr>
+                <tr><td>App fails: "Port 8080 was already in use"</td><td>A previous run is still holding the port</td><td>Stop the old process or set <code>server.port</code> to a free port</td></tr>
+                <tr><td>"Field greetingService required a bean ... that could not be found"</td><td>Missing <code>@Service</code> on the service class</td><td>Add <code>@Service</code> so Spring manages the bean</td></tr>
+                <tr><td>Red squiggles on <code>@RestController</code> / imports</td><td>Dependencies not downloaded yet</td><td>Re-import / "Reload" the Maven project; check your internet</td></tr>
+                <tr><td>Changes don't show in the browser</td><td>App not restarted, or browser cached the page</td><td>Stop &amp; re-run the app; hard-refresh the browser (Ctrl/Cmd+Shift+R)</td></tr>
+                <tr><td>"Web server failed to start" with no clear reason</td><td>Another error earlier in the log</td><td>Scroll up to the first red exception — that's the real cause</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 6d: GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th>Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Bean</strong></td><td>An object that Spring creates and manages for you</td></tr>
+                <tr><td><strong>IoC container</strong></td><td>The part of Spring that builds beans and wires them together</td></tr>
+                <tr><td><strong>Dependency Injection (DI)</strong></td><td>Giving an object the things it needs instead of it creating them</td></tr>
+                <tr><td><strong>Auto-configuration</strong></td><td>Spring Boot setting things up automatically based on the classpath</td></tr>
+                <tr><td><strong>Starter</strong></td><td>A bundle of related dependencies added with one line</td></tr>
+                <tr><td><strong>Embedded server</strong></td><td>A web server (Tomcat) packaged inside your app</td></tr>
+                <tr><td><strong>Endpoint</strong></td><td>A URL your app responds to (e.g. <code>/hello</code>)</td></tr>
+                <tr><td><strong>DispatcherServlet</strong></td><td>Spring's front controller that routes every request to the right method</td></tr>
+                <tr><td><strong>POM</strong></td><td>"Project Object Model" — the <code>pom.xml</code> that defines your Maven build</td></tr>
+                <tr><td><strong>Artifact</strong></td><td>The name/ID of your built project (here, <code>springboot-demo</code>)</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 6e: SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>If you can answer all of these, you're ready for Session 2. Discuss with a neighbour.</p>
+            <ol class="steps">
+              <li>What three annotations does <code>@SpringBootApplication</code> combine?</li>
+              <li>Why don't you need to install Tomcat separately?</li>
+              <li>What does <code>@Autowired</code> ask Spring to do?</li>
+              <li>What happens if you remove <code>@Service</code> from a class that's being injected?</li>
+              <li>Which starter did we add, and what does it pull in?</li>
+              <li>Where must your controllers live for component scanning to find them?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all six self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SECTION 7: QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Annotations used today</h3>
+              <table>
+                <thead><tr><th>Annotation</th><th>What it does</th></tr></thead>
+                <tbody>
+                  <tr><td><code>@SpringBootApplication</code></td><td>Main class; bundles config, auto-config &amp; component scan</td></tr>
+                  <tr><td><code>@RestController</code></td><td>Handles web requests, returns response body directly</td></tr>
+                  <tr><td><code>@GetMapping</code></td><td>Maps an HTTP GET request to a method</td></tr>
+                  <tr><td><code>@PathVariable</code></td><td>Binds a URL path segment to a method parameter</td></tr>
+                  <tr><td><code>@Service</code></td><td>Marks a business-logic bean (a component)</td></tr>
+                  <tr><td><code>@Component</code></td><td>Generic Spring-managed bean</td></tr>
+                  <tr><td><code>@Repository</code></td><td>Marks a data-access bean</td></tr>
+                  <tr><td><code>@Autowired</code></td><td>Injects a managed bean where needed</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Common application.properties keys</h3>
+              <table>
+                <thead><tr><th>Key</th><th>Effect</th></tr></thead>
+                <tbody>
+                  <tr><td><code>server.port</code></td><td>Changes the HTTP port (default 8080)</td></tr>
+                  <tr><td><code>spring.application.name</code></td><td>Names the application in logs</td></tr>
+                  <tr><td><code>spring.jpa.show-sql</code></td><td>Logs generated SQL (Session 2)</td></tr>
+                  <tr><td><code>logging.level.root</code></td><td>Sets the global log level</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">URL patterns</h3>
+              <table>
+                <thead><tr><th>Pattern</th><th>Example</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/hello</code></td><td><code>http://localhost:8080/hello</code></td></tr>
+                  <tr><td><code>/welcome</code></td><td><code>http://localhost:8080/welcome</code></td></tr>
+                  <tr><td><code>/hello/{name}</code></td><td><code>http://localhost:8080/hello/Purvam</code></td></tr>
+                  <tr><td><code>/api/greeting</code></td><td><code>http://localhost:8080/api/greeting</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Handy Maven commands</h3>
+          <table>
+            <thead><tr><th>Command</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>mvn spring-boot:run</code></td><td>Build &amp; run the app</td></tr>
+              <tr><td><code>mvn clean package</code></td><td>Build a runnable JAR into <code>target/</code></td></tr>
+              <tr><td><code>java -jar target/springboot-demo-0.0.1-SNAPSHOT.jar</code></td><td>Run the packaged JAR</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== SECTION 8: WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 2</span>
+          You'll connect your app to a database. We'll add Spring Data JPA and an H2 in-memory database, map a
+          Java class to a table with <code>@Entity</code>, and build full CRUD (Create, Read, Update, Delete)
+          using a repository — with almost no boilerplate. Bring today's <code>springboot-demo</code> project;
+          we'll build on it.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Spring Boot — Session 1 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker (Req 8) + readiness (Req 11.4).
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons (Req 10).
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
