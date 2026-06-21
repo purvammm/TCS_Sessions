@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Foundations — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session1-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 150px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #0a84ff; }
+    .stack-row.l2 { border-left-color: #5e5ce6; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-foundations-theory.html — Java Foundations</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Foundation Session — before the Spring Boot Series</span>
+            <h1>Java Foundations</h1>
+            <div class="sub">Your first steps in Java — the language, the JVM, the tools, and the core building blocks every program is made of.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">This session is for complete beginners. We start with <em>what</em> Java is, look <em>under the hood</em> at the JVM, set up our <em>tools</em>, then learn the <em>building blocks</em> — datatypes, variables, and decisions. By the end you can write, compile, and run your own Java program.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Java Fundamentals — what Java is and how a program is built</li>
+            <li><span class="num">2</span> The JVM — how Java code is compiled and executed</li>
+            <li><span class="num">3</span> The Eclipse IDE — the tool we write Java in</li>
+            <li><span class="num">4</span> JDK &amp; Eclipse Setup — install, verify, and run your first class</li>
+            <li><span class="num">5</span> Datatypes — choosing the right type for your data</li>
+            <li><span class="num">6</span> Variables — declaring, initializing, and scoping values</li>
+            <li><span class="num">7</span> Conditional Statements — making decisions in code</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            Each slide carries the full explanation of its topic, so you can revise from these slides alone afterwards. Take your time — these fundamentals are the ground everything in the later Spring Boot sessions stands on.
+          </div>
+        </section>
+
+        <!-- ============ TOPIC 1: JAVA FUNDAMENTALS ============ -->
+
+        <!-- 3. WHAT IS JAVA -->
+        <section class="slide">
+          <p class="eyebrow">Topic 1 · Java Fundamentals</p>
+          <h2>What is Java?</h2>
+          <p class="deep"><strong>Java</strong> is a high-level, object-oriented programming language designed to be reliable, portable, and easy to maintain. You write human-readable source code, and Java turns it into instructions a computer can run.</p>
+          <ul>
+            <li><strong>Created by Sun Microsystems</strong> — led by James Gosling, with the first public release in <strong>1995</strong>.</li>
+            <li><strong>Now stewarded by Oracle</strong>, which acquired Sun in 2010; Java continues with regular releases.</li>
+            <li><strong>General-purpose</strong> — used for web backends, Android apps, enterprise systems, and big-data tools.</li>
+            <li><strong>Compiled and interpreted</strong> — source compiles to bytecode, which the JVM executes on any machine.</li>
+            <li><strong>Strongly typed</strong> — every value has a type the compiler checks before the program runs.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Why it matters</span>
+            Java's promise from day one was portability and safety: write code once, run it anywhere, with the language catching many mistakes before your program ever starts.
+          </div>
+        </section>
+
+        <!-- 4. KEY FEATURES -->
+        <section class="slide">
+          <p class="eyebrow">Topic 1 · Java Fundamentals</p>
+          <h2>Key features of Java</h2>
+          <p class="deep">A few core features explain why Java became so widely used. We'll meet each again in more depth later in the session.</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🌍</div>
+              <h3>Platform independence</h3>
+              <p>Compiled Java runs on any device that has a JVM — Windows, macOS, Linux — without changing or recompiling the code.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧱</div>
+              <h3>Object orientation</h3>
+              <p>Programs are organised into objects that bundle data and behaviour together, making large systems easier to model and maintain.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧹</div>
+              <h3>Automatic memory management</h3>
+              <p>A garbage collector reclaims memory you no longer use, so you rarely free memory by hand and avoid whole classes of bugs.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🛡️</div>
+              <h3>Robust &amp; secure</h3>
+              <p>Strong typing, exception handling, and a managed runtime catch many errors early and sandbox risky operations.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. WRITE ONCE RUN ANYWHERE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 1 · Java Fundamentals</p>
+          <h2>"Write once, run anywhere"</h2>
+          <p class="deep">This famous phrase is the heart of Java's portability. You don't compile your code separately for every operating system — you compile it once into an intermediate form called <span class="term">bytecode</span>, and any JVM can run that same bytecode.</p>
+          <div class="flow vert" style="max-width:640px;">
+            <div class="flow-box green">Your source code <span class="sm">Hello.java — written once</span></div>
+            <span class="flow-arrow">▼ compiled by javac into</span>
+            <div class="flow-box">Bytecode <span class="sm">Hello.class — platform-independent</span></div>
+            <span class="flow-arrow">▼ runs on any</span>
+            <div class="flow-box alt">JVM <span class="sm">Windows · macOS · Linux — same bytecode</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The key idea</span>
+            The bytecode does not care what machine it runs on. The JVM for each platform knows how to turn that one bytecode into instructions for its own hardware — so one compiled program runs everywhere.
+          </div>
+        </section>
+
+        <!-- 6. STRUCTURE OF A JAVA PROGRAM -->
+        <section class="slide">
+          <p class="eyebrow">Topic 1 · Java Fundamentals</p>
+          <h2>Structure of a Java program</h2>
+          <p class="deep">Every Java program is built from a small set of named parts. Knowing these four lets you read any Java file.</p>
+          <ul>
+            <li><strong>Class</strong> — the basic unit of a Java program. All code lives inside a class, and the file name matches the public class name.</li>
+            <li><strong>The <code>main</code> method</strong> — the entry point. When you run a program, the JVM calls <code>public static void main(String[] args)</code> first.</li>
+            <li><strong>Statements</strong> — the individual instructions inside methods, each ending with a semicolon, executed top to bottom.</li>
+            <li><strong>Packages</strong> — named folders that group related classes and prevent naming clashes, declared with <code>package</code> at the top of a file.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Putting it together</span>
+            A package contains classes; a class contains methods (one of them often <code>main</code>); a method contains statements. That nesting is the shape of every Java program you will write.
+          </div>
+        </section>
+
+        <!-- 7. CODE: FIRST PROGRAM -->
+        <section class="slide">
+          <p class="eyebrow">Topic 1 · Java Fundamentals</p>
+          <h2>Your first Java program</h2>
+          <p class="deep">Here is a complete, compilable program. It declares a class, defines the <code>main</code> method, and prints one line to the console.</p>
+          <pre><code>package com.example;
+
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, Java!");
+    }
+}</code></pre>
+          <ul>
+            <li><code>package com.example;</code> places the class in a package.</li>
+            <li><code>public class HelloWorld</code> declares the class — the file is <code>HelloWorld.java</code>.</li>
+            <li><code>main</code> is where execution begins; <code>System.out.println(...)</code> writes a line of output.</li>
+          </ul>
+        </section>
+
+        <!-- ============ TOPIC 2: THE JVM ============ -->
+
+        <!-- 8. JDK vs JRE vs JVM -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>JDK, JRE, and JVM</h2>
+          <p class="deep">These three names are often confused. They are nested layers — each one contains the next.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">JDK</span>
+              <span class="desc">Java Development Kit — everything you need to <strong>develop</strong>: the compiler (<code>javac</code>), tools, and a full JRE inside it.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">JRE</span>
+              <span class="desc">Java Runtime Environment — everything needed to <strong>run</strong> a Java program: core libraries plus the JVM inside it.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">JVM</span>
+              <span class="desc">Java Virtual Machine — the engine that actually <strong>loads and executes</strong> bytecode.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Remember it as</span>
+            JDK = JRE + development tools. &nbsp; JRE = JVM + libraries. &nbsp; To write code you need the JDK; to merely run it you need the JRE.
+          </div>
+        </section>
+
+        <!-- 9. BYTECODE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>What is bytecode?</h2>
+          <p class="deep"><strong>Bytecode</strong> is the intermediate instruction format the Java compiler produces from your source code. It is stored in <code>.class</code> files and is <em>not</em> tied to any particular operating system or processor.</p>
+          <ul>
+            <li>Produced by <code>javac</code> from your <code>.java</code> source files.</li>
+            <li>Not human source and not native machine code — a compact instruction set the JVM understands.</li>
+            <li><strong>Platform-independent</strong>: the same <code>.class</code> file runs on any JVM, which is what makes "write once, run anywhere" possible.</li>
+            <li>The JVM reads bytecode and translates it into instructions for the actual hardware.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Why an intermediate step?</span>
+            Compiling to bytecode rather than directly to machine code lets one compiled program target every platform at once — the JVM bridges the gap to each specific machine.
+          </div>
+        </section>
+
+        <!-- 10. COMPILE/EXECUTE PIPELINE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>From source to running program</h2>
+          <p class="deep">The journey from the code you type to a running program follows a fixed pipeline, in this order:</p>
+          <div class="flow">
+            <div class="flow-box green">Hello.java <span class="sm">source you write</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">javac <span class="sm">the compiler</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">Hello.class <span class="sm">bytecode</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">JVM <span class="sm">executes it</span></div>
+          </div>
+          <ul>
+            <li><strong>Write</strong> your source in a <code>.java</code> file.</li>
+            <li><strong>Compile</strong> with <code>javac</code>, which checks for errors and produces a <code>.class</code> file of bytecode.</li>
+            <li><strong>Run</strong> with <code>java</code>, which starts the JVM and executes the bytecode.</li>
+          </ul>
+        </section>
+
+        <!-- 11. CLASSLOADING -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>Classloading</h2>
+          <p class="deep">Before any of your code can run, the JVM must bring your classes into memory. This job is done by the <span class="term">class loader</span>.</p>
+          <ul>
+            <li>The JVM <strong>loads classes into memory before they are executed</strong> — a class is read from its <code>.class</code> file on first use.</li>
+            <li>Loading happens <strong>on demand</strong>: a class is loaded the first time the program needs it, not all at once up front.</li>
+            <li>After loading, the bytecode is <strong>verified</strong> for safety, then linked and prepared so the JVM can execute it.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">The takeaway</span>
+            "Loading" simply means: find the <code>.class</code> file, read its bytecode into memory, and make it ready to run — and it always happens before execution.
+          </div>
+        </section>
+
+        <!-- 12. RUNTIME MEMORY AREAS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>JVM runtime memory areas</h2>
+          <p class="deep">While your program runs, the JVM organises memory into distinct areas, each holding a specific kind of data.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Heap</span>
+              <span class="desc">Holds all <strong>objects</strong> and their instance data. Shared across the whole program and managed by the garbage collector.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Stack</span>
+              <span class="desc">Holds <strong>method call frames</strong> — local variables and the call chain. Each thread has its own stack.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Method area</span>
+              <span class="desc">Holds <strong>class-level data</strong>: loaded class definitions, method bytecode, and static variables.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 13. GARBAGE COLLECTION -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>Garbage collection</h2>
+          <p class="deep"><strong>Garbage collection (GC)</strong> is the JVM's automatic memory cleanup. It is what makes Java's "automatic memory management" real.</p>
+          <ul>
+            <li>The garbage collector <strong>automatically reclaims heap objects that are no longer referenced</strong> by your program.</li>
+            <li>An object becomes eligible for collection when nothing in the program can reach it anymore.</li>
+            <li>You do not free memory by hand — this removes whole categories of bugs like memory leaks and dangling pointers.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">In one line</span>
+            If your code can no longer reach an object, the JVM is free to delete it and reuse that memory — automatically, while the program runs.
+          </div>
+        </section>
+
+        <!-- 14. JIT COMPILATION -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>JIT compilation</h2>
+          <p class="deep">The JVM doesn't just interpret bytecode line by line forever. To go faster, it uses a <span class="term">Just-In-Time (JIT) compiler</span>.</p>
+          <ul>
+            <li>The JIT <strong>translates bytecode into native machine code at runtime</strong>, as the program executes.</li>
+            <li>Its <strong>purpose is to improve execution performance</strong> — native code runs much faster than interpreted bytecode.</li>
+            <li>"Hot" code that runs often is compiled and optimised, so long-running Java programs speed up over time.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Interpret then compile</span>
+            The JVM starts by interpreting bytecode for a quick start, then JIT-compiles the frequently used parts to native code for speed — getting the best of both.
+          </div>
+        </section>
+
+        <!-- 15. CODE: COMPILE AND RUN COMMANDS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 2 · The JVM</p>
+          <h2>Compiling and running from the terminal</h2>
+          <p class="deep">These are the two commands behind the whole pipeline — <code>javac</code> to compile, then <code>java</code> to run, in that order:</p>
+          <pre><code>javac HelloWorld.java
+java HelloWorld</code></pre>
+          <ul>
+            <li><code>javac HelloWorld.java</code> compiles the source and produces <code>HelloWorld.class</code>.</li>
+            <li><code>java HelloWorld</code> starts the JVM and runs the class (note: no <code>.class</code> extension).</li>
+            <li>The program's output then appears in the terminal.</li>
+          </ul>
+        </section>
+
+        <!-- ============ TOPIC 3: THE ECLIPSE IDE ============ -->
+
+        <!-- 16. WHAT IS AN IDE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 3 · The Eclipse IDE</p>
+          <h2>What is an IDE?</h2>
+          <p class="deep">An <strong>IDE (Integrated Development Environment)</strong> is a single application that bundles all the tools you need to write, build, run, and debug software in one place — instead of juggling separate programs.</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">⚡</div>
+              <h3>Faster writing</h3>
+              <p>Code completion, instant error highlighting, and refactoring help you write correct code far faster than a plain text editor.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🔨</div>
+              <h3>Build &amp; run in place</h3>
+              <p>Compile and run your program with one click, with output shown right inside the IDE — no manual terminal commands.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🐞</div>
+              <h3>Integrated debugging</h3>
+              <p>Pause the program, step through it line by line, and inspect variables to find bugs — something a plain editor can't do.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 17. ECLIPSE FEATURES -->
+        <section class="slide">
+          <p class="eyebrow">Topic 3 · The Eclipse IDE</p>
+          <h2>Eclipse as a Java IDE</h2>
+          <p class="deep"><strong>Eclipse</strong> is a free, open-source IDE and one of the most popular tools for Java development. It is the environment we will use in this course.</p>
+          <ul>
+            <li><strong>Smart editor</strong> — the code editor offers code completion, syntax colouring, and real-time error underlining as you type.</li>
+            <li><strong>Build and run tooling</strong> — Eclipse compiles your code automatically and runs it with a single click, showing output in a built-in console.</li>
+            <li><strong>Integrated debugger</strong> — set breakpoints, step through code, and inspect variable values to understand and fix your program.</li>
+            <li><strong>Project management</strong> — it organises your source files, libraries, and settings into projects so larger codebases stay tidy.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Why Eclipse for beginners</span>
+            It's free, runs on every major OS, and its instant feedback (errors as you type, one-click run) shortens the learning loop for newcomers.
+          </div>
+        </section>
+
+        <!-- ============ TOPIC 4: JDK & ECLIPSE SETUP ============ -->
+
+        <!-- 18. INSTALL THE JDK -->
+        <section class="slide">
+          <p class="eyebrow">Topic 4 · JDK &amp; Eclipse Setup</p>
+          <h2>Step 1 — Install the JDK</h2>
+          <p class="deep">Before anything else, install the JDK so you have the compiler and runtime. Follow these ordered steps:</p>
+          <ol>
+            <li>Go to a JDK provider's download page (for example, Oracle JDK or an OpenJDK build such as Adoptium Temurin).</li>
+            <li>Download the installer for your operating system and choose a recent Long-Term Support (LTS) version, such as Java 17 or 21.</li>
+            <li>Run the installer and accept the default options to complete the installation.</li>
+            <li>Ensure the JDK's <code>bin</code> folder is on your system <code>PATH</code> so the <code>java</code> and <code>javac</code> commands work in a terminal.</li>
+          </ol>
+        </section>
+
+        <!-- 19. VERIFY THE JDK -->
+        <section class="slide">
+          <p class="eyebrow">Topic 4 · JDK &amp; Eclipse Setup</p>
+          <h2>Step 2 — Verify the JDK</h2>
+          <p class="deep">Confirm the installation worked by asking Java for its version. Open a terminal and run:</p>
+          <pre><code>java -version</code></pre>
+          <p class="deep"><strong>Expected result:</strong> the console displays a JDK version string, similar to this:</p>
+          <pre><code>java version "21.0.2" 2024-01-16 LTS
+Java(TM) SE Runtime Environment (build 21.0.2+13-LTS)
+Java HotSpot(TM) 64-Bit Server VM (build 21.0.2+13-LTS)</code></pre>
+          <div class="keybox">
+            <span class="lbl">What to look for</span>
+            If you see a version number printed, the JDK is installed and on your PATH. If instead you see "command not found," revisit the PATH step.
+          </div>
+        </section>
+
+        <!-- 20. INSTALL & LAUNCH ECLIPSE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 4 · JDK &amp; Eclipse Setup</p>
+          <h2>Step 3 — Install &amp; launch Eclipse</h2>
+          <p class="deep">With the JDK ready, install the Eclipse IDE:</p>
+          <ol>
+            <li>Download the "Eclipse IDE for Java Developers" package from the official Eclipse website.</li>
+            <li>Run the Eclipse Installer (or unzip the package) and follow the prompts to install.</li>
+            <li>Launch Eclipse from the installed application or shortcut.</li>
+            <li>When prompted, choose a <strong>workspace</strong> folder — this is where your projects will be stored — and click Launch.</li>
+          </ol>
+        </section>
+
+        <!-- 21. CREATE PROJECT & CLASS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 4 · JDK &amp; Eclipse Setup</p>
+          <h2>Step 4 — Create a project &amp; class</h2>
+          <p class="deep">Now make your first project and class inside Eclipse:</p>
+          <ol>
+            <li>Choose <strong>File → New → Java Project</strong>, give it a name (e.g. <code>HelloProject</code>), and click Finish.</li>
+            <li>Right-click the project's <code>src</code> folder and choose <strong>New → Class</strong>.</li>
+            <li>Enter a class name (e.g. <code>HelloWorld</code>) and tick the option to generate the <code>public static void main</code> method.</li>
+            <li>Click Finish — Eclipse opens the new class file ready for editing.</li>
+          </ol>
+        </section>
+
+        <!-- 22. RUN IN ECLIPSE + CODE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 4 · JDK &amp; Eclipse Setup</p>
+          <h2>Step 5 — Run your class</h2>
+          <p class="deep">Type a line of code into <code>main</code>, then run it:</p>
+          <pre><code>public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello from Eclipse!");
+    }
+}</code></pre>
+          <ol>
+            <li>Right-click the file and choose <strong>Run As → Java Application</strong> (or click the green Run button).</li>
+            <li><strong>Expected result:</strong> the program output appears in the Eclipse <strong>Console</strong> view at the bottom — here, <code>Hello from Eclipse!</code></li>
+          </ol>
+        </section>
+
+        <!-- ============ TOPIC 5: DATATYPES ============ -->
+
+        <!-- 23. EIGHT PRIMITIVE TYPES TABLE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 5 · Datatypes</p>
+          <h2>The eight primitive types</h2>
+          <p class="deep">Java has exactly <strong>eight primitive types</strong> built into the language. Each has a fixed size and a fixed range of values it can hold.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Type</th><th>Size (bits)</th><th>Minimum</th><th>Maximum</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>byte</code></td><td>8</td><td>-128</td><td>127</td></tr>
+              <tr><td><code>short</code></td><td>16</td><td>-32,768</td><td>32,767</td></tr>
+              <tr><td><code>int</code></td><td>32</td><td>-2,147,483,648</td><td>2,147,483,647</td></tr>
+              <tr><td><code>long</code></td><td>64</td><td>-9.22 &times; 10<sup>18</sup></td><td>9.22 &times; 10<sup>18</sup></td></tr>
+              <tr><td><code>float</code></td><td>32</td><td>~ -3.4 &times; 10<sup>38</sup></td><td>~ 3.4 &times; 10<sup>38</sup></td></tr>
+              <tr><td><code>double</code></td><td>64</td><td>~ -1.8 &times; 10<sup>308</sup></td><td>~ 1.8 &times; 10<sup>308</sup></td></tr>
+              <tr><td><code>char</code></td><td>16</td><td>'\u0000' (0)</td><td>'\uffff' (65,535)</td></tr>
+              <tr><td><code>boolean</code></td><td>1 (logical)</td><td>false</td><td>true</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 24. PRIMITIVE VS REFERENCE -->
+        <section class="slide">
+          <p class="eyebrow">Topic 5 · Datatypes</p>
+          <h2>Primitive vs reference types</h2>
+          <p class="deep">Every Java value is either a <strong>primitive</strong> or a <strong>reference</strong> type. The difference is what the variable actually holds.</p>
+          <ul>
+            <li><strong>Primitive types</strong> hold the value <em>directly</em> — the eight built-in types like <code>int</code> and <code>boolean</code>.</li>
+            <li><strong>Reference types</strong> hold a <em>reference</em> (a pointer) to an object stored on the heap.</li>
+            <li><strong>Objects</strong> — instances of classes — are reference types.</li>
+            <li><strong>Arrays</strong> are reference types, even an array of primitives.</li>
+            <li><strong>Strings</strong> (<code>String</code>) are objects, and therefore reference types too.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">The mental picture</span>
+            A primitive variable is a box containing the value itself; a reference variable is a box containing the <em>address</em> of an object that lives elsewhere on the heap.
+          </div>
+        </section>
+
+        <!-- 25. CASTING & CONVERSION -->
+        <section class="slide">
+          <p class="eyebrow">Topic 5 · Datatypes</p>
+          <h2>Type casting &amp; conversion</h2>
+          <p class="deep">Sometimes you need to move a value from one numeric type to another. Java has two directions:</p>
+          <ul>
+            <li><strong>Widening (implicit) conversion</strong> — a smaller type fits into a larger one automatically, e.g. <code>int → long → double</code>. No cast needed and no data is lost.</li>
+            <li><strong>Narrowing (explicit) cast</strong> — a larger type into a smaller one must be written explicitly with a cast, e.g. <code>(int) myDouble</code>.</li>
+          </ul>
+          <div class="warnbox">
+            <span class="lbl">Caution</span>
+            Narrowing casts <strong>may lose data</strong>. Converting a <code>double</code> to an <code>int</code> drops the fractional part, and a value too big for the target type will overflow into a wrong result.
+          </div>
+        </section>
+
+        <!-- 26. LITERALS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 5 · Datatypes</p>
+          <h2>Literals</h2>
+          <p class="deep">A <strong>literal</strong> is a fixed value written directly in your code. Each category of type has its own literal form:</p>
+          <ul>
+            <li><strong>Integer literal</strong> — a whole number, e.g. <code>42</code> (add <code>L</code> for long: <code>10000000000L</code>).</li>
+            <li><strong>Floating-point literal</strong> — a number with a decimal point, e.g. <code>3.14</code> (add <code>f</code> for float: <code>3.14f</code>).</li>
+            <li><strong>Character literal</strong> — a single character in single quotes, e.g. <code>'A'</code>.</li>
+            <li><strong>Boolean literal</strong> — either <code>true</code> or <code>false</code>.</li>
+            <li><strong>String literal</strong> — text in double quotes, e.g. <code>"Hello"</code>.</li>
+          </ul>
+        </section>
+
+        <!-- 27. CODE: DATATYPES -->
+        <section class="slide">
+          <p class="eyebrow">Topic 5 · Datatypes</p>
+          <h2>Datatypes in code</h2>
+          <p class="deep">Declaring variables of several primitive types:</p>
+          <pre><code>int age = 30;
+double price = 19.99;
+char grade = 'A';
+boolean isActive = true;</code></pre>
+          <p class="deep">A narrowing cast from <code>double</code> to <code>int</code> — note the lost fraction:</p>
+          <pre><code>double pi = 3.14159;
+int whole = (int) pi;   // explicit cast; whole becomes 3</code></pre>
+        </section>
+
+        <!-- ============ TOPIC 6: VARIABLES ============ -->
+
+        <!-- 28. DECLARATION VS INITIALIZATION -->
+        <section class="slide">
+          <p class="eyebrow">Topic 6 · Variables</p>
+          <h2>Declaration vs initialization</h2>
+          <p class="deep">A variable is a named container for a value. Creating one happens in two conceptual steps:</p>
+          <ul>
+            <li><strong>Declaration</strong> introduces a <em>name</em> and a <em>type</em>, telling the compiler what kind of value the variable will hold — e.g. <code>int count;</code></li>
+            <li><strong>Initialization</strong> assigns the variable its <em>first value</em> — e.g. <code>count = 0;</code></li>
+            <li>You can do both at once: <code>int count = 0;</code> declares and initializes in a single line.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Why it matters</span>
+            Java will not let you read a local variable before it has been initialized — the compiler stops you, preventing a common source of bugs.
+          </div>
+        </section>
+
+        <!-- 29. NAMING RULES -->
+        <section class="slide">
+          <p class="eyebrow">Topic 6 · Variables</p>
+          <h2>Naming rules &amp; conventions</h2>
+          <p class="deep">Java enforces rules for variable names, and the community follows a convention on top of them.</p>
+          <ul>
+            <li>A name must <strong>start with a letter, an underscore <code>_</code>, or a dollar sign <code>$</code></strong>.</li>
+            <li>After the first character it may contain <strong>letters, digits, underscores, and dollar signs</strong>.</li>
+            <li>A name <strong>must not be a reserved keyword</strong> (you cannot name a variable <code>class</code> or <code>int</code>).</li>
+            <li>Names are <strong>case-sensitive</strong> — <code>total</code> and <code>Total</code> are two different variables.</li>
+            <li><strong>Convention:</strong> use <strong>camelCase</strong> — start lowercase and capitalise each later word, e.g. <code>firstName</code>, <code>totalAmount</code>.</li>
+          </ul>
+        </section>
+
+        <!-- 30. LOCAL / INSTANCE / STATIC -->
+        <section class="slide">
+          <p class="eyebrow">Topic 6 · Variables</p>
+          <h2>Kinds of variables</h2>
+          <p class="deep">Where a variable is declared determines its <strong>kind</strong> and its <strong>scope</strong> (where it can be used).</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Local</span>
+              <span class="desc">Declared <strong>inside a method</strong>. Exists only while that method runs; scope is the method/block.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Instance</span>
+              <span class="desc">Declared <strong>inside a class but outside any method</strong>. One copy per object; scope is the whole object.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Static</span>
+              <span class="desc">Declared with <code>static</code> in a class. <strong>One copy shared by all objects</strong> of the class; scope is the whole class.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 31. FINAL KEYWORD -->
+        <section class="slide">
+          <p class="eyebrow">Topic 6 · Variables</p>
+          <h2>The <code>final</code> keyword</h2>
+          <p class="deep">Use <code>final</code> when a value should never change after it is first set — this declares a <strong>constant</strong>.</p>
+          <ul>
+            <li>A <code>final</code> variable <strong>cannot be reassigned</strong> once it has been initialized.</li>
+            <li>Trying to assign it a second time is a <strong>compile-time error</strong>, so the rule is enforced for you.</li>
+            <li>Constants are conventionally named in <code>UPPER_CASE</code>, e.g. <code>final double PI = 3.14159;</code></li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Why use it</span>
+            Marking values <code>final</code> makes your intent clear and protects important values (like a tax rate or a limit) from being accidentally changed elsewhere.
+          </div>
+        </section>
+
+        <!-- 32. CODE: VARIABLES -->
+        <section class="slide">
+          <p class="eyebrow">Topic 6 · Variables</p>
+          <h2>The four kinds in code</h2>
+          <p class="deep">One class showing a local, an instance, a static, and a <code>final</code> variable together:</p>
+          <pre><code>public class Account {
+    static int totalAccounts = 0;     // static: shared by all objects
+    String owner = "Unknown";          // instance: one per object
+    final double MIN_BALANCE = 100.0;  // final: constant, cannot change
+
+    void open() {
+        int startingBonus = 50;        // local: exists only in this method
+        totalAccounts = totalAccounts + 1;
+    }
+}</code></pre>
+        </section>
+
+        <!-- ============ TOPIC 7: CONDITIONAL STATEMENTS ============ -->
+
+        <!-- 33. IF FAMILY -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>The <code>if</code> family</h2>
+          <p class="deep">Conditional statements let a program choose what to do based on whether a condition is true. The <code>if</code> family is the foundation.</p>
+          <ul>
+            <li><strong><code>if</code></strong> — runs a block only when its condition is true.</li>
+            <li><strong><code>if</code>-<code>else</code></strong> — runs one block when true, another when false.</li>
+            <li><strong><code>else</code>-<code>if</code> ladder</strong> — chains several conditions; the first true one runs and the rest are skipped.</li>
+            <li><strong>Nested <code>if</code></strong> — an <code>if</code> placed inside another, to test a second condition only when the first holds.</li>
+          </ul>
+        </section>
+
+        <!-- 34. SWITCH STATEMENT -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>The <code>switch</code> statement</h2>
+          <p class="deep">A <code>switch</code> compares one value against many possible <code>case</code> labels — cleaner than a long <code>else</code>-<code>if</code> ladder.</p>
+          <ul>
+            <li><strong><code>case</code> labels</strong> list the values to match against.</li>
+            <li><strong><code>break</code></strong> ends the matched case so execution leaves the switch.</li>
+            <li><strong><code>default</code></strong> runs when no case matches — like a catch-all <code>else</code>.</li>
+            <li><strong>Fall-through</strong> — if you omit <code>break</code>, execution continues into the next case, which is occasionally useful but often a bug.</li>
+          </ul>
+        </section>
+
+        <!-- 35. SWITCH EXPRESSIONS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>Switch expressions (Java 14+)</h2>
+          <p class="deep">Modern Java (version 14 and later) added <strong>switch expressions</strong> using an arrow form that is shorter and safer.</p>
+          <ul>
+            <li>Uses the <strong>arrow <code>-&gt;</code></strong> form instead of <code>case ... :</code> with <code>break</code>.</li>
+            <li>A switch expression <strong>yields a value</strong>, so you can assign its result directly to a variable.</li>
+            <li>No fall-through, so there is no need for <code>break</code> — each arm is self-contained.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Statement vs expression</span>
+            A classic <code>switch</code> <em>does</em> something; a switch <em>expression</em> <em>produces</em> a value you can store or return.
+          </div>
+        </section>
+
+        <!-- 36. TERNARY OPERATOR -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>The ternary operator</h2>
+          <p class="deep">The <strong>ternary conditional operator</strong> is a compact one-line choice between two values, written as <code>condition ? a : b</code>.</p>
+          <ul>
+            <li>It evaluates to <strong><code>a</code> when the condition is true</strong>.</li>
+            <li>It evaluates to <strong><code>b</code> when the condition is false</strong>.</li>
+            <li>Best for short, simple choices — for example picking the larger of two numbers or a label.</li>
+          </ul>
+          <pre><code>int max = (a &gt; b) ? a : b;   // a if a &gt; b, otherwise b</code></pre>
+        </section>
+
+        <!-- 37. OPERATORS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>Building conditions: operators</h2>
+          <p class="deep">Conditions are built from <strong>relational</strong> and <strong>logical</strong> operators that produce a <code>boolean</code> result.</p>
+          <ul>
+            <li><strong>Relational operators</strong> compare two values: <code>==</code> (equal), <code>!=</code> (not equal), <code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>, <code>&gt;=</code>.</li>
+            <li><strong>Logical AND <code>&amp;&amp;</code></strong> — true only when both sides are true.</li>
+            <li><strong>Logical OR <code>||</code></strong> — true when at least one side is true.</li>
+            <li><strong>Logical NOT <code>!</code></strong> — flips true to false and false to true.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Combine them</span>
+            Relational operators produce the true/false facts; logical operators glue several facts together into one condition, e.g. <code>age &gt;= 18 &amp;&amp; hasTicket</code>.
+          </div>
+        </section>
+
+        <!-- 38. CODE: CONDITIONALS -->
+        <section class="slide">
+          <p class="eyebrow">Topic 7 · Conditional Statements</p>
+          <h2>Conditionals in code</h2>
+          <p class="deep">An <code>if</code>-<code>else if</code>-<code>else</code> ladder and a classic <code>switch</code>:</p>
+          <pre><code>if (score &gt;= 90) {
+    grade = 'A';
+} else if (score &gt;= 80) {
+    grade = 'B';
+} else {
+    grade = 'C';
+}
+
+switch (day) {
+    case 1:  name = "Mon"; break;
+    case 2:  name = "Tue"; break;
+    default: name = "Other";
+}</code></pre>
+          <p class="deep">A switch expression (Java 14+) and a ternary:</p>
+          <pre><code>String type = switch (day) {
+    case 6, 7 -&gt; "Weekend";
+    default   -&gt; "Weekday";
+};
+
+String label = (score &gt;= 50) ? "Pass" : "Fail";</code></pre>
+        </section>
+
+        <!-- ============ WRAP-UP ============ -->
+
+        <!-- 39. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Bringing it together</p>
+          <h2>Recap</h2>
+          <p class="lead">In one session you've gone from "what is Java" to writing real decisions in code. Here's what you can now explain:</p>
+          <ul class="checklist">
+            <li><strong>Java Fundamentals</strong> — what Java is, its key features, and the parts of a program.</li>
+            <li><strong>The JVM</strong> — how source becomes bytecode and how the JVM loads, runs, and optimises it.</li>
+            <li><strong>The Eclipse IDE</strong> — what an IDE gives you over a plain editor, and Eclipse's main features.</li>
+            <li><strong>JDK &amp; Eclipse Setup</strong> — installing and verifying the JDK and running your first class.</li>
+            <li><strong>Datatypes</strong> — the eight primitives, reference types, casting, and literals.</li>
+            <li><strong>Variables</strong> — declaration, initialization, naming, kinds, and <code>final</code> constants.</li>
+            <li><strong>Conditional Statements</strong> — <code>if</code>, <code>switch</code>, switch expressions, and the ternary operator.</li>
+          </ul>
+        </section>
+
+        <!-- 40. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of the Java Foundations Session</span>
+            <h1>You're ready</h1>
+            <div class="sub">You can now write, compile, and run Java — and make your programs decide. Next, we build on this foundation.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Spring Boot Session 1 — your first REST API.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java Foundations</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 40</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function isTextInputFocused() {
+      var el = document.activeElement;
+      if (!el) return false;
+      var tag = (el.tagName || '').toUpperCase();
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+      if (el.isContentEditable) return true;
+      return false;
+    }
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (isTextInputFocused()) return;          // ignore arrows in text inputs
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

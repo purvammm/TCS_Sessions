@@ -21,22 +21,22 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - This exact code is the canonical source later duplicated verbatim into both HTML files
     - _Requirements: 3.6, 3.7, 4.1, 4.5, 8.4, 8.5, 8.6, 8.7, 10.2, 17.3_
 
-  - [ ]* 1.3 Write property test for `clampIndex`
+  - [ ] 1.3 Write property test for `clampIndex`
     - **Property 1: Clamp stays in range**
     - **Validates: Requirements 3.6, 3.7**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 1: Clamp stays in range`; assert `0` when `total === 0`, else in `[0, total-1]`, with `clampIndex(-1,total)===0` and `clampIndex(total,total)===total-1`
 
-  - [ ]* 1.4 Write property test for `formatCounter`
+  - [ ] 1.4 Write property test for `formatCounter`
     - **Property 4: Counter correctness**
     - **Validates: Requirements 4.1, 4.3, 4.5**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 4: Counter correctness`; assert exact `"{current} of {total}"` string and `"0 of 0"` for empty deck
 
-  - [ ]* 1.5 Write property test for `computeProgress`
+  - [ ] 1.5 Write property test for `computeProgress`
     - **Property 5: Progress is the rounded ticked ratio**
     - **Validates: Requirements 8.4, 8.5, 8.6, 8.7**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 5: Progress is the rounded ticked ratio`; assert `0` when `total===0`, else `Math.round(ticked/total*100)`, integer in `[0,100]`, `0` at `ticked=0`, `100` at `ticked=total`
 
-  - [ ]* 1.6 Write property test for `getSnippetText`
+  - [ ] 1.6 Write property test for `getSnippetText`
     - **Property 7: Snippet text fidelity**
     - **Validates: Requirements 10.2, 17.3**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 7: Snippet text fidelity`; assert captured text is byte-for-byte equal to authored content including newlines and leading/trailing whitespace
@@ -58,17 +58,17 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Wire next/prev controls, Right/Left arrow keys; disable boundary control and no-op at first/last slide; ignore requests while transitioning; clear `isTransitioning` on `transitionend` with a timeout safety net; load shows current `1`; zero-slide handling shows `"0 of 0"`
     - _Requirements: 1.5, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ]* 3.2 Write property test for the navigation invariant
+  - [ ] 3.2 Write property test for the navigation invariant
     - **Property 2: Navigation invariant — exactly one active slide, counter in range**
     - **Validates: Requirements 3.2, 3.3, 3.4, 3.5, 3.8, 4.2**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 2: Navigation invariant — exactly one active slide, counter in range`; drive a lightweight in-memory model with random next/prev sequences; assert exactly one active slide, current in `[1,total]`, boundary requests no-op
 
-  - [ ]* 3.3 Write property test for navigation during a transition
+  - [ ] 3.3 Write property test for navigation during a transition
     - **Property 3: Navigation during a transition is ignored**
     - **Validates: Requirements 3.9**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 3: Navigation during a transition is ignored`; assert in-transition requests leave `index` unchanged and the single-active invariant holds throughout
 
-  - [ ]* 3.4 Write example/DOM smoke + error-path tests for navigation and counter
+  - [ ] 3.4 Write example/DOM smoke + error-path tests for navigation and counter
     - Boundary disabling at first/last slide; counter format `"current of total"`; on load shows `1`; zero-slides renders `"0 of 0"` without throwing (parse theory HTML via jsdom)
     - _Requirements: 3.1, 3.6, 3.7, 4.4, 4.5_
 
@@ -89,7 +89,7 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Spring Initializr walkthrough; project structure deep dive; `pom.xml` anatomy; `application.properties` slide; Session 2 preview; recap checklist (≥5 items each referencing an earlier topic); closing slide. Confirm total slide count lands in `[30, 40]`
     - _Requirements: 5.1, 5.12, 5.13, 5.14, 5.15, 5.16, 5.17_
 
-  - [ ]* 4.5 Write example/DOM smoke tests for the slide inventory
+  - [ ] 4.5 Write example/DOM smoke tests for the slide inventory
     - Slide count in `[30,40]`; all required slides present; comparison and starter tables have header row, ≥2 columns, visible borders, required row counts; recap has ≥5 items (parse theory HTML via jsdom)
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 5.10, 5.11, 5.12, 5.13, 5.14, 5.15, 5.16, 5.17, 6.3_
 
@@ -102,11 +102,11 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Fade + slight translate on the incoming slide via the `--slide-anim` token (200–800 ms), beginning on the next frame; `@media (prefers-reduced-motion: reduce)` sets duration `0s`; feature-detect `matchMedia` and skip JS-driven animation for immediate final placement
     - _Requirements: 6.2, 6.4_
 
-  - [ ]* 5.3 Write example/DOM smoke tests for the diagram, tables, and code blocks
+  - [ ] 5.3 Write example/DOM smoke tests for the diagram, tables, and code blocks
     - Diagram has 7 labeled node shapes plus connector elements and a fallback element; code blocks use the monospace token, a distinct bordered/padded container, `white-space: pre`, and `overflow-x: auto`
     - _Requirements: 6.1, 6.5, 17.2, 17.4_
 
-  - [ ]* 5.4 Write error-path tests for diagram fallback and reduced-motion
+  - [ ] 5.4 Write error-path tests for diagram fallback and reduced-motion
     - Diagram-failure path reveals `.arch-fallback` and keeps slide text; reduced-motion places the incoming slide immediately; zero-slides path is a safe no-op
     - _Requirements: 6.4, 6.5, 4.5_
 
@@ -135,17 +135,17 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Inline `getSnippetText` copied verbatim; `copySnippet(text)` uses `navigator.clipboard.writeText` with a hidden-textarea `execCommand('copy')` fallback; `attachCopyButtons()` inserts exactly one button per snippet; success confirmation shown within 500 ms and kept ≥2 s; failure shows error and leaves clipboard untouched; empty snippet short-circuits with "nothing to copy"
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 17.3_
 
-  - [ ]* 8.4 Write property test for one copy button per snippet
+  - [ ] 8.4 Write property test for one copy button per snippet
     - **Property 6: Exactly one copy button per snippet**
     - **Validates: Requirements 10.1**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 6: Exactly one copy button per snippet`; build a random collection of snippets in a jsdom DOM, run `attachCopyButtons`, assert button count equals snippet count and each snippet has exactly one
 
-  - [ ]* 8.5 Write property test for independent expandable sections
+  - [ ] 8.5 Write property test for independent expandable sections
     - **Property 8: Expandable sections toggle independently**
     - **Validates: Requirements 9.4**
     - fast-check, ≥100 iterations, tagged `Feature: springboot-session1-training-materials, Property 8: Expandable sections toggle independently`; apply a random toggle sequence to an in-memory/jsdom model and assert each toggle changes only its own section's state
 
-  - [ ]* 8.6 Write error-path tests for copy buttons
+  - [ ] 8.6 Write error-path tests for copy buttons
     - Clipboard-failure path shows error and leaves the clipboard untouched (stub `clipboard.writeText` to reject and `execCommand` to fail); empty-snippet path shows "nothing to copy" with no write attempt
     - _Requirements: 10.4, 10.5_
 
@@ -166,7 +166,7 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Lab 4: `@Service GreetingService` with a public greeting method; inject via `@Autowired`; expected greeting output; observation question on the unsatisfied-dependency startup failure when `@Service` is removed; run-and-verify steps. Quick reference card at the bottom: annotations cheatsheet (≥5), `application.properties` keys (≥3), URL patterns (≥2 with example URLs)
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5, 16.1, 16.2, 16.3, 16.4_
 
-  - [ ]* 9.5 Write example/DOM smoke tests for lab structure and content
+  - [ ] 9.5 Write example/DOM smoke tests for lab structure and content
     - Seven sections present in required order with distinct headings and no slide-navigation control; progress bar is `position: sticky` in the header; four prerequisites each have a verification step; Labs 1–4 and quick-reference content assertions; code blocks use monospace/bordered/padded/`overflow-x` styling
     - _Requirements: 7.3, 7.4, 7.5, 8.1, 8.2, 11.1, 11.2, 11.3, 12.1, 13.1, 14.1, 15.1, 16.1, 16.2, 16.3, 16.4, 17.1, 17.4_
 
@@ -175,7 +175,7 @@ The four pure functions (`clampIndex`, `formatCounter`, `computeProgress`, `getS
     - Extract the text between `/* THEME-SYNC START */` and `/* THEME-SYNC END */` from both HTML files and assert byte-identical; compare the window-chrome markup; assert three traffic-lights in source order red → yellow → green in each file; grep both files for `<link`, `<script src`, `@import`, `fetch`, `XMLHttpRequest`, and remote `url(...)` and assert none present
     - _Requirements: 1.1, 1.2, 1.4, 2.1, 2.2, 2.3, 2.4_
 
-  - [ ]* 10.2 Write the independence smoke test
+  - [ ] 10.2 Write the independence smoke test
     - Assert the two files declare no colliding global identifiers or shared storage keys, so simultaneous use produces no cross-talk
     - _Requirements: 1.6_
 
