@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Collections, Class Relationships &amp; File I/O — Theory Slideshow</title>
+  <style>
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex; flex-direction: row; align-items: center; gap: 8px;
+      padding: 10px 14px; background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px; border-top-right-radius: 10px;
+    }
+    .traffic-light { display: inline-block; width: 12px; height: 12px; border-radius: 50%; flex: 0 0 auto; }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto; text-align: center; font-size: 13px; font-weight: 500;
+      color: var(--mac-text-muted); margin-right: 48px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font); color: var(--mac-text); background: var(--mac-bg);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 12px;
+    }
+    .mac-window {
+      width: 100%; max-width: none; background: var(--mac-window);
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22); overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative; width: 100%; height: calc(100vh - 80px);
+      min-height: 620px; overflow: hidden; background: var(--mac-window);
+    }
+    .slide {
+      display: none; padding: 40px 80px 92px; height: calc(100vh - 80px);
+      min-height: 620px; overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    .slide-footer {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border); color: var(--mac-text-muted);
+      font-size: 13px; z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .slide.animating { animation-duration: 0s; } }
+
+    .slide h1 { font-size: 42px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 29px; margin: 0 0 14px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase; letter-spacing: 0.12em; font-size: 13px;
+      font-weight: 700; color: var(--mac-accent); margin: 0 0 10px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.5; font-size: 16.5px; }
+    .slide ul, .slide ol { margin: 10px 0; padding-left: 24px; }
+    .slide li { margin: 5px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 18.5px; }
+    .slide .deep { font-size: 16px; line-height: 1.55; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    .keybox {
+      border-left: 4px solid var(--mac-accent); background: rgba(10,132,255,0.06);
+      padding: 11px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 15.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 12.5px; display:block; margin-bottom: 3px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow); background: rgba(254,188,46,0.10);
+      padding: 11px 16px; border-radius: 0 10px 10px 0; margin: 14px 0; font-size: 15.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 12.5px; display:block; margin-bottom: 3px; }
+    .note {
+      background: #fafafc; border: 1px solid var(--mac-border); border-radius: 10px;
+      padding: 12px 16px; margin: 12px 0; font-size: 15px; line-height: 1.55;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 5px; font-size: 14px; }
+
+    /* Cover slide */
+    .cover {
+      display: flex; flex-direction: column; justify-content: center; height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%); color: #fff; padding: 48px 80px;
+    }
+    .cover h1 { color: #fff; font-size: 54px; }
+    .cover .badge {
+      display: inline-block; align-self: flex-start; background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4); padding: 6px 16px; border-radius: 20px;
+      font-size: 14px; font-weight: 600; margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 21px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 32px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border); border-radius: 12px; padding: 14px 16px; background: #fafafc;
+    }
+    .card h3 { margin: 0 0 5px; font-size: 17px; }
+    .card p { font-size: 14.5px; margin: 0; }
+    .card .ic { font-size: 24px; margin-bottom: 5px; }
+    .card code { font-family: var(--mac-mono); font-size: 13px; color: var(--mac-accent); }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex; align-items: center; gap: 14px; padding: 11px 16px;
+      border: 1px solid var(--mac-border); border-radius: 10px; margin: 8px 0;
+      background: #fafafc; font-size: 16.5px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff; display: flex;
+      align-items: center; justify-content: center; font-size: 14px; font-weight: 700;
+    }
+    .agenda li .ic { font-size: 22px; }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 15px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border); padding: 8px 12px; text-align: left; vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 13.5px; }
+    table.cmp.sm { font-size: 14px; }
+    table.cmp.sm th, table.cmp.sm td { padding: 6px 10px; }
+
+    /* Flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 14px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent); border-radius: 12px; padding: 11px 16px;
+      background: #f3f8ff; font-weight: 600; font-size: 15px; text-align: center; min-width: 110px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 11.5px; color: var(--mac-text-muted); font-weight: 500; margin-top: 3px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 22px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Two-column comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border); border-radius: 12px; padding: 14px 16px 16px; background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 8px; font-size: 16px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+    .twocol .colbox li { font-size: 14.5px; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+    .panel h3 { margin: 0 0 5px; font-size: 15px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Step chips */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+    .step-chip {
+      border: 1px solid var(--mac-border); border-radius: 12px; padding: 14px; background: #fafafc;
+    }
+    .step-chip .stepnum {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-bottom: 8px;
+    }
+    .step-chip h3 { margin: 0 0 5px; font-size: 15px; }
+    .step-chip p { font-size: 13.5px; margin: 0; }
+
+    /* Recap grid */
+    .recap-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .recap-cell {
+      border: 1px solid var(--mac-border); border-left: 4px solid var(--mac-accent);
+      border-radius: 10px; padding: 12px 16px; background: #fafafc;
+    }
+    .recap-cell h3 { margin: 0 0 6px; font-size: 16px; color: var(--mac-accent); }
+    .recap-cell ul { margin: 0; padding-left: 18px; }
+    .recap-cell li { font-size: 13.5px; margin: 3px 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 10px; }
+    .checklist li { font-size: 16px; padding: 7px 0 7px 34px; position: relative; }
+    .checklist li::before {
+      content: "\2713"; position: absolute; left: 4px; top: 7px;
+      width: 20px; height: 20px; background: #28c840; color: #fff;
+      border-radius: 50%; font-size: 12px; display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block; background: rgba(10,132,255,0.1); color: var(--mac-accent);
+      border-radius: 6px; padding: 2px 8px; font-family: var(--mac-mono); font-size: 13.5px;
+    }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 10px 0; padding: 14px 16px; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow-x: auto; white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.5; color: var(--mac-code-text); white-space: pre;
+    }
+    .slide pre.tight code { font-size: 13px; line-height: 1.45; }
+    /* Java syntax highlight */
+    .c { color: #6b7089; }                /* comment */
+    .s { color: #a6e22e; }                /* string */
+    .k { color: #ff6188; }                /* keyword */
+    .t { color: #66d9ef; }                /* type */
+    .a { color: #fd9353; }                /* annotation */
+    .m { color: #ab9df2; }                /* method */
+    .num { color: #fd9353; }
+
+    /* Tree diagram colouring */
+    .tree { line-height: 1.4; }
+    .tree .list { color: #66d9ef; }
+    .tree .set { color: #a6e22e; }
+    .tree .map { color: #fd9353; }
+    .tree .queue { color: #ab9df2; }
+    .tree .root { color: #f8f8f2; font-weight: 700; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; font-size: 13.5px; }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend .dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+    /* Method grid */
+    .mgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 12px; }
+    .mrow {
+      display: grid; grid-template-columns: 200px 1fr; gap: 12px; align-items: center;
+      border: 1px solid var(--mac-border); border-radius: 8px; padding: 8px 12px; background: #fafafc;
+    }
+    .mrow code { font-family: var(--mac-mono); font-size: 13px; color: var(--mac-accent); }
+    .mrow .md { font-size: 13px; color: var(--mac-text-muted); }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute; top: 50%; transform: translateY(-50%); z-index: 10;
+      width: 46px; height: 46px; border: 1px solid var(--mac-border); border-radius: 50%;
+      background: var(--mac-window); color: var(--mac-text); font-size: 22px; line-height: 1;
+      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    .slide-counter {
+      position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%); z-index: 10;
+      padding: 5px 14px; border: 1px solid var(--mac-border); border-radius: 14px;
+      background: var(--mac-window); color: var(--mac-text-muted); font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--mac-border); z-index: 9;
+    }
+    .progress-rail .fill { height: 100%; width: 0; background: var(--mac-accent); transition: width var(--slide-anim) ease; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-collections-theory.html — Collections, Class Relationships &amp; File I/O</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Core Java · Theory Session</span>
+            <h1>Collections, Class Relationships &amp; File I/O</h1>
+            <div class="sub">Three ways to manage data: in memory (Collections), structurally (Class Relationships), and on disk (File I/O).</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Four topics under one roof — and one thread connects them all: <strong>they're all about managing and organising data</strong>. Collections hold objects in memory, class relationships define how objects relate, and File I/O persists data to disk.</p>
+          <ul class="agenda">
+            <li><span class="ic">📦</span> <span class="num">1</span> Collections Framework — Lists, Sets &amp; Maps</li>
+            <li><span class="ic">🔀</span> <span class="num">2</span> Sorting &amp; choosing the right collection</li>
+            <li><span class="ic">🧬</span> <span class="num">3</span> Class Relationships — IS-A vs HAS-A</li>
+            <li><span class="ic">🧩</span> <span class="num">4</span> Abstract classes vs Interfaces</li>
+            <li><span class="ic">💾</span> <span class="num">5</span> Basic File I/O — data beyond the JVM</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to read these slides</span>
+            Every code snippet is short and reading material, not a lab exercise — each illustrates exactly one concept. This deck is built to revise from on its own afterwards.
+          </div>
+        </section>
+
+        <!-- 3. WHY COLLECTIONS EXIST -->
+        <section class="slide">
+          <p class="eyebrow">The motivating problem</p>
+          <h2>Why collections exist</h2>
+          <p class="deep">Arrays are fine until they aren't. Three everyday scenarios show where plain arrays fall short:</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">📈</div>
+              <h3>Store 500 names…</h3>
+              <p><code>String[] s = new String[500]</code> — and now you need a 501st. You're stuck; arrays are fixed-size.</p>
+            </div>
+            <div class="card">
+              <div class="ic">✂️</div>
+              <h3>Remove item at index 200</h3>
+              <p>Arrays: manually shift every later element left by one. Collections: one method call — <code>list.remove(200)</code>.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🔎</div>
+              <h3>Is "Ravi" already in it?</h3>
+              <p>Arrays: write a loop. Collections: <code>list.contains("Ravi")</code>.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The bottom line</span>
+            Arrays have a <strong>fixed size</strong> and <strong>no built-in utilities</strong>. Collections are <strong>resizable</strong>, <strong>feature-rich</strong>, and <strong>type-safe via generics</strong>. They exist to solve exactly these problems.
+          </div>
+        </section>
+
+        <!-- 4. HIERARCHY -->
+        <section class="slide">
+          <p class="eyebrow">The reference map for the whole section</p>
+          <h2>The Collections hierarchy</h2>
+          <pre class="tight"><code class="tree"><span class="root">java.lang.Iterable</span>
+   └── <span class="root">java.util.Collection</span>
+         ├── <span class="list">List</span>      → <span class="list">ArrayList</span>, <span class="list">LinkedList</span>, <span class="list">Vector</span>
+         ├── <span class="set">Set</span>       → <span class="set">HashSet</span>, <span class="set">LinkedHashSet</span>, <span class="set">TreeSet</span>
+         └── <span class="queue">Queue</span>     → <span class="queue">LinkedList</span>, <span class="queue">ArrayDeque</span>
+
+<span class="root">java.util.Map</span>  (separate hierarchy — NOT a Collection)
+         → <span class="map">HashMap</span>, <span class="map">LinkedHashMap</span>, <span class="map">TreeMap</span></code></pre>
+          <div class="legend">
+            <span><span class="dot" style="background:#66d9ef;"></span> List — ordered, indexed, duplicates</span>
+            <span><span class="dot" style="background:#a6e22e;"></span> Set — no duplicates</span>
+            <span><span class="dot" style="background:#ab9df2;"></span> Queue — FIFO/LIFO ends</span>
+            <span><span class="dot" style="background:#fd9353;"></span> Map — key → value</span>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The one thing to remember</span>
+            <strong>Map is NOT a subtype of Collection.</strong> It stores key–value pairs rather than individual elements, which is why it sits in its own separate hierarchy.
+          </div>
+        </section>
+
+        <!-- 5. GENERICS -->
+        <section class="slide">
+          <p class="eyebrow">The type-safety layer under every collection</p>
+          <h2>Generics</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Without generics (raw type)</h3>
+              <pre><code><span class="t">ArrayList</span> list = <span class="k">new</span> <span class="t">ArrayList</span>();
+list.add(<span class="s">"Ravi"</span>);
+list.add(<span class="num">101</span>);   <span class="c">// no error — anything goes</span>
+
+<span class="t">String</span> n = (<span class="t">String</span>) list.get(<span class="num">1</span>);
+<span class="c">// ClassCastException at RUNTIME!</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ With generics (type-safe)</h3>
+              <pre><code><span class="t">ArrayList</span>&lt;<span class="t">String</span>&gt; list = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+list.add(<span class="s">"Ravi"</span>);
+list.add(<span class="num">101</span>);   <span class="c">// COMPILE error — caught now</span>
+
+<span class="t">String</span> n = list.get(<span class="num">0</span>);
+<span class="c">// no cast needed</span></code></pre>
+            </div>
+          </div>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🛡️</div><h3>Compile-time checks</h3><p>Type errors are caught before the program ever runs.</p></div>
+            <div class="card"><div class="ic">🎯</div><h3>No casting</h3><p>The compiler already knows the element type.</p></div>
+            <div class="card"><div class="ic">📖</div><h3>Self-documenting</h3><p><code>&lt;String&gt;</code> states intent right in the declaration.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Rule</span>
+            Always specify the type parameter. The diamond <code>&lt;&gt;</code> lets the compiler infer it from the left side. Raw types exist only for backward compatibility with pre-Java-5 code.
+          </div>
+        </section>
+
+        <!-- 6. LIST + ARRAYLIST -->
+        <section class="slide">
+          <p class="eyebrow">Lists — ordered, indexed, allow duplicates</p>
+          <h2>ArrayList — the default List</h2>
+          <p class="deep">A <strong>List</strong> preserves insertion order, supports index access, and allows duplicates. <code>ArrayList</code> is its workhorse — backed by a resizable array (initial capacity <strong>10</strong>; when full it grows to ~1.5× and copies elements over).</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>Everyday operations</h3>
+              <pre><code><span class="t">ArrayList</span>&lt;<span class="t">String</span>&gt; d = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+d.add(<span class="s">"Eng"</span>);
+d.add(<span class="num">1</span>, <span class="s">"Mktg"</span>);  <span class="c">// insert at index</span>
+d.get(<span class="num">0</span>);          <span class="c">// "Eng"</span>
+d.set(<span class="num">0</span>, <span class="s">"HR"</span>);    <span class="c">// replace</span>
+d.contains(<span class="s">"HR"</span>);   <span class="c">// true</span>
+d.remove(<span class="s">"Mktg"</span>);    <span class="c">// by value</span>
+d.remove(<span class="num">0</span>);         <span class="c">// by index</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3>Performance</h3>
+              <table class="cmp sm">
+                <tbody>
+                  <tr><td><code>get(i)</code></td><td class="good">O(1) — fast</td></tr>
+                  <tr><td><code>add(end)</code></td><td class="good">O(1) amortized</td></tr>
+                  <tr><td><code>add/remove(mid)</code></td><td class="bad">O(n) — shifts</td></tr>
+                  <tr><td><code>contains()</code></td><td class="bad">O(n) — scan</td></tr>
+                </tbody>
+              </table>
+              <p style="font-size:13.5px; margin-top:8px;" class="muted">Use it when you <strong>read often, modify rarely</strong> — the go-to default.</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Classic gotcha</span>
+            For <code>ArrayList&lt;Integer&gt;</code>, <code>remove(1)</code> removes by <strong>index</strong>, not value. To remove the value 1, use <code>remove(Integer.valueOf(1))</code>.
+          </div>
+        </section>
+
+        <!-- 7. LINKEDLIST -->
+        <section class="slide">
+          <p class="eyebrow">The doubly-linked alternative</p>
+          <h2>LinkedList — nodes &amp; a Deque</h2>
+          <p class="deep">A <code>LinkedList</code> is a chain of nodes, each holding the data plus <strong>prev</strong> and <strong>next</strong> references. Inserting in the middle just re-points two links — no shifting.</p>
+          <pre class="tight"><code>null ← [prev|"Ravi"|next] ⇄ [prev|"Priya"|next] ⇄ [prev|"Arjun"|next] → null
+        HEAD                                              TAIL</code></pre>
+          <div class="panels">
+            <div class="panel">
+              <h3>It's also a Deque (queue + stack)</h3>
+              <pre><code><span class="c">// Queue — FIFO</span>
+q.offer(<span class="s">"T1"</span>);    <span class="c">// add to tail</span>
+q.poll();         <span class="c">// remove head</span>
+q.peek();         <span class="c">// read head</span>
+
+<span class="c">// Stack — LIFO</span>
+st.push(<span class="s">"F1"</span>);   <span class="c">// add to head</span>
+st.pop();         <span class="c">// remove head</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3>Performance</h3>
+              <table class="cmp sm">
+                <tbody>
+                  <tr><td><code>get(i)</code></td><td class="bad">O(n) — traverse</td></tr>
+                  <tr><td><code>add/remove(head/tail)</code></td><td class="good">O(1)</td></tr>
+                  <tr><td>memory/element</td><td class="bad">higher (2 refs)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Modern advice</span>
+            For pure queue/stack use, prefer <code>ArrayDeque</code> — better cache performance. Reach for <code>LinkedList</code> only when you genuinely need List + Queue behaviour together.
+          </div>
+        </section>
+
+        <!-- 8. ARRAYLIST vs LINKEDLIST -->
+        <section class="slide">
+          <p class="eyebrow">The decision guide</p>
+          <h2>ArrayList vs LinkedList</h2>
+          <table class="cmp">
+            <thead>
+              <tr><th>Operation</th><th>ArrayList</th><th>LinkedList</th><th class="hl">Winner</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Random access by index</td><td class="good">O(1)</td><td class="bad">O(n)</td><td class="hl">ArrayList</td></tr>
+              <tr><td>Insert / delete at beginning</td><td class="bad">O(n)</td><td class="good">O(1)</td><td class="hl">LinkedList</td></tr>
+              <tr><td>Insert at end</td><td>O(1) amort.</td><td>O(1)</td><td class="hl">Tie</td></tr>
+              <tr><td>Memory per element</td><td class="good">Low</td><td class="bad">Higher</td><td class="hl">ArrayList</td></tr>
+              <tr><td>Cache performance</td><td class="good">Excellent</td><td class="bad">Poor</td><td class="hl">ArrayList</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">In practice</span>
+            Use <strong>ArrayList by default</strong> — it wins in most real-world scenarios. Use LinkedList only when you constantly add/remove at the ends or need a queue/deque. <strong>~90% of the time, ArrayList is the right answer.</strong>
+          </div>
+        </section>
+
+        <!-- 9. SORTING -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to define order</p>
+          <h2>Sorting — Comparable vs Comparator</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3 style="color:var(--mac-accent);">Comparable — natural order, inside the class</h3>
+              <pre><code><span class="k">class</span> <span class="t">Employee</span> <span class="k">implements</span>
+        <span class="t">Comparable</span>&lt;<span class="t">Employee</span>&gt; {
+  <span class="a">@Override</span>
+  <span class="k">public int</span> <span class="m">compareTo</span>(<span class="t">Employee</span> o) {
+    <span class="c">// neg / 0 / pos</span>
+    <span class="k">return</span> <span class="t">Double</span>.compare(salary, o.salary);
+  }
+}
+<span class="t">Collections</span>.sort(employees); <span class="c">// by salary</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3 style="color:var(--mac-accent);">Comparator — flexible, outside the class</h3>
+              <pre><code><span class="c">// lambda — by name</span>
+employees.sort((a, b) -&gt;
+    a.name.compareTo(b.name));
+
+<span class="c">// by salary, descending</span>
+employees.sort(<span class="t">Comparator</span>
+    .comparingDouble(<span class="t">Employee</span>::getSalary)
+    .reversed());
+
+<span class="c">// dept, then salary</span>
+employees.sort(<span class="t">Comparator</span>
+    .comparing(<span class="t">Employee</span>::getDept)
+    .thenComparingDouble(<span class="t">Employee</span>::getSalary));</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Which to use</span>
+            <strong>Comparable</strong> when there's ONE obvious natural ordering (and you own the class). <strong>Comparator</strong> when you need multiple orderings, or to sort a class you can't modify (like <code>String</code> or <code>Integer</code>).
+          </div>
+        </section>
+
+        <!-- 10. COLLECTIONS UTILITY + CREATION -->
+        <section class="slide">
+          <p class="eyebrow">Two practical helpers you'll use constantly</p>
+          <h2>The Collections utility class &amp; list creation</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3><code>java.util.Collections</code> — static helpers</h3>
+              <pre><code><span class="t">Collections</span>.sort(nums);
+<span class="t">Collections</span>.reverse(nums);
+<span class="t">Collections</span>.shuffle(nums);
+<span class="t">Collections</span>.max(nums);
+<span class="t">Collections</span>.min(nums);
+<span class="t">Collections</span>.frequency(nums, <span class="num">5</span>);
+
+<span class="c">// read-only view</span>
+<span class="t">List</span>&lt;<span class="t">String</span>&gt; ro =
+  <span class="t">Collections</span>.unmodifiableList(nums);</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Three ways to create a list</h3>
+              <table class="cmp sm">
+                <thead><tr><th></th><th>resize</th><th>change</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Arrays.asList()</code></td><td class="bad">No</td><td class="good">Yes</td></tr>
+                  <tr><td><code>List.of()</code></td><td class="bad">No</td><td class="bad">No</td></tr>
+                  <tr><td><code>new ArrayList&lt;&gt;()</code></td><td class="good">Yes</td><td class="good">Yes</td></tr>
+                </tbody>
+              </table>
+              <p style="font-size:13px; margin-top:8px;" class="muted"><code>List.of()</code> = truly immutable (Java 9+). <code>Arrays.asList()</code> = fixed size but elements editable. Need both? Wrap: <code>new ArrayList&lt;&gt;(List.of(...))</code>.</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Don't confuse them</span>
+            <code>Collections</code> (plural, the utility class) vs <code>Collection</code> (singular, the interface) — two completely different things.
+          </div>
+        </section>
+
+        <!-- 11. SET + HASHSET -->
+        <section class="slide">
+          <p class="eyebrow">Sets — no duplicates, no index</p>
+          <h2>Set &amp; how HashSet works</h2>
+          <p class="deep">A <strong>Set</strong> rejects duplicates and has no positional access — perfect for the "have I seen this already?" problem, answered in O(1) instead of a List's O(n) scan.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>Membership in O(1)</h3>
+              <pre><code><span class="t">Set</span>&lt;<span class="t">String</span>&gt; seen = <span class="k">new</span> <span class="t">HashSet</span>&lt;&gt;();
+seen.add(<span class="s">"Mumbai"</span>);
+seen.add(<span class="s">"Mumbai"</span>);  <span class="c">// ignored</span>
+seen.contains(<span class="s">"Mumbai"</span>); <span class="c">// instant</span>
+seen.size();             <span class="c">// 1</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3>The hashing mechanism</h3>
+              <p style="font-size:13.5px; margin:0;">On <code>add("Ravi")</code>: compute <code>"Ravi".hashCode()</code> → map to a bucket index → store there. On <code>contains()</code>: same hash → check only that one bucket. That's why lookups are instant — and why <strong>iteration order is unpredictable</strong> (elements sit in hash-order buckets, not insertion order).</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The hashCode/equals contract</span>
+            For custom objects in a HashSet (or as HashMap keys), you <strong>must override both <code>hashCode()</code> and <code>equals()</code></strong> consistently: equal objects must return the same hashCode. Override one, always override the other.
+          </div>
+        </section>
+
+        <!-- 12. SET IMPLEMENTATIONS -->
+        <section class="slide">
+          <p class="eyebrow">Three flavours of Set</p>
+          <h2>Choosing a Set implementation</h2>
+          <div class="cards c3">
+            <div class="card"><div class="ic">⚡</div><h3>HashSet</h3><p>Fastest, <strong>no order</strong>. O(1) add/remove/contains. The default.</p></div>
+            <div class="card"><div class="ic">🔗</div><h3>LinkedHashSet</h3><p>Keeps <strong>insertion order</strong> via a linked list. Slightly more memory.</p></div>
+            <div class="card"><div class="ic">🌳</div><h3>TreeSet</h3><p>Always <strong>sorted</strong> (Red-Black tree). O(log n). Adds <code>first()</code>, <code>last()</code>, <code>floor()</code>, <code>ceiling()</code>.</p></div>
+          </div>
+          <pre><code><span class="t">Set</span>&lt;<span class="t">Integer</span>&gt; ts = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(<span class="t">List</span>.of(<span class="num">85</span>, <span class="num">72</span>, <span class="num">91</span>, <span class="num">68</span>, <span class="num">72</span>));
+<span class="t">System</span>.out.println(ts);   <span class="c">// [68, 72, 85, 91] — sorted, duplicate dropped</span></code></pre>
+          <table class="cmp sm">
+            <thead><tr><th>Operation</th><th>HashSet</th><th>LinkedHashSet</th><th>TreeSet</th></tr></thead>
+            <tbody>
+              <tr><td>add / remove / contains</td><td class="good">O(1) avg</td><td class="good">O(1) avg</td><td>O(log n)</td></tr>
+              <tr><td>Iteration order</td><td>None</td><td>Insertion</td><td>Sorted</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 13. MAP + HASHMAP -->
+        <section class="slide">
+          <p class="eyebrow">The most useful collection in real projects</p>
+          <h2>Map &amp; HashMap</h2>
+          <p class="deep">A <strong>Map</strong> stores unique <strong>keys</strong> each mapped to one <strong>value</strong> — a dictionary, a phone book, a student-ID-to-grade record. <code>HashMap</code> uses the same hashing trick as HashSet for O(1) lookups.</p>
+          <pre><code><span class="t">HashMap</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; pop = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+pop.put(<span class="s">"Mumbai"</span>, <span class="num">20_000_000</span>);
+pop.put(<span class="s">"Mumbai"</span>, <span class="num">21_000_000</span>);   <span class="c">// updates existing key</span>
+pop.get(<span class="s">"Mumbai"</span>);                  <span class="c">// 21000000</span>
+pop.get(<span class="s">"Chennai"</span>);                 <span class="c">// null — absent</span>
+pop.getOrDefault(<span class="s">"Chennai"</span>, <span class="num">0</span>);   <span class="c">// 0</span>
+pop.containsKey(<span class="s">"Delhi"</span>);</code></pre>
+          <div class="note">
+            <span class="lbl">Frequency counter — a pattern you'll use everywhere</span>
+            <pre style="margin:6px 0 0;"><code><span class="k">for</span> (<span class="t">String</span> w : words)
+    freq.put(w, freq.getOrDefault(w, <span class="num">0</span>) + <span class="num">1</span>);
+<span class="c">// {apple=3, banana=2, cherry=1}</span></code></pre>
+          </div>
+        </section>
+
+        <!-- 14. ITERATING MAPS + ORDERED MAPS -->
+        <section class="slide">
+          <p class="eyebrow">Reading a Map — and its ordered cousins</p>
+          <h2>Iterating Maps</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>entrySet() — both key &amp; value (best)</h3>
+              <pre><code><span class="k">for</span> (<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>,<span class="t">Integer</span>&gt; e
+        : pop.entrySet()) {
+    e.getKey();
+    e.getValue();
+}
+
+<span class="c">// cleanest (Java 8+):</span>
+pop.forEach((city, p) -&gt;
+    <span class="t">System</span>.out.println(city + <span class="s">" → "</span> + p));</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Also: keySet() / values()</h3>
+              <pre><code><span class="k">for</span> (<span class="t">String</span> k : pop.keySet()) { }
+<span class="k">for</span> (<span class="t">Integer</span> v : pop.values()) { }</code></pre>
+              <div class="warnbox" style="margin-top:8px;">
+                <span class="lbl">Don't</span>
+                Loop <code>keySet()</code> then call <code>get(key)</code> inside — that's two lookups per row. Use <code>entrySet()</code>.
+              </div>
+            </div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th>Implementation</th><th>Order of keys</th></tr></thead>
+            <tbody>
+              <tr><td class="hl"><code>HashMap</code></td><td>None (fastest)</td></tr>
+              <tr><td class="hl"><code>LinkedHashMap</code></td><td>Insertion order</td></tr>
+              <tr><td class="hl"><code>TreeMap</code></td><td>Sorted by key (O(log n))</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 15. CLASS RELATIONSHIPS — IS-A -->
+        <section class="slide">
+          <p class="eyebrow">Section 2 · How objects relate — IS-A</p>
+          <h2>Inheritance (IS-A)</h2>
+          <p class="deep">A subclass <strong>IS-A</strong> kind of its superclass. <code>Dog extends Animal</code> means a Dog is an Animal and inherits its behaviour. This is what enables <strong>polymorphism</strong>.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>Inherit &amp; override</h3>
+              <pre><code><span class="k">class</span> <span class="t">Animal</span> {
+  <span class="k">void</span> <span class="m">eat</span>() { ... }
+}
+<span class="k">class</span> <span class="t">Dog</span> <span class="k">extends</span> <span class="t">Animal</span> {
+  <span class="a">@Override</span>
+  <span class="k">void</span> <span class="m">eat</span>() { ... }  <span class="c">// new behaviour</span>
+  <span class="k">void</span> <span class="m">bark</span>() { ... }
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Polymorphism &amp; super</h3>
+              <pre><code><span class="t">Animal</span> a = <span class="k">new</span> <span class="t">Dog</span>(); <span class="c">// Dog IS-A Animal</span>
+a.eat();   <span class="c">// runs Dog's version</span>
+
+<span class="c">// in Manager extends Employee:</span>
+<span class="k">super</span>(name, salary);  <span class="c">// parent ctor</span>
+<span class="k">super</span>.calculatePay(); <span class="c">// parent method</span></code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Two rules worth keeping</span>
+            Always use <code>@Override</code> — without it, a signature typo silently creates a <em>new</em> method instead of overriding. And use inheritance only for a genuine, stable IS-A relationship — <strong>not</strong> merely to reuse code (that's what composition is for).
+          </div>
+        </section>
+
+        <!-- 16. HAS-A: COMPOSITION vs AGGREGATION -->
+        <section class="slide">
+          <p class="eyebrow">HAS-A — the relationship freshers most often confuse</p>
+          <h2>Composition vs Aggregation</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Composition — strong ownership</h3>
+              <pre style="margin:0 0 8px;"><code><span class="k">class</span> <span class="t">House</span> {
+  <span class="k">private</span> <span class="t">Room</span> living;
+  <span class="t">House</span>() {
+    living = <span class="k">new</span> <span class="t">Room</span>(); <span class="c">// House CREATES it</span>
+  }
+}</code></pre>
+              <p style="font-size:14px; margin:0;">House owns the Room. Destroy the House → the Room goes too. A Room <em>without</em> a House makes no sense.</p>
+            </div>
+            <div class="colbox b">
+              <h3>Aggregation — weak ownership</h3>
+              <pre style="margin:0 0 8px;"><code><span class="k">class</span> <span class="t">Department</span> {
+  <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">Employee</span>&gt; emps;
+  <span class="k">void</span> <span class="m">add</span>(<span class="t">Employee</span> e) {
+    emps.add(e); <span class="c">// e existed before</span>
+  }
+}</code></pre>
+              <p style="font-size:14px; margin:0;">Department references Employees. Disband it → Employees still exist and can move elsewhere.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The decision question</span>
+            Can the contained object exist and make sense <em>without</em> the container? <strong>Yes → Aggregation. No → Composition.</strong>
+          </div>
+        </section>
+
+        <!-- 17. COMPOSITION OVER INHERITANCE -->
+        <section class="slide">
+          <p class="eyebrow">A core design principle</p>
+          <h2>Favour composition over inheritance</h2>
+          <p class="deep">You want a <code>Logger</code> that writes to a file <em>and</em> a database. Java has no multiple inheritance — you can't <code>extends FileWriter, DatabaseConnector</code>. Composition solves it cleanly:</p>
+          <pre><code><span class="k">class</span> <span class="t">Logger</span> {
+  <span class="k">private</span> <span class="t">FileWriter</span> file;          <span class="c">// HAS-A</span>
+  <span class="k">private</span> <span class="t">DatabaseConnector</span> db;     <span class="c">// HAS-A</span>
+
+  <span class="k">void</span> <span class="m">log</span>(<span class="t">String</span> msg) {
+    file.write(msg);
+    db.insert(<span class="s">"logs"</span>, msg);
+  }
+}</code></pre>
+          <div class="cards c4">
+            <div class="card"><h3>No limits</h3><p>Compose as many collaborators as you need.</p></div>
+            <div class="card"><h3>Swappable</h3><p>Change behaviour at runtime — inject a different writer.</p></div>
+            <div class="card"><h3>Focused</h3><p>Classes stay small and single-purpose.</p></div>
+            <div class="card"><h3>Testable</h3><p>Inject mock dependencies easily.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule</span>
+            <strong>Inherit</strong> for a genuine IS-A relationship. <strong>Compose</strong> to reuse behaviour. Most of the time, composition is the right answer.
+          </div>
+        </section>
+
+        <!-- 18. ABSTRACT CLASS vs INTERFACE -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to define a contract</p>
+          <h2>Abstract class vs Interface</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>Abstract class — partial implementation</h3>
+              <pre><code><span class="k">abstract class</span> <span class="t">Vehicle</span> {
+  <span class="k">void</span> <span class="m">start</span>() { ... }       <span class="c">// shared</span>
+  <span class="k">abstract double</span> <span class="m">mileage</span>(); <span class="c">// must impl</span>
+}
+<span class="k">class</span> <span class="t">ElectricCar</span> <span class="k">extends</span> <span class="t">Vehicle</span> {
+  <span class="a">@Override double</span> <span class="m">mileage</span>() { ... }
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Interface — a capability contract</h3>
+              <pre><code><span class="k">interface</span> <span class="t">Saveable</span> {
+  <span class="k">void</span> <span class="m">save</span>(<span class="t">String</span> f);
+  <span class="k">default void</span> <span class="m">backup</span>() { ... } <span class="c">// Java 8+</span>
+}
+<span class="k">class</span> <span class="t">Report</span> <span class="k">implements</span>
+        <span class="t">Printable</span>, <span class="t">Saveable</span> { ... } <span class="c">// multiple!</span></code></pre>
+            </div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th></th><th>Abstract class</th><th>Interface</th></tr></thead>
+            <tbody>
+              <tr><td>Constructor / instance fields</td><td class="good">Yes</td><td class="bad">No (only constants)</td></tr>
+              <tr><td>Methods</td><td>Abstract + concrete</td><td>Abstract + default + static</td></tr>
+              <tr><td>Multiple inheritance</td><td class="bad">No (one <code>extends</code>)</td><td class="good">Yes (many <code>implements</code>)</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Which to use</span>
+            <strong>Abstract class</strong> when classes share state and behaviour. <strong>Interface</strong> to define a capability unrelated classes might share — like <code>Comparable</code>, <code>Runnable</code>, <code>Serializable</code>.
+          </div>
+        </section>
+
+        <!-- 19. FILE I/O INTRO -->
+        <section class="slide">
+          <p class="eyebrow">Section 3 · Data beyond the JVM</p>
+          <h2>Why File I/O</h2>
+          <p class="deep">Collections keep data alive in memory; databases keep it on a server. <strong>Files keep it on disk</strong> — simple, no server needed, perfect for configs, logs, and exports.</p>
+          <div class="twocol">
+            <div class="colbox">
+              <h3 style="color:var(--mac-accent);">Byte streams</h3>
+              <p style="font-size:14.5px;"><code>InputStream</code> / <code>OutputStream</code> — for <strong>binary</strong> data: images, audio, PDFs.</p>
+            </div>
+            <div class="colbox">
+              <h3 style="color:var(--mac-accent);">Character streams</h3>
+              <p style="font-size:14.5px;"><code>Reader</code> / <code>Writer</code> — for <strong>text</strong>, with encoding handled for you.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Rule of thumb</span>
+            You'll work with text ~90% of the time — so reach for <strong>character streams</strong>. They handle character encoding (UTF-8, etc.) automatically.
+          </div>
+          <div class="note">
+            <span class="lbl">The File class — paths only, no content</span>
+            <code>java.io.File</code> represents a path. It checks <code>exists()</code>, <code>isFile()</code>, <code>length()</code>, and creates/deletes files &amp; directories — but it does <strong>not</strong> read or write content. Use <code>File.separator</code> (or <code>Paths.get(...)</code>) instead of hardcoding <code>\</code> or <code>/</code>.
+          </div>
+        </section>
+
+        <!-- 20. WRITERS & READERS -->
+        <section class="slide">
+          <p class="eyebrow">Reading &amp; writing text files</p>
+          <h2>Buffered text I/O</h2>
+          <p class="deep">Wrap a <code>FileReader</code>/<code>FileWriter</code> in a <strong>buffered</strong> layer — it reads/writes large chunks at once instead of one slow character at a time. <code>PrintWriter</code> adds <code>println()</code>/<code>printf()</code> convenience on top.</p>
+          <div class="panels">
+            <div class="panel good">
+              <h3>Write — BufferedWriter / PrintWriter</h3>
+              <pre><code><span class="k">try</span> (<span class="t">PrintWriter</span> pw = <span class="k">new</span> <span class="t">PrintWriter</span>(
+       <span class="k">new</span> <span class="t">BufferedWriter</span>(
+         <span class="k">new</span> <span class="t">FileWriter</span>(<span class="s">"emp.txt"</span>)))) {
+  pw.println(<span class="s">"ID,Name,Salary"</span>);
+  pw.printf(<span class="s">"%d,%s,%.2f%n"</span>,
+            <span class="num">101</span>, <span class="s">"Ravi"</span>, <span class="num">75000.0</span>);
+}  <span class="c">// auto-flush + close</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Read — BufferedReader, line by line</h3>
+              <pre><code><span class="k">try</span> (<span class="t">BufferedReader</span> br = <span class="k">new</span> <span class="t">BufferedReader</span>(
+       <span class="k">new</span> <span class="t">FileReader</span>(<span class="s">"emp.txt"</span>))) {
+  <span class="t">String</span> line;
+  <span class="k">while</span> ((line = br.readLine()) != <span class="k">null</span>) {
+    <span class="t">String</span>[] p = line.split(<span class="s">","</span>);
+    <span class="c">// p[0]=ID, p[1]=Name ...</span>
+  }
+}  <span class="c">// readLine() returns null at EOF</span></code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The wrapping idea</span>
+            <code>BufferedReader</code> wraps <code>FileReader</code> wraps the file. Each layer adds a capability — FileReader opens it, BufferedReader adds buffering + <code>readLine()</code>. <code>Scanner</code> is an easier alternative for token-based reading (<code>nextInt()</code>, <code>nextLine()</code>), but slower for large files.
+          </div>
+        </section>
+
+        <!-- 21. try-with-resources + IOException + NIO + Properties -->
+        <section class="slide">
+          <p class="eyebrow">Safety, errors &amp; the modern API</p>
+          <h2>try-with-resources, NIO.2 &amp; Properties</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>Always auto-close + handle IOException</h3>
+              <pre><code><span class="t">File</span> f = <span class="k">new</span> <span class="t">File</span>(<span class="s">"config.txt"</span>);
+<span class="k">if</span> (!f.exists()) { <span class="c">/* defaults */</span> }
+
+<span class="k">try</span> (<span class="t">BufferedReader</span> br =
+       <span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">FileReader</span>(f))) {
+  <span class="c">// ...</span>
+} <span class="k">catch</span> (<span class="t">IOException</span> e) {
+  <span class="t">System</span>.out.println(e.getMessage());
+}</code></pre>
+              <p style="font-size:13px; margin-top:6px;" class="muted">All streams implement <code>AutoCloseable</code> — forgetting to close leaks the file handle and can lock it.</p>
+            </div>
+            <div class="panel">
+              <h3>NIO.2 (Java 7+) — concise</h3>
+              <pre><code><span class="t">Path</span> p = <span class="t">Paths</span>.get(<span class="s">"out.txt"</span>);
+<span class="t">Files</span>.writeString(p, <span class="s">"Hello\n"</span>);
+<span class="t">String</span> all = <span class="t">Files</span>.readString(p);
+<span class="t">List</span>&lt;<span class="t">String</span>&gt; lines =
+    <span class="t">Files</span>.readAllLines(p);</code></pre>
+              <p style="font-size:13px; margin-top:6px;" class="muted">For new code prefer <code>java.nio.file</code>; know <code>java.io</code> for legacy code.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Properties files — exactly how Spring Boot reads config</span>
+            <pre style="margin:6px 0 0;"><code><span class="t">Properties</span> props = <span class="k">new</span> <span class="t">Properties</span>();
+<span class="k">try</span> (<span class="t">FileInputStream</span> fis = <span class="k">new</span> <span class="t">FileInputStream</span>(<span class="s">"config.properties"</span>)) {
+    props.load(fis);
+}
+<span class="t">String</span> url = props.getProperty(<span class="s">"db.url"</span>);   <span class="c">// like application.properties!</span></code></pre>
+          </div>
+        </section>
+
+        <!-- 22. PUTTING IT TOGETHER -->
+        <section class="slide">
+          <p class="eyebrow">The synthesis — it all works together</p>
+          <h2>Collections + File I/O in one flow</h2>
+          <p class="deep">Read a CSV into a List, process it with Collections, write the result back — the practical payoff of everything in this session.</p>
+          <pre class="tight"><code><span class="c">// 1. READ a CSV into a List of objects</span>
+<span class="t">List</span>&lt;<span class="t">Employee</span>&gt; emps = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+<span class="k">try</span> (<span class="t">BufferedReader</span> br = <span class="k">new</span> <span class="t">BufferedReader</span>(<span class="k">new</span> <span class="t">FileReader</span>(<span class="s">"employees.csv"</span>))) {
+    br.readLine();                       <span class="c">// skip header</span>
+    <span class="t">String</span> line;
+    <span class="k">while</span> ((line = br.readLine()) != <span class="k">null</span>) {
+        <span class="t">String</span>[] p = line.split(<span class="s">","</span>);
+        emps.add(<span class="k">new</span> <span class="t">Employee</span>(<span class="t">Integer</span>.parseInt(p[<span class="num">0</span>].trim()), p[<span class="num">1</span>].trim(),
+                              p[<span class="num">2</span>].trim(), <span class="t">Double</span>.parseDouble(p[<span class="num">3</span>].trim())));
+    }
+}
+<span class="c">// 2. PROCESS with Collections</span>
+emps.sort(<span class="t">Comparator</span>.comparingDouble(<span class="t">Employee</span>::getSalary).reversed());
+<span class="t">Map</span>&lt;<span class="t">String</span>,<span class="t">Long</span>&gt; byDept = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+<span class="k">for</span> (<span class="t">Employee</span> e : emps) byDept.merge(e.getDept(), <span class="num">1L</span>, <span class="t">Long</span>::sum);
+
+<span class="c">// 3. WRITE the result back out</span>
+<span class="k">try</span> (<span class="t">PrintWriter</span> pw = <span class="k">new</span> <span class="t">PrintWriter</span>(<span class="k">new</span> <span class="t">BufferedWriter</span>(<span class="k">new</span> <span class="t">FileWriter</span>(<span class="s">"report.csv"</span>)))) {
+    pw.println(<span class="s">"Name,Department,Salary"</span>);
+    <span class="k">for</span> (<span class="t">Employee</span> e : emps)
+        pw.printf(<span class="s">"%s,%s,%.2f%n"</span>, e.getName(), e.getDept(), e.getSalary());
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Everything in one workflow</span>
+            ArrayList, <code>sort</code>, Comparator, HashMap, BufferedReader, BufferedWriter and PrintWriter — all cooperating to read, transform, and persist data.
+          </div>
+        </section>
+
+        <!-- 23. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Everything in one view</p>
+          <h2>Session recap</h2>
+          <div class="recap-grid">
+            <div class="recap-cell">
+              <h3>Lists</h3>
+              <ul>
+                <li><strong>ArrayList</strong> — default; O(1) index, O(n) middle insert</li>
+                <li><strong>LinkedList</strong> — O(1) ends; also a Deque</li>
+                <li>Comparable = natural order; Comparator = flexible</li>
+              </ul>
+            </div>
+            <div class="recap-cell">
+              <h3>Sets</h3>
+              <ul>
+                <li><strong>HashSet</strong> fastest, no order</li>
+                <li><strong>LinkedHashSet</strong> insertion order</li>
+                <li><strong>TreeSet</strong> sorted, O(log n)</li>
+              </ul>
+            </div>
+            <div class="recap-cell">
+              <h3>Maps</h3>
+              <ul>
+                <li><strong>HashMap</strong> fast/unordered, <strong>TreeMap</strong> sorted</li>
+                <li>Iterate with <code>entrySet()</code></li>
+                <li>Override <code>hashCode()</code>+<code>equals()</code> for custom keys</li>
+              </ul>
+            </div>
+            <div class="recap-cell">
+              <h3>Class relationships</h3>
+              <ul>
+                <li>IS-A = inheritance; HAS-A = composition/aggregation</li>
+                <li>Favour composition for reuse</li>
+                <li>Abstract = partial impl; Interface = contract</li>
+              </ul>
+            </div>
+            <div class="recap-cell">
+              <h3>File I/O</h3>
+              <ul>
+                <li>BufferedReader/Writer for text; PrintWriter for formatting</li>
+                <li>NIO.2 <code>Files</code> for concise modern code</li>
+                <li><code>Properties</code> = how Spring reads config</li>
+              </ul>
+            </div>
+            <div class="recap-cell">
+              <h3>Golden rules</h3>
+              <ul>
+                <li>Always use generics <code>&lt;Type&gt;</code></li>
+                <li>ArrayList &amp; HashMap are the right default ~90% of the time</li>
+                <li>Always use try-with-resources for any stream</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 24. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session</span>
+            <h1>The complete data toolkit.</h1>
+            <div class="sub">You can now manage data in Java three ways — in memory with Collections, structurally with class relationships, and on disk with File I/O. In every Spring Boot project, all three are in play every day.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java · Collections, Class Relationships &amp; File I/O</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 24</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
