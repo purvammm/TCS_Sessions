@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JDBC — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into jdbc-theory.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Schema reminder box (pinned visual) === */
+    .schema-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .schema-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .schema-box pre {
+      margin: 0; background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.55; white-space: pre;
+    }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Output console block */
+    .outblock {
+      background: #11131a; color: #d6e9c6; border: 1px solid var(--mac-border);
+      border-radius: 8px; padding: 12px 16px; margin: 8px 0;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; overflow-x: auto; white-space: pre;
+    }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* H2 alternative box */
+    .altbox {
+      border: 2px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .altbox h3 { margin: 0 0 6px; color: #00827b; font-size: 18px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors */
+    details.exp.lab0 { border-left-color: #8e8e93; }
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab0 > summary { background: linear-gradient(135deg,#f4f4f6,#eaeaec); }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab0 .lab-tag { background:#8e8e93; }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+
+    /* SQL verb badge */
+    .verb-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .verb-badge.create { background: #8e8e93; }
+    .verb-badge.insert { background: #49cc90; }
+    .verb-badge.select { background: #61affe; }
+    .verb-badge.update { background: #fca130; }
+    .verb-badge.delete { background: #f93e3e; }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { color: #8fd3ff; font-size: 17px; margin: 18px 0 6px; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref ol { margin: 10px 0 0; padding-left: 22px; }
+    .qref ol li { font-size: 14.5px; margin: 5px 0; color: #e6e6ea; }
+    .qref ol li code { color: #a6e22e; }
+
+    /* Data Source Explorer mock */
+    .dse-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+    }
+    .dse-mock .dse-top { background: #2a2a40; color: #fff; padding: 6px 12px; font-weight: 700; }
+    .dse-mock .dse-row { padding: 5px 14px; border-bottom: 1px solid var(--mac-border); }
+    .dse-mock .dse-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">jdbc-lab.html — Java Database Connectivity</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🗄️</div>
+        <div>
+          <h1>JDBC — Hands-on Lab</h1>
+          <p class="section-intro">Connect to a database, build the <code>employees</code> table, and write full CRUD with PreparedStatement — then refactor into a clean DAO. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for the JDBC session — the theory's five-steps slide stays on the main
+          screen while you build here. We go from a first connection to complete CRUD, then refactor into the DAO
+          pattern. Use the <strong>Copy</strong> button on every snippet, tick each checkbox as you go, and keep the
+          <strong>schema box</strong> below in view — every lab uses that one table. If you fall behind, the
+          <strong>Complete Code Reference</strong> at the bottom has every final file ready to paste.
+        </div>
+      </section>
+
+      <!-- ===== SCHEMA REMINDER (pinned) ===== -->
+      <div class="schema-box">
+        <h3>📌 Database schema — used by every lab</h3>
+        <pre>CREATE TABLE employees (
+    emp_id     INT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name  VARCHAR(50),
+    department VARCHAR(50),
+    salary     DOUBLE
+)</pre>
+      </div>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Derby setup done</strong> — connection tested in Data Source Explorer, URL copied.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · First connection working</strong> — "Connected: true" prints from Java.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · Table created</strong> — EMPLOYEES appears in the explorer.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · INSERT working</strong> — 3 employees inserted via PreparedStatement.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · SELECT all working</strong> — all rows printed in a formatted table.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · SELECT by ID working</strong> — found vs not-found both handled.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · UPDATE + DELETE working</strong> — rows-affected used to confirm.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · DAO refactor complete</strong> — DBConnector + EmployeeDAO + Tester running.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. The "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17+ installed</strong>
+                <span class="verify">Verify: <code>java -version</code> shows 17 or higher.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Derby JAR on the build path</strong> — Eclipse (Add External JARs) or IntelliJ (external library)
+                <span class="verify">Eclipse: bundled under <code>db-derby/lib/derby.jar</code>, or download Apache Derby.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A Java project ready</strong> with a package <code>com.tcs.jdbc</code>
+                <span class="verify">We'll create all classes inside this package.</span>
+              </span>
+            </label>
+            <div class="altbox">
+              <h3>🔄 Derby giving you trouble? Use H2 instead — every lab works identically</h3>
+              <p style="font-size:15.5px; margin:0 0 8px;">H2 is a tiny, zero-setup Type 4 database. Add the JAR/dependency and change just three things — the rest of the code is unchanged:</p>
+              <div class="codewrap"><pre><code><span class="code-comment">// 1. Driver class (Class.forName is optional in JDBC 4.0+):</span>
+org.h2.Driver
+
+<span class="code-comment">// 2. Connection URL (file-based, auto-creates):</span>
+jdbc:h2:~/employeedb
+
+<span class="code-comment">// 3. Maven dependency:</span>
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;version&gt;2.2.224&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+              <p style="font-size:14.5px; margin:0; color:#00827b;">User <code>sa</code>, blank password — same as Derby. The DDL, INSERT, SELECT, UPDATE, DELETE code is all identical.</p>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== THE LABS ===== -->
+      <div class="section-band">The labs — build database CRUD</div>
+
+      <!-- ===== LAB 0: DERBY SETUP ===== -->
+      <section class="section">
+        <details class="exp lab0" open>
+          <summary><span class="lab-tag">LAB 0</span><span class="chevron">▶</span> Derby Setup in Eclipse</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Get a working database connection <em>before</em> writing any Java, and copy the JDBC URL we'll reuse all
+              session. Eclipse's Data Source Explorer lets us test the connection visually first.
+            </div>
+            <ol class="steps">
+              <li><strong>Open the view:</strong> Window → Show View → Other → Data Management → <strong>Data Source Explorer</strong>.</li>
+              <li><strong>New connection:</strong> right-click <strong>Database Connections</strong> → New → select <strong>Derby</strong>.</li>
+              <li><strong>Add the JAR:</strong> click <strong>Add JAR/Zip</strong> → navigate to <code>derby.jar</code>.</li>
+              <li><strong>Set the properties:</strong> database name <code>employeedb</code>, user <code>sa</code>, password blank.</li>
+              <li><strong>Test &amp; copy:</strong> click <strong>Test Connection</strong> → it should succeed → copy the generated JDBC URL.</li>
+            </ol>
+            <div class="dse-mock">
+              <div class="dse-top">🗂️ Data Source Explorer</div>
+              <div class="dse-row">▾ Database Connections</div>
+              <div class="dse-row">&nbsp;&nbsp;&nbsp;▾ Derby — employeedb &nbsp;<span style="color:#1a9e34;">● connected</span></div>
+              <div class="dse-row">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▸ Schemas</div>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected URL format</span>
+              <div class="codewrap"><pre><code>jdbc:derby:C:/path/employeedb;create=true</code></pre></div>
+            </div>
+            <div class="concept">
+              <span class="lbl">What <code>create=true</code> means</span>
+              It tells Derby to <strong>create the database if it doesn't already exist</strong> — essential for the
+              first run. Without it, the first connection fails because the database isn't there yet.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>JAR not found / driver class missing</td><td>Derby JAR isn't on the build path.</td><td>Project → Properties → Java Build Path → Libraries → <strong>Add External JARs</strong> → <code>derby.jar</code>.</td></tr>
+                <tr><td>Test Connection fails</td><td>Derby JAR version doesn't match your JDK.</td><td>Use a Derby release compatible with your JDK (e.g. Derby 10.15+ for JDK 17), or switch to H2 (box above).</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Derby connection tested successfully; JDBC URL copied for use in the labs.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 1: FIRST CONNECTION ===== -->
+      <section class="section">
+        <details class="exp lab1">
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Your First JDBC Connection</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              All five JDBC steps in their simplest form — open a connection, confirm it's live, close it. This is the
+              tactile anchor before CRUD begins.
+            </div>
+            <ol class="steps">
+              <li><strong>Create</strong> package <code>com.tcs.jdbc</code>, class <code>JDBCTest.java</code>.</li>
+              <li><strong>Add the code below</strong> and run it.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class JDBCTest {
+    public static void main(String[] args) {
+        try {
+            <span class="code-comment">// Step 1: Register the driver (optional in JDBC 4.0+, shown for clarity)</span>
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
+
+            <span class="code-comment">// Step 2: Establish the connection</span>
+            String url = "jdbc:derby:employeedb;create=true";
+            Connection con = DriverManager.getConnection(url, "sa", "");
+
+            <span class="code-comment">// Step 3-4: Verify the connection is open</span>
+            System.out.println("Connected: " + !con.isClosed());
+
+            <span class="code-comment">// Step 5: Close it</span>
+            con.close();
+            System.out.println("Closed: " + con.isClosed());
+
+        } catch (ClassNotFoundException e) {
+            System.out.println("Driver not found: " + e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("DB error: " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="outblock">Connected: true
+Closed: true</div>
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>ClassNotFoundException</code></td><td>derby.jar isn't on the classpath.</td><td>Add the Derby JAR to the build path (Lab 0).</td></tr>
+                <tr><td>Path-with-spaces error</td><td>Backslashes / spaces in a Windows path.</td><td>Use forward slashes in the URL, e.g. <code>jdbc:derby:C:/data/employeedb;create=true</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">"Connected: true" then "Closed: true" printed — the connection works.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 2: CREATE + INSERT ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="verb-badge create">CREATE</span><span class="verb-badge insert">INSERT</span><span class="chevron">▶</span> Create Table + INSERT</summary>
+          <div class="exp-body">
+            <h3 style="margin-top:0;">Part A — Create the table (DDL)</h3>
+            <div class="codewrap"><pre><code>String sql = "CREATE TABLE employees (" +
+             "emp_id INT PRIMARY KEY, " +
+             "first_name VARCHAR(50), " +
+             "last_name VARCHAR(50), " +
+             "department VARCHAR(50), " +
+             "salary DOUBLE)";
+
+Statement stmt = con.createStatement();
+stmt.executeUpdate(sql);
+System.out.println("Table created successfully.");</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Heads-up</span>
+              Running this <strong>twice</strong> throws "table already exists" (SQLState <code>X0Y32</code>/<code>42Y55</code>).
+              That's fine — either wrap it in a try-catch, or drop the table first if you're re-running. Then verify:
+              in Data Source Explorer, refresh the connection → expand <strong>Tables</strong> → <code>EMPLOYEES</code> appears.
+            </div>
+
+            <h3>Part B — INSERT with PreparedStatement</h3>
+            <div class="codewrap"><pre><code>public static void insertEmployee(Connection con, int id, String first,
+                                  String last, String dept, double salary)
+                                  throws SQLException {
+    String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
+    PreparedStatement ps = con.prepareStatement(sql);
+
+    ps.setInt(1, id);          <span class="code-comment">// parameter index starts at 1, not 0</span>
+    ps.setString(2, first);
+    ps.setString(3, last);
+    ps.setString(4, dept);
+    ps.setDouble(5, salary);
+
+    int rows = ps.executeUpdate();
+    System.out.println(rows + " row(s) inserted.");
+}</code></pre></div>
+            <p><strong>Call it three times</strong> with different data:</p>
+            <div class="codewrap"><pre><code>insertEmployee(con, 101, "Ravi",  "Sharma", "Engineering", 75000.00);
+insertEmployee(con, 102, "Priya", "Mehta",  "HR",          65000.00);
+insertEmployee(con, 103, "Arjun", "Patel",  "Engineering", 80000.00);</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="outblock">1 row(s) inserted.
+1 row(s) inserted.
+1 row(s) inserted.</div>
+              Verify in Data Source Explorer: right-click <code>EMPLOYEES</code> → Data → Edit — all 3 rows visible.
+            </div>
+            <div class="observe">
+              <span class="lbl">Observation — try breaking it on purpose</span>
+              What happens if you insert <code>emp_id 101</code> again? Run it and read the error carefully — note the
+              <strong>SQLState</strong> code. (It's <code>23505</code> — duplicate primary key. We'll handle this
+              gracefully in Lab 5.)
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Table created and 3 employees inserted via PreparedStatement.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: SELECT ALL ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="verb-badge select">SELECT</span><span class="chevron">▶</span> SELECT All — Reading a ResultSet</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              A SELECT returns a <code>ResultSet</code> — a cursor over the rows. <code>rs.next()</code> moves forward
+              one row and returns <code>true</code>; the <code>while</code> loop stops when it returns <code>false</code>.
+            </div>
+            <div class="codewrap"><pre><code>String sql = "SELECT * FROM employees";
+Statement stmt = con.createStatement();
+ResultSet rs = stmt.executeQuery(sql);
+
+System.out.println("ID  | Name            | Department  | Salary");
+System.out.println("----+-----------------+-------------+--------");
+
+while (rs.next()) {
+    System.out.printf("%-4d| %-16s| %-12s| %.2f%n",
+        rs.getInt("emp_id"),
+        rs.getString("first_name") + " " + rs.getString("last_name"),
+        rs.getString("department"),
+        rs.getDouble("salary"));
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="outblock">ID  | Name            | Department  | Salary
+----+-----------------+-------------+--------
+101 | Ravi Sharma     | Engineering | 75000.00
+102 | Priya Mehta     | HR          | 65000.00
+103 | Arjun Patel     | Engineering | 80000.00</div>
+            </div>
+            <div class="concept">
+              <span class="lbl">How the cursor works</span>
+              <code>rs.next()</code> starts <em>before</em> row 1. Each call advances one row and returns
+              <code>true</code> while rows remain, <code>false</code> when they're exhausted — so the <code>while</code>
+              loop ends naturally. You read columns by name (<code>rs.getString("first_name")</code>) or by 1-based index.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Write <code>getEmployeesByDepartment(String dept)</code> that returns only Engineering employees. Hint:
+              use <code>WHERE department = ?</code> with a <strong>PreparedStatement</strong> and bind the value with
+              <code>ps.setString(1, dept)</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">SELECT all prints every employee in a formatted table.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4: SELECT BY ID, UPDATE, DELETE ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="verb-badge select">SELECT</span><span class="verb-badge update">UPDATE</span><span class="verb-badge delete">DELETE</span><span class="chevron">▶</span> SELECT by ID, UPDATE, DELETE</summary>
+          <div class="exp-body">
+            <h3 style="margin-top:0;">SELECT by ID — use <code>if(rs.next())</code>, not <code>while</code></h3>
+            <div class="concept">
+              <span class="lbl">Why <code>if</code> here?</span>
+              We expect at most one row (the id is the primary key), so a single <code>if(rs.next())</code> is clearer
+              than a loop — and it gives us a clean "not found" branch.
+            </div>
+            <div class="codewrap"><pre><code>String sql = "SELECT * FROM employees WHERE emp_id = ?";
+PreparedStatement ps = con.prepareStatement(sql);
+ps.setInt(1, empId);
+ResultSet rs = ps.executeQuery();
+
+if (rs.next()) {
+    System.out.println("Found: " + rs.getString("first_name") +
+                       " " + rs.getString("last_name"));
+} else {
+    System.out.println("No employee found with ID: " + empId);
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected — test both cases</span>
+              <div class="outblock">empId = 101  ->  Found: Ravi Sharma
+empId = 999  ->  No employee found with ID: 999</div>
+            </div>
+
+            <h3>UPDATE</h3>
+            <div class="codewrap"><pre><code>String sql = "UPDATE employees SET salary = ? WHERE emp_id = ?";
+PreparedStatement ps = con.prepareStatement(sql);
+ps.setDouble(1, 90000.00);
+ps.setInt(2, 101);
+
+int rows = ps.executeUpdate();
+System.out.println(rows > 0 ? "Salary updated." : "Employee not found.");</code></pre></div>
+
+            <h3>DELETE</h3>
+            <div class="codewrap"><pre><code>String sql = "DELETE FROM employees WHERE emp_id = ?";
+PreparedStatement ps = con.prepareStatement(sql);
+ps.setInt(1, 103);
+
+int rows = ps.executeUpdate();
+System.out.println(rows > 0 ? "Deleted." : "Employee not found.");</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Run SELECT all after each operation</span>
+              Confirm 101's salary changed to 90000.00 and 103 is gone. Re-running SELECT all between operations is the
+              fastest way to <em>see</em> your changes land.
+            </div>
+            <div class="concept">
+              <span class="lbl">Why the rows-affected check matters</span>
+              <code>executeUpdate()</code> returns the number of rows changed. Checking <code>rows > 0</code> lets you
+              distinguish <em>"query ran fine but matched nothing"</em> from <em>"record found and modified"</em> — far
+              more useful than assuming success.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">SELECT by ID handles found &amp; not-found; UPDATE and DELETE confirmed via rows-affected.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: try-with-resources ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> try-with-resources Refactor</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">The problem we're fixing</span>
+              Every lab so far has a risk: if an exception fires between <code>getConnection()</code> and
+              <code>con.close()</code>, the connection <strong>leaks</strong>. try-with-resources auto-closes every
+              resource — on success and on failure — eliminating the leak.
+            </div>
+            <div class="codewrap"><pre><code>public static void insertEmployee(int id, String first, String last,
+                                  String dept, double salary) {
+    String url = "jdbc:derby:employeedb;create=true";
+    String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
+
+    try (Connection con = DriverManager.getConnection(url, "sa", "");
+         PreparedStatement ps = con.prepareStatement(sql)) {
+
+        ps.setInt(1, id);
+        ps.setString(2, first);
+        ps.setString(3, last);
+        ps.setString(4, dept);
+        ps.setDouble(5, salary);
+        ps.executeUpdate();
+        System.out.println("Inserted successfully.");
+
+    } catch (SQLException e) {
+        System.out.println("Error    : " + e.getMessage());
+        System.out.println("SQLState : " + e.getSQLState());
+        System.out.println("ErrorCode: " + e.getErrorCode());
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Deliberately trigger a failure</span>
+              Call this with a <strong>duplicate</strong> <code>emp_id</code> and watch all three SQLException fields print:
+              <div class="outblock">Error    : The statement was aborted because it would have caused a
+           duplicate key value in a unique or primary key constraint...
+SQLState : 23505
+ErrorCode: 20000</div>
+              In a real app you'd log these with a logger — but this is exactly the information your DevOps team needs
+              to diagnose a production DB issue.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Refactor task</span>
+              Update your <strong>SELECT, UPDATE and DELETE</strong> methods to also use try-with-resources. For SELECT,
+              declare the <code>ResultSet</code> in the <code>try(...)</code> header too — it's <code>AutoCloseable</code> as well.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Methods refactored to try-with-resources; duplicate-key failure prints message, SQLState &amp; error code.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: DAO PATTERN ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="chevron">▶</span> DAO Pattern — Full Refactor</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">The architecture</span>
+              Three classes, three responsibilities: <strong>DBConnector</strong> (just the connection),
+              <strong>EmployeeDAO</strong> (all SQL), <strong>EmployeeTester</strong> (the menu &amp; I/O). No layer
+              does another's job.
+            </div>
+
+            <h3 style="margin-top:0;">1 · DBConnector.java</h3>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+public class DBConnector {
+    private static final String URL = "jdbc:derby:employeedb;create=true";
+    private static final String USER = "sa";
+    private static final String PASSWORD = "";
+
+    public static Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(URL, USER, PASSWORD);
+    }
+}</code></pre></div>
+
+            <h3>2 · EmployeeDAO.java <span class="muted" style="font-size:14px;">— all five operations, the biggest block</span></h3>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class EmployeeDAO {
+
+    <span class="code-comment">// ===== CREATE =====</span>
+    public void insert(int id, String first, String last,
+                       String dept, double salary) {
+        String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
+        try (Connection con = DBConnector.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.setString(2, first);
+            ps.setString(3, last);
+            ps.setString(4, dept);
+            ps.setDouble(5, salary);
+            int rows = ps.executeUpdate();
+            System.out.println(rows + " row(s) inserted.");
+        } catch (SQLException e) {
+            System.out.println("Insert failed [" + e.getSQLState() + "]: "
+                               + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== READ ALL =====</span>
+    public void getAll() {
+        String sql = "SELECT * FROM employees";
+        try (Connection con = DBConnector.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            System.out.println("ID  | Name            | Department  | Salary");
+            System.out.println("----+-----------------+-------------+--------");
+            while (rs.next()) {
+                System.out.printf("%-4d| %-16s| %-12s| %.2f%n",
+                    rs.getInt("emp_id"),
+                    rs.getString("first_name") + " " + rs.getString("last_name"),
+                    rs.getString("department"),
+                    rs.getDouble("salary"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Read failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== READ BY ID =====</span>
+    public void getById(int id) {
+        String sql = "SELECT * FROM employees WHERE emp_id = ?";
+        try (Connection con = DBConnector.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("Found: " + rs.getString("first_name")
+                        + " " + rs.getString("last_name")
+                        + " (" + rs.getString("department") + ")");
+                } else {
+                    System.out.println("No employee found with ID: " + id);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Read failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== UPDATE =====</span>
+    public void updateSalary(int id, double salary) {
+        String sql = "UPDATE employees SET salary = ? WHERE emp_id = ?";
+        try (Connection con = DBConnector.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, salary);
+            ps.setInt(2, id);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Salary updated." : "Employee not found.");
+        } catch (SQLException e) {
+            System.out.println("Update failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== DELETE =====</span>
+    public void delete(int id) {
+        String sql = "DELETE FROM employees WHERE emp_id = ?";
+        try (Connection con = DBConnector.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Deleted." : "Employee not found.");
+        } catch (SQLException e) {
+            System.out.println("Delete failed: " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+
+            <h3>3 · EmployeeTester.java <span class="muted" style="font-size:14px;">— Scanner menu</span></h3>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.util.Scanner;
+
+public class EmployeeTester {
+    public static void main(String[] args) {
+        EmployeeDAO dao = new EmployeeDAO();
+        Scanner sc = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n==== Employee Menu ====");
+            System.out.println("1 - Add Employee");
+            System.out.println("2 - View All Employees");
+            System.out.println("3 - Search by ID");
+            System.out.println("4 - Update Salary");
+            System.out.println("5 - Delete Employee");
+            System.out.println("0 - Exit");
+            System.out.print("Choose: ");
+            int choice = sc.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("ID: ");        int id = sc.nextInt();
+                    System.out.print("First name: "); String f = sc.next();
+                    System.out.print("Last name: ");  String l = sc.next();
+                    System.out.print("Department: "); String d = sc.next();
+                    System.out.print("Salary: ");      double s = sc.nextDouble();
+                    dao.insert(id, f, l, d, s);
+                    break;
+                case 2:
+                    dao.getAll();
+                    break;
+                case 3:
+                    System.out.print("ID to search: ");
+                    dao.getById(sc.nextInt());
+                    break;
+                case 4:
+                    System.out.print("ID: ");          int uid = sc.nextInt();
+                    System.out.print("New salary: ");  double ns = sc.nextDouble();
+                    dao.updateSalary(uid, ns);
+                    break;
+                case 5:
+                    System.out.print("ID to delete: ");
+                    dao.delete(sc.nextInt());
+                    break;
+                case 0:
+                    System.out.println("Goodbye!");
+                    sc.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Try again.");
+            }
+        }
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              Run <code>EmployeeTester</code>. You now interact with your database through the menu — add, view, search,
+              update, delete, all looping until you enter <code>0</code>.
+            </div>
+            <div class="observe">
+              <span class="lbl">Observation question</span>
+              If you had to switch this project from Derby to MySQL, <strong>which files would change, and which would
+              stay exactly the same?</strong>
+              <br><br>
+              <strong>Answer:</strong> only <code>DBConnector</code> (its URL + driver, and maybe minor SQL syntax in the
+              DAO). <code>EmployeeTester</code> is <strong>completely untouched</strong> — the UI never knew which
+              database it was talking to. That separation is the whole point of the DAO pattern.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">DBConnector + EmployeeDAO + EmployeeTester built; the menu drives full CRUD.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE CODE REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Code Reference (final files)</summary>
+          <div class="exp-body">
+            <p>The three DAO classes are complete in Lab 6 above — copy them directly from there. Below: the H2
+            alternative config if you didn't use Derby.</p>
+            <div class="altbox">
+              <h3>H2 alternative — change only these three things</h3>
+              <div class="codewrap"><pre><code><span class="code-comment">// DBConnector.java — swap the URL (driver class is auto-detected):</span>
+private static final String URL = "jdbc:h2:~/employeedb";
+private static final String USER = "sa";
+private static final String PASSWORD = "";
+
+<span class="code-comment">// Driver class, if you register it explicitly:</span>
+Class.forName("org.h2.Driver");
+
+<span class="code-comment">// Maven dependency:</span>
+&lt;dependency&gt;
+    &lt;groupId&gt;com.h2database&lt;/groupId&gt;
+    &lt;artifactId&gt;h2&lt;/artifactId&gt;
+    &lt;version&gt;2.2.224&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+              <p style="font-size:14.5px; margin:0; color:#00827b;"><code>EmployeeDAO</code> and <code>EmployeeTester</code> need <strong>no changes at all</strong> — proof the DAO pattern works.</p>
+            </div>
+            <div class="observe">
+              <span class="lbl">Run order reminder</span>
+              First run creates the database and table (Labs 1–2). On later runs the table already exists — comment out
+              the CREATE TABLE call, or wrap it in a try-catch so "table already exists" doesn't stop your program.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference card</h2>
+
+          <h3>Interfaces &amp; classes</h3>
+          <table>
+            <thead><tr><th>Interface / Class</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>DriverManager</code></td><td>Manages drivers, returns a Connection from a URL</td></tr>
+              <tr><td><code>Connection</code></td><td>Open DB session — one socket, always close it</td></tr>
+              <tr><td><code>Statement</code></td><td>Static SQL — never use for user input</td></tr>
+              <tr><td><code>PreparedStatement</code></td><td>Parameterized SQL — always use this</td></tr>
+              <tr><td><code>ResultSet</code></td><td>Cursor over SELECT results, iterate with <code>rs.next()</code></td></tr>
+              <tr><td><code>SQLException</code></td><td>Checked exception — getMessage, getSQLState, getErrorCode</td></tr>
+            </tbody>
+          </table>
+
+          <h3>The five steps</h3>
+          <ol>
+            <li><code>Class.forName(driverClass)</code> — register (auto in JDBC 4.0+)</li>
+            <li><code>DriverManager.getConnection(url, user, pass)</code> — connect</li>
+            <li><code>con.prepareStatement(sql)</code> — prepare</li>
+            <li><code>ps.executeQuery()</code> or <code>ps.executeUpdate()</code> — execute</li>
+            <li><code>con.close()</code> — release (or use try-with-resources)</li>
+          </ol>
+
+          <h3>Common SQLState codes</h3>
+          <table>
+            <thead><tr><th>SQLState</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>08001</code></td><td>Cannot connect to database</td></tr>
+              <tr><td><code>42X05</code></td><td>Table not found</td></tr>
+              <tr><td><code>23505</code></td><td>Duplicate primary key</td></tr>
+              <tr><td><code>42X14</code></td><td>Column not found</td></tr>
+              <tr><td><code>42Y55</code></td><td>Table already exists (on DROP)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WRAP UP ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">What you just built</span>
+          You went from "my data disappears on restart" to a complete, persistent CRUD application with safe
+          PreparedStatements, proper exception handling, and a clean DAO architecture. <strong>Everything Spring Data
+          JPA does is built on top of exactly this</strong> — when you later call <code>repository.save()</code>, the
+          JDBC you wrote today is what runs underneath, generated for you.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          JDBC Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

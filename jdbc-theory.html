@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JDBC — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into jdbc-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .dangerbox {
+      border-left: 4px solid var(--tl-red);
+      background: rgba(255,95,87,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .dangerbox .lbl { font-weight: 700; color: var(--tl-red); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+    .card code { font-family: var(--mac-mono); font-size: 13.5px; color: var(--mac-accent); }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 7px 0;
+      background: #fafafc;
+      font-size: 16.5px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Status badges in tables */
+    .sbadge { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .sbadge.dead { background: rgba(255,95,87,0.15); color: var(--tl-red); }
+    .sbadge.rare { background: rgba(254,188,46,0.18); color: #b8860b; }
+    .sbadge.legacy { background: rgba(142,142,147,0.18); color: #6e6e73; }
+    .sbadge.current { background: rgba(40,200,64,0.16); color: #1a9e34; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+    .flow-arrow.bi::before { content: "\2195"; }
+
+    /* Two-column comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Step chips (numbered horizontal steps) */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Numbered vertical step list with code */
+    .vsteps { display: grid; gap: 10px; margin-top: 14px; }
+    .vstep { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: start; }
+    .vstep .vn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-top: 8px;
+    }
+    .vstep .vbody { min-width: 0; }
+    .vstep .vlabel { font-weight: 700; font-size: 15.5px; margin: 6px 0 2px; }
+    .vstep pre { margin: 4px 0; }
+
+    /* Annotation grid (recap) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 15px; font-weight: 700; color: var(--mac-accent); }
+    .anno-cell .ac-def { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* SQL / log color coding */
+    .sql-kw { color: #ff6188; }
+    .sql-str { color: #a6e22e; }
+    .sql-num { color: #fd9353; }
+    .sql-punc { color: #f8f8f2; }
+    .attack { color: #ff6188; font-weight: 700; }
+    .comment-out { color: #6b7089; text-decoration: line-through; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">jdbc-theory.html — Java Database Connectivity</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Core Java · Database Connectivity</span>
+            <h1>JDBC</h1>
+            <div class="sub">Java Database Connectivity — how Java talks to a database, from the five steps to a clean DAO. The foundation every ORM is built on.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Until now, your data has lived in an <code>ArrayList</code> — and vanished the moment the program stopped. Today we fix that permanently. JDBC is how Java reads from and writes to a real database, and it's the bedrock that Hibernate and Spring Data JPA quietly run on top of. Theory is front-loaded; the real weight is the hands-on CRUD lab.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> The persistence problem — why JDBC exists</li>
+            <li><span class="num">2</span> JDBC architecture &amp; the role of the driver</li>
+            <li><span class="num">3</span> The four driver types</li>
+            <li><span class="num">4</span> The four core interfaces</li>
+            <li><span class="num">5</span> The five JDBC steps</li>
+            <li><span class="num">6</span> SQL injection &amp; PreparedStatement</li>
+            <li><span class="num">7</span> Exception handling &amp; the DAO pattern</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic. Keep <strong>slide 8 — the five JDBC steps</strong> in mind during the lab; every program you write today follows it. By the end you'll be able to write complete database CRUD in plain Java and explain exactly what Spring Data does for you under the hood.
+          </div>
+        </section>
+
+        <!-- 3. THE PERSISTENCE PROBLEM -->
+        <section class="slide">
+          <p class="eyebrow">The motivating problem</p>
+          <h2>The persistence problem</h2>
+          <p class="deep">Picture your app: an <code>ArrayList&lt;Student&gt;</code> with 1000 students added through the day. Then the server restarts — a deploy, a crash, a power blip. Where's your data now?</p>
+          <div class="panels">
+            <div class="panel">
+              <h3 style="color:var(--mac-accent);">While the JVM runs</h3>
+              <pre><code>List&lt;Student&gt; list = new ArrayList&lt;&gt;();
+list.add(new Student(1, "Ravi"));
+list.add(new Student(2, "Anita"));
+list.add(new Student(3, "Karan"));
+list.add(new Student(4, "Priya"));
+list.add(new Student(5, "Arjun"));
+
+System.out.println(list.size());
+<span class="code-comment">// 5  — all present</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3 style="color:var(--tl-red);">After the server restarts</h3>
+              <pre><code>List&lt;Student&gt; list = new ArrayList&lt;&gt;();
+<span class="code-comment">// the old objects lived in RAM.</span>
+<span class="code-comment">// RAM is gone. They're gone too.</span>
+
+
+
+
+System.out.println(list.size());
+<span class="code-comment">// 0  — everything lost</span></code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The one idea this whole session rests on</span>
+            <strong>In-memory data lives only as long as the JVM lives.</strong> A database <em>persists</em> data beyond the process lifecycle — it survives restarts, crashes, and redeploys. JDBC is the bridge from your Java objects to that durable store.
+          </div>
+        </section>
+
+        <!-- 4. WHAT IS JDBC -->
+        <section class="slide">
+          <p class="eyebrow">The core idea</p>
+          <h2>What is JDBC?</h2>
+          <p class="deep"><strong>JDBC</strong> (Java Database Connectivity) is Java's standard API for talking to relational databases. The crucial thing to understand: it's <em>mostly a set of interfaces</em>, and the database vendor supplies the actual code.</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🧩</div>
+              <h3>Just interfaces</h3>
+              <p>A set of Java interfaces in the <code>java.sql</code> package — not a framework. They define <em>what</em> operations exist, not <em>how</em> they work.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📦</div>
+              <h3>Vendor provides the driver</h3>
+              <p>The database vendor ships a <strong>JAR file</strong> — the driver — that implements those interfaces for their database. One JAR per database.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🏗️</div>
+              <h3>The foundation of ORMs</h3>
+              <p>Every modern DB framework — JPA, Hibernate, Spring Data — sits <strong>on top of JDBC</strong>. They generate JDBC calls for you.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why interface-based design matters here</span>
+            Because your code talks to <em>interfaces</em>, it stays the same whether the database underneath is MySQL, Oracle, PostgreSQL, or Derby. Swap the driver JAR and the connection URL — your logic is untouched. <strong>Learn JDBC today, and Spring Data JPA will never feel like magic again.</strong>
+          </div>
+        </section>
+
+        <!-- 5. ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">How the pieces fit together</p>
+          <h2>JDBC architecture</h2>
+          <p class="deep">A request flows down through these layers to the database, and the results flow back up. Each layer has exactly one job:</p>
+          <div class="flow vert" style="max-width:620px; margin:14px auto;">
+            <div class="flow-box" style="min-width:340px;">Java Application <span class="sm">your code — calls the JDBC API</span></div>
+            <span class="flow-arrow">&#8597;</span>
+            <div class="flow-box alt" style="min-width:340px;">JDBC API <span class="sm">the <code>java.sql</code> interfaces — Connection, PreparedStatement, ResultSet</span></div>
+            <span class="flow-arrow">&#8597;</span>
+            <div class="flow-box alt" style="min-width:340px;">DriverManager <span class="sm">finds and loads the right driver for your URL</span></div>
+            <span class="flow-arrow">&#8597;</span>
+            <div class="flow-box amber" style="min-width:340px;">JDBC Driver <span class="sm">the vendor JAR — the concrete implementation</span></div>
+            <span class="flow-arrow">&#8597;</span>
+            <div class="flow-box green" style="min-width:340px;">Database <span class="sm">MySQL · Derby · H2 · PostgreSQL · Oracle</span></div>
+          </div>
+          <div class="note">
+            <span class="lbl">The key handoff</span>
+            Your code only ever touches the top two layers — your classes and the <code>java.sql</code> interfaces. <strong>DriverManager</strong> is the matchmaker: you hand it a URL like <code>jdbc:derby:...</code>, and it picks the driver that knows how to speak that database's protocol.
+          </div>
+        </section>
+
+        <!-- 6. FOUR DRIVER TYPES -->
+        <section class="slide">
+          <p class="eyebrow">A bit of history you should recognise</p>
+          <h2>The four driver types</h2>
+          <p class="deep">JDBC drivers come in four historical "types." You only ever use Type 4 in modern work — but interviewers ask, and legacy code exists, so know the landscape:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Type</th><th>Name</th><th>How it works</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>JDBC-ODBC Bridge</td><td>Converts JDBC calls into ODBC calls via a native bridge</td><td><span class="sbadge dead">Removed (Java 8)</span></td></tr>
+              <tr><td><strong>2</strong></td><td>Native API</td><td>Uses the DB's native C/C++ client libraries — needs a local install</td><td><span class="sbadge rare">Rare</span></td></tr>
+              <tr><td><strong>3</strong></td><td>Network Protocol</td><td>Routes calls through a middleware server that talks to the DB</td><td><span class="sbadge legacy">Legacy enterprise</span></td></tr>
+              <tr><td class="hl"><strong>4</strong></td><td class="hl">Thin / Pure Java</td><td class="hl">Pure-Java JAR that speaks the DB's wire protocol directly</td><td><span class="sbadge current">Industry standard</span></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The only one that matters today</span>
+            <strong>Type 4</strong> is what you add to <code>pom.xml</code> (or the build path). It's a single JAR, needs no local database client installed, and works everywhere the JVM runs. MySQL Connector/J, the Derby driver, the H2 driver — all Type 4. <strong>This is all you'll use in modern development.</strong>
+          </div>
+        </section>
+
+        <!-- 7. FOUR CORE INTERFACES -->
+        <section class="slide">
+          <p class="eyebrow">Your toolkit for the lab</p>
+          <h2>The four core interfaces</h2>
+          <p class="deep">Almost every JDBC program is built from just these four. You'll see all of them in code within the next 15 minutes — here's the one-line version of each:</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🗂️</div>
+              <h3>DriverManager</h3>
+              <p>A utility class. You give it a <strong>URL + credentials</strong>; it finds the matching driver and hands back a <code>Connection</code>.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🔌</div>
+              <h3>Connection</h3>
+              <p>One open <strong>session</strong> with the database. Creating it opens a real network socket — so it's precious. <strong>Always close it.</strong></p>
+            </div>
+            <div class="card">
+              <div class="ic">📝</div>
+              <h3>PreparedStatement</h3>
+              <p>A <strong>pre-compiled, parameterized</strong> SQL query with <code>?</code> placeholders. Safe and fast. Use it for everything.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📊</div>
+              <h3>ResultSet</h3>
+              <p>A <strong>cursor</strong> over the rows a SELECT returns. <code>rs.next()</code> walks forward one row at a time until there are none left.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">A mental picture</span>
+            <code>DriverManager</code> gets you a <code>Connection</code>. From the connection you create a <code>PreparedStatement</code>. Running a SELECT on it gives you a <code>ResultSet</code> to read row by row. That chain is the spine of every JDBC program.
+          </div>
+        </section>
+
+        <!-- 8. FIVE JDBC STEPS -->
+        <section class="slide">
+          <p class="eyebrow">The pattern behind every JDBC program — keep this in mind all lab</p>
+          <h2>The five JDBC steps</h2>
+          <div class="vsteps">
+            <div class="vstep">
+              <div class="vn">1</div>
+              <div class="vbody">
+                <div class="vlabel">Register the driver <span class="muted" style="font-weight:400;">— automatic in JDBC 4.0+, shown for understanding</span></div>
+                <pre><code>Class.forName("org.apache.derby.jdbc.EmbeddedDriver");</code></pre>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">2</div>
+              <div class="vbody">
+                <div class="vlabel">Open a connection</div>
+                <pre><code>Connection con = DriverManager.getConnection(url, user, pass);</code></pre>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">3</div>
+              <div class="vbody">
+                <div class="vlabel">Prepare the statement</div>
+                <pre><code>PreparedStatement ps = con.prepareStatement(sql);</code></pre>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">4</div>
+              <div class="vbody">
+                <div class="vlabel">Execute</div>
+                <pre><code>ps.executeUpdate();   <span class="code-comment">// for INSERT/UPDATE/DELETE</span>
+ps.executeQuery();    <span class="code-comment">// for SELECT -> returns a ResultSet</span></code></pre>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">5</div>
+              <div class="vbody">
+                <div class="vlabel">Close / release resources</div>
+                <pre><code>con.close();          <span class="code-comment">// or use try-with-resources (slide 14)</span></code></pre>
+              </div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">This slide stays relevant for the entire hands-on section</span>
+            Every JDBC program you write — INSERT, SELECT, UPDATE, DELETE — follows these same five steps. Memorise the shape and the lab becomes pattern-matching.
+          </div>
+        </section>
+
+        <!-- 9. STATEMENT vs PREPAREDSTATEMENT -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to send SQL — only one is acceptable</p>
+          <h2>Statement vs PreparedStatement</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Statement — string concatenation</h3>
+              <pre><code>String sql = "INSERT INTO employees "
+  + "VALUES (" + id + ", '"
+  + first + "', '" + last + "')";
+
+Statement st = con.createStatement();
+st.executeUpdate(sql);
+<span class="code-comment">// recompiled every call,</span>
+<span class="code-comment">// messy, and INJECTABLE</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ PreparedStatement — placeholders</h3>
+              <pre><code>String sql = "INSERT INTO employees "
+  + "VALUES (?, ?, ?)";
+
+PreparedStatement ps =
+    con.prepareStatement(sql);
+ps.setInt(1, id);
+ps.setString(2, first);
+ps.setString(3, last);
+ps.executeUpdate();
+<span class="code-comment">// compiled once, bound safely</span></code></pre>
+            </div>
+          </div>
+          <div class="cards c3" style="margin-top:14px;">
+            <div class="card"><div class="ic">⚡</div><h3>Performance</h3><p>The SQL template is <strong>pre-compiled once</strong> by the DB, then reused with different parameters.</p></div>
+            <div class="card"><div class="ic">👀</div><h3>Readability</h3><p>No quote-juggling or string soup. The query shape is clear; values are bound separately.</p></div>
+            <div class="card"><div class="ic">🛡️</div><h3>Security</h3><p>Immune to <strong>SQL injection</strong> — parameters are never treated as SQL. (Next two slides.)</p></div>
+          </div>
+        </section>
+
+        <!-- 10. SQL INJECTION — ATTACK -->
+        <section class="slide">
+          <p class="eyebrow">The most memorable five minutes of this session</p>
+          <h2>SQL injection — the attack</h2>
+          <p class="deep">Imagine a login query built the lazy way, with string concatenation:</p>
+          <pre><code>String sql = <span class="sql-str">"SELECT * FROM users WHERE username = '"</span> + username
+           + <span class="sql-str">"' AND password = '"</span> + password + <span class="sql-str">"'"</span>;</code></pre>
+          <p class="deep" style="margin-top:6px;">With normal input it works fine. But watch what a malicious user types into the <strong>username</strong> field:</p>
+          <pre><code>username = <span class="attack">admin' --</span>
+
+<span class="code-comment">// The query string becomes:</span>
+SELECT * FROM users WHERE username = <span class="sql-str">'admin'</span> <span class="attack">--</span><span class="comment-out">' AND password = 'anything'</span></code></pre>
+          <p class="deep" style="margin-top:6px;">The <code>--</code> starts a SQL comment, so <strong>the entire password check is commented out</strong>. The attacker is logged in as admin with no password. And it gets worse:</p>
+          <pre><code>username = <span class="attack">'; DROP TABLE users; --</span>     <span class="code-comment">// goodbye, entire table</span></code></pre>
+          <div class="dangerbox">
+            <span class="lbl">Why you must care</span>
+            SQL injection is consistently in the <strong>OWASP Top 10</strong> most critical web vulnerabilities, decade after decade. It's how real companies get breached. And <strong>one line of PreparedStatement code prevents all of it.</strong>
+          </div>
+        </section>
+
+        <!-- 11. SQL INJECTION — DEFENSE -->
+        <section class="slide">
+          <p class="eyebrow">The fix is almost embarrassingly simple</p>
+          <h2>SQL injection — the defense</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Vulnerable — Statement</h3>
+              <pre><code>String sql =
+  "SELECT * FROM users WHERE "
+  + "username = '" + username
+  + "' AND password = '"
+  + password + "'";
+
+Statement st = con.createStatement();
+ResultSet rs = st.executeQuery(sql);
+<span class="code-comment">// input becomes SQL syntax</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Safe — PreparedStatement</h3>
+              <pre><code>String sql =
+  "SELECT * FROM users WHERE "
+  + "username = ? AND password = ?";
+
+PreparedStatement ps =
+    con.prepareStatement(sql);
+ps.setString(1, username);
+ps.setString(2, password);
+ResultSet rs = ps.executeQuery();
+<span class="code-comment">// input is always just a value</span></code></pre>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">How <code>setString()</code> defeats the attack</span>
+            The driver sends the SQL template and the values <em>separately</em>. Parameters are never parsed as SQL — they're bound as literal data. So the attacker's <code>admin' --</code> is treated as a username that literally contains those characters. The database searches for a user named <code>admin' --</code>, finds none, and login fails. The quote can't "escape" out of the value.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule — never forget it</span>
+            <strong>Never use <code>Statement</code> for any query that includes user input. Always use <code>PreparedStatement</code>.</strong> No exceptions.
+          </div>
+        </section>
+
+        <!-- 12. executeQuery vs executeUpdate -->
+        <section class="slide">
+          <p class="eyebrow">A small distinction that trips up everyone</p>
+          <h2>executeQuery vs executeUpdate</h2>
+          <p class="deep">Two execute methods, two purposes. Pick the wrong one and you'll either get no data or an exception — a classic beginner bug.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Method</th><th>Used for</th><th>Returns</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><code>executeQuery()</code></td><td><strong>SELECT</strong> — reading data</td><td>a <code>ResultSet</code> (the rows)</td></tr>
+              <tr><td class="hl"><code>executeUpdate()</code></td><td><strong>INSERT, UPDATE, DELETE, CREATE</strong> — changing data/schema</td><td>an <code>int</code> — the number of rows affected</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The common mistake</span>
+            Using <code>executeUpdate()</code> for a SELECT returns <strong>0</strong>, not your data. Using <code>executeQuery()</code> for an INSERT <strong>throws an exception</strong>. Getting this pairing wrong is one of the most frequent JDBC bugs for beginners — match the method to the SQL verb.
+          </div>
+          <div class="note">
+            <span class="lbl">Bonus: the return value of <code>executeUpdate()</code> is useful</span>
+            The row count it returns tells you whether anything actually changed. <code>UPDATE ... WHERE emp_id = 999</code> on a missing id returns <code>0</code> — that's how you distinguish "ran fine but matched nothing" from "found it and changed it."
+          </div>
+        </section>
+
+        <!-- 13. SQLException -->
+        <section class="slide">
+          <p class="eyebrow">Catch the right thing</p>
+          <h2>Exception handling — SQLException</h2>
+          <p class="deep">JDBC methods throw <code>SQLException</code> (a checked exception). Don't swallow it with a generic <code>catch(Exception e)</code> — <code>SQLException</code> carries three pieces of diagnostic gold that a plain Exception doesn't:</p>
+          <pre><code>try {
+    <span class="code-comment">// ... JDBC code ...</span>
+} catch (SQLException e) {
+    System.out.println("Message  : " + e.getMessage());      <span class="code-comment">// human-readable</span>
+    System.out.println("SQLState : " + e.getSQLState());     <span class="code-comment">// standard 5-char code</span>
+    System.out.println("ErrorCode: " + e.getErrorCode());    <span class="code-comment">// vendor-specific int</span>
+}</code></pre>
+          <div class="cards c3">
+            <div class="card"><div class="ic">💬</div><h3>getMessage()</h3><p>A human-readable description of what went wrong.</p></div>
+            <div class="card"><div class="ic">🔢</div><h3>getSQLState()</h3><p>A standardized <strong>5-character</strong> code, portable across databases.</p></div>
+            <div class="card"><div class="ic">🏷️</div><h3>getErrorCode()</h3><p>A vendor-specific integer for the exact error.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">A few SQLState codes you'll actually meet</span>
+            <code>42X05</code> — table not found &nbsp;·&nbsp; <code>23505</code> — duplicate primary key &nbsp;·&nbsp; <code>08001</code> — cannot connect to the database. These are exactly what your DevOps team needs when diagnosing a production DB issue.
+          </div>
+        </section>
+
+        <!-- 14. try-with-resources -->
+        <section class="slide">
+          <p class="eyebrow">The modern, leak-proof pattern</p>
+          <h2>try-with-resources</h2>
+          <p class="deep">A <code>Connection</code> is a real network socket. If an exception fires before you close it, the connection <strong>leaks</strong> — and enough leaks exhaust the database. The old <code>finally</code> dance is verbose and easy to botch. try-with-resources auto-closes for you.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Old — manual finally</h3>
+              <pre><code>Connection con = null;
+try {
+    con = DriverManager.getConnection(...);
+    <span class="code-comment">// ... work ...</span>
+} catch (SQLException e) {
+    e.printStackTrace();
+} finally {
+    if (con != null) {
+        try { con.close(); }
+        catch (SQLException ex) {}
+    }
+}
+<span class="code-comment">// 15+ lines, easy to forget</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Modern — try-with-resources</h3>
+              <pre><code>String sql = "INSERT INTO ... VALUES (?,?)";
+
+try (Connection con =
+         DriverManager.getConnection(...);
+     PreparedStatement ps =
+         con.prepareStatement(sql)) {
+
+    <span class="code-comment">// ... work ...</span>
+
+} catch (SQLException e) {
+    e.printStackTrace();
+}
+<span class="code-comment">// both auto-closed, always</span></code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule</span>
+            <code>Connection</code>, <code>Statement</code>/<code>PreparedStatement</code> and <code>ResultSet</code> all implement <code>AutoCloseable</code>. Declare them in the <code>try(...)</code> header and they close automatically — on success <em>and</em> on exception, in reverse order. <strong>Always use try-with-resources in production code.</strong>
+          </div>
+        </section>
+
+        <!-- 15. DAO PATTERN -->
+        <section class="slide">
+          <p class="eyebrow">Organising the code properly</p>
+          <h2>The DAO pattern</h2>
+          <p class="deep">Mixing connection code, SQL, and <code>Scanner</code> menus in one class becomes a tangle fast. The <strong>DAO (Data Access Object)</strong> pattern splits responsibilities into three clean layers:</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🔌</div>
+              <h3>DBConnector</h3>
+              <p>One class, one method: <code>getConnection()</code>. No SQL, no UI — just hands back a connection.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🗄️</div>
+              <h3>DAO</h3>
+              <p>All SQL operations as methods: <code>insert()</code>, <code>getAll()</code>, <code>getById()</code>, <code>update()</code>, <code>delete()</code>. No UI code.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🖥️</div>
+              <h3>Tester / Main</h3>
+              <p>The <code>Scanner</code> menu, calls DAO methods, displays results. No SQL here.</p>
+            </div>
+          </div>
+          <div class="flow" style="justify-content:center;">
+            <div class="flow-box">Tester / Main <span class="sm">UI &amp; input</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">EmployeeDAO <span class="sm">all SQL</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">DBConnector <span class="sm">the connection</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box amber">Database</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why it pays off — and the JPA connection</span>
+            Switching from Derby to MySQL? You change only the <code>DBConnector</code> URL and driver (and maybe minor SQL syntax). Business logic and UI are untouched. <strong>Spring Data's <code>JpaRepository</code> IS a DAO</strong> — when you call <code>repository.findById()</code>, it runs the exact JDBC you're about to write, generated for you.
+          </div>
+        </section>
+
+        <!-- 16. JDBC vs SPRING DATA JPA -->
+        <section class="slide">
+          <p class="eyebrow">Where this fits in the bigger picture</p>
+          <h2>JDBC vs Spring Data JPA</h2>
+          <p class="deep">You're not learning JDBC to use it forever — you're learning it so the abstractions above it make sense. Here's the honest comparison:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Aspect</th><th>Raw JDBC</th><th class="hl">Spring Data JPA</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Code volume</strong></td><td>High — manual SQL + ResultSet mapping</td><td class="hl">Low — method names or annotations</td></tr>
+              <tr><td><strong>Control</strong></td><td>Full — write any SQL you want</td><td class="hl">Moderate — JPQL + <code>@Query</code> for custom</td></tr>
+              <tr><td><strong>Learning curve</strong></td><td>Low — just SQL + 4 interfaces</td><td class="hl">Higher — JPA concepts needed first</td></tr>
+              <tr><td><strong>Best for</strong></td><td>Legacy systems, complex hand-tuned SQL</td><td class="hl">Most modern applications</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The takeaway</span>
+            <strong>You learn JDBC to understand the foundation. You use Spring Data JPA to build efficiently on top of it.</strong> Every <code>repository.save()</code> you'll ever write is JDBC running underneath.
+          </div>
+        </section>
+
+        <!-- 17. SESSION RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Your closing checklist</p>
+          <h2>Session recap</h2>
+          <p class="deep">Six things you should now be able to explain and do:</p>
+          <ul class="checklist">
+            <li><strong>JDBC architecture</strong> — the layers, and that the driver is a vendor-supplied JAR implementing Java's interfaces.</li>
+            <li><strong>The four driver types</strong> — and that Type 4 (pure-Java thin) is today's standard.</li>
+            <li><strong>The four core interfaces</strong> — DriverManager, Connection, PreparedStatement, ResultSet, and what each does.</li>
+            <li><strong>The five JDBC steps</strong> — register, connect, prepare, execute, close.</li>
+            <li><strong>Why PreparedStatement always beats Statement</strong> — performance, readability, and SQL-injection safety.</li>
+            <li><strong>try-with-resources</strong> for safe resource management, and the <strong>DAO pattern</strong> for clean separation of concerns.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">One sentence to carry forward</span>
+            Everything Spring Data JPA does is built on top of exactly this. When you call <code>repository.save()</code>, JDBC is running underneath — and now you know what it's doing.
+          </div>
+        </section>
+
+        <!-- 18. CLOSING (cover-style) -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of JDBC Theory</span>
+            <h1>Let's build it.</h1>
+            <div class="sub">Open the lab sheet — we'll connect to Derby, build the employees table, and write full CRUD with PreparedStatement, then refactor it into a clean DAO.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: persistence the easy way — Spring Data JPA.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java · JDBC</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 18</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
