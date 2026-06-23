@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 3 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session3-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Two-column diagram comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Annotation unpack */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Annotation grid (preview + recap) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 15px; font-weight: 700; color: var(--mac-accent); }
+    .anno-cell .ac-def { font-size: 14.5px; color: var(--mac-text-muted); }
+    .anno-grid.preview { grid-template-columns: repeat(2, 1fr); }
+    .anno-grid.preview .anno-cell { text-align: center; align-items: center; }
+
+    /* Status code badges */
+    .status-list { display: grid; gap: 12px; margin-top: 16px; }
+    .status-row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: center; }
+    .status-badge {
+      font-family: var(--mac-mono);
+      font-weight: 700;
+      font-size: 17px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      text-align: center;
+      color: #fff;
+    }
+    .status-badge.s2 { background: #28c840; }
+    .status-badge.s4 { background: #ff9f0a; }
+    .status-badge.s5 { background: var(--tl-red); }
+    .status-row .sd { font-size: 16px; }
+    .status-row .sd strong { color: var(--mac-text); }
+
+    /* JSON color coding */
+    .json-key { color: #8fd3ff; }
+    .json-str { color: #a6e22e; }
+    .json-num { color: #fd9353; }
+    .json-bool { color: #ff6188; }
+    .json-punc { color: #f8f8f2; }
+
+    /* Flash cards (recap) */
+    .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
+    .flash {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      background: #fafafc;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+    .flash:hover { background: #f0f6ff; }
+    .flash .q { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .flash .q .tap { font-size: 13px; font-weight: 600; color: var(--mac-accent); margin-left: auto; }
+    .flash .a {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--mac-border);
+      font-size: 16.5px;
+      line-height: 1.55;
+    }
+    .flash.revealed .a { display: block; }
+    .flash.revealed .tap { display: none; }
+
+    /* Code-error mockup (generic Spring error response) */
+    .err-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .err-mock .em-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .err-mock .em-status { font-family: var(--mac-mono); }
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s5 { background: #f93e3e; }
+    .em-badge.s4 { background: #fca130; }
+
+    /* Step chips (numbered horizontal steps) */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session3-theory.html — Spring Boot Session 3</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 3 of the Spring Boot Series</span>
+            <h1>Spring Boot</h1>
+            <div class="sub">DTO, Layered Architecture &amp; Exception Handling — plus a first look at Spring Security and Microservices.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Session 2 made our app <em>talk</em> with a CRUD REST API. Today we make it <em>professional</em>. We separate the layers, stop exposing our database objects to the outside world, and handle errors gracefully. Then we close with two "what's next" overviews — Spring Security and Microservices — that frame everything you've built so far in a bigger picture.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Layered architecture — Controller → Service → Repository</li>
+            <li><span class="num">2</span> DTO — why you never expose your Entity directly</li>
+            <li><span class="num">3</span> Exception handling — custom exceptions &amp; clean 404s</li>
+            <li><span class="num">4</span> Spring Security — a 5-minute demo (no lab)</li>
+            <li><span class="num">5</span> Microservices concepts — the bigger picture</li>
+            <li><span class="num">6</span> Recap + annotation cheatsheet</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic, so you can revise from these slides alone. By the end you'll be able to explain why we split an app into layers, build a clean layered Post API with a DTO and custom exceptions, and describe what Spring Security and microservices bring to the table.
+          </div>
+        </section>
+
+        <!-- 3. SESSION 2 RECAP (flash cards) -->
+        <section class="slide">
+          <p class="eyebrow">Before we start something new</p>
+          <h2>Session 2 recap</h2>
+          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q1 · What does <code>@RequestBody</code> do? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">It tells Spring to take the <strong>JSON in the request body</strong> and deserialize it into a Java object (via Jackson). You put it on a method parameter — e.g. <code>addPost(@RequestBody PostDTO dto)</code> — and Spring hands you a ready-built object filled with the client's data.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q2 · What's the difference between <code>POST</code> and <code>PUT</code>? <span class="tap">click to reveal ▸</span></div>
+              <div class="a"><strong>POST</strong> = <em>create</em> a new resource (maps to "C" in CRUD). <strong>PUT</strong> = <em>update</em> an existing resource, usually identified by an id in the path (maps to "U"). POST goes to the collection (<code>/posts</code>); PUT targets one item (<code>/posts/{id}</code>).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q3 · What does <code>@PathVariable</code> do? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">It binds a <strong>segment of the URL path</strong> to a method parameter. In <code>/posts/{id}</code> the <code>{id}</code> placeholder is bound to the method's <code>Long id</code> argument — so a request to <code>/posts/5</code> calls the method with <code>id = 5</code>.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. WHAT'S WRONG WITH RETURNING ENTITIES DIRECTLY -->
+        <section class="slide">
+          <p class="eyebrow">The problem we're solving first</p>
+          <h2>What's wrong with returning Entities directly?</h2>
+          <p class="deep">In Session 2 our controller returned the same object that mapped to the database. That's convenient — but it leaks. When you return your <strong>Entity</strong> straight to the client, <em>every</em> field goes out, including ones the client should never see.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Returning the Entity (User)</h3>
+              <pre><code>@GetMapping("/{id}")
+public User getUser(@PathVariable Long id) {
+    return userRepo.findById(id).get();
+}
+
+<span class="code-comment">// The JSON that goes out:</span>
+{
+  <span class="json-key">"id"</span>: <span class="json-num">7</span>,
+  <span class="json-key">"name"</span>: <span class="json-str">"Ravi"</span>,
+  <span class="json-key">"email"</span>: <span class="json-str">"ravi@tcs.com"</span>,
+  <span class="json-key">"password"</span>: <span class="json-str">"$2a$10$x9..."</span>,  <span class="code-comment">// leaked!</span>
+  <span class="json-key">"isAdmin"</span>: <span class="json-bool">true</span>,          <span class="code-comment">// internal flag</span>
+  <span class="json-key">"failedLogins"</span>: <span class="json-num">3</span>       <span class="code-comment">// internal</span>
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Returning a DTO (UserDTO)</h3>
+              <pre><code>@GetMapping("/{id}")
+public UserDTO getUser(@PathVariable Long id) {
+    return userService.getUser(id);
+}
+
+<span class="code-comment">// The JSON that goes out:</span>
+{
+  <span class="json-key">"id"</span>: <span class="json-num">7</span>,
+  <span class="json-key">"name"</span>: <span class="json-str">"Ravi"</span>,
+  <span class="json-key">"email"</span>: <span class="json-str">"ravi@tcs.com"</span>,
+  <span class="json-key">"role"</span>: <span class="json-str">"USER"</span>
+}
+
+<span class="code-comment">// Only what the client needs.</span></code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The core problem</span>
+            Your database table and your API response are <strong>two different things</strong> with two different audiences. Letting one dictate the other couples them together: change a column and you accidentally change (or break) your public API. The fix is a dedicated object for transfer — a <span class="term">DTO</span>.
+          </div>
+        </section>
+
+        <!-- 5. WHAT IS A DTO -->
+        <section class="slide">
+          <p class="eyebrow">The solution</p>
+          <h2>What is a DTO?</h2>
+          <p class="deep">A <strong>DTO</strong> — <em>Data Transfer Object</em> — is a plain Java class whose only job is to carry data between layers, especially across the boundary between your application and the outside world. It has no JPA annotations and no business logic. It carries <em>only what the client needs to send or receive</em>. Three reasons make it worth the extra class:</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🔒</div>
+              <h3>Security</h3>
+              <p>Hide sensitive fields. Passwords, internal flags and audit columns live on the Entity but never appear on the DTO — so they can't leak through the API.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🎯</div>
+              <h3>Flexibility</h3>
+              <p>Shape the response to the client's needs. One screen wants a summary, another wants detail — different DTOs, same Entity. Not every response needs every field.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🔗</div>
+              <h3>Decoupling</h3>
+              <p>Your DB schema can change without breaking the API contract. Rename a column or split a table — map it in the service, and clients never notice.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">One-line definition to remember</span>
+            <strong>The Entity maps to the database. The DTO travels over the wire.</strong> They often have similar fields, but they exist for completely different reasons — and keeping them separate is what makes an API clean and safe to evolve.
+          </div>
+        </section>
+
+        <!-- 6. LAYERED ARCHITECTURE DIAGRAM -->
+        <section class="slide">
+          <p class="eyebrow">The architectural anchor of this session</p>
+          <h2>Layered architecture</h2>
+          <p class="deep">A professional Spring Boot app is split into <strong>layers</strong>, each with one clear job. A request flows down through them and the response flows back up. This separation is what makes the code testable, maintainable, and easy for a team to work on in parallel.</p>
+          <div class="flow vert">
+            <div class="flow-box">Client <span class="sm">browser · Postman · mobile app — sends an HTTP request</span></div>
+            <span class="flow-arrow">▼ &nbsp; HTTP request (JSON)</span>
+            <div class="flow-box"><span class="pill">@RestController</span> Controller <span class="sm">receives the request, validates input, calls the Service with a DTO</span></div>
+            <span class="flow-arrow">▼ &nbsp; DTO</span>
+            <div class="flow-box alt"><span class="pill">@Service</span> Service <span class="sm">business logic lives here · maps DTO ↔ Entity · decides what happens</span></div>
+            <span class="flow-arrow">▼ &nbsp; Entity</span>
+            <div class="flow-box alt"><span class="pill">@Repository</span> Repository <span class="sm">talks to the database using the Entity · Spring Data writes the SQL</span></div>
+            <span class="flow-arrow">▼ &nbsp; SQL</span>
+            <div class="flow-box green">Database <span class="sm">stores and retrieves the actual data (H2 today)</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Single Responsibility, layer by layer</span>
+            The <strong>Controller</strong> only deals with HTTP. The <strong>Service</strong> only deals with business rules. The <strong>Repository</strong> only deals with the database. No layer reaches past its neighbour — and that discipline is exactly what keeps a growing codebase from turning into spaghetti.
+          </div>
+        </section>
+
+        <!-- 7. ENTITY vs DTO SIDE BY SIDE -->
+        <section class="slide">
+          <p class="eyebrow">Two classes, two purposes</p>
+          <h2>Entity vs DTO — side by side</h2>
+          <table class="cmp">
+            <thead>
+              <tr><th>Aspect</th><th>Entity (<code>Post</code>)</th><th class="hl">DTO (<code>PostDTO</code>)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Where it lives</strong></td><td>Mapped to a database table</td><td class="hl">Travels between client and service</td></tr>
+              <tr><td><strong>Annotations</strong></td><td><code>@Entity</code>, <code>@Id</code>, <code>@GeneratedValue</code> (JPA)</td><td class="hl">None from JPA — just <code>@Data</code></td></tr>
+              <tr><td><strong>Exposure</strong></td><td>Internal — never sent to clients</td><td class="hl">External-facing — this is what clients see</td></tr>
+              <tr><td><strong>Contains</strong></td><td>All columns, even sensitive/internal ones</td><td class="hl">Only the fields the client needs</td></tr>
+            </tbody>
+          </table>
+          <div class="panels" style="margin-top:18px;">
+            <div class="panel">
+              <h3 style="color:var(--mac-accent);">Post.java (Entity)</h3>
+              <pre><code>@Entity
+@Table(name = "posts")
+@Data
+public class Post {
+    @Id
+    @GeneratedValue(strategy =
+        GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String description;
+    private String content;
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3 style="color:var(--mac-accent);">PostDTO.java (DTO)</h3>
+              <pre><code>@Data
+public class PostDTO {
+
+    private Long id;
+    private String title;
+    private String description;
+    private String content;
+
+    <span class="code-comment">// No JPA annotations.</span>
+    <span class="code-comment">// Just a plain carrier.</span>
+}</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. DTO MAPPING — THE CONVERSION -->
+        <section class="slide">
+          <p class="eyebrow">How DTO and Entity talk to each other</p>
+          <h2>DTO mapping — the conversion</h2>
+          <p class="deep">Because the Controller speaks DTO and the Repository speaks Entity, <strong>the Service sits in the middle and converts between them</strong>. We write two small helper methods for this — one each way.</p>
+          <pre><code><span class="code-comment">// Entity  ->  DTO  (on the way OUT to the client)</span>
+private PostDTO mapToDTO(Post post) {
+    PostDTO dto = new PostDTO();
+    dto.setId(post.getId());
+    dto.setTitle(post.getTitle());
+    dto.setDescription(post.getDescription());
+    dto.setContent(post.getContent());
+    return dto;
+}
+
+<span class="code-comment">// DTO  ->  Entity  (on the way IN from the client)</span>
+private Post mapToEntity(PostDTO dto) {
+    Post post = new Post();
+    post.setTitle(dto.getTitle());
+    post.setDescription(dto.getDescription());
+    post.setContent(dto.getContent());
+    return post;
+}</code></pre>
+          <p class="deep" style="margin-top:6px;">The full round-trip, both directions:</p>
+          <div class="flow">
+            <div class="flow-box">Incoming JSON</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box"><span class="pill">@RequestBody</span> PostDTO</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">mapToEntity()</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Post saved to DB</div>
+          </div>
+          <div class="flow">
+            <div class="flow-box green">Post from DB</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">mapToDTO()</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">PostDTO returned</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">JSON response</div>
+          </div>
+          <div class="note">
+            <span class="lbl">Doing this by hand vs automatically</span>
+            We map by hand today so the conversion is <em>visible</em> — you can see exactly which fields cross the boundary. In larger projects teams use libraries like <strong>MapStruct</strong> or <strong>ModelMapper</strong> to generate these mappers automatically, but the concept is identical.
+          </div>
+        </section>
+
+        <!-- 9. LOMBOK -->
+        <section class="slide">
+          <p class="eyebrow">Stop writing boilerplate</p>
+          <h2>Lombok</h2>
+          <p class="deep"><strong>Lombok</strong> is a library that generates repetitive Java code for you at compile time. Instead of hand-writing getters, setters, constructors and <code>toString()</code> on every class, you add one annotation and Lombok writes them. We'll use it on both our Entity and our DTO.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Annotation</th><th>What it generates</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><code>@Data</code></td><td>Getters, setters, <code>toString()</code>, <code>equals()</code> and <code>hashCode()</code> — the all-in-one workhorse.</td></tr>
+              <tr><td class="hl"><code>@AllArgsConstructor</code></td><td>A constructor taking <strong>every</strong> field as an argument.</td></tr>
+              <tr><td class="hl"><code>@NoArgsConstructor</code></td><td>An empty constructor — JPA and Jackson both need one.</td></tr>
+              <tr><td class="hl"><code>@Builder</code></td><td>The builder pattern: <code>Post.builder().title("...").build()</code>.</td></tr>
+            </tbody>
+          </table>
+          <div class="panels" style="margin-top:16px;">
+            <div class="panel bad">
+              <h3>✗ Without Lombok (~30 lines)</h3>
+              <pre><code>public class Post {
+    private Long id;
+    private String title;
+
+    public Long getId() { return id; }
+    public void setId(Long id) {
+        this.id = id;
+    }
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String t) {
+        this.title = t;
+    }
+    <span class="code-comment">// ...and on, and on...</span>
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ With Lombok (5 lines)</h3>
+              <pre><code>@Data
+public class Post {
+    private Long id;
+    private String title;
+}
+
+<span class="code-comment">// @Data generates all the</span>
+<span class="code-comment">// getters, setters, equals,</span>
+<span class="code-comment">// hashCode and toString.</span></code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">IDE setup gotcha</span>
+            Lombok works through <strong>annotation processing</strong>. If your IDE shows "cannot find method getTitle()", you simply need to <strong>enable annotation processing</strong> (IntelliJ) or install the Lombok plugin (Eclipse). The code is correct — the IDE just hasn't been told to run Lombok yet.
+          </div>
+        </section>
+
+        <!-- 10. WITHOUT CUSTOM EXCEPTION HANDLING -->
+        <section class="slide">
+          <p class="eyebrow">Why exception handling matters</p>
+          <h2>What happens without custom exception handling?</h2>
+          <p class="deep">In Session 2, asking for a missing id just returned <code>null</code> or a blank body. If your code throws instead, Spring's default is an ugly, leaky error. Here's what a client sees today when something goes wrong — and what we want them to see instead.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ The default (unhelpful)</h3>
+              <div class="err-mock">
+                <div class="em-top">⚠️ Response <span class="em-badge s5">500</span></div>
+                <pre style="margin:0; border-radius:0; border:none;"><code>{
+  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-06-23T10:02..."</span>,
+  <span class="json-key">"status"</span>: <span class="json-num">500</span>,
+  <span class="json-key">"error"</span>: <span class="json-str">"Internal Server Error"</span>,
+  <span class="json-key">"trace"</span>: <span class="json-str">"java.util.NoSuch...
+    at PostService.get(Post...
+    at ...300 more lines..."</span>,
+  <span class="json-key">"path"</span>: <span class="json-str">"/api/posts/5"</span>
+}</code></pre>
+              </div>
+              <p style="font-size:14px; margin-top:8px;" class="muted">Wrong status (it's not the server's fault), and a stack trace leaks internals.</p>
+            </div>
+            <div class="panel good">
+              <h3>✓ The target (clean)</h3>
+              <div class="err-mock">
+                <div class="em-top">✅ Response <span class="em-badge s4">404</span></div>
+                <pre style="margin:0; border-radius:0; border:none;"><code>{
+  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-06-23T10:02..."</span>,
+  <span class="json-key">"status"</span>: <span class="json-num">404</span>,
+  <span class="json-key">"error"</span>: <span class="json-str">"Not Found"</span>,
+  <span class="json-key">"message"</span>:
+    <span class="json-str">"Post not found with id = 5"</span>,
+  <span class="json-key">"path"</span>: <span class="json-str">"/api/posts/5"</span>
+}</code></pre>
+              </div>
+              <p style="font-size:14px; margin-top:8px;" class="muted">Correct <strong>404</strong>, a clear human message, no internals leaked.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The goal</span>
+            When a record isn't found, the client should get a <strong>404 Not Found</strong> with a message like <em>"Post not found with id = 5"</em> — not a 500 with a wall of stack trace. We get there with a custom exception.
+          </div>
+        </section>
+
+        <!-- 11. CUSTOM EXCEPTION — HOW IT WORKS -->
+        <section class="slide">
+          <p class="eyebrow">Building the clean 404</p>
+          <h2>Custom exception — how it works</h2>
+          <p class="deep">Three small pieces turn an ugly 500 into a clean 404. Each is just a few lines:</p>
+          <div class="steps3">
+            <div class="step-chip">
+              <div class="stepnum">1</div>
+              <h3>Extend RuntimeException</h3>
+              <p>Create a class that extends <code>RuntimeException</code> and takes a message in its constructor, passing it to <code>super(message)</code>.</p>
+            </div>
+            <div class="step-chip">
+              <div class="stepnum">2</div>
+              <h3>Annotate @ResponseStatus</h3>
+              <p>Put <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> on the class. Spring reads it and sets the HTTP response code to 404 automatically.</p>
+            </div>
+            <div class="step-chip">
+              <div class="stepnum">3</div>
+              <h3>Throw it</h3>
+              <p>In the service, throw it with <code>orElseThrow(...)</code> when a record is missing. Spring turns the exception into the response.</p>
+            </div>
+          </div>
+          <pre><code><span class="code-comment">// Step 1 + Step 2: the exception class</span>
+@ResponseStatus(HttpStatus.NOT_FOUND)   <span class="code-comment">// &lt;-- tells Spring: respond 404</span>
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);                 <span class="code-comment">// the message the client will see</span>
+    }
+}
+
+<span class="code-comment">// Step 3: throwing it from the service</span>
+Post post = postRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(
+                "Post not found with id = " + id));</code></pre>
+        </section>
+
+        <!-- 12. OPTIONAL & orElseThrow -->
+        <section class="slide">
+          <p class="eyebrow">The clean way to handle "might not exist"</p>
+          <h2>Optional and orElseThrow()</h2>
+          <p class="deep">When you call <code>findById(id)</code>, Spring Data returns an <strong><code>Optional&lt;Post&gt;</code></strong> — a container that <em>may or may not</em> hold a value. It exists to force you to handle the "not found" case, preventing the dreaded <code>NullPointerException</code>.</p>
+          <div class="flow">
+            <div class="flow-box">findById(id)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Optional&lt;Post&gt;</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">present → return the Post</div>
+          </div>
+          <div class="flow" style="margin-top:8px;">
+            <div class="flow-box alt" style="visibility:hidden;">Optional&lt;Post&gt;</div>
+            <span class="flow-arrow" style="visibility:hidden;">→</span>
+            <div class="flow-box warn">empty → throw ResourceNotFoundException</div>
+          </div>
+          <pre><code>Post post = postRepository.findById(id)
+        .orElseThrow(() -&gt; new ResourceNotFoundException(
+                "Post not found with id = " + id));
+
+<span class="code-comment">// Reads almost like English:</span>
+<span class="code-comment">// "find by id, or else throw this exception."</span>
+<span class="code-comment">// If found -> 'post' holds it. If not -> exception is thrown.</span></code></pre>
+          <div class="warnbox">
+            <span class="lbl">Common mistake</span>
+            Don't call <code>.get()</code> directly on an Optional — if it's empty it throws a generic <code>NoSuchElementException</code> with no useful message. Always prefer <code>orElseThrow()</code> so you control the exception <em>and</em> the message the client receives.
+          </div>
+        </section>
+
+        <!-- 13. SPRING SECURITY -->
+        <section class="slide">
+          <p class="eyebrow">A first taste — demo only</p>
+          <h2>Spring Security — what it gives you</h2>
+          <p class="deep">Just by adding <strong>one dependency</strong> to the classpath, Spring Security locks down your entire application with sensible defaults — before you write a single line of security code. Here's what happens automatically:</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🚧</div>
+              <h3>Blocks everything</h3>
+              <p>Every endpoint now requires authentication. Hit any URL and you're stopped until you log in.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🔑</div>
+              <h3>Login page</h3>
+              <p>A default login form appears in the browser — no HTML written by you. Username defaults to <code>user</code>.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🎲</div>
+              <h3>Generated password</h3>
+              <p>A random password is printed in the console on startup. You use it to log in the first time.</p>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:14px;">You override the defaults with three lines in <code>application.properties</code>:</p>
+          <pre><code>spring.security.user.name=admin
+spring.security.user.password=admin123
+<span class="code-comment"># (the generated password is no longer used once these are set)</span></code></pre>
+          <div class="warnbox">
+            <span class="lbl">This slide is a demo walkthrough — no lab exercise</span>
+            We'll add the dependency and watch the login page appear live. That's it. <strong>Full security</strong> — JWT tokens, role-based access, custom config — is a dedicated later session. For now, just see how little it takes to switch protection on.
+          </div>
+        </section>
+
+        <!-- 14. MONOLITHIC ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">Setting up the bigger picture</p>
+          <h2>Monolithic architecture — the problem</h2>
+          <p class="deep">Everything we've built so far is a <strong>monolith</strong>: one application, one deployable unit, all modules bundled together. That's perfectly fine to start with — but as a system grows, the monolith starts to hurt.</p>
+          <div class="flow vert" style="max-width:520px; margin:18px auto;">
+            <div class="flow-box warn" style="min-width:340px;">One Big Application
+              <span class="sm">User Management · Orders · Payments · Inventory — all deployed together as a single unit</span>
+            </div>
+            <span class="flow-arrow">▼ deployed to</span>
+            <div class="flow-box green">One Server / One Database</div>
+          </div>
+          <div class="cards c3">
+            <div class="card"><div class="ic">💥</div><h3>One failure = total outage</h3><p>If the Payments module crashes, it can take the <em>whole</em> application down with it. There's no isolation.</p></div>
+            <div class="card"><div class="ic">📈</div><h3>Scale everything or nothing</h3><p>Only Orders is under heavy load? Too bad — you must duplicate the entire app to scale that one part.</p></div>
+            <div class="card"><div class="ic">🐢</div><h3>Risky deployments</h3><p>A one-line change to Inventory means rebuilding and redeploying the <em>entire</em> application. Releases get slow and scary.</p></div>
+          </div>
+        </section>
+
+        <!-- 15. MICROSERVICES -->
+        <section class="slide">
+          <p class="eyebrow">The alternative</p>
+          <h2>Microservices architecture — the solution</h2>
+          <p class="deep">Microservices break that one big app into <strong>many small, independent services</strong>, each owning one business capability and its own database. They communicate over the network (usually REST). Compare directly with the monolith:</p>
+          <div class="flow">
+            <div class="flow-box alt">User Service <span class="sm">+ its own DB</span></div>
+            <div class="flow-box alt">Order Service <span class="sm">+ its own DB</span></div>
+            <div class="flow-box alt">Payment Service <span class="sm">+ its own DB</span></div>
+            <div class="flow-box alt">Inventory Service <span class="sm">+ its own DB</span></div>
+          </div>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🚀</div><h3>Independent deployment</h3><p>Update the Payment service and deploy just that one — the rest keep running untouched.</p></div>
+            <div class="card"><div class="ic">📊</div><h3>Independent scaling</h3><p>Order traffic spikes? Run more copies of <em>only</em> the Order service. Pay for what you actually need.</p></div>
+            <div class="card"><div class="ic">🛡️</div><h3>Failure isolation</h3><p>If Payments goes down, Users and Inventory keep serving. One failure no longer means total outage.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">The trade-off (honest framing)</span>
+            Microservices aren't free — they add network calls, distributed data, and operational complexity. They shine for <strong>large systems and large teams</strong>. A small project is often better off as a well-structured monolith. Knowing <em>when</em> to use each is the real skill.
+          </div>
+        </section>
+
+        <!-- 16. SCALING -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to handle more load</p>
+          <h2>Horizontal vs vertical scaling</h2>
+          <p class="deep">When traffic grows, you have two options to keep up. They sound similar but are fundamentally different in cost and ceiling.</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>⬆️ Vertical scaling (scale up)</h3>
+              <div class="flow vert" style="margin-top:6px;">
+                <div class="flow-box">1 server · 4 GB</div>
+                <span class="flow-arrow">▼ add resources</span>
+                <div class="flow-box warn">1 server · 64 GB + more CPU</div>
+              </div>
+              <p style="font-size:14.5px; margin-top:10px;">Make a <strong>single machine</strong> more powerful. Simple, but there's a hard <strong>ceiling</strong> (you can't add RAM forever) and big machines get expensive fast. Still one point of failure.</p>
+            </div>
+            <div class="colbox b">
+              <h3>➡️ Horizontal scaling (scale out)</h3>
+              <div class="flow" style="margin-top:6px; justify-content:center;">
+                <div class="flow-box green">server</div>
+                <div class="flow-box green">server</div>
+                <div class="flow-box green">server</div>
+              </div>
+              <p style="font-size:14.5px; margin-top:10px;">Add <strong>more machines</strong> running the same service, behind a load balancer. No real ceiling, cost-effective with commodity hardware, and naturally fault-tolerant.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why this matters for microservices</span>
+            <strong>Microservices are designed for horizontal scaling.</strong> Because each service is small and stateless, you can spin up as many copies as you need and spread traffic across them — exactly the model the cloud is built for.
+          </div>
+        </section>
+
+        <!-- 17. LOAD BALANCING + HIGH AVAILABILITY -->
+        <section class="slide">
+          <p class="eyebrow">Making scale-out actually work</p>
+          <h2>Load balancing &amp; high availability</h2>
+          <p class="deep">If you run three copies of a service, something has to decide which copy each request goes to. That's a <strong>load balancer</strong> — it sits in front and distributes incoming traffic evenly across the instances.</p>
+          <div class="flow vert" style="max-width:560px; margin:16px auto;">
+            <div class="flow-box">Clients</div>
+            <span class="flow-arrow">▼ requests</span>
+            <div class="flow-box alt" style="min-width:280px;">Load Balancer <span class="sm">distributes traffic evenly</span></div>
+            <span class="flow-arrow">▼ routes to one of</span>
+            <div class="flow" style="justify-content:center; margin-top:0;">
+              <div class="flow-box green">Instance 1</div>
+              <div class="flow-box green">Instance 2</div>
+              <div class="flow-box green">Instance 3</div>
+            </div>
+          </div>
+          <div class="cards">
+            <div class="card"><div class="ic">⚖️</div><h3>Load balancing</h3><p>Spreads requests so no single instance is overwhelmed — and removes the single point of failure.</p></div>
+            <div class="card"><div class="ic">♻️</div><h3>High availability</h3><p>If Instance 2 dies, the load balancer simply stops sending it traffic. Instances 1 and 3 keep serving — users never notice.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Tools you'll meet later</span>
+            In the Spring world this is handled by <strong>Spring Cloud</strong> — with <strong>Eureka</strong> (a registry where services find each other) and an <strong>API Gateway</strong> (a smart front door that routes and load-balances). Just names for now; you'll use them in a later session.
+          </div>
+        </section>
+
+        <!-- 18. FULL ARCHITECTURE AT A GLANCE -->
+        <section class="slide">
+          <p class="eyebrow">Putting it in perspective</p>
+          <h2>Full architecture at a glance</h2>
+          <p class="deep">Here's the payoff. <strong>Everything you've built across Sessions 1–3 — the layered Post API — is <em>one</em> service in a picture like this.</strong> The greyed-out boxes are future territory; the highlighted one is what you can build today.</p>
+          <div class="flow vert" style="max-width:640px; margin:18px auto;">
+            <div class="flow-box">Clients (Web / Mobile)</div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt" style="min-width:300px;">API Gateway <span class="sm">single entry point · routing · security</span></div>
+            <span class="flow-arrow">▼ routes to services</span>
+            <div class="flow" style="justify-content:center; margin-top:0;">
+              <div class="flow-box green" style="border-width:3px;">✅ Post Service <span class="sm">what you built</span></div>
+              <div class="flow-box" style="opacity:0.45;">User Service <span class="sm">later</span></div>
+              <div class="flow-box" style="opacity:0.45;">Payment Service <span class="sm">later</span></div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The takeaway</span>
+            You're not just building toy apps — you're building the <strong>fundamental unit</strong> of a real distributed system. A clean, layered, well-behaved service is exactly what slots into an architecture like this. Master the one service, and the system is just many of them, cooperating.
+          </div>
+        </section>
+
+        <!-- 19. WHAT'S COMING NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed</p>
+          <h2>What's coming next</h2>
+          <p class="deep">Today you saw teasers of Spring Security and microservices. Future sessions turn those previews into hands-on skills:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🔐</div><h3>Spring Security deep-dive</h3><p>Move past the default login page to real authentication: <strong>JWT</strong> tokens, <strong>role-based access</strong> control, and securing specific endpoints by role.</p></div>
+            <div class="card"><div class="ic">☁️</div><h3>Spring Cloud basics</h3><p><strong>Eureka</strong> service registry so services can find each other, and an <strong>API Gateway</strong> as the single front door for routing and load balancing.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>Inter-service communication</h3><p>How one microservice calls another — building on the <code>RestTemplate</code> idea from Session 2, plus modern clients like <strong>OpenFeign</strong>.</p></div>
+            <div class="card"><div class="ic">🗄️</div><h3>Database per service</h3><p>Why each microservice owns its own data, and the patterns that keep data consistent across services.</p></div>
+          </div>
+          <p class="muted" style="margin-top:14px;">Everything connects: today's clean layered service is the foundation every one of these topics builds on.</p>
+        </section>
+
+        <!-- 20. RECAP + CHEATSHEET -->
+        <section class="slide">
+          <p class="eyebrow">Your closing cheatsheet</p>
+          <h2>Session recap + annotation cheatsheet</h2>
+          <p class="deep">Five concepts from today, in plain English:</p>
+          <ul class="checklist">
+            <li><strong>DTO</strong> — a plain class that carries only what the client needs; keeps the Entity hidden.</li>
+            <li><strong>Layered architecture</strong> — Controller → Service → Repository, each with one job.</li>
+            <li><strong>Custom exception</strong> — your own <code>RuntimeException</code> with a meaningful message.</li>
+            <li><strong>@ResponseStatus</strong> — maps that exception to the right HTTP code (e.g. 404) automatically.</li>
+            <li><strong>orElseThrow()</strong> — clean way to throw when an Optional is empty; no null checks.</li>
+          </ul>
+          <div class="anno-grid" style="margin-top:18px;">
+            <div class="anno-cell"><span class="ac-tag">@Entity</span><span class="ac-def">Marks a class as a database table (JPA).</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Data</span><span class="ac-def">Lombok — generates getters, setters, toString, equals, hashCode.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Repository</span><span class="ac-def">Marks the data-access layer; gives CRUD with no boilerplate.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Service</span><span class="ac-def">Marks the business-logic layer; managed by Spring.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span><span class="ac-def">Sets the HTTP status code for a response or exception.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Autowired</span><span class="ac-def">Injects a dependency (e.g. the repository into the service).</span></div>
+          </div>
+        </section>
+
+        <!-- 21. CLOSING (cover-style) -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 3 Theory</span>
+            <h1>Let's build it.</h1>
+            <div class="sub">Open the lab sheet and we'll build the layered Post API together — Entity, DTO, custom exception, Service, and Controller.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Spring Security deep-dive &amp; Spring Cloud.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Spring Boot · Session 3</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 21</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    /* ============================================================
+       Flash cards (Session 2 recap) — click to reveal the answer.
+       ============================================================ */
+    function initFlashCards() {
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          card.classList.toggle('revealed');
+        });
+      });
+    }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      initFlashCards();
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

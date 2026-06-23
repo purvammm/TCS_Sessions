@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 3 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session3-theory.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Property annotation list (application.properties explainer) */
+    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
+    .prop-row {
+      display: grid; grid-template-columns: 1fr; gap: 2px;
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 10px 14px; background: #fafafc;
+    }
+    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
+    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* HTTP verb badge in summaries */
+    .verb-badge {
+      font-family: var(--mac-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .verb-badge.get { background: #61affe; }
+    .verb-badge.post { background: #49cc90; }
+    .verb-badge.put { background: #fca130; }
+    .verb-badge.del { background: #f93e3e; }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+
+    /* Postman / console mock for testing parts */
+    .testpart { border: 1px solid var(--mac-border); border-radius: 10px; margin: 14px 0; overflow: hidden; }
+    .testpart .tp-head {
+      background: var(--mac-titlebar); padding: 10px 16px; font-weight: 700; font-size: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .testpart .tp-body { padding: 8px 16px 16px; }
+    .h2-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin-top: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px;
+    }
+    .h2-mock .h2-top { background:#0a3d62; color:#fff; padding:6px 12px; font-weight:700; }
+    .h2-mock .h2-row { padding: 6px 12px; border-bottom: 1px solid var(--mac-border); background:#fff; }
+    .h2-mock .h2-row:last-child { border-bottom: none; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session3-lab.html — Spring Boot Session 3</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🧱</div>
+        <div>
+          <h1>Spring Boot — Session 3 Hands-on Lab</h1>
+          <p class="section-intro">Build a complete layered Post API with a DTO and custom exception handling — Entity → Repository → DTO → Exception → Service → Controller. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Spring Boot Session 3 — the theory stays on the main screen while you
+          build here on your machine. We'll build a proper <strong>layered Post API</strong> one file at a time:
+          Entity, Repository, DTO, custom Exception, Service, then Controller — and test the whole thing. Click a lab
+          heading to expand it, use the <strong>Copy</strong> button on any snippet instead of retyping, and tick each
+          checkbox as you go. The progress bar at the top fills as you complete steps. If you fall behind, the
+          <strong>Complete Files Reference</strong> at the bottom has every file ready to paste.
+        </div>
+      </section>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Project setup done</strong> — new project with Web, JPA, H2, DevTools &amp; Lombok; <code>application.properties</code> configured.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · Entity + Repository created</strong> — <code>Post</code> entity and <code>PostRepository</code> compile.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · DTO created</strong> — <code>PostDTO</code> with the same fields, no JPA annotations.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · Exception class created</strong> — <code>ResourceNotFoundException</code> with <code>@ResponseStatus</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · Service interface + impl written</strong> — all 5 methods, both mappers.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · Controller wired</strong> — all 5 endpoints under <code>/api/posts</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · Tested POST + GET</strong> — created a record, fetched it back.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · Tested invalid ID</strong> — the custom 404 exception message is visible.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. Tick it once the check passes — the "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A Spring Boot project</strong> — a fresh one (we create it in Setup below), or build on top of your Session 2 <code>student-api</code> project
+                <span class="verify">A fresh project is cleanest for today since we're introducing JPA, H2 and Lombok together.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Postman installed</strong> (or use the H2 console + browser for GETs)
+                <span class="verify">Postman is free from postman.com. We need it for POST and PUT with a JSON body.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Annotation processing enabled</strong> for Lombok
+                <span class="verify">IntelliJ: Settings → Build → Compiler → Annotation Processors → Enable. Eclipse: install the Lombok plugin. Without this, getters/setters won't resolve.</span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Why Lombok needs a one-time IDE step</span>
+              Lombok generates code during compilation through <strong>annotation processing</strong>. If that's off, your
+              IDE doesn't know about the generated <code>getTitle()</code>/<code>setTitle()</code> methods and shows red
+              errors — even though the project compiles fine with Maven. Turn it on once and the errors disappear.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PROJECT SETUP ===== -->
+      <div class="section-band">Project setup</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Create the project + configure application.properties</summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li><strong>Go to Spring Initializr</strong> at <code>https://start.spring.io</code>.</li>
+              <li><strong>Fill in the fields:</strong>
+                <ul>
+                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code> &nbsp;·&nbsp; Java: <code>17</code></li>
+                  <li>Group: <code>com.tcs.training</code> &nbsp;·&nbsp; Artifact: <code>post-api</code></li>
+                </ul>
+              </li>
+              <li><strong>Add these dependencies:</strong>
+                <ul>
+                  <li><code>Spring Web</code> (<code>spring-boot-starter-web</code>)</li>
+                  <li><code>Spring Data JPA</code> (<code>spring-boot-starter-data-jpa</code>)</li>
+                  <li><code>H2 Database</code> (<code>h2</code>)</li>
+                  <li><code>Spring Boot DevTools</code> (<code>spring-boot-devtools</code>)</li>
+                  <li><code>Lombok</code> (<code>lombok</code>)</li>
+                </ul>
+              </li>
+              <li><strong>Generate, unzip, open in your IDE</strong>, then enable annotation processing for Lombok (see pre-requisites).</li>
+              <li><strong>Configure</strong> <code>src/main/resources/application.properties</code> with the block below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update</code></pre></div>
+            <div class="prop-list">
+              <div class="prop-row"><code>spring.datasource.url=jdbc:h2:mem:testdb</code><span class="pd">Use an in-memory H2 database named <code>testdb</code> — lives in RAM, resets on restart.</span></div>
+              <div class="prop-row"><code>spring.datasource.driverClassName=org.h2.Driver</code><span class="pd">The JDBC driver class for H2.</span></div>
+              <div class="prop-row"><code>spring.datasource.username=sa</code><span class="pd">Default H2 username.</span></div>
+              <div class="prop-row"><code>spring.datasource.password=</code><span class="pd">Blank password — fine for an in-memory dev database.</span></div>
+              <div class="prop-row"><code>spring.jpa.database-platform=...H2Dialect</code><span class="pd">Tells Hibernate to generate SQL in H2's dialect.</span></div>
+              <div class="prop-row"><code>spring.h2.console.enabled=true</code><span class="pd">Turns on the browser-based H2 console at <code>/h2-console</code>.</span></div>
+              <div class="prop-row"><code>spring.jpa.show-sql=true</code><span class="pd">Logs every SQL statement Hibernate runs — great for learning.</span></div>
+              <div class="prop-row"><code>spring.jpa.hibernate.ddl-auto=update</code><span class="pd">Auto-creates/updates tables from your entities at startup.</span></div>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              The app starts with no errors. The console shows Hibernate booting and the line about the H2 console being available. Nothing to test yet — we add the entity next.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Project created with all five dependencies and <code>application.properties</code> filled in; the app starts cleanly.</span></label>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>App fails: "Failed to determine a suitable driver class"</td>
+                  <td>JPA is on the classpath but no datasource is configured.</td>
+                  <td>Make sure the H2 dependency is present and the <code>spring.datasource.*</code> lines are in <code>application.properties</code>.</td>
+                </tr>
+                <tr>
+                  <td>Lombok getters/setters show as errors in the IDE</td>
+                  <td>Annotation processing is off.</td>
+                  <td>Enable it (IntelliJ) or install the Lombok plugin (Eclipse), then rebuild.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== THE LABS ===== -->
+      <div class="section-band">The labs — build the layered API</div>
+
+      <!-- ===== LAB 1: ENTITY ===== -->
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create the Post Entity</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              An <strong>Entity</strong> is a Java class mapped to a database table. <code>@Entity</code> marks it,
+              <code>@Id</code> marks the primary key, and <code>@GeneratedValue</code> lets the database auto-number it.
+              <code>@Data</code> (Lombok) writes all the getters and setters for us.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.entity</code>.</li>
+              <li><strong>Create a class</strong> <code>Post.java</code> inside it with the code below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Entity
+@Table(name = "posts")
+@Data                                <span class="code-comment">// Lombok: getters, setters, toString, equals, hashCode</span>
+public class Post {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String description;
+    private String content;
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">What @Data buys you</span>
+              Lombok's <code>@Data</code> generates all getters, setters, <code>equals()</code>, <code>hashCode()</code>
+              and <code>toString()</code>. You write the four fields — Lombok writes the rest. That's ~40 lines you
+              don't have to type or maintain.
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              The class compiles with no errors. When you (re)start the app later, Hibernate will create a
+              <code>POSTS</code> table from this class automatically.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>@Data</code> not resolving / "cannot find symbol getTitle()"</td>
+                  <td>Annotation processing not enabled in the IDE.</td>
+                  <td><strong>IntelliJ:</strong> Settings → Build, Execution, Deployment → Compiler → Annotation Processors → tick "Enable annotation processing". <strong>Eclipse:</strong> install lombok.jar (run it, point it at your Eclipse) and restart.</td>
+                </tr>
+                <tr>
+                  <td>Import errors on <code>javax.persistence.*</code></td>
+                  <td>Spring Boot 3 uses the <code>jakarta</code> namespace, not <code>javax</code>.</td>
+                  <td>Import from <code>jakarta.persistence.*</code> as shown above.</td>
+                </tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Post.java</code> created in <code>com.tcs.training.entity</code> and compiles.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 2: REPOSITORY ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> Create the Repository</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              A <strong>repository</strong> is the data-access layer. By extending <code>JpaRepository&lt;Post, Long&gt;</code>
+              (entity type, id type) you inherit a full set of CRUD methods — you write <em>zero</em> implementation.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.repository</code>.</li>
+              <li><strong>Create an interface</strong> <code>PostRepository.java</code> with the code below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.repository;
+
+import com.tcs.training.entity.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
+    <span class="code-comment">// No methods needed — JpaRepository provides save(), findById(),</span>
+    <span class="code-comment">// findAll(), deleteById() and many more out of the box.</span>
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">One interface, full CRUD</span>
+              This single interface gives you <code>save()</code>, <code>findById()</code>, <code>findAll()</code>,
+              <code>deleteById()</code>, <code>count()</code> and more — no implementation class required. Spring Data
+              generates it at runtime.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>PostRepository.java</code> created in <code>com.tcs.training.repository</code> and compiles.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: DTO ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="chevron">▶</span> Create the PostDTO</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The <strong>DTO</strong> carries data between the client and the service. Same fields as the entity, but
+              <em>no</em> JPA annotations — it's never mapped to the database. Just <code>@Data</code> from Lombok.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.dto</code>.</li>
+              <li><strong>Create a class</strong> <code>PostDTO.java</code> with the code below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.dto;
+
+import lombok.Data;
+
+@Data
+public class PostDTO {
+
+    private Long id;
+    private String title;
+    private String description;
+    private String content;
+}</code></pre></div>
+            <div class="concept">
+              <span class="lbl">PostDTO vs Post — same fields, different purpose</span>
+              They look almost identical, and that's fine. The <strong>Entity</strong> maps to the database table and
+              may grow internal fields later (timestamps, author id, soft-delete flag). The <strong>DTO</strong> is the
+              public face — it only ever exposes what the API should return. Keeping them separate means changing the
+              table never accidentally changes your API.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>PostDTO.java</code> created in <code>com.tcs.training.dto</code> and compiles.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4: EXCEPTION ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Create the Custom Exception</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              A <strong>custom exception</strong> lets us return a clean, meaningful error. It extends
+              <code>RuntimeException</code>, takes a message, and carries <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code>
+              so Spring responds with HTTP 404 automatically when it's thrown.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.exception</code>.</li>
+              <li><strong>Create a class</strong> <code>ResourceNotFoundException.java</code> with the code below.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.NOT_FOUND)        <span class="code-comment">// &lt;-- Spring returns 404 when this is thrown</span>
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);                      <span class="code-comment">// the message the client will see</span>
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">What @ResponseStatus does here</span>
+              It tells Spring: "whenever this exception bubbles up unhandled, set the HTTP response code to
+              <strong>404 Not Found</strong>." No try/catch, no extra config — the annotation does the wiring.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>ResourceNotFoundException.java</code> created in <code>com.tcs.training.exception</code> and compiles.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: SERVICE LAYER ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> Create the Service Layer (interface + impl)</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The <strong>service</strong> holds the business logic and does the DTO ↔ Entity mapping. We code to an
+              <strong>interface</strong> (good practice — easy to swap/test) and put the logic in an
+              <code>@Service</code> implementation. Two private helpers, <code>mapToDTO</code> and
+              <code>mapToEntity</code>, do the conversions.
+            </div>
+
+            <h3 style="margin-top:0;">5a · The interface</h3>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.service</code>.</li>
+              <li><strong>Create</strong> <code>PostService.java</code> with the five method signatures.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+import com.tcs.training.dto.PostDTO;
+import java.util.List;
+
+public interface PostService {
+
+    PostDTO createPost(PostDTO postDTO);
+    List&lt;PostDTO&gt; getAllPosts();
+    PostDTO getPostById(Long id);
+    PostDTO updatePost(Long id, PostDTO postDTO);
+    void deletePost(Long id);
+}</code></pre></div>
+
+            <h3 style="margin-top:24px;">5b · The implementation</h3>
+            <ol class="steps">
+              <li><strong>Create</strong> <code>PostServiceImpl.java</code> in the same package, implementing the interface.</li>
+              <li><strong>Note the two mappers</strong> — they're the heart of the DTO pattern. Read them first.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+import com.tcs.training.dto.PostDTO;
+import com.tcs.training.entity.Post;
+import com.tcs.training.exception.ResourceNotFoundException;
+import com.tcs.training.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class PostServiceImpl implements PostService {
+
+    @Autowired
+    private PostRepository postRepository;
+
+    <span class="code-comment">// ===== Helper mappers — the core of the DTO pattern =====</span>
+
+    <span class="code-comment">// Entity -> DTO  (going OUT to the client)</span>
+    private PostDTO mapToDTO(Post post) {
+        PostDTO dto = new PostDTO();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setDescription(post.getDescription());
+        dto.setContent(post.getContent());
+        return dto;
+    }
+
+    <span class="code-comment">// DTO -> Entity  (coming IN from the client)</span>
+    private Post mapToEntity(PostDTO dto) {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setDescription(dto.getDescription());
+        post.setContent(dto.getContent());
+        return post;
+    }
+
+    <span class="code-comment">// ===== Business methods =====</span>
+
+    @Override
+    public PostDTO createPost(PostDTO postDTO) {
+        Post post = mapToEntity(postDTO);   <span class="code-comment">// DTO -> Entity</span>
+        Post saved = postRepository.save(post);
+        return mapToDTO(saved);             <span class="code-comment">// Entity -> DTO</span>
+    }
+
+    @Override
+    public List&lt;PostDTO&gt; getAllPosts() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PostDTO getPostById(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        return mapToDTO(post);
+    }
+
+    @Override
+    public PostDTO updatePost(Long id, PostDTO postDTO) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        post.setTitle(postDTO.getTitle());
+        post.setDescription(postDTO.getDescription());
+        post.setContent(postDTO.getContent());
+        Post updated = postRepository.save(post);
+        return mapToDTO(updated);
+    }
+
+    @Override
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        postRepository.delete(post);
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">orElseThrow — read it like English</span>
+              <code>findById(id)</code> returns an <code>Optional&lt;Post&gt;</code>. <code>orElseThrow()</code> says:
+              "if a Post was found, give it to me; if not, throw this exception." No null checks, no
+              <code>NullPointerException</code> — and the client gets the clean 404 message you wrote.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Add a method <code>long countPosts()</code> to the interface and implement it with
+              <code>postRepository.count()</code>. Wire it to a <code>GET /api/posts/count</code> endpoint in the next
+              lab and watch it return the number of rows.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>PostService</code> interface and <code>PostServiceImpl</code> created; all five methods implemented with both mappers.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: CONTROLLER ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge post">POST</span><span class="verb-badge get">GET</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Create the Controller</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The <strong>controller</strong> handles HTTP and delegates to the service. <code>@RestController</code> +
+              <code>@RequestMapping("/api/posts")</code> set the base path. <code>ResponseEntity</code> lets us return
+              precise status codes — <strong>201 Created</strong> for POST, <strong>200 OK</strong> for the rest.
+            </div>
+            <ol class="steps">
+              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
+              <li><strong>Create</strong> <code>PostController.java</code> with the code below.</li>
+              <li><strong>Restart the app</strong> — we'll test it in Lab 7.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.dto.PostDTO;
+import com.tcs.training.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/posts")          <span class="code-comment">// base path: every method is relative to this</span>
+public class PostController {
+
+    @Autowired
+    private PostService postService;
+
+    <span class="code-comment">// CREATE -> 201 Created</span>
+    @PostMapping
+    public ResponseEntity&lt;PostDTO&gt; createPost(@RequestBody PostDTO postDTO) {
+        PostDTO created = postService.createPost(postDTO);
+        return new ResponseEntity&lt;&gt;(created, HttpStatus.CREATED);
+    }
+
+    <span class="code-comment">// READ all -> 200 OK</span>
+    @GetMapping
+    public List&lt;PostDTO&gt; getAllPosts() {
+        return postService.getAllPosts();
+    }
+
+    <span class="code-comment">// READ one -> 200 OK (or 404 via the service)</span>
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;PostDTO&gt; getPostById(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    <span class="code-comment">// UPDATE -> 200 OK (or 404 via the service)</span>
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;PostDTO&gt; updatePost(@PathVariable Long id,
+                                              @RequestBody PostDTO postDTO) {
+        return ResponseEntity.ok(postService.updatePost(id, postDTO));
+    }
+
+    <span class="code-comment">// DELETE -> 200 OK with a confirmation message</span>
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;String&gt; deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.ok("Post deleted successfully with id = " + id);
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Class-level @RequestMapping</span>
+              Because <code>@RequestMapping("/api/posts")</code> sits on the class, each method only needs its suffix
+              (<code>/{id}</code>) or nothing at all. The full path is assembled for you:
+              <code>/api/posts</code> + <code>/{id}</code> = <code>/api/posts/{id}</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>PostController.java</code> created with all five endpoints under <code>/api/posts</code>; app restarts cleanly.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 7: TESTING ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">LAB 7</span><span class="chevron">▶</span> Test Everything (H2 + Postman)</summary>
+          <div class="exp-body">
+            <p>Four parts — verify the table, create a record, fetch it (valid &amp; invalid), then update it.</p>
+
+            <!-- Part A -->
+            <div class="testpart">
+              <div class="tp-head">🗄️ Part A — Verify the H2 console</div>
+              <div class="tp-body">
+                <ol class="steps">
+                  <li><strong>Start the app.</strong></li>
+                  <li><strong>Open</strong> <code>http://localhost:8080/h2-console</code> in the browser.</li>
+                  <li><strong>Set the JDBC URL</strong> to <code>jdbc:h2:mem:testdb</code>, username <code>sa</code>, password blank — then <strong>Connect</strong>.</li>
+                  <li><strong>Confirm</strong> the <code>POSTS</code> table exists (Hibernate created it from your entity).</li>
+                </ol>
+                <div class="h2-mock">
+                  <div class="h2-top">H2 Console — Connected to jdbc:h2:mem:testdb</div>
+                  <div class="h2-row">▾ POSTS</div>
+                  <div class="h2-row">&nbsp;&nbsp;&nbsp;ID &nbsp;BIGINT &nbsp;(PK)</div>
+                  <div class="h2-row">&nbsp;&nbsp;&nbsp;TITLE &nbsp;VARCHAR</div>
+                  <div class="h2-row">&nbsp;&nbsp;&nbsp;DESCRIPTION &nbsp;VARCHAR</div>
+                  <div class="h2-row">&nbsp;&nbsp;&nbsp;CONTENT &nbsp;VARCHAR</div>
+                </div>
+                <div class="expected">
+                  <span class="lbl">Expected</span>
+                  The <code>POSTS</code> table is listed in the left tree with the four columns. It's empty for now.
+                </div>
+                <table class="issues">
+                  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td>H2 console shows "Database not found" / connects to wrong DB</td>
+                      <td>JDBC URL in the console doesn't match <code>application.properties</code>.</td>
+                      <td>Type exactly <code>jdbc:h2:mem:testdb</code> in the console's JDBC URL field.</td>
+                    </tr>
+                    <tr>
+                      <td><code>/h2-console</code> returns 404</td>
+                      <td><code>spring.h2.console.enabled=true</code> missing.</td>
+                      <td>Add it to <code>application.properties</code> and restart.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Part B -->
+            <div class="testpart">
+              <div class="tp-head"><span class="verb-badge post">POST</span> Part B — Create a record</div>
+              <div class="tp-body">
+                <ol class="steps">
+                  <li><strong>In Postman:</strong> method <code>POST</code>, URL <code>http://localhost:8080/api/posts</code>.</li>
+                  <li><strong>Headers:</strong> <code>Content-Type: application/json</code>.</li>
+                  <li><strong>Body → raw → JSON</strong> — paste this:</li>
+                </ol>
+                <div class="codewrap"><pre><code>{
+  "title": "Introduction to Spring Boot",
+  "description": "A beginner-friendly post",
+  "content": "Spring Boot simplifies Java development..."
+}</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">Expected — 201 Created</span>
+                  The response is status <strong>201</strong> and the returned <code>PostDTO</code> now has a
+                  generated <code>id</code> (e.g. <code>1</code>). Back in the H2 console run
+                  <code>SELECT * FROM POSTS</code> — your record is there.
+                </div>
+                <div class="codewrap"><pre><code>SELECT * FROM POSTS;</code></pre></div>
+              </div>
+            </div>
+
+            <!-- Part C -->
+            <div class="testpart">
+              <div class="tp-head"><span class="verb-badge get">GET</span> Part C — Valid and invalid IDs <em>(the money moment)</em></div>
+              <div class="tp-body">
+                <ol class="steps">
+                  <li><strong>GET</strong> <code>http://localhost:8080/api/posts/1</code> — expect <strong>200</strong> and the full PostDTO JSON.</li>
+                  <li><strong>GET</strong> <code>http://localhost:8080/api/posts/99</code> — expect <strong>404</strong> with your custom message.</li>
+                </ol>
+                <div class="expected">
+                  <span class="lbl">Expected — GET /api/posts/99 → 404</span>
+                  <div class="codewrap"><pre><code>{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Post not found with id = 99",
+  "path": "/api/posts/99"
+}</code></pre></div>
+                </div>
+                <div class="observe">
+                  <span class="lbl">This is the whole point of today</span>
+                  A missing id no longer returns <code>null</code> or a 500 stack trace — it returns a clean
+                  <strong>404</strong> with the exact message you wrote in the service. That's your custom exception
+                  and <code>@ResponseStatus</code> working together.
+                </div>
+              </div>
+            </div>
+
+            <!-- Part D -->
+            <div class="testpart">
+              <div class="tp-head"><span class="verb-badge put">PUT</span> Part D — Update a record</div>
+              <div class="tp-body">
+                <ol class="steps">
+                  <li><strong>PUT</strong> <code>http://localhost:8080/api/posts/1</code>, Body → raw → JSON:</li>
+                </ol>
+                <div class="codewrap"><pre><code>{
+  "title": "Introduction to Spring Boot (Updated)",
+  "description": "Now with DTOs and exception handling",
+  "content": "Spring Boot simplifies Java development even more..."
+}</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">Expected — 200 OK</span>
+                  Status <strong>200</strong> and the updated <code>PostDTO</code> comes back. Confirm in the H2
+                  console with <code>SELECT * FROM POSTS</code> — the title changed but the <code>id</code> stayed
+                  the same. Try a PUT to <code>/api/posts/99</code> too — you'll get the same clean 404.
+                </div>
+              </div>
+            </div>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">POST creates a record (201), GET returns it (200), GET on a missing id returns the custom 404, and PUT updates it.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The invalid-ID 404 shows the message <code>Post not found with id = 99</code> — custom exception confirmed.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== BONUS: SPRING SECURITY ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Spring Security — observe only (no coding)</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Adding Spring Security to the classpath locks down <strong>every</strong> endpoint with a default login
+              page and a generated password — before you write any security code. This is an <em>observe-only</em>
+              section: the trainer drives, you watch.
+            </div>
+            <ol class="steps">
+              <li><strong>Add this dependency</strong> to <code>pom.xml</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre></div>
+            <ol class="steps" start="2">
+              <li><strong>Restart the app.</strong></li>
+              <li><strong>Navigate</strong> to <code>http://localhost:8080/api/posts</code> in the browser — a <strong>login page appears automatically</strong>.</li>
+              <li><strong>Check the console</strong> for the generated password line:
+                <div class="codewrap"><pre><code>Using generated security password: 8f3c1d2e-....-a1b2c3d4e5f6</code></pre></div>
+              </li>
+              <li><strong>Log in</strong> with username <code>user</code> and that generated password.</li>
+              <li><strong>Override the defaults</strong> — add these two lines to <code>application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>spring.security.user.name=admin
+spring.security.user.password=admin123</code></pre></div>
+            <ol class="steps" start="7">
+              <li><strong>Restart and log in</strong> with <code>admin</code> / <code>admin123</code> — endpoints are now accessible.</li>
+            </ol>
+            <div class="observe">
+              <span class="lbl">Note</span>
+              This is <strong>form-based</strong> security — fine for a quick lockdown. Production APIs use
+              <strong>token-based</strong> security (JWT) with roles, which is a separate, dedicated session. Today's
+              point is just how little it takes to switch protection on.
+            </div>
+            <div class="warnbox" style="border-left:4px solid var(--tl-yellow); background:rgba(254,188,46,0.1); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0;">
+              <span style="font-weight:700; color:#b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;">Tip — testing after this</span>
+              Once security is on, Postman requests need <strong>Basic Auth</strong> (username + password) in the
+              Authorization tab, or they'll get <strong>401 Unauthorized</strong>. If you want to keep testing freely,
+              remove the dependency again after the demo.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Bonus: saw the auto login page, logged in with the generated password, then with custom credentials.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE FILES REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Files Reference (all five Java files)</summary>
+          <div class="exp-body">
+            <p>Every file as it looks at the end of the lab, in build order. If you fell behind, paste these, run, and
+            you're caught up with the group.</p>
+
+            <h3>1 · Post.java</h3>
+            <div class="codewrap"><pre><code>package com.tcs.training.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import lombok.Data;
+
+@Entity
+@Table(name = "posts")
+@Data
+public class Post {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String title;
+    private String description;
+    private String content;
+}</code></pre></div>
+
+            <h3>2 · PostDTO.java</h3>
+            <div class="codewrap"><pre><code>package com.tcs.training.dto;
+
+import lombok.Data;
+
+@Data
+public class PostDTO {
+
+    private Long id;
+    private String title;
+    private String description;
+    private String content;
+}</code></pre></div>
+
+            <h3>3 · ResourceNotFoundException.java</h3>
+            <div class="codewrap"><pre><code>package com.tcs.training.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException {
+
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}</code></pre></div>
+
+            <h3>4 · PostServiceImpl.java <span class="muted" style="font-size:14px;">(with PostService interface above it)</span></h3>
+            <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+import com.tcs.training.dto.PostDTO;
+import java.util.List;
+
+public interface PostService {
+    PostDTO createPost(PostDTO postDTO);
+    List&lt;PostDTO&gt; getAllPosts();
+    PostDTO getPostById(Long id);
+    PostDTO updatePost(Long id, PostDTO postDTO);
+    void deletePost(Long id);
+}</code></pre></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+import com.tcs.training.dto.PostDTO;
+import com.tcs.training.entity.Post;
+import com.tcs.training.exception.ResourceNotFoundException;
+import com.tcs.training.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class PostServiceImpl implements PostService {
+
+    @Autowired
+    private PostRepository postRepository;
+
+    private PostDTO mapToDTO(Post post) {
+        PostDTO dto = new PostDTO();
+        dto.setId(post.getId());
+        dto.setTitle(post.getTitle());
+        dto.setDescription(post.getDescription());
+        dto.setContent(post.getContent());
+        return dto;
+    }
+
+    private Post mapToEntity(PostDTO dto) {
+        Post post = new Post();
+        post.setTitle(dto.getTitle());
+        post.setDescription(dto.getDescription());
+        post.setContent(dto.getContent());
+        return post;
+    }
+
+    @Override
+    public PostDTO createPost(PostDTO postDTO) {
+        Post post = mapToEntity(postDTO);
+        Post saved = postRepository.save(post);
+        return mapToDTO(saved);
+    }
+
+    @Override
+    public List&lt;PostDTO&gt; getAllPosts() {
+        return postRepository.findAll()
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PostDTO getPostById(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        return mapToDTO(post);
+    }
+
+    @Override
+    public PostDTO updatePost(Long id, PostDTO postDTO) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        post.setTitle(postDTO.getTitle());
+        post.setDescription(postDTO.getDescription());
+        post.setContent(postDTO.getContent());
+        Post updated = postRepository.save(post);
+        return mapToDTO(updated);
+    }
+
+    @Override
+    public void deletePost(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new ResourceNotFoundException(
+                        "Post not found with id = " + id));
+        postRepository.delete(post);
+    }
+}</code></pre></div>
+
+            <h3>5 · PostController.java</h3>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.dto.PostDTO;
+import com.tcs.training.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/posts")
+public class PostController {
+
+    @Autowired
+    private PostService postService;
+
+    @PostMapping
+    public ResponseEntity&lt;PostDTO&gt; createPost(@RequestBody PostDTO postDTO) {
+        PostDTO created = postService.createPost(postDTO);
+        return new ResponseEntity&lt;&gt;(created, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public List&lt;PostDTO&gt; getAllPosts() {
+        return postService.getAllPosts();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;PostDTO&gt; getPostById(@PathVariable Long id) {
+        return ResponseEntity.ok(postService.getPostById(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;PostDTO&gt; updatePost(@PathVariable Long id,
+                                              @RequestBody PostDTO postDTO) {
+        return ResponseEntity.ok(postService.updatePost(id, postDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;String&gt; deletePost(@PathVariable Long id) {
+        postService.deletePost(id);
+        return ResponseEntity.ok("Post deleted successfully with id = " + id);
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Final package layout</span>
+              <code>entity/Post.java</code> · <code>repository/PostRepository.java</code> ·
+              <code>dto/PostDTO.java</code> · <code>exception/ResourceNotFoundException.java</code> ·
+              <code>service/PostService.java</code> + <code>service/PostServiceImpl.java</code> ·
+              <code>controller/PostController.java</code> — one package per layer.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference card</h2>
+          <table>
+            <thead><tr><th>Item</th><th>What it is</th><th>Key point</th></tr></thead>
+            <tbody>
+              <tr><td><code>DTO</code></td><td>Plain Java class for data transfer</td><td>No JPA annotations; shapes the API response</td></tr>
+              <tr><td><code>@Data</code></td><td>Lombok annotation</td><td>Generates getters, setters, equals, hashCode, toString</td></tr>
+              <tr><td><code>@ResponseStatus</code></td><td>Method/Class annotation</td><td>Sets the HTTP status code on the response</td></tr>
+              <tr><td><code>orElseThrow()</code></td><td>Optional method</td><td>Throws an exception if the value is absent</td></tr>
+              <tr><td><code>ResourceNotFoundException</code></td><td>Custom RuntimeException</td><td>Returns 404 with a custom message</td></tr>
+              <tr><td><code>@Service</code></td><td>Stereotype annotation</td><td>Marks the business-logic layer; managed by Spring</td></tr>
+              <tr><td><code>ResponseEntity</code></td><td>Return-type wrapper</td><td>Full control over status code + body + headers</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up next</span>
+          You've now built a clean, layered service with a DTO and proper exception handling — the fundamental unit of
+          a real system. Next we go deeper on <strong>Spring Security</strong> (JWT tokens, role-based access) and into
+          <strong>Spring Cloud</strong> — <code>Eureka</code> for service discovery and an <strong>API Gateway</strong>
+          as the front door — turning today's single service into one piece of a microservices architecture.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Spring Boot — Session 3 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
