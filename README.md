@@ -13,6 +13,7 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 | Session | Theory (slideshow) | Hands-on lab |
 |--------:|--------------------|--------------|
 | Java Foundations | `java-foundations-theory.html` | — |
+| JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` |
 | 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` |
 | 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` |
 | 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` |
