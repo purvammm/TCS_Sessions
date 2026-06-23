@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 4 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session4-theory.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Architecture reminder box (pinned visual) === */
+    .arch-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
+    }
+    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
+    .arch-node.reg { border-color: #ff9f0a; }
+    .arch-node.svc { border-color: #28c840; }
+    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    details.exp > summary .port-tag {
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      background: rgba(94,92,230,0.12); color: #5e5ce6;
+      padding: 3px 9px; border-radius: 8px;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Property annotation list */
+    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
+    .prop-row {
+      display: grid; grid-template-columns: 1fr; gap: 2px;
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 10px 14px; background: #fafafc;
+    }
+    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
+    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* Version compatibility table (highlighted) */
+    .vercompat {
+      border: 2px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .vercompat h3 { margin: 0 0 6px; color: #b8860b; font-size: 18px; }
+    .vercompat table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+    .vercompat th, .vercompat td { border: 1px solid #e4c48a; padding: 9px 13px; text-align: left; }
+    .vercompat th { background: rgba(254,188,46,0.18); }
+    .vercompat code { font-family: var(--mac-mono); }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #ff9f0a; }
+    details.exp.lab2 { border-left-color: #28c840; }
+    details.exp.lab3 { border-left-color: #00c7be; }
+    details.exp.lab4 { border-left-color: #5e5ce6; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.lab8 { border-left-color: #34c759; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#eafaef,#dcf5e3); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab1 .lab-tag { background:#ff9f0a; }
+    details.exp.lab2 .lab-tag { background:#28c840; }
+    details.exp.lab3 .lab-tag { background:#00c7be; }
+    details.exp.lab4 .lab-tag { background:#5e5ce6; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.lab8 .lab-tag { background:#34c759; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* HTTP verb badge in summaries */
+    .verb-badge {
+      font-family: var(--mac-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .verb-badge.get { background: #61affe; }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+
+    /* Eureka dashboard mock */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin: 12px 0;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+
+    /* Console log mock */
+    .logmock {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 12px 16px; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.7; overflow-x: auto;
+    }
+    .logmock .hit { color: #a6e22e; }
+    .logmock .port { color: #fd9353; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session4-lab.html — Spring Boot Session 4</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🌐</div>
+        <div>
+          <h1>Spring Boot — Session 4 Hands-on Lab</h1>
+          <p class="section-intro">Stand up a microservices skeleton: Eureka registry, two microservices, multiple instances, and an API Gateway with live load balancing. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Spring Boot Session 4 — the theory's architecture diagram stays on the
+          main screen while you build here. Today is different from previous sessions: instead of one project, you'll
+          run <strong>four separate Spring Boot apps at once</strong> (then six, once we scale Student MS). Work through
+          the labs top to bottom, use the <strong>Copy</strong> button on every snippet, and tick each checkbox as you
+          go. Keep the <strong>architecture reminder</strong> below in view — it's the map. If you fall behind, the
+          <strong>Complete Configuration Reference</strong> at the bottom has every file ready to paste.
+        </div>
+      </section>
+
+      <!-- ===== ARCHITECTURE REMINDER (pinned visual) ===== -->
+      <div class="arch-box">
+        <h3>📌 Architecture map — keep this in view</h3>
+        <div class="arch-flow">
+          <div class="arch-node">Client<span class="p">Postman</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node">API Gateway<span class="p">:9393</span></div>
+          <span class="arch-arrow">⇄</span>
+          <div class="arch-node reg">Eureka<span class="p">:8761</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node svc">Student MS<span class="p">:8080/82/83</span></div>
+          <div class="arch-node svc">Customer MS<span class="p">:8081</span></div>
+        </div>
+        <p style="margin:12px 0 0; font-size:14.5px; color:var(--mac-text-muted);">
+          Client hits the gateway → gateway asks Eureka where the service lives → Eureka returns live instances →
+          gateway round-robins the request to one of them → response returns to the client.
+        </p>
+      </div>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 9-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all nine are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Eureka Server running</strong> — dashboard loads at <code>localhost:8761</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · Student MS registered</strong> — STUDENT-MS appears in the Eureka dashboard.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · Customer MS registered</strong> — CUSTOMER-MS appears in the dashboard.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · Multiple Student MS instances running</strong> — 8082 and 8083 started.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · All instances visible</strong> — STUDENT-MS shows 3 instances in Eureka.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · API Gateway created</strong> — running on 9393 and registered in Eureka.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · Manual route for Student MS works</strong> — request flows through the gateway.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · Manual route for Customer MS works</strong> — both services reachable via 9393.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · Discovery Locator tested</strong> — auto-routing by service name works.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites &amp; ports</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. The "ready" badge at the top lights up when all four are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Java 17+ and an IDE</strong> (IntelliJ or Eclipse/STS)
+                <span class="verify">All four projects are independent Spring Boot apps — using four IDE windows/tabs keeps them organised.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Postman installed</strong> (or browser for GET requests)
+                <span class="verify">All endpoints today are GETs, so a browser works too — but Postman makes repeat-hitting easier.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>At least 8 GB RAM free</strong> — you'll run up to six JVMs at once
+                <span class="verify">If your machine slows down, stop the extra Student MS instances after you've confirmed they register.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>These ports are free:</strong> 8761, 8080, 8081, 8082, 8083, 9393
+                <span class="verify">Eureka 8761 · Student MS 8080/8082/8083 · Customer MS 8081 · Gateway 9393.</span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Trainer tip — have a safety net</span>
+              Pre-create and run the Eureka Server on your machine <strong>before</strong> the session. Walk associates
+              through building it step by step, but keep your working copy running so the live demo never breaks while
+              they catch up.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SPRING CLOUD VERSION COMPAT (prominent) ===== -->
+      <section class="section">
+        <div class="vercompat">
+          <h3>⚠️ Spring Cloud ↔ Spring Boot version compatibility — read this first</h3>
+          <p style="font-size:15.5px; margin:0;">This is the <strong>#1 cause of failure</strong> in this session. Spring Cloud releases are tied to specific Spring Boot versions. On <code>start.spring.io</code> the versions are matched for you automatically — but if you set them manually, use this guide:</p>
+          <table>
+            <thead><tr><th>Spring Boot</th><th>Spring Cloud release train</th></tr></thead>
+            <tbody>
+              <tr><td><code>3.3.x</code></td><td><code>2023.0.x</code> (Leyton)</td></tr>
+              <tr><td><code>3.2.x</code></td><td><code>2023.0.x</code> (Leyton)</td></tr>
+              <tr><td><code>3.1.x</code></td><td><code>2022.0.x</code> (Kilburn)</td></tr>
+              <tr><td><code>2.7.x</code></td><td><code>2021.0.x</code> (Jubilee)</td></tr>
+            </tbody>
+          </table>
+          <p style="font-size:14.5px; margin:10px 0 0; color:#7a5b08;">Symptom of a mismatch: the app fails to start, or <code>@EnableEurekaServer</code>/the gateway classes won't resolve. Fix: align the versions per this table, or just regenerate from Spring Initializr which always picks a compatible pair.</p>
+        </div>
+      </section>
+
+      <!-- ===== THE LABS ===== -->
+      <div class="section-band">The labs — build the microservices system</div>
+
+      <!-- ===== LAB 1: EUREKA SERVER ===== -->
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">LAB 1</span><span class="port-tag">:8761</span><span class="chevron">▶</span> Create the Eureka Server</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The Eureka Server is the <strong>service registry</strong> — the phonebook every other service registers
+              with. It's almost pure config: one annotation and four properties.
+            </div>
+            <ol class="steps">
+              <li><strong>Spring Initializr</strong> (<code>start.spring.io</code>): Maven · Java 17 · Group <code>com.tcs.training</code> · Artifact <code>eureka-server</code>.</li>
+              <li><strong>Dependency:</strong> <code>Eureka Server</code> (<code>spring-cloud-starter-netflix-eureka-server</code>). That's the only one.</li>
+              <li><strong>Add <code>@EnableEurekaServer</code></strong> to the main class:</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.eurekaserver;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+
+@SpringBootApplication
+@EnableEurekaServer                  <span class="code-comment">// turns this app INTO the registry</span>
+public class EurekaServerApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}</code></pre></div>
+            <ol class="steps" start="4">
+              <li><strong>Configure</strong> <code>src/main/resources/application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>server.port=8761
+spring.application.name=eureka-server
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false</code></pre></div>
+            <div class="prop-list">
+              <div class="prop-row"><code>server.port=8761</code><span class="pd">The standard Eureka port — clients are configured to expect it here.</span></div>
+              <div class="prop-row"><code>spring.application.name=eureka-server</code><span class="pd">A friendly name for this app.</span></div>
+              <div class="prop-row"><code>eureka.client.register-with-eureka=false</code><span class="pd">The server shouldn't register itself in its own registry.</span></div>
+              <div class="prop-row"><code>eureka.client.fetch-registry=false</code><span class="pd">It doesn't pull a registry from elsewhere — it IS the registry.</span></div>
+            </div>
+            <ol class="steps" start="5">
+              <li><strong>Run the app</strong> and open <code>http://localhost:8761</code> in the browser.</li>
+            </ol>
+            <div class="dash-mock">
+              <div class="dm-top">📇 Spring Eureka — System Status · localhost:8761</div>
+              <table>
+                <thead><tr><th>Application</th><th>AMIs</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td colspan="3" style="text-align:center; color:var(--mac-text-muted);">No instances available</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              The Eureka dashboard loads. Under "Instances currently registered with Eureka" it says
+              <strong>"No instances available"</strong> — correct, because nothing has registered yet.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Port 8761 already in use</td><td>Another process (or an old run) is on it.</td><td>Find &amp; stop it: <code>lsof -i:8761</code> (Mac/Linux) or <code>netstat -ano | findstr 8761</code> (Windows), then kill the PID.</td></tr>
+                <tr><td><code>@EnableEurekaServer</code> not found</td><td>Spring Cloud version mismatch or missing dependency.</td><td>Check the version compatibility box above; confirm the Eureka Server starter is in <code>pom.xml</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Eureka dashboard loads at <code>localhost:8761</code> with "No instances available".</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 2: STUDENT MS ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="port-tag">:8080</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Create the Student Microservice</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              A normal Spring Boot REST app that <strong>registers itself with Eureka</strong>. The only new ingredient
+              is the Eureka Client dependency plus the <code>defaultZone</code> property pointing at the registry.
+            </div>
+            <ol class="steps">
+              <li><strong>Spring Initializr:</strong> Artifact <code>student-ms</code>. Dependencies: <code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code>.</li>
+              <li><strong>Create</strong> <code>StudentController.java</code>. It injects <code>Environment</code> so the response shows <em>which</em> instance answered — essential for seeing load balancing later.</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.studentms.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/students")
+public class StudentController {
+
+    @Autowired
+    private Environment environment;     <span class="code-comment">// lets us read the actual running port</span>
+
+    @GetMapping
+    public String getStudents() {
+        return "Student Service - Port: "
+                + environment.getProperty("local.server.port");
+    }
+}</code></pre></div>
+            <ol class="steps" start="3">
+              <li><strong>Configure</strong> <code>application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>server.port=8080
+spring.application.name=STUDENT-MS
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Critical — the service name</span>
+              <code>spring.application.name=STUDENT-MS</code> must be <strong>exactly this</strong> (uppercase by
+              convention). The Gateway will route to this precise name with <code>lb://STUDENT-MS</code>. A typo here
+              means the gateway route silently fails to resolve.
+            </div>
+            <ol class="steps" start="4">
+              <li><strong>Run the app</strong>, then refresh <code>localhost:8761</code>.</li>
+            </ol>
+            <div class="dash-mock">
+              <div class="dm-top">📇 Eureka — Instances currently registered</div>
+              <table>
+                <thead><tr><th>Application</th><th>Status</th><th>Instance</th></tr></thead>
+                <tbody>
+                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (1)</td><td><code>localhost:STUDENT-MS:8080</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              STUDENT-MS appears in the Eureka instances table with port 8080. Hitting
+              <code>localhost:8080/students</code> directly returns <code>Student Service - Port: 8080</code>.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Registers then immediately disappears</td><td>Eureka server isn't actually running, or wrong <code>defaultZone</code>.</td><td>Confirm 8761 is up and the URL is exactly <code>http://localhost:8761/eureka/</code> (trailing slash).</td></tr>
+                <tr><td>App won't start — bean/version errors</td><td>Spring Boot ↔ Spring Cloud mismatch.</td><td>See the version compatibility box above.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">STUDENT-MS registered in Eureka; <code>localhost:8080/students</code> returns the port string.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: CUSTOMER MS ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="port-tag">:8081</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Create the Customer Microservice</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Exactly the same pattern as Lab 2 — go fast. Different name (<code>CUSTOMER-MS</code>), different port
+              (<code>8081</code>), different endpoint (<code>/customers</code>).
+            </div>
+            <ol class="steps">
+              <li><strong>Spring Initializr:</strong> Artifact <code>customer-ms</code>. Same dependencies: Web + Eureka Discovery Client + DevTools.</li>
+              <li><strong>Create</strong> <code>CustomerController.java</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>package com.tcs.training.customerms.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/customers")
+public class CustomerController {
+
+    @Autowired
+    private Environment environment;
+
+    @GetMapping
+    public String getCustomers() {
+        return "Customer Service - Port: "
+                + environment.getProperty("local.server.port");
+    }
+}</code></pre></div>
+            <ol class="steps" start="3">
+              <li><strong>Configure</strong> <code>application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>server.port=8081
+spring.application.name=CUSTOMER-MS
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+            <ol class="steps" start="4">
+              <li><strong>Run it</strong>, then refresh <code>localhost:8761</code> — both services should now be listed.</li>
+            </ol>
+            <div class="dash-mock">
+              <div class="dm-top">📇 Eureka — Instances currently registered</div>
+              <table>
+                <thead><tr><th>Application</th><th>Status</th><th>Instance</th></tr></thead>
+                <tbody>
+                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (1)</td><td><code>:8080</code></td></tr>
+                  <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              Both STUDENT-MS and CUSTOMER-MS show as UP in the Eureka dashboard.
+              <code>localhost:8081/customers</code> returns <code>Customer Service - Port: 8081</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">CUSTOMER-MS registered; both services visible in Eureka.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4: MULTIPLE INSTANCES ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="port-tag">:8082 / :8083</span><span class="chevron">▶</span> Run Multiple Instances of Student MS</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Right now Student MS runs on 8080. We'll start two <strong>more</strong> instances of the <em>same</em>
+              project on 8082 and 8083 to simulate <strong>horizontal scaling</strong> — without creating new projects.
+              We override the port at runtime with a VM argument.
+            </div>
+            <div class="twocol" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+              <div class="concept" style="margin:0;">
+                <span class="lbl">IntelliJ IDEA</span>
+                <ol style="margin:6px 0 0; padding-left:18px; font-size:15.5px;">
+                  <li>Run → <strong>Edit Configurations…</strong></li>
+                  <li>Select the Student MS config → <strong>Copy</strong> it (the duplicate icon)</li>
+                  <li>Rename to "Student MS · 8082"</li>
+                  <li>In <strong>VM options</strong> add: <code>-Dserver.port=8082</code><br><span style="font-size:13px; color:var(--mac-text-muted);">(if VM options is hidden: Modify options → Add VM options)</span></li>
+                  <li>Apply → Run. Repeat for <code>-Dserver.port=8083</code></li>
+                </ol>
+              </div>
+              <div class="concept" style="margin:0;">
+                <span class="lbl">Eclipse / STS</span>
+                <ol style="margin:6px 0 0; padding-left:18px; font-size:15.5px;">
+                  <li>Right-click project → Run As → <strong>Run Configurations…</strong></li>
+                  <li>New <strong>Maven Build</strong></li>
+                  <li>Goals: <code>spring-boot:run</code></li>
+                  <li>VM Arguments: <code>-Dserver.port=8082</code></li>
+                  <li>Apply → Run. Repeat for <code>8083</code></li>
+                </ol>
+              </div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Command-line alternative (any IDE)</span>
+              From the <code>student-ms</code> folder you can also run:
+              <div class="codewrap"><pre><code>mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dserver.port=8082"</code></pre></div>
+              Open a second terminal and repeat with <code>8083</code>.
+            </div>
+            <ol class="steps">
+              <li><strong>Refresh</strong> the Eureka dashboard at <code>localhost:8761</code>.</li>
+            </ol>
+            <div class="dash-mock">
+              <div class="dm-top">📇 Eureka — STUDENT-MS now has 3 instances</div>
+              <table>
+                <thead><tr><th>Application</th><th>Status</th><th>Instances</th></tr></thead>
+                <tbody>
+                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (3)</td><td><code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
+                  <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected — the visual payoff</span>
+              The STUDENT-MS row now lists <strong>three instances</strong> on ports 8080, 8082 and 8083. You've
+              simulated horizontal scaling on one machine.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>All three instances show the same port</td><td>The VM argument wasn't applied.</td><td>Double-check it's in <strong>VM options</strong> (not Program arguments) and starts with <code>-D</code>.</td></tr>
+                <tr><td>Second instance fails: "port already in use"</td><td>That port is taken by something else.</td><td>Pick another free port, e.g. <code>8084</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Started 8082 and 8083 instances of Student MS.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Eureka shows STUDENT-MS with all 3 instances (8080, 8082, 8083).</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: API GATEWAY ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="port-tag">:9393</span><span class="chevron">▶</span> Create the API Gateway</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The Gateway is the single entry point. It has <strong>no controller</strong> — it's configuration only.
+              It registers with Eureka (so it can discover services) and we'll add routing in the next lab.
+            </div>
+            <ol class="steps">
+              <li><strong>Spring Initializr:</strong> Artifact <code>api-gateway</code>. Dependencies: <code>Gateway</code> (<code>spring-cloud-starter-gateway</code>) + <code>Eureka Discovery Client</code>.</li>
+              <li><strong>Configure</strong> the base <code>application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>server.port=9393
+spring.application.name=api-gateway
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+            <ol class="steps" start="3">
+              <li><strong>Run the Gateway</strong> and refresh Eureka — API-GATEWAY should now be registered too.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              The gateway starts on 9393 and appears in the Eureka dashboard alongside STUDENT-MS and CUSTOMER-MS.
+              There's nothing to call yet — routes come next.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Startup warning / failure about web application type</td><td>Spring Cloud Gateway is built on the reactive (WebFlux) stack — a Web MVC dependency can clash.</td><td>Add <code>spring.main.web-application-type=reactive</code> to <code>application.properties</code>, and make sure <code>spring-boot-starter-web</code> is NOT also included.</td></tr>
+              </tbody>
+            </table>
+            <div class="observe">
+              <span class="lbl">Why no <code>spring-boot-starter-web</code>?</span>
+              Spring Cloud Gateway uses the <strong>reactive</strong> Netty server, not Tomcat. If you accidentally
+              add the regular Web starter too, they conflict. The Gateway starter brings everything the gateway needs.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">API Gateway runs on 9393 and is registered in Eureka.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: MANUAL ROUTES ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="chevron">▶</span> Manual Route Configuration</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — what a route is</span>
+              A <strong>route</strong> maps an incoming URL pattern on the gateway to a backend service. It has three
+              parts: an <strong>id</strong> (any name), a <strong>uri</strong> (which service to forward to), and one or
+              more <strong>predicates</strong> (which incoming URLs trigger it).
+            </div>
+            <ol class="steps">
+              <li><strong>Add</strong> the routing config to the Gateway's <code>application.properties</code>:</li>
+            </ol>
+            <div class="codewrap"><pre><code>spring.cloud.gateway.routes[0].id=student-ms-route
+spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**
+
+spring.cloud.gateway.routes[1].id=customer-ms-route
+spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**</code></pre></div>
+            <div class="concept">
+              <span class="lbl">What <code>lb://</code> means</span>
+              <strong>lb</strong> = Load Balancer. <code>uri=lb://STUDENT-MS</code> tells the gateway: don't use a
+              hardcoded address — ask Eureka for the live instances of <code>STUDENT-MS</code> and load-balance across
+              them. This is what makes round robin work in the next lab.
+            </div>
+            <div class="concept">
+              <span class="lbl">What the predicate means</span>
+              <code>Path=/students-api/**</code> means: "any request to the gateway whose path starts with
+              <code>/students-api/</code> gets forwarded to this route's service." The part after is passed along — so
+              <code>:9393/students-api/students</code> → <code>STUDENT-MS</code> + <code>/students</code>.
+            </div>
+            <ol class="steps" start="2">
+              <li><strong>Restart the Gateway</strong> so it picks up the new routes.</li>
+            </ol>
+            <div class="observe">
+              <span class="lbl">Path mapping in plain terms</span>
+              Request <code>GET :9393/students-api/students</code> → predicate matches <code>/students-api/**</code> →
+              gateway strips nothing by default and forwards the full path to <code>STUDENT-MS</code>, which serves
+              <code>/students</code>. So your controller's <code>@RequestMapping("/students")</code> lines up with the
+              part after <code>/students-api</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Manual routes added for STUDENT-MS and CUSTOMER-MS; gateway restarted.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 7: TEST LOAD BALANCING ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Test Load Balancing <em>(the payoff)</em></summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li><strong>In Postman</strong> (or browser): <code>GET http://localhost:9393/students-api/students</code></li>
+              <li><strong>Hit it 3–4 times rapidly.</strong> Watch the port in the response string change each time.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected — Round Robin in action</span>
+              The response cycles through the instances:
+              <div class="logmock">
+Request 1 → <span class="hit">Student Service - Port: <span class="port">8080</span></span>
+Request 2 → <span class="hit">Student Service - Port: <span class="port">8082</span></span>
+Request 3 → <span class="hit">Student Service - Port: <span class="port">8083</span></span>
+Request 4 → <span class="hit">Student Service - Port: <span class="port">8080</span></span>  (loops back)
+              </div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Watch the consoles too</span>
+              Tile the IDE consoles for all three Student MS instances. As you hit the endpoint, watch which console
+              logs the incoming request — it rotates 8080 → 8082 → 8083. <strong>This is the visual payoff of the whole
+              session:</strong> one URL, traffic spread automatically across three instances by the gateway.
+            </div>
+            <ol class="steps" start="3">
+              <li><strong>Test Customer MS too:</strong> <code>GET http://localhost:9393/customers-api/customers</code></li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected — Customer MS via gateway</span>
+              <div class="logmock">Student Service - Port: 8080 / 8082 / 8083  (rotating)
+Customer Service - Port: 8081               (only one instance)</div>
+              Both services are now reachable through the <strong>single</strong> gateway port 9393.
+            </div>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>503 Service Unavailable</td><td>Gateway can't find the service in Eureka.</td><td>Confirm the service name in <code>lb://NAME</code> exactly matches the registered name, and the service is UP in Eureka.</td></tr>
+                <tr><td>404 Not Found</td><td>Path predicate didn't match, or wrong endpoint path.</td><td>Verify the URL prefix matches the predicate and the service actually serves that sub-path.</td></tr>
+                <tr><td>Always same port — no rotation</td><td>Only one instance is actually running.</td><td>Re-check the Eureka dashboard shows 3 STUDENT-MS instances.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Student MS via gateway rotates across 8080/8082/8083 (Round Robin observed).</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Customer MS reachable through the same gateway port 9393.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 8: DISCOVERY LOCATOR ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">LAB 8</span><span class="chevron">▶</span> Discovery Locator Approach</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Instead of defining each route by hand, <strong>Discovery Locator</strong> tells the gateway to
+              auto-create routes for <em>every</em> service registered in Eureka, keyed by service name. Zero route
+              config — but the service name appears in the URL.
+            </div>
+            <ol class="steps">
+              <li><strong>Comment out</strong> the manual routes from Lab 6 (prefix each line with <code>#</code>).</li>
+              <li><strong>Add</strong> the discovery locator config:</li>
+            </ol>
+            <div class="codewrap"><pre><code>spring.cloud.gateway.discovery.locator.enabled=true
+spring.cloud.gateway.discovery.locator.lower-case-service-id=true</code></pre></div>
+            <ol class="steps" start="3">
+              <li><strong>Restart the Gateway.</strong></li>
+              <li><strong>Test</strong> with the service name in the path:
+                <ul>
+                  <li><code>GET http://localhost:9393/student-ms/students</code></li>
+                  <li><code>GET http://localhost:9393/customer-ms/customers</code></li>
+                </ul>
+              </li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              Both work with <strong>no manual route configuration</strong>. Student MS still round-robins across its
+              three instances — load balancing is automatic here too. Note the URL now uses
+              <code>/student-ms/</code> (lower-cased service id) instead of <code>/students-api/</code>.
+            </div>
+            <div class="concept">
+              <span class="lbl">Manual routes vs Discovery Locator — the trade-off</span>
+              <strong>Manual routes</strong> → clean, custom URLs (<code>/students-api/...</code>), full control, more
+              config; better for <strong>production</strong>. <strong>Discovery Locator</strong> → automatic, zero
+              config, but service names leak into URLs (<code>/student-ms/...</code>); better for
+              <strong>development &amp; exploration</strong>. The trade-off is URL cleanliness vs zero configuration.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Discovery Locator enabled; both services auto-route by name without manual config.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 9: BONUS — HEARTBEAT ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Observe the Eureka Heartbeat — do this if you finish early</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Eureka relies on <strong>heartbeats</strong>. If a service stops sending them, Eureka eventually removes
+              it — and the gateway stops routing to it. Let's watch that self-healing happen.
+            </div>
+            <ol class="steps">
+              <li><strong>Stop</strong> one Student MS instance — e.g. the one on port 8082.</li>
+              <li><strong>Wait 30–60 seconds</strong> (Eureka has a grace period before it evicts a missing instance).</li>
+              <li><strong>Refresh</strong> the Eureka dashboard. STUDENT-MS drops from 3 instances to 2.</li>
+              <li><strong>Hit the gateway endpoint</strong> repeatedly again.</li>
+            </ol>
+            <div class="expected">
+              <span class="lbl">Expected — self-healing routing</span>
+              <div class="logmock">Before: 8080 → 8082 → 8083 → 8080 ...
+After  : <span class="hit">8080 → 8083 → 8080 → 8083 ...</span>  (8082 gone, no errors)</div>
+              Traffic now only cycles between 8080 and 8083. <strong>No config change was needed</strong> — Eureka
+              detected the missing heartbeat and the gateway adjusted automatically.
+            </div>
+            <div class="observe">
+              <span class="lbl">Why this matters</span>
+              In production, instances crash, get redeployed, or scale down all the time. This heartbeat-driven
+              eviction is what keeps traffic flowing to <em>healthy</em> instances only — the foundation of high
+              availability, with zero manual intervention.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Bonus: stopped an instance, watched Eureka evict it, and saw the gateway reroute automatically.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE CONFIG REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Configuration Reference (all four projects)</summary>
+          <div class="exp-body">
+            <p>Every <code>application.properties</code> and the two key main-class snippets. If you fell behind, paste
+            these, run in order (Eureka first), and you're caught up.</p>
+
+            <h3>1 · eureka-server / application.properties</h3>
+            <div class="codewrap"><pre><code>server.port=8761
+spring.application.name=eureka-server
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false</code></pre></div>
+
+            <h3>2 · student-ms / application.properties</h3>
+            <div class="codewrap"><pre><code>server.port=8080
+spring.application.name=STUDENT-MS
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+
+            <h3>3 · customer-ms / application.properties</h3>
+            <div class="codewrap"><pre><code>server.port=8081
+spring.application.name=CUSTOMER-MS
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+
+            <h3>4 · api-gateway / application.properties <span class="muted" style="font-size:14px;">(use EITHER manual routes OR discovery locator)</span></h3>
+            <div class="codewrap"><pre><code>server.port=9393
+spring.application.name=api-gateway
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+
+<span class="code-comment"># ---- OPTION A: Manual routes (clean URLs, production-friendly) ----</span>
+spring.cloud.gateway.routes[0].id=student-ms-route
+spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**
+
+spring.cloud.gateway.routes[1].id=customer-ms-route
+spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**
+
+<span class="code-comment"># ---- OPTION B: Discovery Locator (zero config, dev-friendly) ----</span>
+<span class="code-comment"># Comment out OPTION A above if you enable this.</span>
+#spring.cloud.gateway.discovery.locator.enabled=true
+#spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+
+<span class="code-comment"># If you hit a web-application-type conflict on startup:</span>
+#spring.main.web-application-type=reactive</code></pre></div>
+
+            <h3>5 · Eureka Server main class</h3>
+            <div class="codewrap"><pre><code>@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}</code></pre></div>
+
+            <h3>6 · Microservice main class</h3>
+            <div class="codewrap"><pre><code>@SpringBootApplication
+<span class="code-comment">// @EnableEurekaClient is OPTIONAL in modern Spring Cloud —</span>
+<span class="code-comment">// the client is auto-detected from the classpath. Older versions</span>
+<span class="code-comment">// required it explicitly.</span>
+public class StudentMsApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(StudentMsApplication.class, args);
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Start order matters</span>
+              Always start <strong>Eureka Server first</strong>, give it a few seconds, then start the microservices,
+              then the gateway. If a service starts before Eureka is ready it'll log a couple of retries — harmless,
+              it connects once Eureka is up.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference card</h2>
+          <table>
+            <thead><tr><th>Concept</th><th>Tool / Annotation</th><th>Key config property</th></tr></thead>
+            <tbody>
+              <tr><td>Eureka Server</td><td><code>@EnableEurekaServer</code></td><td><code>server.port=8761</code></td></tr>
+              <tr><td>Eureka Client</td><td>Auto-detected (or <code>@EnableEurekaClient</code>)</td><td><code>eureka.client.service-url.defaultZone</code></td></tr>
+              <tr><td>Service Identity</td><td>—</td><td><code>spring.application.name</code></td></tr>
+              <tr><td>Gateway Load Balance</td><td><code>lb://</code> URI prefix</td><td><code>spring.cloud.gateway.routes[n].uri</code></td></tr>
+              <tr><td>Route Predicate</td><td>—</td><td><code>...routes[n].predicates[0]=Path=...</code></td></tr>
+              <tr><td>Discovery Locator</td><td>—</td><td><code>spring.cloud.gateway.discovery.locator.enabled=true</code></td></tr>
+              <tr><td>Multiple Instances</td><td>VM arg at runtime</td><td><code>-Dserver.port=XXXX</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WRAP UP ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">That's the series — congratulations</span>
+          You started with a single Hello World controller in Session 1 and you've finished with a running
+          <strong>microservices architecture</strong>: a service registry, two microservices, multiple load-balanced
+          instances, and an API gateway as the single front door. In the real world this skeleton grows with a
+          <strong>Config Server</strong>, <strong>JWT security</strong> across services, <strong>Docker</strong> +
+          <strong>Kubernetes</strong> for packaging and orchestration, <strong>CI/CD</strong> pipelines, and
+          <strong>distributed tracing</strong> with Zipkin. You now have the foundation every one of those builds on.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Spring Boot — Session 4 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spring Boot Session 4 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into springboot-session4-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .cards.c5 { grid-template-columns: repeat(5, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+    .card.tight { padding: 13px 14px; }
+    .card.tight h3 { font-size: 15.5px; }
+    .card.tight p { font-size: 13.5px; }
+    .card .prob { color: var(--tl-red); font-weight: 600; display:block; font-size: 13.5px; margin-top: 4px; }
+    .card .sol { color: #1a9e34; font-weight: 600; display:block; font-size: 13.5px; margin-top: 4px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Two-column diagram comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Annotation unpack */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Annotation grid (preview + recap) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 15px; font-weight: 700; color: var(--mac-accent); }
+    .anno-cell .ac-def { font-size: 14.5px; color: var(--mac-text-muted); }
+    .anno-grid.preview { grid-template-columns: repeat(2, 1fr); }
+    .anno-grid.preview .anno-cell { text-align: center; align-items: center; }
+
+    /* JSON / log color coding */
+    .json-key { color: #8fd3ff; }
+    .json-str { color: #a6e22e; }
+    .json-num { color: #fd9353; }
+    .json-bool { color: #ff6188; }
+    .json-punc { color: #f8f8f2; }
+
+    /* Flash cards (recap) */
+    .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
+    .flash {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      background: #fafafc;
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      user-select: none;
+    }
+    .flash:hover { background: #f0f6ff; }
+    .flash .q { font-weight: 700; font-size: 18px; display: flex; align-items: center; gap: 10px; }
+    .flash .q .tap { font-size: 13px; font-weight: 600; color: var(--mac-accent); margin-left: auto; }
+    .flash .a {
+      display: none;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--mac-border);
+      font-size: 16.5px;
+      line-height: 1.55;
+    }
+    .flash.revealed .a { display: block; }
+    .flash.revealed .tap { display: none; }
+
+    /* Step chips (numbered horizontal steps) */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Round-robin visual */
+    .rr { display: grid; grid-template-columns: 160px 1fr; gap: 14px; align-items: center; margin-top: 16px; }
+    .rr .req { font-family: var(--mac-mono); font-weight: 700; font-size: 15px; text-align: right; color: var(--mac-text); }
+    .rr .target { display: flex; gap: 10px; }
+    .rr-inst {
+      border: 2px solid var(--mac-border); border-radius: 10px;
+      padding: 8px 14px; font-family: var(--mac-mono); font-size: 14px; font-weight: 600;
+      background: #fafafc; min-width: 92px; text-align: center;
+    }
+    .rr-inst.hit { border-color: #28c840; background: #eefcf1; color: #1a9e34; box-shadow: 0 0 0 3px rgba(40,200,64,0.15); }
+
+    /* Circuit breaker states */
+    .cb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .cb-state { border-radius: 12px; padding: 16px 18px; border: 2px solid; }
+    .cb-state h3 { margin: 0 0 6px; font-size: 18px; font-family: var(--mac-mono); }
+    .cb-state p { font-size: 14.5px; margin: 0; }
+    .cb-state.closed { border-color: #28c840; background: #eefcf1; }
+    .cb-state.closed h3 { color: #1a9e34; }
+    .cb-state.open { border-color: var(--tl-red); background: #fff0ef; }
+    .cb-state.open h3 { color: var(--tl-red); }
+    .cb-state.half { border-color: #ff9f0a; background: #fff6ea; }
+    .cb-state.half h3 { color: #b8860b; }
+
+    /* Dashboard mockup (Eureka) */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin-top: 10px;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+    .port {
+      display: inline-block;
+      background: rgba(94,92,230,0.12);
+      color: #5e5ce6;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">springboot-session4-theory.html — Spring Boot Session 4</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 4 of the Spring Boot Series · Final Session</span>
+            <h1>Spring Boot</h1>
+            <div class="sub">Microservices with Spring Cloud — Service Registry, API Gateway &amp; Load Balancing, built live.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Session 3 ended with the <em>idea</em> of microservices. Today we build the <strong>infrastructure that runs them</strong>. By the end you'll have four Spring Boot apps running at once — a registry, two microservices, and a gateway — talking to each other and load-balancing traffic. This is the most infrastructure-heavy session, so the theory is front-loaded and every concept maps to something you'll build in the next 45 minutes.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Monolith vs Microservices — a 60-second anchor</li>
+            <li><span class="num">2</span> The 5 microservices design patterns</li>
+            <li><span class="num">3</span> Spring Cloud — the toolbox that implements them</li>
+            <li><span class="num">4</span> The full architecture flow — the mental model for today</li>
+            <li><span class="num">5</span> Eureka Server + Client — the service registry</li>
+            <li><span class="num">6</span> API Gateway — routing &amp; round-robin load balancing</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic. Keep <strong>slide 14 — the architecture flow</strong> in mind throughout the lab; it's the map for everything we build. By the end you'll be able to explain how a request travels from a client, through a gateway, to the right service instance — and build that path yourself.
+          </div>
+        </section>
+
+        <!-- 3. SESSION 3 RECAP (flash cards) -->
+        <section class="slide">
+          <p class="eyebrow">Before we start something new</p>
+          <h2>Session 3 recap</h2>
+          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q1 · What is a DTO and why use it? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">A <strong>Data Transfer Object</strong> — a plain Java class that carries only the data the client needs. We use it to <strong>hide sensitive fields</strong> (security), <strong>shape responses</strong> (flexibility), and <strong>decouple</strong> the API contract from the database schema. The Entity maps to the DB; the DTO travels over the wire.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q2 · What does <code>@ResponseStatus</code> do on a custom exception? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">It tells Spring which <strong>HTTP status code</strong> to return when that exception is thrown. Putting <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> on <code>ResourceNotFoundException</code> makes Spring respond with a clean <strong>404</strong> automatically — no try/catch needed.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q3 · What does Spring Security do the moment its dependency is added? <span class="tap">click to reveal ▸</span></div>
+              <div class="a">It <strong>locks down every endpoint</strong> with sensible defaults: a login page appears, a random password is printed in the console, and the default username is <code>user</code> — all before you write a single line of security code.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. MONOLITH vs MICROSERVICES REVISIT -->
+        <section class="slide">
+          <p class="eyebrow">A 60-second anchor</p>
+          <h2>Monolith vs Microservices — revisited</h2>
+          <p class="deep">Last session we discussed <em>why</em> microservices exist. Today we build the infrastructure <strong>that runs them</strong>. Quick reminder of the contrast before we dive in:</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>🧱 Monolith</h3>
+              <ul>
+                <li><strong>One deployable unit</strong> — everything ships together.</li>
+                <li><strong>One shared database.</strong></li>
+                <li><strong>One failure = full outage</strong> — no isolation.</li>
+                <li>Scale it = duplicate the <em>whole</em> app.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>🧩 Microservices</h3>
+              <ul>
+                <li><strong>Independent services</strong>, deployed separately.</li>
+                <li><strong>A database per service.</strong></li>
+                <li><strong>Failure isolation</strong> — one down, others up.</li>
+                <li>Scale only the service that needs it.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Today's framing</span>
+            Microservices give you independence and scalability — but they introduce a new question: <strong>how do all these separate, independently-deployed services find and talk to each other?</strong> That's the problem the rest of this session solves.
+          </div>
+        </section>
+
+        <!-- 5. SCALING REVISIT -->
+        <section class="slide">
+          <p class="eyebrow">Why the next patterns exist</p>
+          <h2>Horizontal vs vertical scaling — revisited</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>⬆️ Vertical (scale up)</h3>
+              <p style="font-size:15px; text-align:center;">One machine, more RAM/CPU. Simple, but has a hard ceiling and gets expensive.</p>
+            </div>
+            <div class="colbox b">
+              <h3>➡️ Horizontal (scale out)</h3>
+              <p style="font-size:15px; text-align:center;">More machines running the same service. No real ceiling, cost-effective, fault-tolerant.</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Here's the catch — and it sets up the whole session</span>
+            <strong>Horizontal scaling means you'll have MULTIPLE INSTANCES of the same service</strong> (e.g. Student MS on ports 8080, 8082, 8083). That creates two brand-new problems:
+            <ul style="margin:8px 0 0;">
+              <li><strong>How does the client know all the addresses?</strong> Instances come and go on dynamic ports.</li>
+              <li><strong>How does traffic get distributed evenly</strong> across them?</li>
+            </ul>
+            These two problems are solved by the next two patterns: a <span class="term">Service Registry</span> and an <span class="term">API Gateway</span>.
+          </div>
+        </section>
+
+        <!-- 6. THE 5 DESIGN PATTERNS -->
+        <section class="slide">
+          <p class="eyebrow">The vocabulary of microservices</p>
+          <h2>The 5 microservices design patterns</h2>
+          <p class="deep">Five patterns come up in every real microservices system. Each solves one specific pain. We'll <strong>build the first two today</strong> (Registry + Gateway) and cover the other three conceptually — you'll meet all of them in industry projects.</p>
+          <div class="cards c5">
+            <div class="card tight">
+              <div class="ic">⚙️</div>
+              <h3>Config Server</h3>
+              <span class="prob">✗ 10 services, 10 properties files</span>
+              <span class="sol">✓ one central Git-backed config</span>
+            </div>
+            <div class="card tight">
+              <div class="ic">📇</div>
+              <h3>Service Registry</h3>
+              <span class="prob">✗ dynamic ports, can't hardcode</span>
+              <span class="sol">✓ a live catalog of what's running</span>
+            </div>
+            <div class="card tight">
+              <div class="ic">🚪</div>
+              <h3>API Gateway</h3>
+              <span class="prob">✗ clients shouldn't know internal URLs</span>
+              <span class="sol">✓ one single entry point</span>
+            </div>
+            <div class="card tight">
+              <div class="ic">🔍</div>
+              <h3>Distributed Tracing</h3>
+              <span class="prob">✗ request spans 5 services, what's slow?</span>
+              <span class="sol">✓ end-to-end request tracking</span>
+            </div>
+            <div class="card tight">
+              <div class="ic">🔌</div>
+              <h3>Circuit Breaker</h3>
+              <span class="prob">✗ Service B down, A keeps calling</span>
+              <span class="sol">✓ detect, stop, return fallback</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Today's scope</span>
+            <strong>Build:</strong> Service Registry (Eureka) + API Gateway (Spring Cloud Gateway). <strong>Concept-only:</strong> Config Server, Distributed Tracing, Circuit Breaker. Knowing they exist — and what problem each solves — is what matters today.
+          </div>
+        </section>
+
+        <!-- 7. CONFIG SERVER -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 1 of 5 — concept only</p>
+          <h2>Config Server</h2>
+          <p class="deep">Imagine 10 microservices, each with its own <code>application.properties</code>. You need to change the database URL — now you're editing 10 files and redeploying 10 services. The <strong>Config Server</strong> fixes this: every service pulls its configuration from one <strong>central, Git-backed</strong> source at startup.</p>
+          <div class="flow vert" style="max-width:560px; margin:18px auto;">
+            <div class="flow-box amber" style="min-width:300px;">Git Repository <span class="sm">all config files, version-controlled</span></div>
+            <span class="flow-arrow">▼ served by</span>
+            <div class="flow-box alt" style="min-width:300px;">Spring Cloud Config Server</div>
+            <span class="flow-arrow">▼ services read from it at startup</span>
+            <div class="flow" style="justify-content:center; margin-top:0;">
+              <div class="flow-box green">Service A</div>
+              <div class="flow-box green">Service B</div>
+              <div class="flow-box green">Service C</div>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">When you'll use it</span>
+            When you have <strong>environment-specific configs</strong> (dev / test / prod) across many services, and want a single, audited place to manage them. Change one property in Git, and services can refresh without a redeploy. <strong>Not building this today</strong> — but you'll encounter it in real projects.
+          </div>
+        </section>
+
+        <!-- 8. SERVICE REGISTRY (EUREKA) -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 2 of 5 — building this today</p>
+          <h2>Service Registry (Eureka) — how it works</h2>
+          <p class="deep">A <strong>Service Registry</strong> is a live phonebook of every running service: its name, address, and port. <strong>Netflix Eureka</strong> is the registry we'll use. Services register themselves on startup and prove they're alive with a <strong>heartbeat</strong>. Here's the flow:</p>
+          <div class="steps4">
+            <div class="step-chip">
+              <div class="stepnum">1</div>
+              <h3>Eureka starts</h3>
+              <p>The registry boots on port <span class="port">8761</span> — the phonebook itself, empty at first.</p>
+            </div>
+            <div class="step-chip">
+              <div class="stepnum">2</div>
+              <h3>Student MS registers</h3>
+              <p>On startup it tells Eureka "I'm <code>STUDENT-MS</code> at port 8080" and sends a heartbeat every ~30s.</p>
+            </div>
+            <div class="step-chip">
+              <div class="stepnum">3</div>
+              <h3>Customer MS registers</h3>
+              <p>Same thing — <code>CUSTOMER-MS</code> joins the registry. Now Eureka knows both.</p>
+            </div>
+            <div class="step-chip">
+              <div class="stepnum">4</div>
+              <h3>Gateway asks Eureka</h3>
+              <p>"Where is <code>STUDENT-MS</code>?" → Eureka returns the live list of instances.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The heartbeat — self-healing built in</span>
+            Registered services <strong>ping Eureka regularly</strong>. If a service crashes and the heartbeats stop, Eureka <strong>removes it from the registry</strong> after a grace period — so the gateway stops routing traffic to a dead instance, automatically. No manual cleanup, no config change.
+          </div>
+        </section>
+
+        <!-- 9. API GATEWAY -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 3 of 5 — building this today</p>
+          <h2>API Gateway — what it does</h2>
+          <p class="deep">The <strong>API Gateway</strong> is the single front door to your whole system. Clients talk to one URL; the gateway figures out the rest. It has three core jobs:</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🧭</div><h3>Routing</h3><p>Forward <code>/students-api/**</code> to Student MS and <code>/customers-api/**</code> to Customer MS, based on the URL.</p></div>
+            <div class="card"><div class="ic">⚖️</div><h3>Load Balancing</h3><p>Spread traffic across multiple instances of a service (8080, 8082, 8083) so none is overwhelmed.</p></div>
+            <div class="card"><div class="ic">🚪</div><h3>Single Entry Point</h3><p>Clients only ever know <strong>one</strong> URL — the gateway (port <span class="port">9393</span>). Internal services stay hidden.</p></div>
+          </div>
+          <p class="deep" style="margin-top:14px;">A gateway route in <code>application.properties</code> looks like this:</p>
+          <pre><code>spring.cloud.gateway.routes[0].id=student-ms-route
+spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS          <span class="code-comment"># lb = load-balanced via Eureka</span>
+spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**</code></pre>
+          <p class="muted">Secondary capabilities (mention-only today): authentication, rate limiting, request logging — all natural to centralise at the gateway.</p>
+        </section>
+
+        <!-- 10. ROUND ROBIN LOAD BALANCING -->
+        <section class="slide">
+          <p class="eyebrow">How traffic gets spread</p>
+          <h2>Load balancing — Round Robin</h2>
+          <p class="deep">When several instances of a service are running, the gateway needs a rule to pick one per request. The simplest and default rule is <strong>Round Robin</strong>: just cycle through the instances in order, one after another, then loop back to the start.</p>
+          <div style="margin-top:8px;">
+            <div class="rr">
+              <div class="req">Request 1 →</div>
+              <div class="target"><div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div>
+            </div>
+            <div class="rr">
+              <div class="req">Request 2 →</div>
+              <div class="target"><div class="rr-inst">:8080</div><div class="rr-inst hit">:8082 ✓</div><div class="rr-inst">:8083</div></div>
+            </div>
+            <div class="rr">
+              <div class="req">Request 3 →</div>
+              <div class="target"><div class="rr-inst">:8080</div><div class="rr-inst">:8082</div><div class="rr-inst hit">:8083 ✓</div></div>
+            </div>
+            <div class="rr">
+              <div class="req">Request 4 →</div>
+              <div class="target"><div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The magic word: <code>lb://</code></span>
+            The <code>lb://</code> prefix in your gateway route (<code>uri=lb://STUDENT-MS</code>) is what switches this on. <strong>lb</strong> = load balancer. It tells Spring Cloud: don't use a hardcoded address — ask Eureka for all live instances of <code>STUDENT-MS</code> and round-robin across them automatically. You'll watch this happen live in the lab.
+          </div>
+        </section>
+
+        <!-- 11. DISTRIBUTED TRACING -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 4 of 5 — concept only</p>
+          <h2>Distributed Tracing</h2>
+          <p class="deep">When one request hops through five services and the whole thing is slow, <em>which</em> service caused it? <strong>Distributed tracing</strong> answers that. Every request gets a unique <strong>trace ID</strong> that's passed along the chain; each service logs with that ID, and a tool like <strong>Zipkin</strong> stitches them into one timeline.</p>
+          <div class="flow">
+            <div class="flow-box">Client</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">API Gateway</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Order MS</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Inventory MS</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Payment MS</div>
+          </div>
+          <p class="deep" style="margin-top:14px;">Each box adds the <strong>same trace ID</strong> to its logs. Zipkin collects them and shows the full journey with timings:</p>
+          <pre><code><span class="code-comment"># All share traceId=4f9a... Zipkin shows where time went:</span>
+Gateway      ▏ 4ms
+Order MS     ▏▏▏ 40ms
+Inventory MS ▏▏▏▏▏▏▏▏▏▏▏▏ <span class="json-bool">2600ms  &lt;-- the slow one!</span>
+Payment MS   ▏▏ 25ms</code></pre>
+          <div class="note">
+            <span class="lbl">Tooling &amp; scope</span>
+            In the Spring world this is done with <strong>Micrometer Tracing + Zipkin</strong>. Use case: "the request takes 3 seconds — who's responsible?" <strong>Conceptual overview only today</strong>, but it's invaluable the moment you have more than two services.
+          </div>
+        </section>
+
+        <!-- 12. CIRCUIT BREAKER -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 5 of 5 — concept only</p>
+          <h2>Circuit Breaker</h2>
+          <p class="deep">If Service B is down, Service A shouldn't keep hammering it — that wastes resources and can cascade into a system-wide failure. A <strong>circuit breaker</strong> wraps the call and watches for failures, just like an electrical breaker that trips to prevent damage. It has three states:</p>
+          <div class="cb">
+            <div class="cb-state closed">
+              <h3>CLOSED</h3>
+              <p>Normal operation. Requests flow through to Service B. Failures are counted.</p>
+            </div>
+            <div class="cb-state open">
+              <h3>OPEN</h3>
+              <p>Too many failures — the breaker trips. Requests are <strong>rejected instantly</strong> and a fallback is returned. No more hammering.</p>
+            </div>
+            <div class="cb-state half">
+              <h3>HALF-OPEN</h3>
+              <p>After a timeout, let <strong>one</strong> trial request through. If it succeeds → back to CLOSED. If it fails → back to OPEN.</p>
+            </div>
+          </div>
+          <div class="flow" style="justify-content:center;">
+            <div class="flow-box green">CLOSED</div>
+            <span class="flow-arrow">— failures →</span>
+            <div class="flow-box warn">OPEN</div>
+            <span class="flow-arrow">— timeout →</span>
+            <div class="flow-box amber">HALF-OPEN</div>
+            <span class="flow-arrow">— success →</span>
+            <div class="flow-box green">CLOSED</div>
+          </div>
+          <div class="note">
+            <span class="lbl">Analogy &amp; tooling</span>
+            Like a household circuit breaker: it trips to prevent damage, then lets you check if it's safe to resume. In Spring, this is implemented with <strong>Resilience4j</strong>. The fallback might return cached data or a friendly "try again later" instead of an error cascade. <strong>Not building today.</strong>
+          </div>
+        </section>
+
+        <!-- 13. SPRING CLOUD TOOLBOX -->
+        <section class="slide">
+          <p class="eyebrow">From patterns to tools</p>
+          <h2>Spring Cloud — the toolbox</h2>
+          <p class="deep"><strong>Spring Cloud</strong> isn't one library — it's a <em>collection</em> of tools that implement these patterns on top of Spring Boot. You pick the pieces you need. Here's how each pattern maps to its Spring Cloud implementation:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Design Pattern</th><th class="hl">Spring Cloud Tool</th><th>Today?</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Service Registry</td><td class="hl"><strong>Netflix Eureka</strong></td><td class="good">✓ building</td></tr>
+              <tr><td>API Gateway</td><td class="hl"><strong>Spring Cloud Gateway</strong></td><td class="good">✓ building</td></tr>
+              <tr><td>Load Balancing</td><td class="hl">Spring Cloud LoadBalancer</td><td class="good">✓ (via <code>lb://</code>)</td></tr>
+              <tr><td>Config Server</td><td class="hl">Spring Cloud Config</td><td>concept</td></tr>
+              <tr><td>Circuit Breaker</td><td class="hl">Resilience4j</td><td>concept</td></tr>
+              <tr><td>Distributed Tracing</td><td class="hl">Micrometer + Zipkin</td><td>concept</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The point</span>
+            You don't use every tool in every project — you assemble the toolbox your system needs. <strong>Today: Eureka + Gateway + LoadBalancer.</strong> That trio alone is a genuine, production-shaped microservices skeleton.
+          </div>
+        </section>
+
+        <!-- 14. FULL ARCHITECTURE FLOW -->
+        <section class="slide">
+          <p class="eyebrow">The mental model for the whole session — keep this in mind</p>
+          <h2>Full architecture flow</h2>
+          <p class="deep">This is the centrepiece. Trace a single request through the system, top to bottom. We'll refer back to this diagram throughout the hands-on labs.</p>
+          <div class="flow vert" style="max-width:680px; margin:14px auto;">
+            <div class="flow-box">① React Client / Postman <span class="sm">knows only ONE URL</span></div>
+            <span class="flow-arrow">▼ &nbsp; request to <code>:9393/students-api/...</code></span>
+            <div class="flow-box alt" style="min-width:340px;">② API Gateway <span class="port">:9393</span> <span class="sm">Spring Cloud Gateway — the single entry point</span></div>
+            <span class="flow-arrow">▼ &nbsp; "where is STUDENT-MS?" &nbsp; ▲ list of instances</span>
+            <div class="flow-box amber" style="min-width:340px;">③ Eureka Server <span class="port">:8761</span> <span class="sm">the registry — gateway queries it to find live services</span></div>
+            <span class="flow-arrow">▼ &nbsp; gateway routes via Round Robin</span>
+            <div class="flow" style="justify-content:center; margin-top:0;">
+              <div class="flow-box green">Student MS <span class="port">:8080</span></div>
+              <div class="flow-box green">Student MS <span class="port">:8082</span></div>
+              <div class="flow-box green">Student MS <span class="port">:8083</span></div>
+              <div class="flow-box">Customer MS <span class="port">:8081</span></div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Read it as a sentence</span>
+            The client hits the <strong>gateway</strong> → the gateway asks <strong>Eureka</strong> which instances of the service are alive → Eureka returns the list → the gateway picks one via <strong>round robin</strong> and forwards the request → the response travels back to the client. The client never knew there were three Student MS instances.
+          </div>
+        </section>
+
+        <!-- 15. WHAT WE'RE BUILDING — PROJECT MAP -->
+        <section class="slide">
+          <p class="eyebrow">Your build checklist, visualised</p>
+          <h2>What we're building today</h2>
+          <p class="deep">Four independent Spring Boot projects, each with one key dependency and (where needed) one key annotation. This is the map for the entire lab:</p>
+          <div class="cards c4">
+            <div class="card">
+              <div class="ic">📇</div>
+              <h3>Eureka Server</h3>
+              <p><span class="port">:8761</span></p>
+              <p style="margin-top:6px;"><strong>Dep:</strong> Eureka Server<br><strong>Annotation:</strong> <code>@EnableEurekaServer</code></p>
+            </div>
+            <div class="card">
+              <div class="ic">🎓</div>
+              <h3>Student MS</h3>
+              <p><span class="port">:8080 / :8082 / :8083</span></p>
+              <p style="margin-top:6px;"><strong>Dep:</strong> Web + Eureka Client<br><strong>Name:</strong> <code>STUDENT-MS</code></p>
+            </div>
+            <div class="card">
+              <div class="ic">🛍️</div>
+              <h3>Customer MS</h3>
+              <p><span class="port">:8081</span></p>
+              <p style="margin-top:6px;"><strong>Dep:</strong> Web + Eureka Client<br><strong>Name:</strong> <code>CUSTOMER-MS</code></p>
+            </div>
+            <div class="card">
+              <div class="ic">🚪</div>
+              <h3>API Gateway</h3>
+              <p><span class="port">:9393</span></p>
+              <p style="margin-top:6px;"><strong>Dep:</strong> Gateway + Eureka Client<br><strong>Config:</strong> routes only</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Heads-up before we code</span>
+            You'll run <strong>four (then six) JVMs at once</strong>. That needs a bit of RAM — if your machine struggles, it's fine to stop the extra Student MS instances after you've seen them register. The lab sheet has the exact ports and steps.
+          </div>
+        </section>
+
+        <!-- 16. EUREKA SERVER SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Config that matters — the registry</p>
+          <h2>Eureka Server setup — key config</h2>
+          <p class="deep">The Eureka Server is almost all configuration. One annotation on the main class, four lines of properties:</p>
+          <pre><code>@SpringBootApplication
+@EnableEurekaServer                 <span class="code-comment">// &lt;-- turns this app INTO the registry</span>
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}</code></pre>
+          <pre><code>server.port=8761                              <span class="code-comment"># the standard Eureka port — clients expect it</span>
+spring.application.name=eureka-server
+eureka.client.register-with-eureka=false      <span class="code-comment"># the server shouldn't register with itself</span>
+eureka.client.fetch-registry=false            <span class="code-comment"># it doesn't fetch a registry — it IS the registry</span></code></pre>
+          <div class="note">
+            <span class="lbl">Why those two <code>false</code> lines?</span>
+            Eureka components are clients by default. For the <strong>server</strong> we switch both off: it has no reason to register itself in its own phonebook, and no reason to download a registry from elsewhere. Leave these out and you'll see noisy startup errors as it tries to talk to a registry that doesn't exist.
+          </div>
+        </section>
+
+        <!-- 17. EUREKA CLIENT SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Config that matters — a microservice</p>
+          <h2>Eureka Client setup — key config</h2>
+          <p class="deep">Any microservice that wants to join the registry just needs the Eureka Client dependency and three properties. No annotation is required in modern Spring Cloud — it auto-detects the client from the classpath (older versions used <code>@EnableEurekaClient</code>).</p>
+          <pre><code>server.port=8080                                                  <span class="code-comment"># override at runtime for more instances</span>
+spring.application.name=STUDENT-MS                                <span class="code-comment"># the service ID — Gateway routes to THIS name</span>
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/   <span class="code-comment"># where to register</span></code></pre>
+          <div class="keybox">
+            <span class="lbl">The single most important line</span>
+            <code>spring.application.name=STUDENT-MS</code> is <strong>critical</strong>. This exact name is what Eureka lists the service under, and what the Gateway uses to route (<code>lb://STUDENT-MS</code>). Get it wrong or mismatched and the gateway route silently fails to resolve. Convention here: uppercase service IDs.
+          </div>
+          <div class="note">
+            <span class="lbl">Running more instances</span>
+            <code>server.port=8080</code> is just a default. At runtime you override it with a VM argument — <code>-Dserver.port=8082</code> — to start the <em>same</em> service on another port. Each one registers under <code>STUDENT-MS</code>, and Eureka groups them as multiple instances of one service.
+          </div>
+        </section>
+
+        <!-- 18. MANUAL vs DISCOVERY LOCATOR -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to configure the gateway</p>
+          <h2>API Gateway — manual routes vs discovery locator</h2>
+          <p class="deep">There are two ways to tell the gateway how to route. You'll try both in the lab.</p>
+          <div class="panels">
+            <div class="panel good">
+              <h3>Manual routing</h3>
+              <pre><code>spring.cloud.gateway.routes[0]
+  .id=student-ms-route
+spring.cloud.gateway.routes[0]
+  .uri=lb://STUDENT-MS
+spring.cloud.gateway.routes[0]
+  .predicates[0]=Path=/students-api/**</code></pre>
+              <ul style="font-size:14px; margin-top:8px;">
+                <li>Clean, custom URLs (<code>/students-api/...</code>)</li>
+                <li>More control (filters, rewrites)</li>
+                <li>More config to write per service</li>
+              </ul>
+            </div>
+            <div class="panel good">
+              <h3>Discovery locator</h3>
+              <pre><code>spring.cloud.gateway.discovery
+  .locator.enabled=true
+spring.cloud.gateway.discovery
+  .locator.lower-case-service-id=true</code></pre>
+              <ul style="font-size:14px; margin-top:8px;">
+                <li>One block, auto-routes <em>all</em> Eureka services</li>
+                <li>Zero per-service config</li>
+                <li>Service name appears in URL (<code>/student-ms/...</code>)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Which to use</span>
+            <strong>Manual routes</strong> for production-grade, clean public APIs where you control the URL shape. <strong>Discovery locator</strong> for quick prototyping and exploration — zero config, but it exposes internal service names in the URL. The trade-off is <em>URL cleanliness vs zero configuration</em>.
+          </div>
+        </section>
+
+        <!-- 19. RUNNING MULTIPLE INSTANCES -->
+        <section class="slide">
+          <p class="eyebrow">Simulating horizontal scaling locally</p>
+          <h2>Running multiple instances</h2>
+          <p class="deep">To see load balancing, you need more than one instance of Student MS. You don't create new projects — you run the <em>same</em> project again on a different port using a VM argument.</p>
+          <div class="twocol">
+            <div class="colbox">
+              <h3 style="color:var(--mac-accent);">IntelliJ IDEA</h3>
+              <ol style="margin:0; padding-left:18px; font-size:15px;">
+                <li>Run → <strong>Edit Configurations…</strong></li>
+                <li>Copy the Student MS config, rename it "Student MS · 8082"</li>
+                <li>Add VM option: <code>-Dserver.port=8082</code></li>
+                <li>Repeat for 8083, then run both</li>
+              </ol>
+            </div>
+            <div class="colbox">
+              <h3 style="color:var(--mac-accent);">Eclipse / STS</h3>
+              <ol style="margin:0; padding-left:18px; font-size:15px;">
+                <li>Right-click project → Run As → <strong>Maven build…</strong></li>
+                <li>Goals: <code>spring-boot:run</code></li>
+                <li>VM args: <code>-Dserver.port=8082</code></li>
+                <li>Apply → Run; repeat for 8083</li>
+              </ol>
+            </div>
+          </div>
+          <div class="dash-mock">
+            <div class="dm-top">📇 Eureka — localhost:8761 · Instances currently registered</div>
+            <table>
+              <thead><tr><th>Application</th><th>Status</th><th>Instances</th></tr></thead>
+              <tbody>
+                <tr><td class="app">STUDENT-MS</td><td class="up">UP (3)</td><td><code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
+                <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="keybox">
+            <span class="lbl">What you just did</span>
+            You're <strong>simulating horizontal scaling on one laptop</strong>. In production these would be separate machines or containers — but to Eureka and the gateway, three instances on three ports look exactly like three instances on three servers.
+          </div>
+        </section>
+
+        <!-- 20. THE FULL JOURNEY — SESSIONS 1-4 -->
+        <section class="slide">
+          <p class="eyebrow">Where you started, where you are</p>
+          <h2>The full journey — Sessions 1 to 4</h2>
+          <p class="deep">Look how far this has come. Four sessions, one continuous evolution:</p>
+          <div class="flow vert">
+            <div class="flow-box"><strong>Session 1</strong> — a single Spring Boot app with one controller <span class="sm">"Hello World" endpoint, the basics of the framework</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box"><strong>Session 2</strong> — a full REST API <span class="sm">CRUD endpoints, JSON, HTTP methods &amp; status codes</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt"><strong>Session 3</strong> — layered &amp; production-shaped <span class="sm">DTOs, Service/Repository layers, custom exceptions, H2 database</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green"><strong>Session 4</strong> — a microservices architecture <span class="sm">registry, gateway, multiple instances, load balancing</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The takeaway</span>
+            <strong>You've gone from a Hello World endpoint to a microservices architecture in four sessions.</strong> Every concept built on the last — and what you can build now is a genuine, production-grade microservices skeleton.
+          </div>
+        </section>
+
+        <!-- 21. WHAT'S NEXT — INDUSTRY ROADMAP -->
+        <section class="slide">
+          <p class="eyebrow">Beyond this course</p>
+          <h2>What's next — the industry roadmap</h2>
+          <p class="deep">What you built today is the skeleton. A real production microservices project layers more on top. Here's where to go next — framed as context, not pressure:</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">⚙️</div><h3>Config Server</h3><p>Centralised, Git-backed configuration across all services and environments.</p></div>
+            <div class="card"><div class="ic">🔐</div><h3>JWT security</h3><p>Token-based authentication enforced at the gateway and shared across services.</p></div>
+            <div class="card"><div class="ic">🐳</div><h3>Docker</h3><p>Package each service into a container so it runs the same everywhere.</p></div>
+            <div class="card"><div class="ic">☸️</div><h3>Kubernetes</h3><p>Orchestrate, scale and self-heal those containers across a cluster.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>CI/CD pipelines</h3><p>Automated build, test and deploy for each service independently.</p></div>
+            <div class="card"><div class="ic">🔍</div><h3>Tracing with Zipkin</h3><p>End-to-end visibility into requests crossing many services.</p></div>
+          </div>
+          <p class="muted" style="margin-top:14px;">You now have the foundation every one of these builds on. That's the real win of these four sessions.</p>
+        </section>
+
+        <!-- 22. CLOSING (cover-style) -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 4 Theory · End of the Series</span>
+            <h1>Let's build it.</h1>
+            <div class="sub">Open the lab sheet — we'll stand up Eureka, register two microservices, scale one to three instances, and route everything through a gateway with live load balancing.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Thank you for completing the Spring Boot series.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Spring Boot · Session 4</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 22</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    /* ============================================================
+       Flash cards (Session 3 recap) — click to reveal the answer.
+       ============================================================ */
+    function initFlashCards() {
+      var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
+      cards.forEach(function (card) {
+        card.addEventListener('click', function () {
+          card.classList.toggle('revealed');
+        });
+      });
+    }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      initFlashCards();
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
