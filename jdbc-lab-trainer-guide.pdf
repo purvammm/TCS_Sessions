@@ -1,0 +1,307 @@
+%PDF-1.4
+%‚„œ”
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [8 0 R 10 0 R 12 0 R 14 0 R 16 0 R 18 0 R] /Count 6 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Courier /Encoding /WinAnsiEncoding >>
+endobj
+7 0 obj
+<< /Length 1270 >>
+stream
+BT /F2 23.00 Tf 0.040 0.340 0.780 rg 1 0 0 1 58.00 600.00 Tm (Trainer Guide: JDBC - Hands-on Lab) Tj ET
+BT /F3 12.50 Tf 0.200 0.200 0.220 rg 1 0 0 1 58.00 561.00 Tm (A walk-through script for jdbc-lab.html - building full database CRUD from a first) Tj ET
+BT /F3 12.50 Tf 0.200 0.200 0.220 rg 1 0 0 1 58.00 543.00 Tm (connection to a clean DAO. Explain every step out loud as you lead.) Tj ET
+0.040 0.340 0.780 rg 58.00 503.00 496.00 2.00 re f
+BT /F1 10.50 Tf 0.320 0.320 0.350 rg 1 0 0 1 58.00 479.00 Tm (Presenter: Purvam Prajapati  -  Faculty, AHD) Tj ET
+BT /F1 10.50 Tf 0.320 0.320 0.350 rg 1 0 0 1 58.00 463.00 Tm (Companion to: jdbc-lab.html) Tj ET
+BT /F1 10.50 Tf 0.320 0.320 0.350 rg 1 0 0 1 58.00 447.00 Tm () Tj ET
+BT /F1 10.50 Tf 0.320 0.320 0.350 rg 1 0 0 1 58.00 431.00 Tm (Each lab has an ON SCREEN reminder and a SAY / WALK THROUGH section you can) Tj ET
+BT /F1 10.50 Tf 0.320 0.320 0.350 rg 1 0 0 1 58.00 415.00 Tm (read out as you lead. EMPHASISE and DELIVERY TIP notes are for you only.) Tj ET
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 1 of 6) Tj ET
+
+endstream
+endobj
+8 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 7 0 R >>
+endobj
+9 0 obj
+<< /Length 4196 >>
+stream
+0.930 0.950 0.990 rg 58.00 722.00 496.00 28.00 re f
+0.040 0.340 0.780 rg 58.00 722.00 4.00 28.00 re f
+BT /F2 13.00 Tf 0.040 0.340 0.780 rg 1 0 0 1 70.00 730.00 Tm (Setup) Tj ET
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 696.00 Tm (Lab flow, schema box & the H2 fallback) Tj ET
+0.820 0.820 0.860 rg 58.00 679.00 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 665.00 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 649.00 Tm (The lab page: a pinned employees-table schema box, an 8-step checklist, and lab sections with copy) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 635.50 Tm (buttons. An H2 alternative box in the pre-requisites.) Tj ET
+0.720 0.720 0.760 rg 58.00 622.00 3.00 49.00 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 612.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 596.00 Tm (Today we go from 'my data disappears on restart' to a complete, persistent CRUD application, and) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 581.00 Tm (then refactor it into a clean DAO. The employees-table schema is pinned at the top - every lab) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 566.00 Tm (uses that one table, so keep it in view. One safety valve to mention up front: if Derby setup gives) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 551.00 Tm (anyone trouble, there's an H2 fallback box. H2 is a tiny zero-setup database - change just three) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 536.00 Tm (things, the URL, the driver class, and the dependency, and every line of lab code works identically.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 521.00 Tm (Keep that in your back pocket in case Derby fights someone.) Tj ET
+0.040 0.520 1.000 rg 58.00 506.00 3.00 112.00 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 490.00 Tm (Pre-requisites Check) Tj ET
+0.820 0.820 0.860 rg 58.00 473.00 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 459.00 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 443.00 Tm (Pre-requisites: JDK 17+, the Derby JAR on the build path, and a project with a com.tcs.jdbc package.) Tj ET
+0.720 0.720 0.760 rg 58.00 429.50 3.00 35.50 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 419.50 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 403.50 Tm (Pre-requisites: JDK 17 or higher - check with java dash version. The Derby JAR on the build path -) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 388.50 Tm (in Eclipse it's bundled, or download Apache Derby. And a Java project ready with a package com) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 373.50 Tm (dot tcs dot jdbc, where we'll create all our classes. Tick each as you confirm it. If the Derby JAR) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 358.50 Tm (isn't found later, the fix is Project, Build Path, Add External JARs - point that out now so it's not a) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 343.50 Tm (surprise.) Tj ET
+0.040 0.520 1.000 rg 58.00 328.50 3.00 97.00 re f
+0.930 0.950 0.990 rg 58.00 286.50 496.00 28.00 re f
+0.040 0.340 0.780 rg 58.00 286.50 4.00 28.00 re f
+BT /F2 13.00 Tf 0.040 0.340 0.780 rg 1 0 0 1 70.00 294.50 Tm (The labs - build database CRUD) Tj ET
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 260.50 Tm (Lab 0 - Derby Setup in Eclipse) Tj ET
+0.820 0.820 0.860 rg 58.00 243.50 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 229.50 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 213.50 Tm (Steps in the Data Source Explorer to add a Derby connection, the JAR, test it, and copy the JDBC URL.) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 200.00 Tm (Expected URL with create=true.) Tj ET
+0.720 0.720 0.760 rg 58.00 186.50 3.00 49.00 re f
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 2 of 6) Tj ET
+
+endstream
+endobj
+10 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 9 0 R >>
+endobj
+11 0 obj
+<< /Length 5865 >>
+stream
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 754.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 738.00 Tm (Lab zero - we get a working connection before writing any Java, using Eclipse's Data Source) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 723.00 Tm (Explorer so we can test it visually. Window, Show View, Other, Data Management, Data Source) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 708.00 Tm (Explorer. Right-click Database Connections, New, choose Derby. Add the derby JAR. Set the) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 693.00 Tm (database name to employeedb, user sa, password blank. Click Test Connection - it should) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 678.00 Tm (succeed - then copy the generated JDBC URL. The URL looks like jdbc colon derby colon path) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 663.00 Tm (slash employeedb semicolon create equals true. Explain that create equals true tells Derby to) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 648.00 Tm (create the database if it doesn't exist - essential for the first run. Without it, the very first connection) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 633.00 Tm (fails because the database isn't there yet.) Tj ET
+0.040 0.520 1.000 rg 58.00 618.00 3.00 142.00 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 602.00 Tm (Lab 1 - Your First JDBC Connection) Tj ET
+0.820 0.820 0.860 rg 58.00 585.00 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 571.00 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 555.00 Tm (A JDBCTest class running all five steps - register, connect, verify, close - with expected output 'Connected:) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 541.50 Tm (true / Closed: true'.) Tj ET
+0.720 0.720 0.760 rg 58.00 528.00 3.00 49.00 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 518.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 502.00 Tm (Lab one - all five JDBC steps in their simplest form, the tactile anchor before CRUD. Create the) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 487.00 Tm (package com dot tcs dot jdbc and a class JDBCTest. The code does five things: Class dot) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 472.00 Tm (forName registers the driver - optional in modern JDBC but shown for clarity; DriverManager dot) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 457.00 Tm (getConnection opens the connection with the URL, sa, and blank password; we print) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 442.00 Tm (not-con-dot-isClosed to verify it's open; and con dot close releases it. Run it. You're looking for two) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 427.00 Tm (lines: Connected true, then Closed true. That's the whole JDBC lifecycle in one tiny program. If) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 412.00 Tm (you get a ClassNotFoundException, the Derby JAR isn't on the classpath - back to Lab 0.) Tj ET
+0.040 0.520 1.000 rg 58.00 397.00 3.00 127.00 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 381.00 Tm (Lab 2 - Create Table + INSERT) Tj ET
+0.820 0.820 0.860 rg 58.00 364.00 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 350.00 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 334.00 Tm (Part A: a CREATE TABLE statement via a Statement. Part B: an insertEmployee method using a) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 320.50 Tm (PreparedStatement with setInt/setString, called three times.) Tj ET
+0.720 0.720 0.760 rg 58.00 307.00 3.00 49.00 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 297.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 281.00 Tm (Lab two has two parts. Part A creates the table - a CREATE TABLE statement run with a) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 266.00 Tm (Statement and executeUpdate. Mention that running it twice throws 'table already exists' - that's) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 251.00 Tm (fine, either wrap it in a try-catch or drop the table first. Then verify in Data Source Explorer that the) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 236.00 Tm (EMPLOYEES table appears. Part B is the important one - INSERT with a PreparedStatement.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 221.00 Tm (Write an insertEmployee method: the SQL has five question-mark placeholders, then setInt and) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 206.00 Tm (setString bind each value - and stress that the parameter index starts at one, not zero. Call it three) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 191.00 Tm (times with different employees, and you'll see three 'one row inserted' lines.) Tj ET
+0.040 0.520 1.000 rg 58.00 176.00 3.00 127.00 re f
+BT /F2 9.50 Tf 0.100 0.550 0.200 rg 1 0 0 1 72.00 166.00 Tm (EMPHASISE) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 150.00 Tm (Do the deliberate experiment: insert emp_id 101 twice and read the error. Point out the SQLState code) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 135.60 Tm (23505 - duplicate primary key. It both teaches SQLState and sets up the exception-handling lab) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 121.20 Tm (coming in Lab 5.) Tj ET
+0.160 0.660 0.250 rg 58.00 106.80 3.00 65.20 re f
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 3 of 6) Tj ET
+
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 11 0 R >>
+endobj
+13 0 obj
+<< /Length 5164 >>
+stream
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 748.00 Tm (Lab 3 - SELECT All - Reading a ResultSet) Tj ET
+0.820 0.820 0.860 rg 58.00 731.00 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 717.00 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 701.00 Tm (A SELECT star query with a while\(rs.next\(\)\) loop printing a formatted table of all employees.) Tj ET
+0.720 0.720 0.760 rg 58.00 687.50 3.00 35.50 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 677.50 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 661.50 Tm (Lab three - reading data back. Run SELECT star FROM employees with executeQuery, which) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 646.50 Tm (returns a ResultSet - a cursor over the rows. Then a while loop on rs dot next, pulling each column) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 631.50 Tm (with rs dot getInt and rs dot getString, printed as a neat table. Explain how the cursor works,) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 616.50 Tm (because it confuses beginners: rs dot next starts before the first row; each call moves forward one) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 601.50 Tm (row and returns true while rows remain, false when they're exhausted - so the while loop ends) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 586.50 Tm (naturally. You read columns by name, like getString of first_name, or by 1-based index.) Tj ET
+0.040 0.520 1.000 rg 58.00 571.50 3.00 112.00 re f
+BT /F2 9.50 Tf 0.700 0.500 0.030 rg 1 0 0 1 72.00 561.50 Tm (DELIVERY TIP) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 545.50 Tm (If there's time, do the 'try it yourself' - a getEmployeesByDepartment method using WHERE department) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 531.10 Tm (equals question-mark with a PreparedStatement. It reinforces parameter binding in a SELECT, not just) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 516.70 Tm (an INSERT.) Tj ET
+0.920 0.650 0.050 rg 58.00 502.30 3.00 65.20 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 486.30 Tm (Lab 4 - SELECT by ID, UPDATE, DELETE) Tj ET
+0.820 0.820 0.860 rg 58.00 469.30 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 455.30 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 439.30 Tm (SELECT by id using if\(rs.next\(\)\) for found-vs-not-found; an UPDATE and a DELETE, each checking) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 425.80 Tm (rows-affected.) Tj ET
+0.720 0.720 0.760 rg 58.00 412.30 3.00 49.00 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 402.30 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 386.30 Tm (Lab four completes CRUD. SELECT by id uses if-rs-dot-next rather than a while loop, because we) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 371.30 Tm (expect at most one row - and it gives a clean not-found branch. Test it with id 101, which exists,) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 356.30 Tm (and id 999, which doesn't, so they see both paths. Then UPDATE - set a new salary where) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 341.30 Tm (emp_id matches - and DELETE - remove where emp_id matches. Both use executeUpdate, which) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 326.30 Tm (returns the number of rows affected. Check rows greater than zero to print 'updated' or 'employee) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 311.30 Tm (not found'. Run SELECT all after each operation so they watch the change land.) Tj ET
+0.040 0.520 1.000 rg 58.00 296.30 3.00 112.00 re f
+BT /F2 9.50 Tf 0.100 0.550 0.200 rg 1 0 0 1 72.00 286.30 Tm (EMPHASISE) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 270.30 Tm (Highlight why the rows-affected check matters: executeUpdate returning zero means 'ran fine but) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 255.90 Tm (matched nothing', versus a positive number meaning 'found it and changed it'. That distinction is far) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 241.50 Tm (more useful than just assuming success.) Tj ET
+0.160 0.660 0.250 rg 58.00 227.10 3.00 65.20 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 211.10 Tm (Lab 5 - try-with-resources Refactor) Tj ET
+0.820 0.820 0.860 rg 58.00 194.10 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 180.10 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 164.10 Tm (The insert method refactored into try-with-resources, with a catch that prints message, SQLState, and error) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 150.60 Tm (code. A deliberate duplicate-key failure.) Tj ET
+0.720 0.720 0.760 rg 58.00 137.10 3.00 49.00 re f
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 4 of 6) Tj ET
+
+endstream
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 13 0 R >>
+endobj
+15 0 obj
+<< /Length 5429 >>
+stream
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 754.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 738.00 Tm (Lab five makes the code production-safe. Every lab so far has a hidden risk: if an exception fires) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 723.00 Tm (between getConnection and con dot close, the connection leaks - and enough leaks exhaust the) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 708.00 Tm (database. The fix is try-with-resources: declare the Connection and PreparedStatement in the try) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 693.00 Tm (parentheses, and Java closes them automatically, on success and on exception. Refactor) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 678.00 Tm (insertEmployee this way, and in the catch block print all three pieces of SQLException info -) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 663.00 Tm (getMessage, getSQLState, getErrorCode. Then deliberately trigger a failure by inserting a) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 648.00 Tm (duplicate emp_id, and watch those three print: a message, SQLState 23505, and an error code.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 633.00 Tm (That's exactly the information your DevOps team needs to diagnose a production database issue.) Tj ET
+0.040 0.520 1.000 rg 58.00 618.00 3.00 142.00 re f
+BT /F2 9.50 Tf 0.700 0.500 0.030 rg 1 0 0 1 72.00 608.00 Tm (DELIVERY TIP) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 592.00 Tm (Set the refactor task: have them update their SELECT, UPDATE, and DELETE methods to) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 577.60 Tm (try-with-resources too - and for SELECT, declare the ResultSet in the try header as well, since it's) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 563.20 Tm (AutoCloseable.) Tj ET
+0.920 0.650 0.050 rg 58.00 548.80 3.00 65.20 re f
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 532.80 Tm (Lab 6 - DAO Pattern - Full Refactor) Tj ET
+0.820 0.820 0.860 rg 58.00 515.80 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 501.80 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 485.80 Tm (Three classes: DBConnector \(just the connection\), EmployeeDAO \(all SQL methods\), and EmployeeTester) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 472.30 Tm (\(a Scanner menu\). The biggest block in the lab.) Tj ET
+0.720 0.720 0.760 rg 58.00 458.80 3.00 49.00 re f
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 448.80 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 432.80 Tm (Lab six pulls it all together into the DAO pattern - three classes, three responsibilities.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 417.80 Tm (DBConnector has one job: a getConnection method, no SQL, no UI. EmployeeDAO holds all the) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 402.80 Tm (SQL operations - insert, getAll, getById, update, delete - each using DBConnector and) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 387.80 Tm (try-with-resources. And EmployeeTester is a Scanner menu with a switch: add, view, search,) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 372.80 Tm (update, delete, exit - looping until the user enters zero. Run EmployeeTester and let them interact) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 357.80 Tm (with their own database through the menu. This is the biggest block, so lean on the copy buttons.) Tj ET
+0.040 0.520 1.000 rg 58.00 342.80 3.00 112.00 re f
+BT /F2 9.50 Tf 0.100 0.550 0.200 rg 1 0 0 1 72.00 332.80 Tm (EMPHASISE) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 316.80 Tm (End with the observation question and let them answer it: if you switched this project from Derby to) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 302.40 Tm (MySQL, which files change? Only DBConnector - its URL and driver, and maybe minor SQL.) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 288.00 Tm (EmployeeTester is untouched. Then land it: Spring Data's JpaRepository IS a DAO - when you call) Tj ET
+BT /F1 10.50 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 273.60 Tm (repository dot findById, it runs exactly this JDBC, generated for you.) Tj ET
+0.160 0.660 0.250 rg 58.00 259.20 3.00 79.60 re f
+0.930 0.950 0.990 rg 58.00 217.20 496.00 28.00 re f
+0.040 0.340 0.780 rg 58.00 217.20 4.00 28.00 re f
+BT /F2 13.00 Tf 0.040 0.340 0.780 rg 1 0 0 1 70.00 225.20 Tm (Reference & close) Tj ET
+BT /F2 14.50 Tf 0.100 0.100 0.120 rg 1 0 0 1 58.00 191.20 Tm (Complete code reference & wrap-up) Tj ET
+0.820 0.820 0.860 rg 58.00 174.20 496.00 1.20 re f
+BT /F2 9.50 Tf 0.420 0.420 0.460 rg 1 0 0 1 72.00 160.20 Tm (ON SCREEN) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 144.20 Tm (The complete code reference with the H2 alternative config, and the quick-reference card with interfaces,) Tj ET
+BT /F1 10.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 130.70 Tm (the five steps, and SQLState codes.) Tj ET
+0.720 0.720 0.760 rg 58.00 117.20 3.00 49.00 re f
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 5 of 6) Tj ET
+
+endstream
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 15 0 R >>
+endobj
+17 0 obj
+<< /Length 1674 >>
+stream
+BT /F2 9.50 Tf 0.040 0.340 0.780 rg 1 0 0 1 72.00 754.00 Tm (SAY / WALK THROUGH) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 738.00 Tm (The reference at the bottom has the H2 alternative config - the three things to change if Derby) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 723.00 Tm (didn't cooperate - and a reminder about run order on later runs, since the table already exists. The) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 708.00 Tm (quick-reference card lists the core interfaces, the five steps, and the common SQLState codes. To) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 693.00 Tm (wrap: today you went from data that vanished on restart to a complete, persistent CRUD) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 678.00 Tm (application, with safe PreparedStatements, real exception handling, and a clean DAO architecture.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 663.00 Tm (And the big connection - everything Spring Data JPA does is built on exactly this. When you later) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 648.00 Tm (call repository dot save, the JDBC you wrote today is what runs underneath, generated for you.) Tj ET
+BT /F1 11.00 Tf 0.120 0.120 0.140 rg 1 0 0 1 72.00 633.00 Tm (Now you know what the magic actually is. Great work.) Tj ET
+0.040 0.520 1.000 rg 58.00 618.00 3.00 142.00 re f
+0.800 0.800 0.840 rg 58.00 44.00 496.00 0.80 re f
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 58.00 32.00 Tm (Trainer Guide - JDBC Lab   -   Purvam Prajapati, Faculty AHD) Tj ET
+BT /F1 8.50 Tf 0.500 0.500 0.540 rg 1 0 0 1 510.52 32.00 Tm (Page 6 of 6) Tj ET
+
+endstream
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 5 0 R /F4 6 0 R >> >> /Contents 17 0 R >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000015 00000 n 
+0000000064 00000 n 
+0000000156 00000 n 
+0000000253 00000 n 
+0000000355 00000 n 
+0000000460 00000 n 
+0000000555 00000 n 
+0000001877 00000 n 
+0000002033 00000 n 
+0000006281 00000 n 
+0000006438 00000 n 
+0000012356 00000 n 
+0000012514 00000 n 
+0000017731 00000 n 
+0000017889 00000 n 
+0000023371 00000 n 
+0000023529 00000 n 
+0000025256 00000 n 
+trailer
+<< /Size 19 /Root 1 0 R >>
+startxref
+25414
+%%EOF
