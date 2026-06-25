@@ -363,6 +363,50 @@
     details.exp.lab4 .lab-tag { background:#ff9f0a; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
     /* Quick reference card */
     .qref {
       background: linear-gradient(135deg, #1e1e2e, #2a2a40);
@@ -647,11 +691,26 @@ public class SpringbootDemoApplication {
               body directly (not a view name). <code>@GetMapping("/hello")</code> maps HTTP GET requests for the
               <code>/hello</code> path to a method.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
-              <li><strong>Create a class</strong> <code>HelloController.java</code> inside it.</li>
-              <li><strong>Add this code:</strong>
-                <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>In your IDE, find the package <code>com.tcs.training</code> (where the main class lives) and
+                    create a <strong>sub-package</strong> called <code>controller</code>. Right-click the parent
+                    package → <strong>New → Package</strong> → name it <code>com.tcs.training.controller</code>.</li>
+                <li>Inside that new package, right-click → <strong>New → Class</strong>. Class name:
+                    <code>HelloController</code> (no <code>.java</code>, capital H). Click <strong>Finish</strong>.</li>
+                <li>Eclipse opens an empty file. Press <span class="kbd">Ctrl</span>+<span class="kbd">A</span> →
+                    <strong>Delete</strong>, then paste the full file below.</li>
+                <li>Right-click the <strong>main application class</strong>
+                    (<code>SpringbootDemoApplication.java</code>) → <strong>Run As → Java Application</strong>.
+                    Wait for "Tomcat started on port 8080".</li>
+                <li>Open <code>http://localhost:8080/hello</code> in your browser.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -664,38 +723,66 @@ public class HelloController {
         return "Hello from Spring Boot!";
     }
 }</code></pre></div>
-              </li>
-              <li><strong>Run the app</strong> and open the endpoint in your browser.</li>
-            </ol>
+
             <div class="expected">
               <span class="lbl">Expected output</span>
               Request: <code>GET http://localhost:8080/hello</code><br>
               Response body (plain text): <code>Hello from Spring Boot!</code>
             </div>
-            <div class="tryit">
-              <span class="lbl">Try it yourself</span>
-              <ol style="margin:6px 0 0; padding-left:18px;">
-                <li>Change the returned string to your own message and re-run. Expected: the browser shows your new text.</li>
-                <li>Add a second endpoint <code>@GetMapping("/welcome")</code> returning <code>"Welcome!"</code>. Expected: <code>http://localhost:8080/welcome</code> shows <code>Welcome!</code>.</li>
-                <li>Add a path that takes input: <code>@GetMapping("/hello/{name}")</code> with a <code>@PathVariable String name</code> parameter, returning <code>"Hello, " + name</code>. Expected: <code>/hello/Purvam</code> shows <code>Hello, Purvam</code>.</li>
-              </ol>
-            </div>
-            <div class="codewrap"><pre><code>@GetMapping("/hello/{name}")
-public String helloName(@PathVariable String name) {
-    return "Hello, " + name + "!";
-}</code></pre></div>
+
             <div class="concept">
               <span class="lbl">What happens under the hood</span>
               Your browser sends <code>GET /hello</code> → the embedded Tomcat hands it to Spring's
               <code>DispatcherServlet</code> → which routes it to your <code>sayHello()</code> method →
               whose return value becomes the HTTP response body. That's the request flow from the slides, live.
             </div>
+
+            <h3 style="margin-top:18px;">Now extend it — replace the file with this richer version</h3>
+            <p>Stop the app (red square in the console), <strong>replace the entire <code>HelloController.java</code></strong>
+               with the version below, save, then run again. It adds a second endpoint and a path-variable example.</p>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">REPLACE — version 2</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "Hello from Spring Boot!";
+    }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome!";
+    }
+
+    @GetMapping("/hello/{name}")
+    public String helloName(@PathVariable String name) {
+        return "Hello, " + name + "!";
+    }
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — try all three URLs</span>
+              <ul style="margin:6px 0 0;">
+                <li><code>http://localhost:8080/hello</code> → <code>Hello from Spring Boot!</code></li>
+                <li><code>http://localhost:8080/welcome</code> → <code>Welcome!</code></li>
+                <li><code>http://localhost:8080/hello/Purvam</code> → <code>Hello, Purvam!</code></li>
+              </ul>
+            </div>
+
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext">My <code>/hello</code> endpoint returns the expected text in the browser.</span>
             </label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I added a second endpoint and saw it respond at its own URL.</span>
+              <span class="ctext">I added the <code>/welcome</code> and <code>/hello/{name}</code> endpoints and saw all three respond.</span>
             </label>
+          </div>
           </div>
         </details>
       </section>
@@ -711,10 +798,26 @@ public String helloName(@PathVariable String name) {
               <code>@Autowired</code> asks Spring to inject that bean where it's needed — so the controller never
               calls <code>new</code> on the service.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.service</code>.</li>
-              <li><strong>Create</strong> <code>GreetingService.java</code> with a <code>@Service</code> annotation and a public method:
-                <div class="codewrap"><pre><code>package com.tcs.training.service;
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Create a <strong>second</strong> sub-package next to <code>controller</code>: right-click
+                    <code>com.tcs.training</code> → <strong>New → Package</strong> → name it
+                    <code>com.tcs.training.service</code>.</li>
+                <li>Inside <code>service</code>, right-click → <strong>New → Class</strong> → name it
+                    <code>GreetingService</code> → Finish. Replace its contents with file ① below.</li>
+                <li>Open the existing <code>HelloController.java</code> (in the <code>controller</code> package),
+                    select all (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>), and replace it with file ②.</li>
+                <li>Stop the running app if it's still running (red square), then right-click
+                    <code>SpringbootDemoApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
+                <li>Open <code>http://localhost:8080/hello</code> — the response should now come from the service.</li>
+              </ol>
+            </div>
+
+            <h3 style="margin-top:6px;">① GreetingService.java <span style="font-size:14px;color:var(--mac-text-muted);">— a brand-new file</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/GreetingService.java</span><span class="fb-tag">file ① — new file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.service;
 
 import org.springframework.stereotype.Service;
 
@@ -725,13 +828,15 @@ public class GreetingService {
         return "Hello from the GreetingService bean!";
     }
 }</code></pre></div>
-              </li>
-              <li><strong>Inject it</strong> into <code>HelloController</code> with <code>@Autowired</code> and call it:
-                <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+            <h3>② HelloController.java <span style="font-size:14px;color:var(--mac-text-muted);">— REPLACE the existing file</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">file ② — REPLACE</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
 import com.tcs.training.service.GreetingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -744,21 +849,31 @@ public class HelloController {
     public String sayHello() {
         return greetingService.getGreeting();
     }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome!";
+    }
+
+    @GetMapping("/hello/{name}")
+    public String helloName(@PathVariable String name) {
+        return "Hello, " + name + "!";
+    }
 }</code></pre></div>
-              </li>
-              <li><strong>Run the app</strong> and reload <code>http://localhost:8080/hello</code>.</li>
-            </ol>
+
             <div class="expected">
               <span class="lbl">Expected output</span>
               <code>GET http://localhost:8080/hello</code> now returns:
-              <code>Hello from the GreetingService bean!</code>
+              <code>Hello from the GreetingService bean!</code><br>
+              The other two endpoints (<code>/welcome</code> and <code>/hello/{name}</code>) still work exactly as before.
             </div>
             <div class="observe">
-              <span class="lbl">Observation question</span>
+              <span class="lbl">Observation question — break it on purpose</span>
               Remove the <code>@Service</code> annotation from <code>GreetingService</code> and re-run.
               What happens? Write down the behavior you see. <em>(Expected: the app fails to start with an
               "unsatisfied dependency" / "required a bean of type GreetingService that could not be found"
               error — because without <code>@Service</code>, Spring no longer manages the bean to inject.)</em>
+              Put the annotation back when you're done.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext">My controller uses the injected service, and I observed the startup failure when <code>@Service</code> was removed.</span>
@@ -772,9 +887,9 @@ public class HelloController {
             </div>
             <div class="tryit">
               <span class="lbl">Stretch goal</span>
-              Add a second method to <code>GreetingService</code>, e.g. <code>getFarewell()</code> returning
-              <code>"Goodbye!"</code>, and a new controller endpoint <code>/bye</code> that calls it. Expected:
-              <code>/bye</code> returns <code>Goodbye!</code> using the same injected bean.
+              Add a second method <code>getFarewell()</code> to <code>GreetingService</code> returning
+              <code>"Goodbye!"</code>, and a new controller endpoint <code>@GetMapping("/bye")</code> that calls it.
+              Expected: <code>/bye</code> returns <code>Goodbye!</code> using the same injected bean.
             </div>
           </div>
         </details>
@@ -791,18 +906,65 @@ public class HelloController {
               automatically serializes it to <strong>JSON</strong> using Jackson — which came in with the web
               starter. This is the first step toward building real APIs.
             </div>
-            <ol class="steps">
-              <li><strong>Create a simple record</strong> in <code>com.tcs.training.controller</code>:
-                <div class="codewrap"><pre><code>public record Greeting(String message, String from) { }</code></pre></div>
-              </li>
-              <li><strong>Add an endpoint</strong> that returns it:
-                <div class="codewrap"><pre><code>@GetMapping("/api/greeting")
-public Greeting greetingJson() {
-    return new Greeting("Hello from Spring Boot!", "GreetingService");
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>In <code>com.tcs.training.controller</code>, right-click → <strong>New → Class</strong> →
+                    name it <code>Greeting</code> → Finish. Replace its contents with file ① below.
+                    <br><span style="font-size:14px;color:var(--mac-text-muted);">(A Java <em>record</em> is a one-line data class — Java 16+. If your IDE complains, upgrade Java level to 17 or use a normal class with fields + getters.)</span></li>
+                <li>Open <code>HelloController.java</code> (your existing file from Lab 4), select all,
+                    and replace it with file ② — it adds <strong>one new method</strong> to the controller you already had.</li>
+                <li>Stop and re-run <code>SpringbootDemoApplication</code>. Open
+                    <code>http://localhost:8080/api/greeting</code>.</li>
+              </ol>
+            </div>
+
+            <h3 style="margin-top:6px;">① Greeting.java <span style="font-size:14px;color:var(--mac-text-muted);">— a tiny data record</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/Greeting.java</span><span class="fb-tag">file ① — new file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+public record Greeting(String message, String from) { }
+</code></pre></div>
+
+            <h3>② HelloController.java <span style="font-size:14px;color:var(--mac-text-muted);">— REPLACE the existing file</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">file ② — REPLACE</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+
+import com.tcs.training.service.GreetingService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class HelloController {
+
+    @Autowired
+    private GreetingService greetingService;
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return greetingService.getGreeting();
+    }
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome!";
+    }
+
+    @GetMapping("/hello/{name}")
+    public String helloName(@PathVariable String name) {
+        return "Hello, " + name + "!";
+    }
+
+    // NEW — returns an object; Spring Boot/Jackson turns it into JSON automatically
+    @GetMapping("/api/greeting")
+    public Greeting greetingJson() {
+        return new Greeting("Hello from Spring Boot!", "GreetingService");
+    }
 }</code></pre></div>
-              </li>
-              <li><strong>Run and open</strong> <code>http://localhost:8080/api/greeting</code>.</li>
-            </ol>
+
             <div class="expected">
               <span class="lbl">Expected output (JSON)</span>
               <div class="codewrap"><pre><code>{

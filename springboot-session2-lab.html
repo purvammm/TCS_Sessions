@@ -372,6 +372,50 @@
     details.exp.lab7 .lab-tag { background:#ff6482; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
+    /* === File banner: tells the beginner EXACTLY which file to create/edit === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run / test it" purple callout === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
     /* HTTP verb badge in summaries */
     .verb-badge {
       font-family: var(--mac-mono);
@@ -613,10 +657,21 @@
               to turn a <code>Student</code> into JSON, and the setters to turn incoming JSON back into a
               <code>Student</code>.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.model</code>.</li>
-              <li><strong>Create a class</strong> <code>Student.java</code> inside it with the code below.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>In your IDE, find the package <code>com.tcs.training</code> (where the main class lives).</li>
+                <li>Right-click it → <strong>New → Package</strong> → name it <code>com.tcs.training.model</code>.</li>
+                <li>Right-click the new <code>model</code> package → <strong>New → Class</strong> → name
+                    <code>Student</code> → Finish.</li>
+                <li><strong>Replace the entire file</strong> with the code below
+                    (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>, Delete, then paste).</li>
+                <li>Save. Nothing to run yet — the controller in Lab 2 will use it.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/model/Student.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.model;
 
 public class Student {
@@ -678,12 +733,25 @@ public class Student {
               <code>@RequestMapping("/students")</code> at the <strong>class level</strong> means every method's URL
               starts with <code>/students</code> — you don't repeat it on each method.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
-              <li><strong>Create</strong> <code>StudentController.java</code> with the code below.</li>
-              <li><strong>Run the app</strong> and open <code>http://localhost:8080/students</code> in your browser.</li>
-              <li><strong>Open Swagger</strong> at <code>/swagger-ui/index.html</code> and confirm the endpoint is now listed.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.controller</code>.</li>
+                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
+                    name <code>StudentController</code> → Finish.</li>
+                <li>Replace the file's contents with the code below.</li>
+                <li>Right-click your <strong>main application class</strong> (the one with
+                    <code>@SpringBootApplication</code>) → <strong>Run As → Java Application</strong>. Wait for
+                    "Tomcat started on port 8080".</li>
+                <li>Open <code>http://localhost:8080/students</code> in your browser.</li>
+                <li>Open Swagger at <code>http://localhost:8080/swagger-ui/index.html</code> — your endpoint should be listed.</li>
+              </ol>
+              <p style="margin:8px 0 0;font-size:15px;">💡 With <strong>DevTools</strong> on the classpath, every <em>save</em> triggers an auto-restart in a couple of seconds — no need to stop &amp; re-run between labs.</p>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
 import com.tcs.training.model.Student;
@@ -737,11 +805,20 @@ public class StudentController {
           <div class="exp-body">
             <p>Now return a <code>List&lt;Student&gt;</code>. We'll keep a shared list as a field on the controller so
             the later POST/PUT/DELETE labs can modify the same data.</p>
-            <ol class="steps">
-              <li><strong>Add a field-level list</strong> of students at the top of the class (we'll reuse it everywhere).</li>
-              <li><strong>Add a GET method</strong> mapped to <code>/students/all</code> that returns the list.</li>
-              <li><strong>Run and test</strong> <code>http://localhost:8080/students/all</code>.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Open <code>StudentController.java</code> (the file you created in Lab 2) — we are <strong>editing</strong>, not replacing.</li>
+                <li>Add the three <code>import java.util.*</code> lines to the existing imports at the top of the file.</li>
+                <li>Add the <code>private List&lt;Student&gt; students = ...</code> <strong>field</strong> as the first thing inside the class body (right after <code>public class StudentController {</code>).</li>
+                <li>Add the new <code>getAllStudents()</code> <strong>method</strong> below the existing <code>getStudent()</code> method.</li>
+                <li>Save — DevTools auto-restarts the app — then open <code>http://localhost:8080/students/all</code>.</li>
+              </ol>
+              <p style="margin:8px 0 0;font-size:15px;">📌 Got lost merging? Scroll to the bottom of this sheet — the <strong>"Complete StudentController.java"</strong> reference shows the whole file at the end of all labs.</p>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add field + method</span></div>
             <div class="codewrap"><pre><code>import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -788,10 +865,17 @@ public List&lt;Student&gt; getAllStudents() {
               <code>{id}</code> placeholder is bound to the method's <code>int id</code> parameter. So
               <code>/students/2</code> calls the method with <code>id = 2</code>.
             </div>
-            <ol class="steps">
-              <li><strong>Add a method</strong> mapped to <code>/students/{id}</code> that loops the list to find a match.</li>
-              <li><strong>Test</strong> <code>http://localhost:8080/students/1</code> and <code>/students/2</code>.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Add the <code>import org.springframework.web.bind.annotation.PathVariable;</code> line to the imports at the top.</li>
+                <li>Add the <code>getStudentById</code> <strong>method</strong> inside the class body, below the previous methods.</li>
+                <li>Save → DevTools restarts → test in the browser.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PathVariable;
 
 @GetMapping("/{id}")   // maps GET /students/{id}
@@ -830,10 +914,17 @@ public Student getStudentById(@PathVariable int id) {
               <code>?</code>. In <code>/students/search?name=Ravi</code>, the <code>name</code> query value is bound
               to the method parameter.
             </div>
-            <ol class="steps">
-              <li><strong>Add a search method</strong> mapped to <code>/students/search</code> with a <code>name</code> query param.</li>
-              <li><strong>Test</strong> <code>http://localhost:8080/students/search?name=Ravi</code>.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Add the <code>import org.springframework.web.bind.annotation.RequestParam;</code> line to the imports.</li>
+                <li>Add the <code>searchByName</code> <strong>method</strong> inside the class body.</li>
+                <li>Save → DevTools restarts → test the search URL.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.RequestParam;
 
 @GetMapping("/search")   // maps GET /students/search?name=...
@@ -874,10 +965,17 @@ public List&lt;Student&gt; searchByName(@RequestParam String name) {
               <code>Student</code> object — Jackson deserializes it. <code>@ResponseStatus(HttpStatus.CREATED)</code>
               makes the endpoint return <strong>201 Created</strong> instead of the default 200.
             </div>
-            <ol class="steps">
-              <li><strong>Add a POST method</strong> that takes a <code>@RequestBody Student</code>, adds it to the list, and is annotated with <code>@ResponseStatus(HttpStatus.CREATED)</code>.</li>
-              <li><strong>Test in Postman:</strong> method <code>POST</code>, URL <code>http://localhost:8080/students</code>, Body → <em>raw</em> → <em>JSON</em>, and set <code>Content-Type: application/json</code>.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Add the four new <code>import</code> lines (HttpStatus, PostMapping, RequestBody, ResponseStatus) to the imports.</li>
+                <li>Add the <code>addStudent</code> <strong>method</strong> inside the class body.</li>
+                <li>Save → DevTools restarts → test in Postman or Swagger.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add POST method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -896,6 +994,18 @@ public String addStudent(@RequestBody Student student) {
   "lastName": "Mehta",
   "email": "priya@tcs.com"
 }</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">▶ How to send a POST request in Postman (click-by-click)</span>
+              <ol>
+                <li>Open Postman → click the <strong>+</strong> tab to open a new request.</li>
+                <li>Change the method dropdown from <code>GET</code> to <strong><code>POST</code></strong>.</li>
+                <li>Paste the URL: <code>http://localhost:8080/students</code></li>
+                <li>Click the <strong>Body</strong> tab → select the <strong>raw</strong> radio button → on the dropdown to its right pick <strong>JSON</strong>.</li>
+                <li>Paste the JSON above into the body text area.</li>
+                <li>Click <strong>Send</strong>.</li>
+              </ol>
+            </div>
             <div class="expected">
               <span class="lbl">Expected</span>
               Postman's response panel shows status <strong>201 Created</strong> and the body
@@ -917,12 +1027,24 @@ public String addStudent(@RequestBody Student student) {
         <details class="exp lab7">
           <summary><span class="lab-tag">LAB 7</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Update &amp; Delete by ID</summary>
           <div class="exp-body">
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Add <code>import org.springframework.web.bind.annotation.PutMapping;</code> and
+                    <code>import org.springframework.web.bind.annotation.DeleteMapping;</code> to your imports.</li>
+                <li>Add <strong>both</strong> the <code>updateStudent</code> and <code>deleteStudent</code>
+                    methods (shown below) inside the class body.</li>
+                <li>Save → DevTools restarts → test in Postman.</li>
+              </ol>
+            </div>
+
             <h3 style="margin-top:0;">PUT — update an existing student</h3>
             <div class="concept">
               <span class="lbl">Concept</span>
               <code>@PutMapping("/{id}")</code> combines both ideas: <code>@PathVariable</code> tells us <em>which</em>
               student to update, and <code>@RequestBody</code> carries the new data.
             </div>
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add PUT method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PutMapping;
 
 @PutMapping("/{id}")   // maps PUT /students/{id}
@@ -943,7 +1065,17 @@ public Student updateStudent(@PathVariable int id, @RequestBody Student updated)
               shows the updated record; <code>GET /students/all</code> confirms student 2 changed.
             </div>
 
+            <div class="runbox">
+              <span class="lbl">▶ Postman steps for PUT and DELETE</span>
+              <ol>
+                <li><strong>PUT:</strong> set method to <code>PUT</code>, URL <code>http://localhost:8080/students/2</code>, Body → raw → JSON, paste the body above, then <strong>Send</strong>.</li>
+                <li><strong>DELETE:</strong> set method to <code>DELETE</code>, URL <code>http://localhost:8080/students/3</code>. No body needed. <strong>Send</strong>.</li>
+                <li>After each, run a quick <code>GET</code> on <code>http://localhost:8080/students/all</code> to confirm the change in the list.</li>
+              </ol>
+            </div>
+
             <h3 style="margin-top:24px;">DELETE — remove a student</h3>
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add DELETE method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.DeleteMapping;
 
 @DeleteMapping("/{id}")   // maps DELETE /students/{id}
@@ -984,6 +1116,19 @@ public String deleteStudent(@PathVariable int id) {
               body. Here we refactor "GET by ID" to return <strong>200 OK</strong> when the student exists and a clean
               <strong>404 Not Found</strong> when it doesn't. This previews Session 3's exception handling without going deep.
             </div>
+
+            <div class="dothis">
+              <span class="lbl">Where to paste this in StudentController.java</span>
+              <ol>
+                <li>Add <code>import org.springframework.http.ResponseEntity;</code> to the imports.</li>
+                <li>Add the new <code>getByIdEntity</code> method below the existing methods. It uses a different
+                    path (<code>/entity/{id}</code>) so it doesn't clash with Lab 4's <code>/{id}</code>.</li>
+                <li>Save → DevTools restarts → test both <code>/students/entity/1</code> (200) and
+                    <code>/students/entity/999</code> (404).</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add bonus method</span></div>
             <div class="codewrap"><pre><code>import org.springframework.http.ResponseEntity;
 
 @GetMapping("/entity/{id}")   // a ResponseEntity version of GET by id
@@ -1015,6 +1160,7 @@ public ResponseEntity&lt;Student&gt; getByIdEntity(@PathVariable int id) {
           <div class="exp-body">
             <p>The entire controller as it looks after all the labs. If you fell behind, paste this, run it, and
             you're caught up with the group.</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">CATCH-UP — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
 import com.tcs.training.model.Student;

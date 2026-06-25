@@ -353,6 +353,67 @@
     .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
     .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
 
+    /* === File banner: tells the beginner EXACTLY which file to create/edit === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run / test it" purple callout === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* "New project" blue card showing exact Initializr inputs */
+    .newproj {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .newproj .lbl {
+      font-weight:700; color: var(--mac-accent); display:block;
+      margin: 0 0 8px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .newproj table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 15.5px; }
+    .newproj th, .newproj td { border: 1px solid var(--mac-border); padding: 7px 12px; text-align: left; vertical-align: top; }
+    .newproj th { background: rgba(10,132,255,0.08); width: 32%; font-weight: 700; }
+
     /* Property annotation list */
     .prop-list { display: grid; gap: 8px; margin: 14px 0; }
     .prop-row {
@@ -669,11 +730,35 @@
               The Eureka Server is the <strong>service registry</strong> — the phonebook every other service registers
               with. It's almost pure config: one annotation and four properties.
             </div>
-            <ol class="steps">
-              <li><strong>Spring Initializr</strong> (<code>start.spring.io</code>): Maven · Java 17 · Group <code>com.tcs.training</code> · Artifact <code>eureka-server</code>.</li>
-              <li><strong>Dependency:</strong> <code>Eureka Server</code> (<code>spring-cloud-starter-netflix-eureka-server</code>). That's the only one.</li>
-              <li><strong>Add <code>@EnableEurekaServer</code></strong> to the main class:</li>
-            </ol>
+
+            <div class="newproj">
+              <span class="lbl">📦 Generate this project on Spring Initializr</span>
+              <p style="margin:0 0 6px;">Open <code>https://start.spring.io</code> in your browser and fill in the form <strong>exactly</strong> like this:</p>
+              <table>
+                <tr><th>Project</th><td>Maven</td></tr>
+                <tr><th>Language</th><td>Java</td></tr>
+                <tr><th>Java</th><td>17</td></tr>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>eureka-server</code></td></tr>
+                <tr><th>Packaging</th><td>Jar</td></tr>
+                <tr><th>Dependencies</th><td><code>Eureka Server</code> (<code>spring-cloud-starter-netflix-eureka-server</code>) — that's the <strong>only</strong> one</td></tr>
+              </table>
+              <p style="margin:8px 0 0;">Click <strong>Generate</strong> → unzip → import into your IDE
+                (IntelliJ: File → Open → pick <code>pom.xml</code>; Eclipse: File → Import → Maven → Existing Maven Projects).</p>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open the generated main class
+                    <code>EurekaServerApplication.java</code> (under <code>src/main/java/com/tcs/training/eurekaserver</code>).</li>
+                <li>Replace its contents with file ① below — the only change is adding
+                    <code>@EnableEurekaServer</code>.</li>
+                <li>Open <code>src/main/resources/application.properties</code> and replace its contents with the four lines in file ②.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/eurekaserver/EurekaServerApplication.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.eurekaserver;
 
 import org.springframework.boot.SpringApplication;
@@ -688,22 +773,31 @@ public class EurekaServerApplication {
         SpringApplication.run(EurekaServerApplication.class, args);
     }
 }</code></pre></div>
-            <ol class="steps" start="4">
-              <li><strong>Configure</strong> <code>src/main/resources/application.properties</code>:</li>
-            </ol>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
             <div class="codewrap"><pre><code>server.port=8761
 spring.application.name=eureka-server
 eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false</code></pre></div>
+
             <div class="prop-list">
               <div class="prop-row"><code>server.port=8761</code><span class="pd">The standard Eureka port — clients are configured to expect it here.</span></div>
               <div class="prop-row"><code>spring.application.name=eureka-server</code><span class="pd">A friendly name for this app.</span></div>
               <div class="prop-row"><code>eureka.client.register-with-eureka=false</code><span class="pd">The server shouldn't register itself in its own registry.</span></div>
               <div class="prop-row"><code>eureka.client.fetch-registry=false</code><span class="pd">It doesn't pull a registry from elsewhere — it IS the registry.</span></div>
             </div>
-            <ol class="steps" start="5">
-              <li><strong>Run the app</strong> and open <code>http://localhost:8761</code> in the browser.</li>
-            </ol>
+
+            <div class="runbox">
+              <span class="lbl">▶ Run this project (eureka-server)</span>
+              <ol>
+                <li>Right-click <code>EurekaServerApplication.java</code> → <strong>Run As → Java Application</strong>
+                    (Eclipse), or click the green ▶ next to <code>main</code> (IntelliJ).</li>
+                <li>Wait until you see <code>Started EurekaServerApplication in ...</code> in the console.</li>
+                <li>Open <code>http://localhost:8761</code> in your browser — the Eureka dashboard loads.</li>
+                <li><strong>Leave this app running</strong> for the rest of the session — Labs 2–8 connect to it.</li>
+              </ol>
+            </div>
+
             <div class="dash-mock">
               <div class="dm-top">📇 Spring Eureka — System Status · localhost:8761</div>
               <table>
@@ -741,10 +835,33 @@ eureka.client.fetch-registry=false</code></pre></div>
               A normal Spring Boot REST app that <strong>registers itself with Eureka</strong>. The only new ingredient
               is the Eureka Client dependency plus the <code>defaultZone</code> property pointing at the registry.
             </div>
-            <ol class="steps">
-              <li><strong>Spring Initializr:</strong> Artifact <code>student-ms</code>. Dependencies: <code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code>.</li>
-              <li><strong>Create</strong> <code>StudentController.java</code>. It injects <code>Environment</code> so the response shows <em>which</em> instance answered — essential for seeing load balancing later.</li>
-            </ol>
+
+            <div class="newproj">
+              <span class="lbl">📦 Generate a SECOND project on Spring Initializr</span>
+              <p style="margin:0 0 6px;">This is a <strong>brand new project</strong> — go back to <code>https://start.spring.io</code> and generate it separately:</p>
+              <table>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>student-ms</code></td></tr>
+                <tr><th>Java</th><td>17</td></tr>
+                <tr><th>Dependencies</th><td><code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code></td></tr>
+              </table>
+              <p style="margin:8px 0 0;">Generate → unzip into a <strong>different folder</strong> from <code>eureka-server</code> → import into the IDE
+                  alongside the Eureka project.</p>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>In the new <code>student-ms</code> project, right-click the package
+                    <code>com.tcs.training.studentms</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.studentms.controller</code>.</li>
+                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
+                    name <code>StudentController</code> → Finish. Replace the file with code ① below.</li>
+                <li>Open <code>src/main/resources/application.properties</code> and replace its contents with file ②.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/studentms/controller/StudentController.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.studentms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -766,9 +883,7 @@ public class StudentController {
                 + environment.getProperty("local.server.port");
     }
 }</code></pre></div>
-            <ol class="steps" start="3">
-              <li><strong>Configure</strong> <code>application.properties</code>:</li>
-            </ol>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
             <div class="codewrap"><pre><code>server.port=8080
 spring.application.name=STUDENT-MS
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
@@ -778,9 +893,17 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
               convention). The Gateway will route to this precise name with <code>lb://STUDENT-MS</code>. A typo here
               means the gateway route silently fails to resolve.
             </div>
-            <ol class="steps" start="4">
-              <li><strong>Run the app</strong>, then refresh <code>localhost:8761</code>.</li>
-            </ol>
+            <div class="runbox">
+              <span class="lbl">▶ Run this project (student-ms)</span>
+              <ol>
+                <li>Make sure <strong>eureka-server is still running</strong> on port 8761 — open <code>http://localhost:8761</code> to confirm.</li>
+                <li>Right-click <code>StudentMsApplication.java</code> (the main class in the <code>student-ms</code> project) → <strong>Run As → Java Application</strong>.</li>
+                <li>Wait for "Started StudentMsApplication" in the console.</li>
+                <li>Refresh <code>http://localhost:8761</code> — STUDENT-MS should now appear under "Instances currently registered".</li>
+                <li>Hit <code>http://localhost:8080/students</code> directly to confirm the service responds.</li>
+                <li><strong>Leave this app running</strong> — you'll keep it up for the rest of the session.</li>
+              </ol>
+            </div>
             <div class="dash-mock">
               <div class="dm-top">📇 Eureka — Instances currently registered</div>
               <table>
@@ -818,10 +941,30 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
               Exactly the same pattern as Lab 2 — go fast. Different name (<code>CUSTOMER-MS</code>), different port
               (<code>8081</code>), different endpoint (<code>/customers</code>).
             </div>
-            <ol class="steps">
-              <li><strong>Spring Initializr:</strong> Artifact <code>customer-ms</code>. Same dependencies: Web + Eureka Discovery Client + DevTools.</li>
-              <li><strong>Create</strong> <code>CustomerController.java</code>:</li>
-            </ol>
+
+            <div class="newproj">
+              <span class="lbl">📦 Generate a THIRD project on Spring Initializr</span>
+              <p style="margin:0 0 6px;">Same recipe as Lab 2, just a different artifact name:</p>
+              <table>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>customer-ms</code></td></tr>
+                <tr><th>Java</th><td>17</td></tr>
+                <tr><th>Dependencies</th><td><code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code></td></tr>
+              </table>
+              <p style="margin:8px 0 0;">Generate → unzip into a separate folder → import.</p>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>In the <code>customer-ms</code> project, create the package
+                    <code>com.tcs.training.customerms.controller</code>.</li>
+                <li>Inside it, create class <code>CustomerController</code> and replace its contents with file ①.</li>
+                <li>Replace <code>application.properties</code> with file ②.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/customerms/controller/CustomerController.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.customerms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -843,15 +986,20 @@ public class CustomerController {
                 + environment.getProperty("local.server.port");
     }
 }</code></pre></div>
-            <ol class="steps" start="3">
-              <li><strong>Configure</strong> <code>application.properties</code>:</li>
-            </ol>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
             <div class="codewrap"><pre><code>server.port=8081
 spring.application.name=CUSTOMER-MS
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
-            <ol class="steps" start="4">
-              <li><strong>Run it</strong>, then refresh <code>localhost:8761</code> — both services should now be listed.</li>
-            </ol>
+            <div class="runbox">
+              <span class="lbl">▶ Run this project (customer-ms)</span>
+              <ol>
+                <li>Eureka Server still running on 8761? Student MS still running on 8080? Good.</li>
+                <li>Right-click <code>CustomerMsApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
+                <li>Refresh <code>http://localhost:8761</code> — both STUDENT-MS and CUSTOMER-MS should now be listed.</li>
+                <li>Hit <code>http://localhost:8081/customers</code> directly to confirm.</li>
+                <li><strong>Leave it running</strong> — you'll need it for Labs 5–8.</li>
+              </ol>
+            </div>
             <div class="dash-mock">
               <div class="dm-top">📇 Eureka — Instances currently registered</div>
               <table>
@@ -884,6 +1032,20 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
               project on 8082 and 8083 to simulate <strong>horizontal scaling</strong> — without creating new projects.
               We override the port at runtime with a VM argument.
             </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li><strong>Don't stop</strong> the original 8080 instance — leave it running.</li>
+                <li>Make a <em>copy</em> of its run configuration (see your IDE's instructions in the two cards below)
+                    and add a VM argument <code>-Dserver.port=8082</code> to the copy.</li>
+                <li>Run that copy → confirm a second <code>StudentMsApplication</code> log appears, this time saying port 8082.</li>
+                <li>Repeat: copy the config again, change to <code>-Dserver.port=8083</code>, run.</li>
+                <li>You should now have <strong>three</strong> Student MS instances running side-by-side. Refresh
+                    <code>http://localhost:8761</code>.</li>
+              </ol>
+            </div>
+
             <div class="twocol" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
               <div class="concept" style="margin:0;">
                 <span class="lbl">IntelliJ IDEA</span>
@@ -955,16 +1117,42 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
               The Gateway is the single entry point. It has <strong>no controller</strong> — it's configuration only.
               It registers with Eureka (so it can discover services) and we'll add routing in the next lab.
             </div>
-            <ol class="steps">
-              <li><strong>Spring Initializr:</strong> Artifact <code>api-gateway</code>. Dependencies: <code>Gateway</code> (<code>spring-cloud-starter-gateway</code>) + <code>Eureka Discovery Client</code>.</li>
-              <li><strong>Configure</strong> the base <code>application.properties</code>:</li>
-            </ol>
+
+            <div class="newproj">
+              <span class="lbl">📦 Generate the FOURTH project on Spring Initializr</span>
+              <p style="margin:0 0 6px;">One more brand new project — same Spring Initializr, different deps:</p>
+              <table>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>api-gateway</code></td></tr>
+                <tr><th>Java</th><td>17</td></tr>
+                <tr><th>Dependencies</th><td><strong>Gateway</strong> (<code>spring-cloud-starter-gateway</code>) + <strong>Eureka Discovery Client</strong> &nbsp;<em>— do NOT add Spring Web</em></td></tr>
+              </table>
+              <p style="margin:8px 0 0;">Generate → unzip → import.</p>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>application.properties</code> in the new <code>api-gateway</code> project and replace its contents with the file below.</li>
+                <li>Don't write any controller code — the gateway is configuration-only.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">REPLACE — base config</span></div>
             <div class="codewrap"><pre><code>server.port=9393
 spring.application.name=api-gateway
 eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
-            <ol class="steps" start="3">
-              <li><strong>Run the Gateway</strong> and refresh Eureka — API-GATEWAY should now be registered too.</li>
-            </ol>
+
+            <div class="runbox">
+              <span class="lbl">▶ Run this project (api-gateway)</span>
+              <ol>
+                <li>With Eureka, Student MS (×3) and Customer MS all still running, right-click
+                    <code>ApiGatewayApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
+                <li>Wait for <code>Started ApiGatewayApplication</code> in the console.</li>
+                <li>Refresh <code>http://localhost:8761</code> — API-GATEWAY should now appear in the list.</li>
+                <li>There's nothing to call yet — routes come in Lab 6.</li>
+              </ol>
+            </div>
             <div class="expected">
               <span class="lbl">Expected</span>
               The gateway starts on 9393 and appears in the Eureka dashboard alongside STUDENT-MS and CUSTOMER-MS.
@@ -998,9 +1186,17 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
               parts: an <strong>id</strong> (any name), a <strong>uri</strong> (which service to forward to), and one or
               more <strong>predicates</strong> (which incoming URLs trigger it).
             </div>
-            <ol class="steps">
-              <li><strong>Add</strong> the routing config to the Gateway's <code>application.properties</code>:</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>application.properties</code> in the <code>api-gateway</code> project (the one from Lab 5).</li>
+                <li><strong>Append</strong> the six lines below to whatever is already there — keep <code>server.port</code>, <code>spring.application.name</code> and the Eureka <code>defaultZone</code> from Lab 5; just add the routing block underneath.</li>
+                <li>Stop the api-gateway app (red square) and run it again so it picks up the new config.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">APPEND — manual routes</span></div>
             <div class="codewrap"><pre><code>spring.cloud.gateway.routes[0].id=student-ms-route
 spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
 spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**
@@ -1021,7 +1217,7 @@ spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**</code></pre>
               <code>:9393/students-api/students</code> → <code>STUDENT-MS</code> + <code>/students</code>.
             </div>
             <ol class="steps" start="2">
-              <li><strong>Restart the Gateway</strong> so it picks up the new routes.</li>
+              <li><strong>Restart the Gateway</strong> if you haven't already — the new routes only load on startup.</li>
             </ol>
             <div class="observe">
               <span class="lbl">Path mapping in plain terms</span>
@@ -1041,6 +1237,27 @@ spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**</code></pre>
         <details class="exp lab7">
           <summary><span class="lab-tag">LAB 7</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Test Load Balancing <em>(the payoff)</em></summary>
           <div class="exp-body">
+            <div class="dothis">
+              <span class="lbl">Sanity check before testing</span>
+              <ol>
+                <li>Eureka Server running on <strong>8761</strong> ✓</li>
+                <li>Three Student MS instances running on <strong>8080, 8082, 8083</strong> ✓ (Eureka shows STUDENT-MS with 3 instances)</li>
+                <li>Customer MS running on <strong>8081</strong> ✓</li>
+                <li>API Gateway running on <strong>9393</strong> ✓ (with the routes from Lab 6)</li>
+              </ol>
+              <p style="margin:8px 0 0;font-size:15px;">Five JVMs in total. If anything's missing, start it before you proceed.</p>
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">▶ Watch round-robin in Postman</span>
+              <ol>
+                <li>Open Postman → click <strong>+</strong> for a new request.</li>
+                <li>Method: <strong><code>GET</code></strong>. URL: <code>http://localhost:9393/students-api/students</code></li>
+                <li>Click <strong>Send</strong> three or four times in quick succession.</li>
+                <li>Watch the response body — the port number cycles 8080 → 8082 → 8083 → 8080 → ...</li>
+              </ol>
+            </div>
+
             <ol class="steps">
               <li><strong>In Postman</strong> (or browser): <code>GET http://localhost:9393/students-api/students</code></li>
               <li><strong>Hit it 3–4 times rapidly.</strong> Watch the port in the response string change each time.</li>
@@ -1097,14 +1314,23 @@ Customer Service - Port: 8081               (only one instance)</div>
               auto-create routes for <em>every</em> service registered in Eureka, keyed by service name. Zero route
               config — but the service name appears in the URL.
             </div>
-            <ol class="steps">
-              <li><strong>Comment out</strong> the manual routes from Lab 6 (prefix each line with <code>#</code>).</li>
-              <li><strong>Add</strong> the discovery locator config:</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>application.properties</code> in the <code>api-gateway</code> project.</li>
+                <li><strong>Comment out</strong> the six manual-route lines from Lab 6 (put a <code>#</code> at the start of each).</li>
+                <li><strong>Append</strong> the two lines below underneath them.</li>
+                <li>Stop the api-gateway app and run it again.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">EDIT — comment routes, add locator</span></div>
             <div class="codewrap"><pre><code>spring.cloud.gateway.discovery.locator.enabled=true
 spring.cloud.gateway.discovery.locator.lower-case-service-id=true</code></pre></div>
-            <ol class="steps" start="3">
-              <li><strong>Restart the Gateway.</strong></li>
+
+            <ol class="steps">
+              <li><strong>Restart</strong> the api-gateway app.</li>
               <li><strong>Test</strong> with the service name in the path:
                 <ul>
                   <li><code>GET http://localhost:9393/student-ms/students</code></li>

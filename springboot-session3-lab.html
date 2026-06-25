@@ -328,6 +328,50 @@
     .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
     .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
 
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run / test it" purple callout === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
     /* Property annotation list (application.properties explainer) */
     .prop-list { display: grid; gap: 8px; margin: 14px 0; }
     .prop-row {
@@ -645,10 +689,19 @@ spring.jpa.hibernate.ddl-auto=update</code></pre></div>
               <code>@Id</code> marks the primary key, and <code>@GeneratedValue</code> lets the database auto-number it.
               <code>@Data</code> (Lombok) writes all the getters and setters for us.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.entity</code>.</li>
-              <li><strong>Create a class</strong> <code>Post.java</code> inside it with the code below.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> (the package with the main class) →
+                    <strong>New → Package</strong> → name it <code>com.tcs.training.entity</code>.</li>
+                <li>Right-click the new <code>entity</code> package → <strong>New → Class</strong> →
+                    name <code>Post</code> → Finish.</li>
+                <li>Replace the file's contents with the code below
+                    (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>, Delete, paste).</li>
+                <li>Save. There's nothing to run yet — the repository in Lab 2 will use this class.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/entity/Post.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.entity;
 
 import jakarta.persistence.Entity;
@@ -713,10 +766,18 @@ public class Post {
               A <strong>repository</strong> is the data-access layer. By extending <code>JpaRepository&lt;Post, Long&gt;</code>
               (entity type, id type) you inherit a full set of CRUD methods — you write <em>zero</em> implementation.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.repository</code>.</li>
-              <li><strong>Create an interface</strong> <code>PostRepository.java</code> with the code below.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.repository</code>.</li>
+                <li>Right-click the new <code>repository</code> package → <strong>New → Interface</strong>
+                    (yes, an <em>Interface</em>, not a Class) → name <code>PostRepository</code> → Finish.</li>
+                <li>Replace the file's contents with the code below.</li>
+                <li>Save. Spring Data will build the implementation for you at startup.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/repository/PostRepository.java</span><span class="fb-tag">paste the WHOLE file (interface)</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.repository;
 
 import com.tcs.training.entity.Post;
@@ -750,10 +811,17 @@ public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
               The <strong>DTO</strong> carries data between the client and the service. Same fields as the entity, but
               <em>no</em> JPA annotations — it's never mapped to the database. Just <code>@Data</code> from Lombok.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.dto</code>.</li>
-              <li><strong>Create a class</strong> <code>PostDTO.java</code> with the code below.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.dto</code>.</li>
+                <li>Right-click the new <code>dto</code> package → <strong>New → Class</strong> →
+                    name <code>PostDTO</code> → Finish.</li>
+                <li>Replace the file's contents with the code below.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/dto/PostDTO.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.dto;
 
 import lombok.Data;
@@ -790,10 +858,17 @@ public class PostDTO {
               <code>RuntimeException</code>, takes a message, and carries <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code>
               so Spring responds with HTTP 404 automatically when it's thrown.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.exception</code>.</li>
-              <li><strong>Create a class</strong> <code>ResourceNotFoundException.java</code> with the code below.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.exception</code>.</li>
+                <li>Right-click the new <code>exception</code> package → <strong>New → Class</strong> →
+                    name <code>ResourceNotFoundException</code> → Finish.</li>
+                <li>Replace the file's contents with the code below.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/exception/ResourceNotFoundException.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.exception;
 
 import org.springframework.http.HttpStatus;
@@ -831,10 +906,16 @@ public class ResourceNotFoundException extends RuntimeException {
             </div>
 
             <h3 style="margin-top:0;">5a · The interface</h3>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.service</code>.</li>
-              <li><strong>Create</strong> <code>PostService.java</code> with the five method signatures.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.service</code>.</li>
+                <li>Right-click the new <code>service</code> package → <strong>New → Interface</strong> →
+                    name <code>PostService</code> → Finish. Replace its contents with file ① below.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/PostService.java</span><span class="fb-tag">file ① — interface</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.service;
 
 import com.tcs.training.dto.PostDTO;
@@ -850,10 +931,16 @@ public interface PostService {
 }</code></pre></div>
 
             <h3 style="margin-top:24px;">5b · The implementation</h3>
-            <ol class="steps">
-              <li><strong>Create</strong> <code>PostServiceImpl.java</code> in the same package, implementing the interface.</li>
-              <li><strong>Note the two mappers</strong> — they're the heart of the DTO pattern. Read them first.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click the same <code>service</code> package → <strong>New → Class</strong> →
+                    name <code>PostServiceImpl</code> → Finish.</li>
+                <li>Replace its contents with file ② below — read the two private mappers
+                    (<code>mapToDTO</code>, <code>mapToEntity</code>) first; they're the heart of the DTO pattern.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/PostServiceImpl.java</span><span class="fb-tag">file ② — implementation</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.service;
 
 import com.tcs.training.dto.PostDTO;
@@ -967,11 +1054,20 @@ public class PostServiceImpl implements PostService {
               <code>@RequestMapping("/api/posts")</code> set the base path. <code>ResponseEntity</code> lets us return
               precise status codes — <strong>201 Created</strong> for POST, <strong>200 OK</strong> for the rest.
             </div>
-            <ol class="steps">
-              <li><strong>Create a package</strong> <code>com.tcs.training.controller</code>.</li>
-              <li><strong>Create</strong> <code>PostController.java</code> with the code below.</li>
-              <li><strong>Restart the app</strong> — we'll test it in Lab 7.</li>
-            </ol>
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
+                    <code>com.tcs.training.controller</code>.</li>
+                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
+                    name <code>PostController</code> → Finish.</li>
+                <li>Replace the file's contents with the code below.</li>
+                <li>Right-click your <strong>main application class</strong> →
+                    <strong>Run As → Java Application</strong>. Wait for "Tomcat started on port 8080".</li>
+                <li>Lab 7 has all the test calls.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/PostController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
 import com.tcs.training.dto.PostDTO;
@@ -1086,11 +1182,17 @@ public class PostController {
             <div class="testpart">
               <div class="tp-head"><span class="verb-badge post">POST</span> Part B — Create a record</div>
               <div class="tp-body">
-                <ol class="steps">
-                  <li><strong>In Postman:</strong> method <code>POST</code>, URL <code>http://localhost:8080/api/posts</code>.</li>
-                  <li><strong>Headers:</strong> <code>Content-Type: application/json</code>.</li>
-                  <li><strong>Body → raw → JSON</strong> — paste this:</li>
-                </ol>
+                <div class="runbox">
+                  <span class="lbl">▶ Postman steps for POST</span>
+                  <ol>
+                    <li>Open Postman → click the <strong>+</strong> tab to open a new request.</li>
+                    <li>Change the method dropdown from <code>GET</code> to <strong><code>POST</code></strong>.</li>
+                    <li>Paste the URL: <code>http://localhost:8080/api/posts</code></li>
+                    <li>Click the <strong>Headers</strong> tab → add a row: Key <code>Content-Type</code>, Value <code>application/json</code>.</li>
+                    <li>Click the <strong>Body</strong> tab → select <strong>raw</strong> → in the dropdown to its right pick <strong>JSON</strong>.</li>
+                    <li>Paste the JSON below into the body text area, then click <strong>Send</strong>.</li>
+                  </ol>
+                </div>
                 <div class="codewrap"><pre><code>{
   "title": "Introduction to Spring Boot",
   "description": "A beginner-friendly post",
