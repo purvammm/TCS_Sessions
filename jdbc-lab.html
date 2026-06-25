@@ -466,6 +466,49 @@
     .dse-mock .dse-top { background: #2a2a40; color: #fff; padding: 6px 12px; font-weight: 700; }
     .dse-mock .dse-row { padding: 5px 14px; border-bottom: 1px solid var(--mac-border); }
     .dse-mock .dse-row:last-child { border-bottom: none; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    /* When a filebar sits directly on top of a code block, square the code's top corners */
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* Numbered "where to paste" mini-steps inside a lab */
+    .wheretopaste {
+      background: #fffdf3; border: 1px solid #f0e3a8; border-radius: 10px;
+      padding: 6px 18px 6px; margin: 14px 0;
+    }
+    .wheretopaste .lbl { font-weight:700; color:#b8860b; display:block; margin:10px 0 2px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
   </style>
 </head>
 <body>
@@ -656,9 +699,12 @@ jdbc:h2:~/employeedb
               tactile anchor before CRUD begins.
             </div>
             <ol class="steps">
-              <li><strong>Create</strong> package <code>com.tcs.jdbc</code>, class <code>JDBCTest.java</code>.</li>
-              <li><strong>Add the code below</strong> and run it.</li>
+              <li><strong>Create the class:</strong> right-click package <code>com.tcs.jdbc</code> → New → Class → name it
+                  <code>JDBCTest</code> → Finish.</li>
+              <li><strong>Paste the full code below</strong> — replace everything in the new file with it.</li>
+              <li><strong>Run it:</strong> right-click the file → Run As → Java Application.</li>
             </ol>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">JDBCTest.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
 import java.sql.Connection;
@@ -712,56 +758,116 @@ Closed: true</div>
         <details class="exp lab2">
           <summary><span class="lab-tag">LAB 2</span><span class="verb-badge create">CREATE</span><span class="verb-badge insert">INSERT</span><span class="chevron">▶</span> Create Table + INSERT</summary>
           <div class="exp-body">
-            <h3 style="margin-top:0;">Part A — Create the table (DDL)</h3>
-            <div class="codewrap"><pre><code>String sql = "CREATE TABLE employees (" +
-             "emp_id INT PRIMARY KEY, " +
-             "first_name VARCHAR(50), " +
-             "last_name VARCHAR(50), " +
-             "department VARCHAR(50), " +
-             "salary DOUBLE)";
-
-Statement stmt = con.createStatement();
-stmt.executeUpdate(sql);
-System.out.println("Table created successfully.");</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Heads-up</span>
-              Running this <strong>twice</strong> throws "table already exists" (SQLState <code>X0Y32</code>/<code>42Y55</code>).
-              That's fine — either wrap it in a try-catch, or drop the table first if you're re-running. Then verify:
-              in Data Source Explorer, refresh the connection → expand <strong>Tables</strong> → <code>EMPLOYEES</code> appears.
+            <div class="concept">
+              <span class="lbl">Goal of this lab</span>
+              Make a table called <code>employees</code>, then add 3 people into it. You'll do this with <strong>one new
+              class</strong> that you create, paste, and run — exactly like Lab 1.
             </div>
 
-            <h3>Part B — INSERT with PreparedStatement</h3>
-            <div class="codewrap"><pre><code>public static void insertEmployee(Connection con, int id, String first,
-                                  String last, String dept, double salary)
-                                  throws SQLException {
-    String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
-    PreparedStatement ps = con.prepareStatement(sql);
+            <div class="concept" style="background:#fffdf3;border-color:#f0e3a8;">
+              <span class="lbl" style="color:#b8860b;">Do this — step by step</span>
+              <ol class="steps" style="margin:0;">
+                <li>Right-click package <code>com.tcs.jdbc</code> → <strong>New → Class</strong> → name it
+                    <code>CreateAndInsert</code> → <strong>Finish</strong>.</li>
+                <li>Delete everything in the new file, then <strong>paste the entire code block below</strong> (it already
+                    has <code>package</code>, <code>import</code>s, and <code>main</code> — it is a complete program).</li>
+                <li>Right-click the file → <strong>Run As → Java Application</strong>.</li>
+              </ol>
+            </div>
 
-    ps.setInt(1, id);          <span class="code-comment">// parameter index starts at 1, not 0</span>
-    ps.setString(2, first);
-    ps.setString(3, last);
-    ps.setString(4, dept);
-    ps.setDouble(5, salary);
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CreateAndInsert.java</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
-    int rows = ps.executeUpdate();
-    System.out.println(rows + " row(s) inserted.");
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class CreateAndInsert {
+
+    public static void main(String[] args) {
+        String url = "jdbc:derby:employeedb;create=true";
+
+        try (Connection con = DriverManager.getConnection(url, "sa", "")) {
+
+            <span class="code-comment">// ---- STEP 1: create the table (only succeeds the first time) ----</span>
+            createTable(con);
+
+            <span class="code-comment">// ---- STEP 2: insert 3 employees ----</span>
+            insertEmployee(con, 101, "Ravi",  "Sharma", "Engineering", 75000.00);
+            insertEmployee(con, 102, "Priya", "Mehta",  "HR",          65000.00);
+            insertEmployee(con, 103, "Arjun", "Patel",  "Engineering", 80000.00);
+
+        } catch (SQLException e) {
+            System.out.println("DB error: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// Creates the employees table. If it already exists, we just print a note</span>
+    <span class="code-comment">// instead of crashing — so you can re-run this file safely.</span>
+    public static void createTable(Connection con) {
+        String sql = "CREATE TABLE employees (" +
+                     "emp_id INT PRIMARY KEY, " +
+                     "first_name VARCHAR(50), " +
+                     "last_name VARCHAR(50), " +
+                     "department VARCHAR(50), " +
+                     "salary DOUBLE)";
+        try (Statement stmt = con.createStatement()) {
+            stmt.executeUpdate(sql);
+            System.out.println("Table created successfully.");
+        } catch (SQLException e) {
+            System.out.println("Table already exists — skipping create. (" + e.getSQLState() + ")");
+        }
+    }
+
+    <span class="code-comment">// Inserts one employee using a PreparedStatement (the safe way).</span>
+    public static void insertEmployee(Connection con, int id, String first,
+                                      String last, String dept, double salary)
+                                      throws SQLException {
+        String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);          <span class="code-comment">// parameter numbers start at 1, not 0</span>
+            ps.setString(2, first);
+            ps.setString(3, last);
+            ps.setString(4, dept);
+            ps.setDouble(5, salary);
+            int rows = ps.executeUpdate();
+            System.out.println(rows + " row(s) inserted.");
+        }
+    }
 }</code></pre></div>
-            <p><strong>Call it three times</strong> with different data:</p>
-            <div class="codewrap"><pre><code>insertEmployee(con, 101, "Ravi",  "Sharma", "Engineering", 75000.00);
-insertEmployee(con, 102, "Priya", "Mehta",  "HR",          65000.00);
-insertEmployee(con, 103, "Arjun", "Patel",  "Engineering", 80000.00);</code></pre></div>
+
             <div class="expected">
-              <span class="lbl">Expected output</span>
-              <div class="outblock">1 row(s) inserted.
+              <span class="lbl">Expected output (first run)</span>
+              <div class="outblock">Table created successfully.
+1 row(s) inserted.
 1 row(s) inserted.
 1 row(s) inserted.</div>
-              Verify in Data Source Explorer: right-click <code>EMPLOYEES</code> → Data → Edit — all 3 rows visible.
+              On the <strong>second</strong> run you'll instead see <code>Table already exists — skipping create.</code> at
+              the top, then the duplicate-key errors (next box) — that's expected.
             </div>
+
+            <div class="concept">
+              <span class="lbl">Understand what you pasted</span>
+              <strong>Part A</strong> is the <code>createTable</code> method — it runs the SQL <code>CREATE TABLE</code> using a
+              plain <code>Statement</code>. <strong>Part B</strong> is the <code>insertEmployee</code> method — it runs
+              <code>INSERT</code> using a <code>PreparedStatement</code> with <code>?</code> placeholders. The <code>main</code>
+              method at the top calls them in order: create first, then insert three times.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Verify it really worked</span>
+              In <strong>Data Source Explorer</strong>: refresh your connection → expand <strong>Tables</strong> →
+              <code>EMPLOYEES</code> now appears. Right-click <code>EMPLOYEES</code> → <strong>Data → Edit</strong> to see all 3 rows.
+            </div>
+
             <div class="observe">
               <span class="lbl">Observation — try breaking it on purpose</span>
-              What happens if you insert <code>emp_id 101</code> again? Run it and read the error carefully — note the
-              <strong>SQLState</strong> code. (It's <code>23505</code> — duplicate primary key. We'll handle this
-              gracefully in Lab 5.)
+              Run the file a <strong>second time</strong>. The same 3 IDs already exist, so each insert now fails with a
+              duplicate-primary-key error. Read it carefully and note the <strong>SQLState</strong> code — it's
+              <code>23505</code>. We'll handle this gracefully in Lab 5. To start clean, delete the rows in Data Source
+              Explorer (or pick new IDs like 201/202/203).
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext">Table created and 3 employees inserted via PreparedStatement.</span></label>
@@ -779,20 +885,54 @@ insertEmployee(con, 103, "Arjun", "Patel",  "Engineering", 80000.00);</code></pr
               A SELECT returns a <code>ResultSet</code> — a cursor over the rows. <code>rs.next()</code> moves forward
               one row and returns <code>true</code>; the <code>while</code> loop stops when it returns <code>false</code>.
             </div>
-            <div class="codewrap"><pre><code>String sql = "SELECT * FROM employees";
-Statement stmt = con.createStatement();
-ResultSet rs = stmt.executeQuery(sql);
 
-System.out.println("ID  | Name            | Department  | Salary");
-System.out.println("----+-----------------+-------------+--------");
+            <div class="concept" style="background:#fffdf3;border-color:#f0e3a8;">
+              <span class="lbl" style="color:#b8860b;">Do this — step by step</span>
+              <ol class="steps" style="margin:0;">
+                <li>Create a new class: right-click <code>com.tcs.jdbc</code> → <strong>New → Class</strong> → name it
+                    <code>SelectAll</code> → <strong>Finish</strong>.</li>
+                <li>Replace everything in the file with the <strong>entire code block below</strong>.</li>
+                <li>Right-click the file → <strong>Run As → Java Application</strong>.</li>
+              </ol>
+              <p style="margin:8px 0 0;font-size:15px;">⚠️ Run <strong>Lab 2 first</strong> so the table and rows exist — otherwise this prints only the header with no rows.</p>
+            </div>
 
-while (rs.next()) {
-    System.out.printf("%-4d| %-16s| %-12s| %.2f%n",
-        rs.getInt("emp_id"),
-        rs.getString("first_name") + " " + rs.getString("last_name"),
-        rs.getString("department"),
-        rs.getDouble("salary"));
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SelectAll.java</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class SelectAll {
+
+    public static void main(String[] args) {
+        String url = "jdbc:derby:employeedb;create=true";
+        String sql = "SELECT * FROM employees";
+
+        try (Connection con = DriverManager.getConnection(url, "sa", "");
+             Statement stmt = con.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+
+            System.out.println("ID  | Name            | Department  | Salary");
+            System.out.println("----+-----------------+-------------+--------");
+
+            while (rs.next()) {   <span class="code-comment">// moves to the next row; false when no rows left</span>
+                System.out.printf("%-4d| %-16s| %-12s| %.2f%n",
+                    rs.getInt("emp_id"),
+                    rs.getString("first_name") + " " + rs.getString("last_name"),
+                    rs.getString("department"),
+                    rs.getDouble("salary"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println("DB error: " + e.getMessage());
+        }
+    }
 }</code></pre></div>
+
             <div class="expected">
               <span class="lbl">Expected output</span>
               <div class="outblock">ID  | Name            | Department  | Salary
@@ -809,7 +949,7 @@ while (rs.next()) {
             </div>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Write <code>getEmployeesByDepartment(String dept)</code> that returns only Engineering employees. Hint:
+              Add a method <code>getEmployeesByDepartment(String dept)</code> that returns only Engineering employees. Hint:
               use <code>WHERE department = ?</code> with a <strong>PreparedStatement</strong> and bind the value with
               <code>ps.setString(1, dept)</code>.
             </div>
@@ -824,54 +964,134 @@ while (rs.next()) {
         <details class="exp lab4">
           <summary><span class="lab-tag">LAB 4</span><span class="verb-badge select">SELECT</span><span class="verb-badge update">UPDATE</span><span class="verb-badge delete">DELETE</span><span class="chevron">▶</span> SELECT by ID, UPDATE, DELETE</summary>
           <div class="exp-body">
-            <h3 style="margin-top:0;">SELECT by ID — use <code>if(rs.next())</code>, not <code>while</code></h3>
             <div class="concept">
-              <span class="lbl">Why <code>if</code> here?</span>
-              We expect at most one row (the id is the primary key), so a single <code>if(rs.next())</code> is clearer
-              than a loop — and it gives us a clean "not found" branch.
+              <span class="lbl">Goal of this lab</span>
+              The last three CRUD operations: find one employee by ID, change a salary, and delete a row. All three live
+              in <strong>one new class</strong> with three small methods that <code>main</code> calls in order.
             </div>
-            <div class="codewrap"><pre><code>String sql = "SELECT * FROM employees WHERE emp_id = ?";
-PreparedStatement ps = con.prepareStatement(sql);
-ps.setInt(1, empId);
-ResultSet rs = ps.executeQuery();
 
-if (rs.next()) {
-    System.out.println("Found: " + rs.getString("first_name") +
-                       " " + rs.getString("last_name"));
-} else {
-    System.out.println("No employee found with ID: " + empId);
+            <div class="concept" style="background:#fffdf3;border-color:#f0e3a8;">
+              <span class="lbl" style="color:#b8860b;">Do this — step by step</span>
+              <ol class="steps" style="margin:0;">
+                <li>Create a new class: right-click <code>com.tcs.jdbc</code> → <strong>New → Class</strong> → name it
+                    <code>UpdateDeleteSearch</code> → <strong>Finish</strong>.</li>
+                <li>Replace everything in the file with the <strong>entire code block below</strong>.</li>
+                <li>Right-click the file → <strong>Run As → Java Application</strong>.</li>
+              </ol>
+              <p style="margin:8px 0 0;font-size:15px;">⚠️ Make sure Lab 2 has been run (rows 101–103 exist) before running this.</p>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">UpdateDeleteSearch.java</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class UpdateDeleteSearch {
+
+    static final String URL = "jdbc:derby:employeedb;create=true";
+
+    public static void main(String[] args) {
+        searchById(101);   <span class="code-comment">// exists  -> "Found: ..."</span>
+        searchById(999);   <span class="code-comment">// missing -> "No employee found..."</span>
+
+        updateSalary(101, 90000.00);
+        deleteById(103);
+
+        System.out.println("\n--- Table after update & delete ---");
+        printAll();        <span class="code-comment">// confirm the changes landed</span>
+    }
+
+    <span class="code-comment">// ===== SELECT BY ID — use if(rs.next()), not a while loop =====</span>
+    public static void searchById(int empId) {
+        String sql = "SELECT * FROM employees WHERE emp_id = ?";
+        try (Connection con = DriverManager.getConnection(URL, "sa", "");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, empId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("Found: " + rs.getString("first_name")
+                        + " " + rs.getString("last_name"));
+                } else {
+                    System.out.println("No employee found with ID: " + empId);
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Search failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== UPDATE =====</span>
+    public static void updateSalary(int empId, double newSalary) {
+        String sql = "UPDATE employees SET salary = ? WHERE emp_id = ?";
+        try (Connection con = DriverManager.getConnection(URL, "sa", "");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setDouble(1, newSalary);
+            ps.setInt(2, empId);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Salary updated." : "Employee not found.");
+        } catch (SQLException e) {
+            System.out.println("Update failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== DELETE =====</span>
+    public static void deleteById(int empId) {
+        String sql = "DELETE FROM employees WHERE emp_id = ?";
+        try (Connection con = DriverManager.getConnection(URL, "sa", "");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, empId);
+            int rows = ps.executeUpdate();
+            System.out.println(rows > 0 ? "Deleted." : "Employee not found.");
+        } catch (SQLException e) {
+            System.out.println("Delete failed: " + e.getMessage());
+        }
+    }
+
+    <span class="code-comment">// ===== helper: print everything so you can SEE the changes =====</span>
+    public static void printAll() {
+        String sql = "SELECT * FROM employees";
+        try (Connection con = DriverManager.getConnection(URL, "sa", "");
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                System.out.printf("%-4d| %-16s| %-12s| %.2f%n",
+                    rs.getInt("emp_id"),
+                    rs.getString("first_name") + " " + rs.getString("last_name"),
+                    rs.getString("department"),
+                    rs.getDouble("salary"));
+            }
+        } catch (SQLException e) {
+            System.out.println("Read failed: " + e.getMessage());
+        }
+    }
 }</code></pre></div>
+
             <div class="expected">
-              <span class="lbl">Expected — test both cases</span>
-              <div class="outblock">empId = 101  ->  Found: Ravi Sharma
-empId = 999  ->  No employee found with ID: 999</div>
+              <span class="lbl">Expected output</span>
+              <div class="outblock">Found: Ravi Sharma
+No employee found with ID: 999
+Salary updated.
+Deleted.
+
+--- Table after update & delete ---
+101 | Ravi Sharma     | Engineering | 90000.00
+102 | Priya Mehta     | HR          | 65000.00</div>
+              Notice 101's salary is now <code>90000.00</code> and row 103 is gone.
             </div>
 
-            <h3>UPDATE</h3>
-            <div class="codewrap"><pre><code>String sql = "UPDATE employees SET salary = ? WHERE emp_id = ?";
-PreparedStatement ps = con.prepareStatement(sql);
-ps.setDouble(1, 90000.00);
-ps.setInt(2, 101);
-
-int rows = ps.executeUpdate();
-System.out.println(rows > 0 ? "Salary updated." : "Employee not found.");</code></pre></div>
-
-            <h3>DELETE</h3>
-            <div class="codewrap"><pre><code>String sql = "DELETE FROM employees WHERE emp_id = ?";
-PreparedStatement ps = con.prepareStatement(sql);
-ps.setInt(1, 103);
-
-int rows = ps.executeUpdate();
-System.out.println(rows > 0 ? "Deleted." : "Employee not found.");</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Run SELECT all after each operation</span>
-              Confirm 101's salary changed to 90000.00 and 103 is gone. Re-running SELECT all between operations is the
-              fastest way to <em>see</em> your changes land.
+            <div class="concept">
+              <span class="lbl">Why <code>if(rs.next())</code> for search?</span>
+              The id is the primary key, so a search returns <strong>at most one row</strong>. A single
+              <code>if(rs.next())</code> is clearer than a loop and gives you a clean “not found” branch.
             </div>
             <div class="concept">
               <span class="lbl">Why the rows-affected check matters</span>
-              <code>executeUpdate()</code> returns the number of rows changed. Checking <code>rows > 0</code> lets you
-              distinguish <em>"query ran fine but matched nothing"</em> from <em>"record found and modified"</em> — far
+              <code>executeUpdate()</code> returns the number of rows changed. Checking <code>rows &gt; 0</code> lets you
+              tell <em>“query ran fine but matched nothing”</em> apart from <em>“record found and modified”</em> — far
               more useful than assuming success.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
@@ -889,44 +1109,75 @@ System.out.println(rows > 0 ? "Deleted." : "Employee not found.");</code></pre><
               <span class="lbl">The problem we're fixing</span>
               Every lab so far has a risk: if an exception fires between <code>getConnection()</code> and
               <code>con.close()</code>, the connection <strong>leaks</strong>. try-with-resources auto-closes every
-              resource — on success and on failure — eliminating the leak.
+              resource — on success and on failure — eliminating the leak. (We already used it above; here we focus on it
+              and on reading errors properly.)
             </div>
-            <div class="codewrap"><pre><code>public static void insertEmployee(int id, String first, String last,
-                                  String dept, double salary) {
-    String url = "jdbc:derby:employeedb;create=true";
-    String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
 
-    try (Connection con = DriverManager.getConnection(url, "sa", "");
-         PreparedStatement ps = con.prepareStatement(sql)) {
+            <div class="concept" style="background:#fffdf3;border-color:#f0e3a8;">
+              <span class="lbl" style="color:#b8860b;">Do this — step by step</span>
+              <ol class="steps" style="margin:0;">
+                <li>Create a new class: right-click <code>com.tcs.jdbc</code> → <strong>New → Class</strong> → name it
+                    <code>SafeInsert</code> → <strong>Finish</strong>.</li>
+                <li>Replace everything with the <strong>entire code block below</strong>.</li>
+                <li>Right-click the file → <strong>Run As → Java Application</strong>. We pass <code>id = 101</code> on
+                    purpose — it already exists, so you'll see the error fields print.</li>
+              </ol>
+            </div>
 
-        ps.setInt(1, id);
-        ps.setString(2, first);
-        ps.setString(3, last);
-        ps.setString(4, dept);
-        ps.setDouble(5, salary);
-        ps.executeUpdate();
-        System.out.println("Inserted successfully.");
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SafeInsert.java</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
-    } catch (SQLException e) {
-        System.out.println("Error    : " + e.getMessage());
-        System.out.println("SQLState : " + e.getSQLState());
-        System.out.println("ErrorCode: " + e.getErrorCode());
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+public class SafeInsert {
+
+    public static void main(String[] args) {
+        <span class="code-comment">// 101 already exists from Lab 2, so this will fail on purpose</span>
+        <span class="code-comment">// and show you how to read a SQLException properly.</span>
+        insertEmployee(101, "Ravi", "Sharma", "Engineering", 75000.00);
+    }
+
+    public static void insertEmployee(int id, String first, String last,
+                                      String dept, double salary) {
+        String url = "jdbc:derby:employeedb;create=true";
+        String sql = "INSERT INTO employees VALUES (?, ?, ?, ?, ?)";
+
+        try (Connection con = DriverManager.getConnection(url, "sa", "");
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.setString(2, first);
+            ps.setString(3, last);
+            ps.setString(4, dept);
+            ps.setDouble(5, salary);
+            ps.executeUpdate();
+            System.out.println("Inserted successfully.");
+
+        } catch (SQLException e) {
+            System.out.println("Error    : " + e.getMessage());
+            System.out.println("SQLState : " + e.getSQLState());
+            System.out.println("ErrorCode: " + e.getErrorCode());
+        }
     }
 }</code></pre></div>
             <div class="observe">
-              <span class="lbl">Deliberately trigger a failure</span>
-              Call this with a <strong>duplicate</strong> <code>emp_id</code> and watch all three SQLException fields print:
+              <span class="lbl">Expected output — the failure is intentional</span>
               <div class="outblock">Error    : The statement was aborted because it would have caused a
            duplicate key value in a unique or primary key constraint...
 SQLState : 23505
 ErrorCode: 20000</div>
               In a real app you'd log these with a logger — but this is exactly the information your DevOps team needs
-              to diagnose a production DB issue.
+              to diagnose a production DB issue. To see <code>Inserted successfully.</code> instead, change the id to a
+              fresh value like <code>104</code> and run again.
             </div>
             <div class="tryit">
               <span class="lbl">Refactor task</span>
-              Update your <strong>SELECT, UPDATE and DELETE</strong> methods to also use try-with-resources. For SELECT,
-              declare the <code>ResultSet</code> in the <code>try(...)</code> header too — it's <code>AutoCloseable</code> as well.
+              Go back and make sure your <strong>SELECT, UPDATE and DELETE</strong> methods also use try-with-resources
+              (Labs 3–4 above already do). For SELECT, declare the <code>ResultSet</code> in the <code>try(...)</code>
+              header too — it's <code>AutoCloseable</code> as well.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext">Methods refactored to try-with-resources; duplicate-key failure prints message, SQLState &amp; error code.</span></label>
@@ -946,7 +1197,19 @@ ErrorCode: 20000</div>
               does another's job.
             </div>
 
+            <div class="concept" style="background:#fffdf3;border-color:#f0e3a8;">
+              <span class="lbl" style="color:#b8860b;">Do this — create THREE separate classes</span>
+              <ol class="steps" style="margin:0;">
+                <li>Create a class named <code>DBConnector</code> → paste file ① below.</li>
+                <li>Create a class named <code>EmployeeDAO</code> → paste file ② below.</li>
+                <li>Create a class named <code>EmployeeTester</code> → paste file ③ below.</li>
+                <li>All three go in the <strong>same</strong> package <code>com.tcs.jdbc</code>. Each “New → Class” step
+                    is the same as before — just three of them this time.</li>
+              </ol>
+            </div>
+
             <h3 style="margin-top:0;">1 · DBConnector.java</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">DBConnector.java</span><span class="fb-tag">file ① — paste whole</span></div>
             <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
 import java.sql.Connection;
@@ -964,6 +1227,7 @@ public class DBConnector {
 }</code></pre></div>
 
             <h3>2 · EmployeeDAO.java <span class="muted" style="font-size:14px;">— all five operations, the biggest block</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">EmployeeDAO.java</span><span class="fb-tag">file ② — paste whole</span></div>
             <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
 import java.sql.Connection;
@@ -1061,6 +1325,7 @@ public class EmployeeDAO {
 }</code></pre></div>
 
             <h3>3 · EmployeeTester.java <span class="muted" style="font-size:14px;">— Scanner menu</span></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">EmployeeTester.java</span><span class="fb-tag">file ③ — run THIS one</span></div>
             <div class="codewrap"><pre><code>package com.tcs.jdbc;
 
 import java.util.Scanner;
@@ -1117,9 +1382,25 @@ public class EmployeeTester {
     }
 }</code></pre></div>
             <div class="expected">
-              <span class="lbl">Expected</span>
-              Run <code>EmployeeTester</code>. You now interact with your database through the menu — add, view, search,
-              update, delete, all looping until you enter <code>0</code>.
+              <span class="lbl">How to run — run ONLY EmployeeTester</span>
+              <code>DBConnector</code> and <code>EmployeeDAO</code> have no <code>main</code> — they're helpers. Run the
+              <strong>third</strong> file: right-click <code>EmployeeTester.java</code> → <strong>Run As → Java
+              Application</strong>. The menu prints in the <strong>Console</strong>; click into the console, type a number
+              (e.g. <code>2</code> to view all), and press <span class="kbd" style="font-family:var(--mac-mono);font-size:13px;background:#fff;border:1px solid var(--mac-border);border-radius:5px;padding:1px 6px;">Enter</span>.
+              Keep choosing options; enter <code>0</code> to quit.
+            </div>
+            <div class="expected">
+              <span class="lbl">Example console session</span>
+              <div class="outblock">==== Employee Menu ====
+1 - Add Employee
+2 - View All Employees
+3 - Search by ID
+4 - Update Salary
+5 - Delete Employee
+0 - Exit
+Choose: 2
+101 | Ravi Sharma     | Engineering | 90000.00
+102 | Priya Mehta     | HR          | 65000.00</div>
             </div>
             <div class="observe">
               <span class="lbl">Observation question</span>
