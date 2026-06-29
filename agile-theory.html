@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agile &amp; Scrum — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block matches the other theory decks byte-for-byte so all sessions
+      share the same visual identity.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: #00827b;
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      background: rgba(0,199,190,0.10);
+      color: #00827b;
+      padding: 1px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout boxes — accent recoloured to the Agile teal */
+    .keybox {
+      border-left: 4px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: #00827b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .dangerbox {
+      border-left: 4px solid var(--tl-red);
+      background: rgba(255,95,87,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .dangerbox .lbl { font-weight: 700; color: var(--tl-red); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: #00827b; }
+
+    /* Cover slide — Agile teal-to-green gradient (distinct from JDBC/Spring Boot decks) */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #00c7be 0%, #1a9e34 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+    .card .lbl-sm {
+      display: inline-block; font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      color: #00827b; background: rgba(0,199,190,0.12);
+      padding: 2px 8px; border-radius: 6px; margin-bottom: 8px;
+    }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 7px 0;
+      background: #fafafc;
+      font-size: 16.5px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #00c7be;
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(0,199,190,0.16); color: #00827b; }
+    table.cmp td.hl { background: rgba(0,199,190,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid #00c7be;
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #e9fbfa;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: #00827b; font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Two-column comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: var(--tl-red); }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+    .twocol .colbox.a { background: #fff6f5; border-color: #ffd1cc; }
+    .twocol .colbox.b { background: #f1fdf3; border-color: #c6ecce; }
+
+    /* Manifesto values — "left over right" lines */
+    .mvalues { display: grid; gap: 12px; margin-top: 16px; }
+    .mvalue {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: center;
+      padding: 14px 18px;
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #fafafc;
+    }
+    .mvalue .left {
+      font-size: 18px; font-weight: 700; color: #1a9e34; text-align: right;
+    }
+    .mvalue .over {
+      font-size: 13px; font-weight: 800; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--mac-text-muted);
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      padding: 4px 10px; border-radius: 16px;
+    }
+    .mvalue .right { font-size: 16.5px; color: var(--mac-text-muted); }
+
+    /* Numbered principle list */
+    .vsteps { display: grid; gap: 10px; margin-top: 14px; }
+    .vstep { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: start; }
+    .vstep .vn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: #00c7be; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-top: 4px;
+    }
+    .vstep .vbody { min-width: 0; }
+    .vstep .vlabel { font-weight: 700; font-size: 16px; margin: 6px 0 2px; }
+    .vstep p { font-size: 15.5px; margin: 2px 0 0; color: var(--mac-text-muted); }
+
+    /* TDD cycle */
+    .tdd-cycle {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .tdd-step {
+      border-radius: 12px; padding: 18px;
+      text-align: center; color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+    }
+    .tdd-step.red { background: linear-gradient(135deg, #ff5f57, #d93b30); }
+    .tdd-step.green { background: linear-gradient(135deg, #28c840, #1a9e34); }
+    .tdd-step.refactor { background: linear-gradient(135deg, #0a84ff, #5e5ce6); }
+    .tdd-step .dot {
+      width: 44px; height: 44px; border-radius: 50%;
+      background: rgba(255,255,255,0.22);
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 22px; margin-bottom: 8px;
+    }
+    .tdd-step h3 { color: #fff; margin: 0 0 6px; font-size: 19px; }
+    .tdd-step p { color: rgba(255,255,255,0.92); font-size: 14.5px; margin: 0; }
+
+    /* Sprint-loop circle diagram (CSS-only) */
+    .sprint-loop {
+      position: relative;
+      width: 100%;
+      max-width: 720px;
+      margin: 12px auto 0;
+      padding: 18px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: #fafafc;
+    }
+    .sprint-loop .stage-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+    .sl-box {
+      flex: 0 0 auto;
+      min-width: 130px;
+      padding: 9px 12px;
+      border: 2px solid #00c7be;
+      background: #e9fbfa;
+      border-radius: 10px;
+      font-size: 14.5px; font-weight: 600;
+      text-align: center; color: #00827b;
+    }
+    .sl-box.sprint { min-width: 220px; background: #f1fdf3; border-color: #28c840; color: #1a9e34; }
+    .sl-box.review { background: #fff6ea; border-color: #ff9f0a; color: #b8860b; }
+    .sl-box.retro { background: #f3f1ff; border-color: #5e5ce6; color: #5e5ce6; }
+    .sl-arrow { color: #00827b; font-size: 22px; font-weight: 700; }
+    .sl-loop-back {
+      margin-top: 10px; text-align: center; font-size: 14px;
+      color: #00827b; font-style: italic;
+    }
+
+    /* Annotation grid (cheat sheet) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 14.5px; font-weight: 700; color: #00827b; }
+    .anno-cell .ac-def { font-size: 14px; color: var(--mac-text-muted); }
+
+    /* Checklist */
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 16.5px; padding: 7px 0 7px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 6px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Story-point chips */
+    .sp-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; }
+    .sp-chip {
+      width: 56px; height: 56px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #00c7be, #1a9e34);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 800;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.18);
+    }
+    .sp-chip.big { width: 72px; height: 72px; font-size: 26px; }
+    .sp-chip.bigger { width: 84px; height: 84px; font-size: 28px; }
+
+    /* Burndown chart — CSS-only SVG-style */
+    .burndown {
+      position: relative;
+      width: 100%;
+      max-width: 680px;
+      margin: 16px auto 0;
+      padding: 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #fafafc;
+    }
+    .burndown svg { width: 100%; height: auto; display: block; }
+    .bd-legend { display: flex; justify-content: center; gap: 22px; margin-top: 10px; font-size: 14.5px; }
+    .bd-legend .key { display: flex; align-items: center; gap: 6px; }
+    .bd-legend .swatch { width: 22px; height: 4px; border-radius: 2px; }
+
+    /* Pill */
+    .pill {
+      display: inline-block;
+      background: rgba(0,199,190,0.12);
+      color: #00827b;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Roles grid — sized to make WHAT/HOW/DOING distinct */
+    .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .role-card {
+      border-radius: 14px;
+      padding: 18px 20px;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+    }
+    .role-card.po { background: linear-gradient(135deg, #ff9f0a, #ff6482); }
+    .role-card.sm { background: linear-gradient(135deg, #0a84ff, #5e5ce6); }
+    .role-card.dev { background: linear-gradient(135deg, #00c7be, #1a9e34); }
+    .role-card h3 { color: #fff; margin: 0 0 6px; font-size: 19px; }
+    .role-card .owns { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 700; background: rgba(255,255,255,0.20); display: inline-block; padding: 3px 8px; border-radius: 6px; margin-bottom: 8px; }
+    .role-card p { color: rgba(255,255,255,0.94); font-size: 14.5px; margin: 0; line-height: 1.55; }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: #00c7be;
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">agile-theory.html — Agile &amp; Scrum</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Process &amp; Methodology · Theory Session</span>
+            <h1>Agile &amp; Scrum</h1>
+            <div class="sub">Iterative delivery, the Scrum framework, and how modern software teams plan, ship, and improve — every sprint.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Software didn't always ship every two weeks. Agile is the reason it does today. We start with the <strong>why</strong> (the waterfall trap), move to the <strong>what</strong> (the Manifesto and Scrum), the <strong>how</strong> (roles, artifacts, ceremonies), and the <strong>tools</strong> teams use day-to-day — story points, planning poker, and the burndown chart.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Why Agile? — the Waterfall problem</li>
+            <li><span class="num">2</span> The Agile Manifesto &amp; its 12 principles</li>
+            <li><span class="num">3</span> Agile flavors — Scrum, XP, TDD, Kanban, SAFe</li>
+            <li><span class="num">4</span> Scrum deep dive — roles, artifacts, ceremonies</li>
+            <li><span class="num">5</span> Story points &amp; Planning Poker</li>
+            <li><span class="num">6</span> The Sprint Burndown chart</li>
+            <li><span class="num">7</span> Recap &amp; cheat sheet</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            Each slide carries the full explanation of its topic, so you can revise from this deck alone afterwards. The session is dense on terminology — keep <strong>slides 13–15</strong> (Scrum roles, artifacts and ceremonies) close at hand: most interview questions on Agile come from those three slides.
+          </div>
+        </section>
+
+        <!-- 3. SDLC RECAP -->
+        <section class="slide">
+          <p class="eyebrow">A quick refresher before we critique anything</p>
+          <h2>Traditional SDLC — the six phases</h2>
+          <p class="deep">Every software project — whether you call it Waterfall, Agile, or anything else — moves through the same six broad phases. The difference between methodologies is the <strong>order</strong>, the <strong>size</strong> of each step, and <strong>how often you loop back</strong>.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">📋</div><h3>1 · Requirements</h3><p>Talk to users, write down what the system should do. <em>"What are we building?"</em></p></div>
+            <div class="card"><div class="ic">🧭</div><h3>2 · Design</h3><p>Decide the architecture, the data model, the modules. <em>"How will it be structured?"</em></p></div>
+            <div class="card"><div class="ic">⌨️</div><h3>3 · Implementation</h3><p>Write the code. <em>"Build it."</em></p></div>
+            <div class="card"><div class="ic">🧪</div><h3>4 · Testing</h3><p>Verify it works — unit tests, integration tests, QA. <em>"Does it behave correctly?"</em></p></div>
+            <div class="card"><div class="ic">🚀</div><h3>5 · Deployment</h3><p>Release it to production where users can reach it. <em>"Ship it."</em></p></div>
+            <div class="card"><div class="ic">🔧</div><h3>6 · Maintenance</h3><p>Fix bugs, add small features, keep the lights on. <em>"Keep it running."</em></p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The whole story in one line</span>
+            Agile doesn't skip any of these phases. It just runs <strong>all six in a tight loop</strong> — a 1-to-4 week loop called a <em>Sprint</em> — instead of one long single-pass line.
+          </div>
+        </section>
+
+        <!-- 4. WATERFALL MODEL -->
+        <section class="slide">
+          <p class="eyebrow">The "do it all in order" model</p>
+          <h2>Waterfall Model</h2>
+          <p class="deep">Waterfall is the classical sequential model. You finish each phase <strong>completely</strong> before starting the next — like water cascading down a series of pools, never flowing back up. It was popularised in the 1970s by Winston Royce, borrowing from manufacturing-era project management.</p>
+          <div class="flow" style="justify-content:center;">
+            <div class="flow-box">📋<br>Requirements</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">🧭<br>Design</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">⌨️<br>Implementation</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">🧪<br>Testing</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">🚀<br>Deployment</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">🔧<br>Maintenance</div>
+          </div>
+          <div class="note" style="margin-top:22px;">
+            <span class="lbl">How a Waterfall project actually feels</span>
+            You spend the first 2–3 months gathering and signing off requirements. Then 2–3 months on design documents. Then 4–6 months coding. Then 1–2 months in QA. Then you ship — and the customer sees a running system for the <em>first time</em> nearly a year after the project started. If their needs shifted in the meantime — and they almost always do — that's a problem the model doesn't gracefully handle.
+          </div>
+          <div class="keybox">
+            <span class="lbl">When Waterfall genuinely works</span>
+            When requirements are <strong>truly known and stable up-front</strong> — building a bridge, designing a chip, certifying a medical device for the FDA. Software almost never has that luxury, which is exactly why we needed something else.
+          </div>
+        </section>
+
+        <!-- 5. WATERFALL DISADVANTAGES -->
+        <section class="slide">
+          <p class="eyebrow">Why Waterfall breaks down for modern software</p>
+          <h2>Disadvantages of Waterfall</h2>
+          <p class="deep">Three structural problems make Waterfall a bad fit for software where you're learning as you go:</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">⏰</div>
+              <h3>Late feedback</h3>
+              <p>The customer doesn't see anything working until weeks or months in. By then, the original assumptions may already be obsolete. <strong>The first sprint of Agile delivers working software; Waterfall's first <em>year</em> may not.</strong></p>
+            </div>
+            <div class="card">
+              <div class="ic">🔁</div>
+              <h3>Hard to change</h3>
+              <p>A requirement change late in the cycle ripples back through every prior phase — and there's no efficient way to absorb it. Change requests become expensive battles, often refused, often the reason projects fail.</p>
+            </div>
+            <div class="card">
+              <div class="ic">💣</div>
+              <h3>Big-bang testing</h3>
+              <p>Testing only begins after months of coding. Bugs found at that stage are <strong>10–100× more expensive</strong> to fix than the same bug caught during design. The longer a defect lives, the more code depends on it.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The remedy in one sentence</span>
+            "Plan the plan, build the thing, hope it's right" is too risky for software. The fix: make the loop small, learn quickly, and adjust. That's the Agile thesis.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Honest disclaimer</span>
+            Waterfall isn't dead. Regulated, fixed-scope projects (medical devices, aerospace flight controls, certain government contracts) still use it — sometimes because compliance demands it. But for the kind of business software TCS associates write day-to-day, Agile is the default for good reason.
+          </div>
+        </section>
+
+        <!-- 6. WHAT IS AGILE -->
+        <section class="slide">
+          <p class="eyebrow">The mindset that changed software</p>
+          <h2>What is Agile?</h2>
+          <p class="deep">Agile is <strong>not a tool</strong>, <strong>not a single methodology</strong>, and <strong>not a piece of software</strong>. It's a set of <em>values</em> for how to build software when the requirements are uncertain — and in software, they almost always are. It was formalised in <strong>February 2001</strong> by seventeen practitioners who met at a ski lodge in Snowbird, Utah and wrote what is now called the <span class="term">Agile Manifesto</span>.</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🔁</div>
+              <h3>Iterative</h3>
+              <p>Work in short, repeating cycles — usually 1 to 4 weeks. Each cycle ends with feedback that shapes the next one.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📦</div>
+              <h3>Incremental</h3>
+              <p>Each cycle produces a <strong>working, shippable slice</strong> of the product — not a document, not a half-built piece, but something a real user could touch.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧭</div>
+              <h3>Adaptive</h3>
+              <p>Change direction based on what you learned in the previous cycle. The plan is allowed — encouraged — to evolve.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The core assumption</span>
+            Agile assumes you'll <strong>learn things during the project</strong> that change your plan. The shorter the loop, the faster you learn, and the less waste from being wrong. That's the whole argument.
+          </div>
+        </section>
+
+        <!-- 7. AGILE MANIFESTO 4 VALUES -->
+        <section class="slide">
+          <p class="eyebrow">The four values that started everything</p>
+          <h2>The 4 Agile Manifesto Values</h2>
+          <p class="deep">Each value reads as <strong>"We value A <em>over</em> B."</strong> Both sides matter — you still need processes and documents and plans — but when something has to give, you choose the left.</p>
+          <div class="mvalues">
+            <div class="mvalue">
+              <div class="left">Individuals &amp; interactions</div>
+              <div class="over">over</div>
+              <div class="right">processes and tools</div>
+            </div>
+            <div class="mvalue">
+              <div class="left">Working software</div>
+              <div class="over">over</div>
+              <div class="right">comprehensive documentation</div>
+            </div>
+            <div class="mvalue">
+              <div class="left">Customer collaboration</div>
+              <div class="over">over</div>
+              <div class="right">contract negotiation</div>
+            </div>
+            <div class="mvalue">
+              <div class="left">Responding to change</div>
+              <div class="over">over</div>
+              <div class="right">following a plan</div>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">A worked example of "left over right"</span>
+            Imagine a build pipeline is broken on a Tuesday afternoon. The <em>process</em> says raise a ticket and wait for a DevOps engineer. The <em>Agile instinct</em> says walk over (or DM) the closest person who can help, fix it together, and update the process afterwards. The ticket isn't <em>wrong</em> — but the interaction unblocks faster.
+          </div>
+        </section>
+
+        <!-- 8. 12 PRINCIPLES -->
+        <section class="slide">
+          <p class="eyebrow">The values made operational</p>
+          <h2>The 12 Agile Principles — the heartbeat six</h2>
+          <p class="deep">The Manifesto expands its 4 values into <strong>12 principles</strong> that describe what teams should actually <em>do</em>. Six of them carry most of the weight day-to-day:</p>
+          <div class="vsteps">
+            <div class="vstep">
+              <div class="vn">1</div>
+              <div class="vbody">
+                <div class="vlabel">Highest priority: satisfy the customer through early and continuous delivery.</div>
+                <p>Ship something useful in the first sprint. Then keep shipping. Don't disappear for six months and reappear with a final product.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">2</div>
+              <div class="vbody">
+                <div class="vlabel">Welcome changing requirements, even late in development.</div>
+                <p>Treat a late change as a competitive advantage — it means the product gets better — instead of as a contract violation.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">3</div>
+              <div class="vbody">
+                <div class="vlabel">Deliver working software frequently — every few weeks, ideally shorter.</div>
+                <p>The shorter the gap between releases, the faster you learn what's working and what isn't.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">4</div>
+              <div class="vbody">
+                <div class="vlabel">Business people and developers must work together daily.</div>
+                <p>The "throw a spec over the wall" model is over. The PO is part of the team, in the same chat, in the same standup.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">5</div>
+              <div class="vbody">
+                <div class="vlabel">Working software is the primary measure of progress.</div>
+                <p>Not lines of code, not pages of design, not story points done. Working software, in the hands of users.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">6</div>
+              <div class="vbody">
+                <div class="vlabel">At regular intervals, the team reflects and tunes its behaviour.</div>
+                <p>This is the principle that the <strong>Retrospective</strong> (slide 15) exists to live out.</p>
+              </div>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">The other six in one line</span>
+            Build projects around motivated individuals · face-to-face conversation is best · sustainable pace · technical excellence and good design · simplicity (the art of maximising the work <em>not</em> done) · the best architectures emerge from self-organising teams. (Full text at <span class="pill">agilemanifesto.org</span>.)
+          </div>
+        </section>
+
+        <!-- 9. AGILE vs WATERFALL TABLE -->
+        <section class="slide">
+          <p class="eyebrow">Same six SDLC phases, very different paths</p>
+          <h2>Agile vs Waterfall</h2>
+          <p class="deep">Both models walk through requirements, design, build, test, deploy, maintain. The difference is <strong>how often the loop runs</strong> and <strong>where in that loop the customer lives</strong>.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Dimension</th><th>Waterfall</th><th class="hl">Agile (Scrum)</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Cycle length</strong></td><td>Months to a year+ (one pass)</td><td class="hl">1–4 weeks per sprint, then repeat</td></tr>
+              <tr><td><strong>Customer involvement</strong></td><td>Beginning &amp; end</td><td class="hl">Continuous — every sprint review</td></tr>
+              <tr><td><strong>Change requests</strong></td><td class="bad">Expensive, often refused</td><td class="good">Welcomed between sprints</td></tr>
+              <tr><td><strong>First working software</strong></td><td>Near the end of the project</td><td class="hl">End of Sprint 1 (~2 weeks)</td></tr>
+              <tr><td><strong>Documentation</strong></td><td>Heavy, written up-front</td><td class="hl">Just enough, kept current</td></tr>
+              <tr><td><strong>Risk discovery</strong></td><td class="bad">Late — at integration / testing</td><td class="good">Early and ongoing, every sprint</td></tr>
+              <tr><td><strong>Team structure</strong></td><td>Specialist silos (devs, then QA, then ops)</td><td class="hl">Cross-functional, self-organising</td></tr>
+              <tr><td><strong>Best fit</strong></td><td>Fixed scope, regulated, predictable</td><td class="hl">Uncertain, evolving, product-focused</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Don't get tripped up</span>
+            Agile is <strong>not</strong> "no planning." It's "planning in small, frequent chunks." Every sprint has a plan — it just covers two weeks instead of two years.
+          </div>
+        </section>
+
+        <!-- 10. AGILE FLAVORS -->
+        <section class="slide">
+          <p class="eyebrow">Agile is a family, not a single recipe</p>
+          <h2>Agile flavors</h2>
+          <p class="deep">"Agile" is a mindset. Several concrete frameworks implement it — some emphasize <strong>process</strong>, some emphasize <strong>engineering practices</strong>, some emphasize <strong>flow</strong>, some emphasize <strong>scaling</strong>. The most-used ones at a glance:</p>
+          <div class="cards c4">
+            <div class="card">
+              <span class="lbl-sm">Process</span>
+              <h3>Scrum</h3>
+              <p>Sprint-based delivery with defined roles, artifacts and ceremonies. The most widely adopted Agile framework — used by an estimated <strong>80%+</strong> of Agile teams. <strong>Today's deep dive.</strong></p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">Engineering</span>
+              <h3>XP</h3>
+              <p>Extreme Programming. A programmer-centric flavor focused on engineering practices: pair programming, TDD, continuous integration, refactoring, simple design.</p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">Flow</span>
+              <h3>Kanban</h3>
+              <p>No fixed sprints. Visualise work as cards on a board, set a <strong>work-in-progress (WIP) limit</strong>, and pull the next card only when capacity frees up. Great for support &amp; ops teams.</p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">Scaling</span>
+              <h3>SAFe</h3>
+              <p>Scaled Agile Framework. For 50–500+ engineers across many teams. Adds program-level coordination layers (Agile Release Trains, PI Planning) on top of Scrum.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Today's session zooms in on Scrum</span>
+            because that's what most enterprise teams (TCS included) use. The engineering practices from XP — especially <strong>TDD</strong> — layer on top of Scrum naturally; the next slide gives both a closer look.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Kanban &amp; SAFe — awareness, not depth</span>
+            Recognise the names if they come up in interviews. Kanban = continuous flow with WIP limits. SAFe = Scrum scaled across many teams. Neither is on the practical exam for this session.
+          </div>
+        </section>
+
+        <!-- 11. XP and TDD -->
+        <section class="slide">
+          <p class="eyebrow">Two engineering practices every Agile developer should know</p>
+          <h2>XP &amp; TDD up close</h2>
+          <div class="twocol">
+            <div class="colbox b" style="background:#f1fdf3; border-color:#c6ecce;">
+              <h3 style="color:#1a9e34;">XP — Extreme Programming</h3>
+              <p style="font-size:15.5px;">Programmer-centric: <strong>how the engineering work itself is done</strong>. "Extreme" means: take the things software dev should already do, and crank them to 11.</p>
+              <ul style="margin:8px 0 0; padding-left:20px; font-size:15px;">
+                <li><strong>Pair programming</strong> — two devs, one keyboard. Continuous review.</li>
+                <li><strong>Test-Driven Development</strong> — see the right column.</li>
+                <li><strong>Continuous Integration</strong> — every commit goes through the build &amp; tests.</li>
+                <li><strong>Refactoring</strong> — improve code structure constantly, without changing behaviour.</li>
+                <li><strong>Simple design</strong> — do the simplest thing that could work, no speculative complexity.</li>
+                <li><strong>Small releases</strong> — release early, release often.</li>
+              </ul>
+            </div>
+            <div class="colbox b" style="background:#f3f8ff; border-color:#cfe4ff;">
+              <h3 style="color:var(--mac-accent);">TDD — Test-Driven Development</h3>
+              <p style="font-size:15.5px;">Write the test <strong>first</strong>, then write just enough code to make it pass. A three-step cycle:</p>
+              <div class="tdd-cycle" style="margin-top:10px;">
+                <div class="tdd-step red">
+                  <div class="dot">🔴</div>
+                  <h3>Red</h3>
+                  <p>Write a failing test. The feature doesn't exist yet, so the test fails.</p>
+                </div>
+                <div class="tdd-step green">
+                  <div class="dot">🟢</div>
+                  <h3>Green</h3>
+                  <p>Write the <em>minimum</em> code to make the test pass. Ugly is fine.</p>
+                </div>
+                <div class="tdd-step refactor">
+                  <div class="dot">🔵</div>
+                  <h3>Refactor</h3>
+                  <p>Clean up the code while keeping the test green. Repeat.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Why TDD matters in your work</span>
+            TDD isn't exclusive to XP — Scrum teams use it constantly, and so should you in your assignments. The discipline of "test first" prevents the classic <em>"I'll write the tests later"</em> (i.e. never) anti-pattern, and the code that emerges from TDD is naturally testable because it had to be.
+          </div>
+        </section>
+
+        <!-- 12. SCRUM AT A GLANCE -->
+        <section class="slide">
+          <p class="eyebrow">The Sprint — the loop that makes Scrum work</p>
+          <h2>Scrum at a glance</h2>
+          <p class="deep">The whole Scrum framework boils down to one repeating loop. Pull a chunk of work from the backlog, deliver it in a fixed time-box (a <span class="term">Sprint</span>, usually 2 weeks), inspect what was built, reflect on the process, repeat.</p>
+          <div class="sprint-loop">
+            <div class="stage-row">
+              <div class="sl-box">📚<br>Product<br>Backlog</div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box">📅<br>Sprint<br>Planning</div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box sprint">🏃 2-week Sprint<br><span style="font-size:12.5px; font-weight:500; color:#1a9e34;">Daily Scrum every morning · the team builds the Increment</span></div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box review">🎬<br>Sprint<br>Review</div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box retro">🪞<br>Sprint<br>Retro</div>
+            </div>
+            <div class="sl-loop-back">⤴ &nbsp; back to Sprint Planning with an updated Product Backlog &nbsp; ⤴</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The Scrum balance in one sentence</span>
+            <strong>Inside a sprint, the goal doesn't change. Between sprints, anything can change.</strong> That's how Scrum gives the team stability to focus, and the product space to evolve.
+          </div>
+        </section>
+
+        <!-- 13. SCRUM ROLES -->
+        <section class="slide">
+          <p class="eyebrow">Three roles · three responsibilities · no overlap</p>
+          <h2>Scrum Roles</h2>
+          <div class="roles-grid">
+            <div class="role-card po">
+              <span class="owns">Owns the WHAT &amp; WHY</span>
+              <h3>Product Owner (PO)</h3>
+              <p>Maintains the Product Backlog and prioritises it. Decides what goes into a sprint. Faces the customer and business. <strong>One person, never a committee.</strong> The PO is empowered to say "yes, build this" or "no, not yet."</p>
+            </div>
+            <div class="role-card sm">
+              <span class="owns">Owns the HOW</span>
+              <h3>Scrum Master (SM)</h3>
+              <p>Coaches the team on Scrum, facilitates ceremonies, removes blockers. A <strong>servant-leader</strong> — not a project manager, not a boss. Protects the team from outside interruption during a sprint.</p>
+            </div>
+            <div class="role-card dev">
+              <span class="owns">Owns the DOING</span>
+              <h3>Development Team</h3>
+              <p>Cross-functional (devs, testers, designers — whatever the work needs), self-organising, typically <strong>3–9 people</strong>. The team decides <em>how</em> to split tasks. No team lead within the Dev Team — they're all peers on the work.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">A few rules of thumb</span>
+            Every Scrum team has all three roles — even a four-person startup. One person can sometimes hold two roles, but <strong>PO + Dev Team is forbidden</strong> (conflict of interest — the PO would unconsciously protect their own team's workload), and <strong>PO + Scrum Master is discouraged</strong> (the PO advocates for the product, the SM advocates for the team — different incentives).
+          </div>
+        </section>
+
+        <!-- 14. SCRUM ARTIFACTS -->
+        <section class="slide">
+          <p class="eyebrow">The three "things" Scrum produces and uses</p>
+          <h2>Scrum Artifacts</h2>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">📚</div>
+              <h3>Product Backlog</h3>
+              <p>The master list of <em>everything</em> that might ever go into the product. Ordered top-to-bottom by priority. Owned and groomed by the PO. Each item is a <span class="term">User Story</span>:</p>
+              <p style="margin-top:8px; padding:8px 10px; background:#fff; border:1px dashed var(--mac-border); border-radius:6px; font-size:14.5px; color:var(--mac-text);"><em>"As a returning customer, I want to save my shipping address, so that checkout is faster next time."</em></p>
+            </div>
+            <div class="card">
+              <div class="ic">📋</div>
+              <h3>Sprint Backlog</h3>
+              <p>The subset of stories the team commits to deliver in <strong>this sprint</strong>, pulled from the top of the Product Backlog during Sprint Planning. <strong>Doesn't change mid-sprint.</strong> Owned by the Dev Team.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📦</div>
+              <h3>Increment</h3>
+              <p>The actual working software produced by the end of the sprint. It must be <span class="term">Done</span> — coded, tested, integrated, potentially shippable. Every sprint produces an Increment, even if the team chooses not to release externally each time.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">A useful analogy</span>
+            <strong>Product Backlog</strong> is the kitchen menu (everything the restaurant <em>could</em> cook). <strong>Sprint Backlog</strong> is tonight's order list (what's actively being cooked right now). <strong>Increment</strong> is the plated meal that goes out to the table.
+          </div>
+        </section>
+
+        <!-- 15. SCRUM CEREMONIES -->
+        <section class="slide">
+          <p class="eyebrow">Four meetings · each with one clear purpose</p>
+          <h2>Scrum Ceremonies</h2>
+          <p class="deep">Scrum has <strong>exactly four meetings</strong>. Every one has a fixed time-box and a fixed goal — if a meeting doesn't fit one of these, it shouldn't exist on a Scrum team's calendar.</p>
+          <div class="cards c4">
+            <div class="card">
+              <span class="lbl-sm">Start of sprint</span>
+              <h3>📅 Sprint Planning</h3>
+              <p><strong>What</strong> will we deliver and <strong>how</strong>? The PO walks through top-priority backlog items; the team estimates and commits. <em>Time-box: ~2 hours per week of sprint length.</em></p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">Every weekday</span>
+              <h3>🌅 Daily Scrum</h3>
+              <p>15 minutes, same time daily, often standing up. Each dev answers three questions: (1) <em>What did I do yesterday?</em> (2) <em>What will I do today?</em> (3) <em>Any blockers?</em> A team sync — not a status report to a manager.</p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">End of sprint</span>
+              <h3>🎬 Sprint Review</h3>
+              <p><strong>Demo</strong> the working Increment to stakeholders. They give feedback that flows back into the Product Backlog. <em>Time-box: ~1 hour per week of sprint length.</em></p>
+            </div>
+            <div class="card">
+              <span class="lbl-sm">Right after Review</span>
+              <h3>🪞 Sprint Retrospective</h3>
+              <p><strong>Inward-looking.</strong> What went well? What didn't? What will we change next sprint? <strong>Team only, no outsiders.</strong> <em>Time-box: ~45 min per week of sprint length.</em></p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">The most common confusion in this slide</span>
+            <strong>Sprint Review</strong> = look <em>outward</em> at the product, with stakeholders. <strong>Sprint Retrospective</strong> = look <em>inward</em> at the process, with the team only. People mix these up — they're very different meetings with very different audiences and very different outputs.
+          </div>
+        </section>
+
+        <!-- 16. STORY POINTS & PLANNING POKER -->
+        <section class="slide">
+          <p class="eyebrow">How Scrum teams estimate work</p>
+          <h2>Story Points &amp; Planning Poker</h2>
+          <p class="deep">"How big is this story?" Not in hours — in <span class="term">Story Points</span>. Story points are a <strong>relative size</strong>: a 3-point story is roughly three times the effort of a 1-point story. Why relative? Because humans are bad at absolute time estimates but reasonable at comparing two things side-by-side.</p>
+          <p style="text-align:center; margin-top:14px; color:var(--mac-text-muted); font-size:15px;">The Fibonacci scale — gaps widen as size grows, reflecting growing uncertainty</p>
+          <div class="sp-chips">
+            <div class="sp-chip">1</div>
+            <div class="sp-chip">2</div>
+            <div class="sp-chip">3</div>
+            <div class="sp-chip big">5</div>
+            <div class="sp-chip big">8</div>
+            <div class="sp-chip bigger">13</div>
+            <div class="sp-chip bigger">21</div>
+          </div>
+          <h3 style="margin-top:24px; font-size:19px;">Planning Poker — the estimation game</h3>
+          <div class="vsteps">
+            <div class="vstep">
+              <div class="vn">1</div>
+              <div class="vbody"><div class="vlabel">PO reads the story aloud — team asks clarifying questions.</div></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">2</div>
+              <div class="vbody"><div class="vlabel">Each developer privately picks a card with their point estimate.</div></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">3</div>
+              <div class="vbody"><div class="vlabel">Everyone reveals at the same time — no anchoring on the loudest voice.</div></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">4</div>
+              <div class="vbody"><div class="vlabel">If estimates differ wildly (one says 2, another says 13), the lowest and highest share their reasoning. New context surfaces.</div></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">5</div>
+              <div class="vbody"><div class="vlabel">Re-vote until reasonably converged. The number matters less than the conversation that produced it.</div></div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why this works</span>
+            Planning Poker forces every developer to think about every story, prevents the senior-est person from dominating, and surfaces unknown unknowns. A wide spread of votes is a <em>feature</em> — it means the team doesn't yet share the same picture, and you need to talk about that <strong>before</strong> committing.
+          </div>
+        </section>
+
+        <!-- 17. RELATIVE vs TIME -->
+        <section class="slide">
+          <p class="eyebrow">The reason story points beat "give me the hours"</p>
+          <h2>Why relative estimation &gt; time estimation</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>⏱️ Time estimates (hours / days)</h3>
+              <ul style="font-size:15px; padding-left:20px;">
+                <li>Different devs work at different speeds — same task, different hours from different people.</li>
+                <li>Anchor to the past ("last time it took 4 hours") — but the last time isn't this time.</li>
+                <li>Implicitly commits to a deadline — and management treats the estimate as a promise.</li>
+                <li>Psychologically harder than comparing two stories side-by-side.</li>
+                <li>Inflates under social pressure ("I'll say 6 hours to be safe").</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>📐 Story points (relative)</h3>
+              <ul style="font-size:15px; padding-left:20px;">
+                <li>Team-relative scale — same people estimate, same team interprets.</li>
+                <li>Captures complexity + risk + effort, not just clock time.</li>
+                <li>Over 3–4 sprints, the team's <strong>velocity</strong> (avg. points completed per sprint) becomes a reliable forecasting tool.</li>
+                <li>Decouples size from delivery date — the date is a function of <em>size ÷ velocity</em>.</li>
+                <li>Easier for new joiners to plug into ("this feels like that 5-point one we did last sprint").</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The honest forecast</span>
+            After 3–4 sprints the team has a stable <span class="term">velocity</span>. Then <em>"we have 60 points left, velocity is ~20, that's about 3 sprints"</em> is a far more honest forecast than asking <em>"how many hours?"</em> — and it gets sharper with every sprint.
+          </div>
+        </section>
+
+        <!-- 18. BURNDOWN CHART -->
+        <section class="slide">
+          <p class="eyebrow">The team's daily progress radar</p>
+          <h2>Sprint Burndown Chart</h2>
+          <p class="deep">The Sprint Burndown shows <strong>how much work remains</strong> each day of a sprint. <span class="term">Y-axis</span> = remaining work (in story points or task-hours). <span class="term">X-axis</span> = sprint days. It's updated daily, usually at the standup.</p>
+          <div class="burndown">
+            <svg viewBox="0 0 640 280" xmlns="http://www.w3.org/2000/svg">
+              <!-- axes -->
+              <line x1="60" y1="20" x2="60" y2="240" stroke="#6e6e73" stroke-width="1.5"/>
+              <line x1="60" y1="240" x2="610" y2="240" stroke="#6e6e73" stroke-width="1.5"/>
+              <!-- Y-axis grid + labels -->
+              <line x1="60" y1="20" x2="610" y2="20" stroke="#d2d2d7" stroke-width="0.5"/>
+              <line x1="60" y1="76" x2="610" y2="76" stroke="#d2d2d7" stroke-width="0.5"/>
+              <line x1="60" y1="132" x2="610" y2="132" stroke="#d2d2d7" stroke-width="0.5"/>
+              <line x1="60" y1="188" x2="610" y2="188" stroke="#d2d2d7" stroke-width="0.5"/>
+              <text x="50" y="24" text-anchor="end" font-size="11" fill="#6e6e73">40</text>
+              <text x="50" y="80" text-anchor="end" font-size="11" fill="#6e6e73">30</text>
+              <text x="50" y="136" text-anchor="end" font-size="11" fill="#6e6e73">20</text>
+              <text x="50" y="192" text-anchor="end" font-size="11" fill="#6e6e73">10</text>
+              <text x="50" y="244" text-anchor="end" font-size="11" fill="#6e6e73">0</text>
+              <text x="20" y="130" font-size="12" fill="#6e6e73" transform="rotate(-90 20,130)">Story points remaining</text>
+              <!-- X-axis labels (days 1..10) -->
+              <text x="60"  y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D1</text>
+              <text x="115" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D2</text>
+              <text x="170" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D3</text>
+              <text x="225" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D4</text>
+              <text x="280" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D5</text>
+              <text x="335" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D6</text>
+              <text x="390" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D7</text>
+              <text x="445" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D8</text>
+              <text x="500" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D9</text>
+              <text x="555" y="258" font-size="11" fill="#6e6e73" text-anchor="middle">D10</text>
+              <!-- Ideal line: 40 → 0 over 10 days -->
+              <line x1="60" y1="20" x2="555" y2="240" stroke="#6e6e73" stroke-width="2" stroke-dasharray="6 4"/>
+              <text x="320" y="135" font-size="11" fill="#6e6e73" transform="rotate(-23 320,135)">Ideal</text>
+              <!-- Actual line: jagged, slightly behind then catching up -->
+              <polyline fill="none" stroke="#00c7be" stroke-width="3"
+                        points="60,20 115,38 170,72 225,94 280,124 335,150 390,168 445,182 500,210 555,240"/>
+              <!-- Dots at each data point -->
+              <circle cx="60"  cy="20"  r="3.5" fill="#00c7be"/>
+              <circle cx="115" cy="38"  r="3.5" fill="#00c7be"/>
+              <circle cx="170" cy="72"  r="3.5" fill="#00c7be"/>
+              <circle cx="225" cy="94"  r="3.5" fill="#00c7be"/>
+              <circle cx="280" cy="124" r="3.5" fill="#00c7be"/>
+              <circle cx="335" cy="150" r="3.5" fill="#00c7be"/>
+              <circle cx="390" cy="168" r="3.5" fill="#00c7be"/>
+              <circle cx="445" cy="182" r="3.5" fill="#00c7be"/>
+              <circle cx="500" cy="210" r="3.5" fill="#00c7be"/>
+              <circle cx="555" cy="240" r="3.5" fill="#00c7be"/>
+            </svg>
+            <div class="bd-legend">
+              <div class="key"><span class="swatch" style="background:#6e6e73; height:2px; border-top:2px dashed #6e6e73;"></span> Ideal burndown</div>
+              <div class="key"><span class="swatch" style="background:#00c7be;"></span> Actual remaining work</div>
+            </div>
+          </div>
+          <div class="cards c3" style="margin-top:18px;">
+            <div class="card">
+              <div class="ic">✅</div>
+              <h3>On track</h3>
+              <p>The actual line hugs the ideal. Healthy sprint — keep doing what you're doing.</p>
+            </div>
+            <div class="card">
+              <div class="ic">⚠️</div>
+              <h3>Behind</h3>
+              <p>Actual sits consistently <em>above</em> the ideal. Risk of not finishing — discuss in standup, consider de-scoping a story.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🚀</div>
+              <h3>Ahead</h3>
+              <p>Actual sits <em>below</em> the ideal. Either we over-estimated (calibrate next sprint) or we can pull in extra work.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The chart is a conversation, not a verdict</span>
+            A line going the wrong way means <strong>talk about it now</strong>, not push harder in silence. The point of the burndown is to give the team enough information mid-sprint to course-correct — not to grade them at the end.
+          </div>
+        </section>
+
+        <!-- 19. SCRUM LIFECYCLE RECAP DIAGRAM -->
+        <section class="slide">
+          <p class="eyebrow">All of Scrum in one picture</p>
+          <h2>The Scrum lifecycle — who does what, when</h2>
+          <p class="deep">Point to this slide at the end and you should be able to locate every concept we covered today. Each box is tagged with who owns that step.</p>
+          <div class="sprint-loop" style="max-width: 900px;">
+            <div class="stage-row" style="margin-bottom:10px;">
+              <div class="sl-box" style="background:#fff6ea; border-color:#ff9f0a; color:#b8860b;">
+                📚 Product Backlog
+                <span class="sm" style="color:#b8860b; font-weight:500; font-size:11.5px;">groomed by Product Owner</span>
+              </div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box">
+                📅 Sprint Planning
+                <span class="sm" style="color:#00827b; font-weight:500; font-size:11.5px;">whole team — pick top stories</span>
+              </div>
+            </div>
+            <div class="stage-row" style="margin-bottom:10px;">
+              <div class="sl-box sprint" style="min-width:340px;">
+                🏃 Sprint (1–4 weeks)<br>
+                <span style="font-size:12.5px; font-weight:500; color:#1a9e34;">Dev Team builds the Increment · Daily Scrum every day · Scrum Master removes blockers</span>
+              </div>
+            </div>
+            <div class="stage-row">
+              <div class="sl-box review">
+                🎬 Sprint Review
+                <span class="sm" style="color:#b8860b; font-weight:500; font-size:11.5px;">team + stakeholders</span>
+              </div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box retro">
+                🪞 Sprint Retrospective
+                <span class="sm" style="color:#5e5ce6; font-weight:500; font-size:11.5px;">team-only — improve the process</span>
+              </div>
+              <span class="sl-arrow">&#8594;</span>
+              <div class="sl-box" style="background:#fff6ea; border-color:#ff9f0a; color:#b8860b;">
+                📚 Backlog updated
+                <span class="sm" style="color:#b8860b; font-weight:500; font-size:11.5px;">PO incorporates feedback</span>
+              </div>
+            </div>
+            <div class="sl-loop-back">⤴ &nbsp; and the next Sprint Planning starts &nbsp; ⤴</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The one-line takeaway</span>
+            Every artifact, every meeting, every story point, every line on the burndown — all serve one purpose: <strong>deliver working software, learn from it, do better next time.</strong>
+          </div>
+        </section>
+
+        <!-- 20. RECAP / CHEAT SHEET -->
+        <section class="slide">
+          <p class="eyebrow">Walk out of this session knowing these</p>
+          <h2>Session recap &amp; cheat sheet</h2>
+          <p class="deep">Sixteen terms cover ~95% of the Agile / Scrum vocabulary you'll meet in interviews, standups and code reviews. If you can give a one-sentence definition for each of these, you're set.</p>
+          <div class="anno-grid">
+            <div class="anno-cell"><span class="ac-tag">Sprint</span><span class="ac-def">Fixed-length iteration, usually 2 weeks.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Product Backlog</span><span class="ac-def">Prioritised master list of all work, owned by the PO.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Sprint Backlog</span><span class="ac-def">Work committed for the current sprint.</span></div>
+            <div class="anno-cell"><span class="ac-tag">User Story</span><span class="ac-def">"As a __, I want __, so that __."</span></div>
+            <div class="anno-cell"><span class="ac-tag">Story Point</span><span class="ac-def">Relative size estimate on the Fibonacci scale.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Velocity</span><span class="ac-def">Story points completed per sprint, averaged.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Increment</span><span class="ac-def">"Done", potentially shippable output of a sprint.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Product Owner</span><span class="ac-def">Owns the WHAT — the backlog and its priorities.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Scrum Master</span><span class="ac-def">Owns the HOW — process, blockers, ceremonies.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Dev Team</span><span class="ac-def">Owns the DOING — cross-functional, self-organising.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Sprint Planning</span><span class="ac-def">Kick-off meeting — pick stories for the sprint.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Daily Scrum</span><span class="ac-def">15-min daily sync — three questions, no status report.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Sprint Review</span><span class="ac-def">Demo to stakeholders — outward-looking.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Retrospective</span><span class="ac-def">Team-only process review — inward-looking.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Burndown Chart</span><span class="ac-def">Daily remaining-work tracker for the sprint.</span></div>
+            <div class="anno-cell"><span class="ac-tag">Planning Poker</span><span class="ac-def">Relative-estimate exercise using Fibonacci cards.</span></div>
+          </div>
+          <h3 style="margin-top:22px; font-size:19px;">You should now be able to…</h3>
+          <ul class="checklist">
+            <li>Explain why Waterfall struggles with most modern software.</li>
+            <li>Name the four Agile Manifesto values from memory.</li>
+            <li>Name Scrum's three roles, three artifacts, and four ceremonies.</li>
+            <li>Walk through how Story Points + Planning Poker work.</li>
+            <li>Read a Burndown Chart and say whether the sprint is on, behind, or ahead.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Coming up next</span>
+            That's the theory — the part you'll be tested on. In the workplace, you'll see all of this come to life inside <strong>Jira</strong> (or Azure DevOps): the backlog is a board, the sprint is a swimlane, stories carry points, and the burndown is generated for you. Same vocabulary, just rendered in a UI.
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Process · Agile &amp; Scrum</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 20</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
