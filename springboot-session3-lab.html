@@ -552,7 +552,7 @@
           <div class="exp-body">
             <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>1 · Project setup done</strong> — new project with Web, JPA, H2, DevTools &amp; Lombok; <code>application.properties</code> configured.</span></label>
+              <span class="ctext"><strong>1 · Project setup done</strong> — new project with Web, JPA, H2 &amp; DevTools; <code>application.properties</code> configured.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext"><strong>2 · Entity + Repository created</strong> — <code>Post</code> entity and <code>PostRepository</code> compile.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
@@ -581,7 +581,7 @@
             <label class="check">
               <input type="checkbox" class="prereq" />
               <span class="ctext"><strong>A Spring Boot project</strong> — a fresh one (we create it in Setup below), or build on top of your Session 2 <code>student-api</code> project
-                <span class="verify">A fresh project is cleanest for today since we're introducing JPA, H2 and Lombok together.</span>
+                <span class="verify">A fresh project is cleanest for today since we're introducing JPA and H2 together.</span>
               </span>
             </label>
             <label class="check">
@@ -592,15 +592,16 @@
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Annotation processing enabled</strong> for Lombok
-                <span class="verify">IntelliJ: Settings → Build → Compiler → Annotation Processors → Enable. Eclipse: install the Lombok plugin. Without this, getters/setters won't resolve.</span>
+              <span class="ctext"><strong>JDK 17 &amp; an IDE</strong> (IntelliJ or Eclipse) you can generate getters/setters in
+                <span class="verify">You'll use the IDE's <em>Generate → Getters and Setters</em> feature on the Entity and DTO — IntelliJ: <code>Alt+Insert</code>; Eclipse: right-click → Source.</span>
               </span>
             </label>
             <div class="observe">
-              <span class="lbl">Why Lombok needs a one-time IDE step</span>
-              Lombok generates code during compilation through <strong>annotation processing</strong>. If that's off, your
-              IDE doesn't know about the generated <code>getTitle()</code>/<code>setTitle()</code> methods and shows red
-              errors — even though the project compiles fine with Maven. Turn it on once and the errors disappear.
+              <span class="lbl">Why getters &amp; setters matter</span>
+              The Entity and DTO have <strong>private</strong> fields, so Jackson (JSON) and JPA can only reach them
+              through public <code>getTitle()</code>/<code>setTitle()</code> methods. Missing accessors are the number-one
+              cause of "my JSON comes back empty" later on. Let the IDE generate them the moment you create each class —
+              it takes seconds and needs no extra library.
             </div>
           </div>
         </details>
@@ -626,10 +627,9 @@
                   <li><code>Spring Data JPA</code> (<code>spring-boot-starter-data-jpa</code>)</li>
                   <li><code>H2 Database</code> (<code>h2</code>)</li>
                   <li><code>Spring Boot DevTools</code> (<code>spring-boot-devtools</code>)</li>
-                  <li><code>Lombok</code> (<code>lombok</code>)</li>
                 </ul>
               </li>
-              <li><strong>Generate, unzip, open in your IDE</strong>, then enable annotation processing for Lombok (see pre-requisites).</li>
+              <li><strong>Generate, unzip, open in your IDE.</strong></li>
               <li><strong>Configure</strong> <code>src/main/resources/application.properties</code> with the block below.</li>
             </ol>
             <div class="codewrap"><pre><code>spring.datasource.url=jdbc:h2:mem:testdb
@@ -655,7 +655,7 @@ spring.jpa.hibernate.ddl-auto=update</code></pre></div>
               The app starts with no errors. The console shows Hibernate booting and the line about the H2 console being available. Nothing to test yet — we add the entity next.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Project created with all five dependencies and <code>application.properties</code> filled in; the app starts cleanly.</span></label>
+              <span class="ctext">Project created with all four dependencies and <code>application.properties</code> filled in; the app starts cleanly.</span></label>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
@@ -665,9 +665,9 @@ spring.jpa.hibernate.ddl-auto=update</code></pre></div>
                   <td>Make sure the H2 dependency is present and the <code>spring.datasource.*</code> lines are in <code>application.properties</code>.</td>
                 </tr>
                 <tr>
-                  <td>Lombok getters/setters show as errors in the IDE</td>
-                  <td>Annotation processing is off.</td>
-                  <td>Enable it (IntelliJ) or install the Lombok plugin (Eclipse), then rebuild.</td>
+                  <td>JSON response is empty / incoming fields are all <code>null</code></td>
+                  <td>The Entity or DTO is missing getters/setters.</td>
+                  <td>Generate them in the IDE (IntelliJ <code>Alt+Insert</code>; Eclipse → Source → Generate Getters and Setters), then rebuild.</td>
                 </tr>
               </tbody>
             </table>
@@ -687,7 +687,8 @@ spring.jpa.hibernate.ddl-auto=update</code></pre></div>
               <span class="lbl">Concept</span>
               An <strong>Entity</strong> is a Java class mapped to a database table. <code>@Entity</code> marks it,
               <code>@Id</code> marks the primary key, and <code>@GeneratedValue</code> lets the database auto-number it.
-              <code>@Data</code> (Lombok) writes all the getters and setters for us.
+              The fields are <code>private</code>, so we add <strong>getters and setters</strong> (let the IDE generate them) —
+              JPA and Jackson both need them.
             </div>
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
@@ -709,11 +710,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
 
 @Entity
 @Table(name = "posts")
-@Data                                <span class="code-comment">// Lombok: getters, setters, toString, equals, hashCode</span>
 public class Post {
 
     @Id
@@ -723,12 +722,26 @@ public class Post {
     private String title;
     private String description;
     private String content;
+
+    <span class="code-comment">// Getters and setters — generate these in your IDE</span>
+    <span class="code-comment">// (IntelliJ: Alt+Insert · Eclipse: Source → Generate Getters and Setters)</span>
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }</code></pre></div>
             <div class="observe">
-              <span class="lbl">What @Data buys you</span>
-              Lombok's <code>@Data</code> generates all getters, setters, <code>equals()</code>, <code>hashCode()</code>
-              and <code>toString()</code>. You write the four fields — Lombok writes the rest. That's ~40 lines you
-              don't have to type or maintain.
+              <span class="lbl">Don't type the accessors by hand</span>
+              You write the four fields, then let the IDE generate the getters and setters: IntelliJ
+              <code>Alt+Insert</code> → <em>Getter and Setter</em>; Eclipse right-click → <em>Source → Generate Getters
+              and Setters</em>. JPA and Jackson both drive the class through these methods, so they must be present.
             </div>
             <div class="expected">
               <span class="lbl">Expected</span>
@@ -739,9 +752,9 @@ public class Post {
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
                 <tr>
-                  <td><code>@Data</code> not resolving / "cannot find symbol getTitle()"</td>
-                  <td>Annotation processing not enabled in the IDE.</td>
-                  <td><strong>IntelliJ:</strong> Settings → Build, Execution, Deployment → Compiler → Annotation Processors → tick "Enable annotation processing". <strong>Eclipse:</strong> install lombok.jar (run it, point it at your Eclipse) and restart.</td>
+                  <td>"cannot find symbol getTitle()" in the service later</td>
+                  <td>Getters/setters were never added to the Entity.</td>
+                  <td>Generate them: <strong>IntelliJ</strong> <code>Alt+Insert</code> → Getter and Setter; <strong>Eclipse</strong> right-click → Source → Generate Getters and Setters.</td>
                 </tr>
                 <tr>
                   <td>Import errors on <code>javax.persistence.*</code></td>
@@ -809,7 +822,8 @@ public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
             <div class="concept">
               <span class="lbl">Concept</span>
               The <strong>DTO</strong> carries data between the client and the service. Same fields as the entity, but
-              <em>no</em> JPA annotations — it's never mapped to the database. Just <code>@Data</code> from Lombok.
+              <em>no</em> JPA annotations — it's never mapped to the database. Add getters and setters (generate them in
+              your IDE) so Jackson can read and write it.
             </div>
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
@@ -824,15 +838,25 @@ public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
             <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/dto/PostDTO.java</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.dto;
 
-import lombok.Data;
-
-@Data
 public class PostDTO {
 
     private Long id;
     private String title;
     private String description;
     private String content;
+
+    <span class="code-comment">// Getters and setters — generate these in your IDE</span>
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }</code></pre></div>
             <div class="concept">
               <span class="lbl">PostDTO vs Post — same fields, different purpose</span>
@@ -1330,11 +1354,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
 
 @Entity
 @Table(name = "posts")
-@Data
 public class Post {
 
     @Id
@@ -1344,20 +1366,41 @@ public class Post {
     private String title;
     private String description;
     private String content;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }</code></pre></div>
 
             <h3>2 · PostDTO.java</h3>
             <div class="codewrap"><pre><code>package com.tcs.training.dto;
 
-import lombok.Data;
-
-@Data
 public class PostDTO {
 
     private Long id;
     private String title;
     private String description;
     private String content;
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 }</code></pre></div>
 
             <h3>3 · ResourceNotFoundException.java</h3>
@@ -1532,7 +1575,7 @@ public class PostController {
             <thead><tr><th>Item</th><th>What it is</th><th>Key point</th></tr></thead>
             <tbody>
               <tr><td><code>DTO</code></td><td>Plain Java class for data transfer</td><td>No JPA annotations; shapes the API response</td></tr>
-              <tr><td><code>@Data</code></td><td>Lombok annotation</td><td>Generates getters, setters, equals, hashCode, toString</td></tr>
+              <tr><td>Getters/setters</td><td>Field accessor methods</td><td>Required by Jackson (JSON) and JPA; generate them in your IDE</td></tr>
               <tr><td><code>@ResponseStatus</code></td><td>Method/Class annotation</td><td>Sets the HTTP status code on the response</td></tr>
               <tr><td><code>orElseThrow()</code></td><td>Optional method</td><td>Throws an exception if the value is absent</td></tr>
               <tr><td><code>ResourceNotFoundException</code></td><td>Custom RuntimeException</td><td>Returns 404 with a custom message</td></tr>
