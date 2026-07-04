@@ -687,7 +687,7 @@ public UserDTO getUser(@PathVariable Long id) {
             </thead>
             <tbody>
               <tr><td><strong>Where it lives</strong></td><td>Mapped to a database table</td><td class="hl">Travels between client and service</td></tr>
-              <tr><td><strong>Annotations</strong></td><td><code>@Entity</code>, <code>@Id</code>, <code>@GeneratedValue</code> (JPA)</td><td class="hl">None from JPA — just <code>@Data</code></td></tr>
+              <tr><td><strong>Annotations</strong></td><td><code>@Entity</code>, <code>@Id</code>, <code>@GeneratedValue</code> (JPA)</td><td class="hl">None from JPA — a plain class with getters/setters</td></tr>
               <tr><td><strong>Exposure</strong></td><td>Internal — never sent to clients</td><td class="hl">External-facing — this is what clients see</td></tr>
               <tr><td><strong>Contains</strong></td><td>All columns, even sensitive/internal ones</td><td class="hl">Only the fields the client needs</td></tr>
             </tbody>
@@ -697,7 +697,6 @@ public UserDTO getUser(@PathVariable Long id) {
               <h3 style="color:var(--mac-accent);">Post.java (Entity)</h3>
               <pre><code>@Entity
 @Table(name = "posts")
-@Data
 public class Post {
     @Id
     @GeneratedValue(strategy =
@@ -706,12 +705,14 @@ public class Post {
     private String title;
     private String description;
     private String content;
+
+    <span class="code-comment">// + getters and setters</span>
+    <span class="code-comment">// (generate in your IDE)</span>
 }</code></pre>
             </div>
             <div class="panel">
               <h3 style="color:var(--mac-accent);">PostDTO.java (DTO)</h3>
-              <pre><code>@Data
-public class PostDTO {
+              <pre><code>public class PostDTO {
 
     private Long id;
     private String title;
@@ -719,7 +720,7 @@ public class PostDTO {
     private String content;
 
     <span class="code-comment">// No JPA annotations.</span>
-    <span class="code-comment">// Just a plain carrier.</span>
+    <span class="code-comment">// + getters and setters.</span>
 }</code></pre>
             </div>
           </div>
@@ -773,25 +774,36 @@ private Post mapToEntity(PostDTO dto) {
           </div>
         </section>
 
-        <!-- 9. LOMBOK -->
+        <!-- 9. GETTERS, SETTERS & CONSTRUCTORS -->
         <section class="slide">
-          <p class="eyebrow">Stop writing boilerplate</p>
-          <h2>Lombok</h2>
-          <p class="deep"><strong>Lombok</strong> is a library that generates repetitive Java code for you at compile time. Instead of hand-writing getters, setters, constructors and <code>toString()</code> on every class, you add one annotation and Lombok writes them. We'll use it on both our Entity and our DTO.</p>
-          <table class="cmp">
-            <thead>
-              <tr><th>Annotation</th><th>What it generates</th></tr>
-            </thead>
-            <tbody>
-              <tr><td class="hl"><code>@Data</code></td><td>Getters, setters, <code>toString()</code>, <code>equals()</code> and <code>hashCode()</code> — the all-in-one workhorse.</td></tr>
-              <tr><td class="hl"><code>@AllArgsConstructor</code></td><td>A constructor taking <strong>every</strong> field as an argument.</td></tr>
-              <tr><td class="hl"><code>@NoArgsConstructor</code></td><td>An empty constructor — JPA and Jackson both need one.</td></tr>
-              <tr><td class="hl"><code>@Builder</code></td><td>The builder pattern: <code>Post.builder().title("...").build()</code>.</td></tr>
-            </tbody>
-          </table>
+          <p class="eyebrow">The boilerplate every class needs</p>
+          <h2>Getters, Setters &amp; Constructors</h2>
+          <p class="deep">Both our Entity and our DTO are plain Java classes with <strong>private</strong> fields — and <em>private</em> means nothing outside the class can touch them directly. So for anything else to read or write a field, we give it a pair of small methods: a <strong>getter</strong> that returns the value and a <strong>setter</strong> that changes it. This is standard Java boilerplate — and two frameworks depend on it completely:</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🔄</div>
+              <h3>Jackson (JSON)</h3>
+              <p>Serialises objects to JSON and back <em>through these methods</em>. It calls <code>getTitle()</code> to build the <code>"title"</code> key, and <code>setTitle(...)</code> to fill the object from an incoming request.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🗃️</div>
+              <h3>JPA / Hibernate</h3>
+              <p>Needs a <strong>no-argument constructor</strong> plus getters and setters to load rows into your Entity and save them back. No accessors → no persistence.</p>
+            </div>
+          </div>
           <div class="panels" style="margin-top:16px;">
             <div class="panel bad">
-              <h3>✗ Without Lombok (~30 lines)</h3>
+              <h3>✗ Fields only — Jackson can't read them</h3>
+              <pre><code>public class Post {
+    private Long id;
+    private String title;
+    <span class="code-comment">// no getters/setters →</span>
+    <span class="code-comment">// JSON comes back empty,</span>
+    <span class="code-comment">// incoming data never binds</span>
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ With getters &amp; setters</h3>
               <pre><code>public class Post {
     private Long id;
     private String title;
@@ -803,28 +815,15 @@ private Post mapToEntity(PostDTO dto) {
     public String getTitle() {
         return title;
     }
-    public void setTitle(String t) {
-        this.title = t;
+    public void setTitle(String title) {
+        this.title = title;
     }
-    <span class="code-comment">// ...and on, and on...</span>
 }</code></pre>
             </div>
-            <div class="panel good">
-              <h3>✓ With Lombok (5 lines)</h3>
-              <pre><code>@Data
-public class Post {
-    private Long id;
-    private String title;
-}
-
-<span class="code-comment">// @Data generates all the</span>
-<span class="code-comment">// getters, setters, equals,</span>
-<span class="code-comment">// hashCode and toString.</span></code></pre>
-            </div>
           </div>
-          <div class="warnbox">
-            <span class="lbl">IDE setup gotcha</span>
-            Lombok works through <strong>annotation processing</strong>. If your IDE shows "cannot find method getTitle()", you simply need to <strong>enable annotation processing</strong> (IntelliJ) or install the Lombok plugin (Eclipse). The code is correct — the IDE just hasn't been told to run Lombok yet.
+          <div class="keybox">
+            <span class="lbl">Let your IDE write them — one click, no library</span>
+            You never type these by hand. <strong>IntelliJ:</strong> <code>Alt+Insert</code> → <em>Getter and Setter</em> → tick all fields. <strong>Eclipse:</strong> right-click → <em>Source → Generate Getters and Setters</em>. <strong>VS Code:</strong> right-click → <em>Source Action</em>. Four fields become eight methods in seconds — no extra dependency, works on any machine.
           </div>
         </section>
 
@@ -1119,7 +1118,7 @@ spring.security.user.password=admin123
           </ul>
           <div class="anno-grid" style="margin-top:18px;">
             <div class="anno-cell"><span class="ac-tag">@Entity</span><span class="ac-def">Marks a class as a database table (JPA).</span></div>
-            <div class="anno-cell"><span class="ac-tag">@Data</span><span class="ac-def">Lombok — generates getters, setters, toString, equals, hashCode.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">Marks the web layer; each method returns data straight as the HTTP response body.</span></div>
             <div class="anno-cell"><span class="ac-tag">@Repository</span><span class="ac-def">Marks the data-access layer; gives CRUD with no boilerplate.</span></div>
             <div class="anno-cell"><span class="ac-tag">@Service</span><span class="ac-def">Marks the business-logic layer; managed by Spring.</span></div>
             <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span><span class="ac-def">Sets the HTTP status code for a response or exception.</span></div>
