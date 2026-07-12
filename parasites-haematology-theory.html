@@ -1,0 +1,1866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parasites in Haematology — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — shared byte-identically with the
+      other TCS_Sessions theory decks (jdbc-theory.html etc.).
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .dangerbox {
+      border-left: 4px solid var(--tl-red);
+      background: rgba(255,95,87,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .dangerbox .lbl { font-weight: 700; color: var(--tl-red); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+    .card code { font-family: var(--mac-mono); font-size: 13.5px; color: var(--mac-accent); }
+
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 7px 0;
+      background: #fafafc;
+      font-size: 16.5px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 15.5px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 9px 12px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 13.5px; }
+
+    .sbadge { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .sbadge.dead { background: rgba(255,95,87,0.15); color: var(--tl-red); }
+    .sbadge.rare { background: rgba(254,188,46,0.18); color: #b8860b; }
+    .sbadge.legacy { background: rgba(142,142,147,0.18); color: #6e6e73; }
+    .sbadge.current { background: rgba(40,200,64,0.16); color: #1a9e34; }
+
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* --- Medical-figure additions (SVG schematics) --- */
+    .figure { text-align: center; margin: 16px 0; }
+    .figure svg { max-width: 100%; height: auto; }
+    .figcap { font-size: 13.5px; color: var(--mac-text-muted); font-style: italic; margin-top: 8px; }
+    .svg-card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #fafafc;
+      padding: 16px 18px;
+      margin-top: 14px;
+    }
+    .svg-card h3 { margin: 0 0 4px; font-size: 16px; text-align: center; }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; justify-content: center; margin-top: 10px; font-size: 13.5px; color: var(--mac-text-muted); }
+    .legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+    .ref-list { margin-top: 12px; }
+    .ref-list li { font-size: 15.5px; margin: 6px 0; }
+    .src-note { font-size: 13px; color: var(--mac-text-muted); margin-top: 6px; font-style: italic; }
+
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">parasites-haematology-theory.html — Blood &amp; Marrow Parasites for Pathology Residents</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Clinical Pathology · Haematology</span>
+            <h1>Parasites in Haematology</h1>
+            <div class="sub">A morphology-first tour of the parasites a pathologist meets on the peripheral blood film, buffy coat and bone marrow — malaria, babesia, microfilariae, trypanosomes and leishmania — with the diagnostic reasoning to tell them apart.</div>
+            <div class="meta">Presenter: __________ &nbsp;&nbsp;•&nbsp;&nbsp; Pathology Residency Teaching &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">The peripheral blood film is one of the few places in medicine where you can see the pathogen <em>and</em> make the diagnosis in the same glance. This session builds the systematic eye a pathologist needs: how to prepare and stain the film, where each organism hides, and — most importantly — the morphological features that separate look-alikes under oil immersion.</p>
+          <ul class="agenda">
+            <li><span class="num">1</span> Films, stains &amp; a diagnostic approach to the blood parasite</li>
+            <li><span class="num">2</span> Malaria — the five <em>Plasmodium</em> species, in depth</li>
+            <li><span class="num">3</span> Babesia — and how not to call it malaria</li>
+            <li><span class="num">4</span> Microfilariae — sheath &amp; tail nuclei as the key</li>
+            <li><span class="num">5</span> Trypanosomes &amp; Leishmania (LD bodies)</li>
+            <li><span class="num">6</span> Parasites that damage blood from a distance</li>
+            <li><span class="num">7</span> Lab methods, reporting, artefacts &amp; references</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            The deck is written to be read on its own afterwards, not just watched — every slide carries its full explanation. Diagrams are <strong>schematic teaching illustrations</strong> drawn to highlight the diagnostic feature; always correlate with a photomicrograph atlas (Bain; CDC DPDx) at the microscope. Content is drawn from standard references listed on the penultimate slide.
+          </div>
+        </section>
+
+        <!-- 3. WHAT ARE HAEMATOLOGICAL PARASITES -->
+        <section class="slide">
+          <p class="eyebrow">Framing the topic</p>
+          <h2>What do we mean by "parasites in haematology"?</h2>
+          <p class="deep">Two overlapping groups of organisms concern the haematologist and the pathologist reporting a blood film:</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🩸</div>
+              <h3>Blood- &amp; marrow-dwelling parasites</h3>
+              <p>Organisms actually <strong>seen</strong> in blood or marrow: <em>Plasmodium</em>, <em>Babesia</em>, microfilariae, <em>Trypanosoma</em>, and <em>Leishmania</em> amastigotes (LD bodies). The film is the diagnostic specimen.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📉</div>
+              <h3>Parasites causing haematological disease</h3>
+              <p>Organisms living elsewhere that produce <strong>blood consequences</strong>: hookworm → iron-deficiency anaemia; <em>Diphyllobothrium</em> → B<sub>12</sub> deficiency; tissue helminths → eosinophilia.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The pathologist's dual role</span>
+            You are asked to do two things: <strong>(1) detect and identify</strong> the organism when it is on the film, and <strong>(2) recognise the blood picture</strong> that should make you <em>suspect</em> a parasite even when none is visible — anaemia, eosinophilia, thrombocytopenia, or an unexplained haemolytic picture in a traveller.
+          </div>
+        </section>
+
+        <!-- 4. WHY IT MATTERS -->
+        <section class="slide">
+          <p class="eyebrow">Clinical significance</p>
+          <h2>Why this matters at the bench</h2>
+          <p class="deep">Blood-film parasitology is high-stakes because the diagnosis is often <strong>time-critical</strong> and the specimen is <strong>you, at the microscope</strong> — there is frequently no second chance if the film is misread.</p>
+          <ul>
+            <li><strong>Malaria is a medical emergency.</strong> <em>P. falciparum</em> can kill within hours; a film reported as "no parasites" that was actually positive is a sentinel event. Species and parasitaemia change management directly.</li>
+            <li><strong>Travel &amp; migration.</strong> Imported malaria, filariasis, trypanosomiasis and leishmaniasis appear in non-endemic labs where the eye is least practised.</li>
+            <li><strong>The film may be the first clue to immunosuppression</strong> — babesiosis in the asplenic patient, disseminated leishmaniasis or toxoplasmosis in HIV/transplant.</li>
+            <li><strong>Incidental findings.</strong> A microfilaria drifting across a routine FBC film, or LD bodies in a marrow done for pancytopenia, can be the whole diagnosis.</li>
+          </ul>
+          <div class="dangerbox">
+            <span class="lbl">The cardinal rule</span>
+            In a febrile patient with any travel or residence in an endemic area, <strong>malaria must be actively excluded</strong> by blood film and/or rapid test. "Not requested" is never an excuse for a missed <em>falciparum</em>.
+          </div>
+        </section>
+
+        <!-- 5. CLASSIFICATION -->
+        <section class="slide">
+          <p class="eyebrow">Getting organised</p>
+          <h2>Classification of haematological parasites</h2>
+          <p class="deep">A working classification the pathologist can carry to the microscope — grouped by kingdom and by <em>where</em> the organism is found on the film:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Group</th><th>Organisms</th><th>Where seen on the film</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><strong>Protozoa — intra-erythrocytic</strong></td><td><em>Plasmodium</em> (5 spp.), <em>Babesia</em></td><td>Inside red cells</td></tr>
+              <tr><td class="hl"><strong>Protozoa — extracellular (plasma)</strong></td><td><em>Trypanosoma brucei</em>, <em>T. cruzi</em></td><td>Free between cells (flagellates)</td></tr>
+              <tr><td class="hl"><strong>Protozoa — intracellular (macrophage)</strong></td><td><em>Leishmania</em> (LD bodies), <em>Toxoplasma</em></td><td>Within macrophages — buffy coat / marrow</td></tr>
+              <tr><td class="hl"><strong>Helminths — in blood</strong></td><td>Microfilariae (<em>Wuchereria, Brugia, Loa, Mansonella</em>)</td><td>Free in plasma, larger than cells</td></tr>
+              <tr><td class="hl"><strong>Helminths — elsewhere, blood effects</strong></td><td>Hookworm, <em>Diphyllobothrium</em>, <em>Trichuris</em></td><td>Not on film — cause anaemia / eosinophilia</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">A useful first split at the scope</span>
+            Ask: is it <strong>inside a red cell</strong> (malaria/babesia), <strong>free and moving between cells</strong> (trypanosome / microfilaria — and note the size), or <strong>inside a macrophage</strong> (leishmania)? That single question routes most of your differential.
+          </div>
+        </section>
+
+        <!-- 6. WHERE PARASITES LIVE (localization) -->
+        <section class="slide">
+          <p class="eyebrow">Anatomical localisation on the specimen</p>
+          <h2>Where to look — and in what</h2>
+          <p class="deep">Matching the organism to the right compartment (and the right specimen) is half the diagnosis. Sensitivity collapses if you look in the wrong place.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Compartment</th><th>Best specimen / method</th><th>Organisms</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Red cell interior</strong></td><td>Thick + thin film (Giemsa)</td><td><em>Plasmodium</em>, <em>Babesia</em></td></tr>
+              <tr><td><strong>Plasma / between cells</strong></td><td>Thin film, wet prep, buffy coat</td><td>Trypomastigotes, microfilariae</td></tr>
+              <tr><td><strong>Leucocytes / macrophages</strong></td><td>Buffy-coat smear, bone marrow, splenic aspirate</td><td><em>Leishmania</em>, <em>Toxoplasma</em>, <em>Histoplasma</em> (mimic)</td></tr>
+              <tr><td><strong>Bone marrow</strong></td><td>Aspirate + trephine, touch imprint</td><td><em>Leishmania</em> (most sensitive after spleen), rarely malaria pigment / haemophagocytosis</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Timing is a specimen variable too</span>
+            <strong>When</strong> you draw blood changes the yield: malaria films are ideally taken during/just after a fever spike and repeated ×3 over 48 h; nocturnally-periodic microfilariae (<em>Wuchereria</em>, <em>Brugia</em>) need a night sample (≈22:00–02:00); <em>Loa loa</em> is diurnal (midday). More on periodicity later.
+          </div>
+        </section>
+
+        <!-- 7. SPECIMEN & COLLECTION -->
+        <section class="slide">
+          <p class="eyebrow">Pre-analytics — where errors begin</p>
+          <h2>The specimen: collection &amp; film-making</h2>
+          <div class="steps3">
+            <div class="step-chip"><div class="stepnum">1</div><h3>Sample</h3><p>Fresh <strong>finger/heel prick</strong> gives the best morphology; EDTA blood is acceptable if films are made promptly (&lt;1 h) — storage distorts parasites and may cause <em>falciparum</em> gametocyte exflagellation.</p></div>
+            <div class="step-chip"><div class="stepnum">2</div><h3>Films</h3><p>Make <strong>both</strong> a thick film (for detection) and a thin film (for species ID) on the same or paired slides. Air-dry thoroughly; never heat-fix a thick film.</p></div>
+            <div class="step-chip"><div class="stepnum">3</div><h3>Stain</h3><p><strong>Giemsa at pH 7.2</strong> is the reference. Correct pH is essential to reveal Schüffner's dots and true parasite colours.</p></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Common pre-analytical pitfalls</span>
+            EDTA that is too old → crenated cells, vacuolated parasites, and platelet clumps that mimic organisms. Wrong stain pH → dots don't appear, leading to species misclassification. Thick films that are too thick or heat-fixed → won't dehaemoglobinise and wash off. A single negative film <strong>does not</strong> exclude malaria.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Golden standard, still</span>
+            Despite antigen tests and PCR, the <strong>Giemsa-stained thick and thin blood film</strong> remains the reference method: it detects, identifies species, and quantifies parasitaemia in one specimen.
+          </div>
+        </section>
+
+
+        <!-- 8. THICK vs THIN FILM -->
+        <section class="slide">
+          <p class="eyebrow">The two-film principle</p>
+          <h2>Thick film vs thin film</h2>
+          <p class="deep">Every parasitology work-up rests on two complementary films. Understand what each is <em>for</em> and you will never rely on the wrong one.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Feature</th><th class="hl">Thick film</th><th class="hl">Thin film</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Purpose</strong></td><td>Detection / screening — is a parasite present?</td><td>Identification — which species, what stage?</td></tr>
+              <tr><td><strong>Blood volume examined</strong></td><td>Large (≈10–20× more) → high sensitivity</td><td>Small → lower sensitivity</td></tr>
+              <tr><td><strong>Fixation</strong></td><td><strong>Not</strong> fixed — RBCs are lysed (dehaemoglobinised)</td><td>Methanol-fixed — RBCs preserved</td></tr>
+              <tr><td><strong>What you see</strong></td><td>Free parasites on a clear background; no intact RBCs</td><td>Parasite <em>within</em> the RBC; RBC size &amp; inclusions visible</td></tr>
+              <tr><td class="good"><strong>Strength</strong></td><td class="good">Finds low parasitaemia (~4× more sensitive)</td><td class="good">Species differentiation &amp; % parasitaemia</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why RBC preservation decides species</span>
+            Species ID depends on <strong>the infected red cell</strong> — is it enlarged? does it have Schüffner's dots? Only the thin film preserves that. The thick film concentrates parasites for detection but destroys the very host-cell clues you need to name the species. Hence: <strong>thick to find, thin to name.</strong>
+          </div>
+        </section>
+
+        <!-- 9. STAINS -->
+        <section class="slide">
+          <p class="eyebrow">Making the invisible visible</p>
+          <h2>Romanowsky stains for blood parasites</h2>
+          <p class="deep">All are Romanowsky (methylene-blue + eosin) stains; the parasite nucleus (chromatin) stains <span style="color:#b3005a;font-weight:700;">red-purple</span> and the cytoplasm <span style="color:#0a84ff;font-weight:700;">blue</span> — the "red dot, blue comma" of a malaria ring.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Stain</th><th>Typical use</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><strong>Giemsa (pH 7.2)</strong></td><td>Reference stain for thick &amp; thin films</td><td>Best for Schüffner's dots &amp; true colour; needs buffered water</td></tr>
+              <tr><td><strong>Field's stain</strong></td><td>Rapid staining of thick films</td><td>Aqueous, ~seconds; ideal for high-throughput screening</td></tr>
+              <tr><td><strong>Leishman</strong></td><td>Routine thin films (methanol-based)</td><td>Common in labs; dots less reliably shown than Giemsa</td></tr>
+              <tr><td><strong>JSB (Jaswant Singh–Bhattacharji)</strong></td><td>Rapid thick-film malaria surveys</td><td>Two-solution method used widely in endemic-area programmes</td></tr>
+              <tr><td><strong>Wright / Wright–Giemsa</strong></td><td>Automated haematology stainers</td><td>Fine for detection; dots may be under-stained</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">pH is not a detail</span>
+            At acidic pH, Schüffner's dots fail to appear and a <em>vivax</em>/<em>ovale</em> infection can be mis-called. <strong>Buffer water to pH 7.0–7.2</strong> for any film where species matters.
+          </div>
+        </section>
+
+        <!-- 10. DIAGNOSTIC APPROACH FLOWCHART -->
+        <section class="slide">
+          <p class="eyebrow">A systematic eye</p>
+          <h2>Approach to a possible parasite on the film</h2>
+          <p class="deep">When something "extra" is on the film, work through this decision tree rather than guessing:</p>
+          <div class="flow vert" style="max-width:720px;margin:12px auto;">
+            <div class="flow-box" style="min-width:420px;">Abnormal structure seen on film<span class="sm">at ×100 oil, on a well-stained thin film</span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box alt" style="min-width:420px;">Is it inside a red cell?</div>
+            <div class="flow" style="justify-content:center;gap:14px;">
+              <div class="flow-box green">YES → intra-RBC<span class="sm">ring/pigment? malaria · tetrads/no pigment? Babesia</span></div>
+              <div class="flow-box amber">NO → extracellular<span class="sm">next question ↓</span></div>
+            </div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box alt" style="min-width:420px;">Is it much larger than a cell &amp; worm-like?</div>
+            <div class="flow" style="justify-content:center;gap:14px;">
+              <div class="flow-box green">YES → microfilaria<span class="sm">assess sheath + tail nuclei</span></div>
+              <div class="flow-box warn">NO → flagellate<span class="sm">trypomastigote (kinetoplast + undulating membrane)</span></div>
+            </div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box" style="min-width:420px;">Inside a macrophage on buffy coat / marrow? → <em>Leishmania</em> LD bodies</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Always confirm, then quantify &amp; report</span>
+            Confirm species on the thin film, <strong>quantify</strong> parasitaemia if malaria/babesia, exclude artefacts (next-door platelet, stain debris), and escalate malaria as a critical result.
+          </div>
+        </section>
+
+        <!-- 11. MALARIA OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Section 2 · Malaria</p>
+          <h2>Malaria — the organism &amp; the burden</h2>
+          <p class="deep">Malaria is caused by the apicomplexan protozoan <em>Plasmodium</em>, transmitted by the female <em>Anopheles</em> mosquito. Five species infect humans:</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🅵</div><h3><em>P. falciparum</em></h3><p>Most lethal; cerebral &amp; severe malaria; high parasitaemia. Predominant in sub-Saharan Africa.</p></div>
+            <div class="card"><div class="ic">🆅</div><h3><em>P. vivax</em></h3><p>Widest geographic range; <strong>relapses</strong> from dormant liver hypnozoites.</p></div>
+            <div class="card"><div class="ic">🅾</div><h3><em>P. ovale</em></h3><p>West Africa; also relapses (hypnozoites); mild.</p></div>
+            <div class="card"><div class="ic">🅼</div><h3><em>P. malariae</em></h3><p>Chronic, low-grade; classic <strong>quartan</strong> fever; can persist for years.</p></div>
+            <div class="card"><div class="ic">🅺</div><h3><em>P. knowlesi</em></h3><p>Zoonotic (macaque); SE Asia; morphology mimics <em>malariae</em> but can be severe.</p></div>
+            <div class="card" style="background:#f3f8ff;border-color:var(--mac-accent);"><div class="ic">🦟</div><h3>Vector</h3><p>Female <em>Anopheles</em>. Also: transfusion, congenital, needle-stick.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Why the pathologist ranks the species</span>
+            <em>Falciparum</em> and <em>knowlesi</em> can be rapidly fatal and need urgent, sometimes parenteral, therapy; <em>vivax</em> and <em>ovale</em> require anti-relapse treatment (primaquine) because of hypnozoites. Getting the species right steers the clinician.
+          </div>
+        </section>
+
+        <!-- 12. LIFE CYCLE -->
+        <section class="slide">
+          <p class="eyebrow">The cycle behind the film</p>
+          <h2>Plasmodium life cycle</h2>
+          <p class="deep">Only the <strong>erythrocytic (blood) stages</strong> are seen on the film — but the whole cycle explains relapse, fever periodicity and transmission.</p>
+          <div class="figure">
+            <svg viewBox="0 0 860 340" width="860" role="img" aria-label="Plasmodium life cycle diagram">
+              <style>
+                .lc-box{fill:#f3f8ff;stroke:#0a84ff;stroke-width:2;rx:10;}
+                .lc-box2{fill:#f3f1ff;stroke:#5e5ce6;stroke-width:2;}
+                .lc-box3{fill:#eefcf1;stroke:#28c840;stroke-width:2;}
+                .lc-t{font:600 13px -apple-system,sans-serif;fill:#1d1d1f;}
+                .lc-s{font:12px -apple-system,sans-serif;fill:#6e6e73;}
+                .lc-h{font:700 13px -apple-system,sans-serif;fill:#0a84ff;}
+                .lc-a{stroke:#0a84ff;stroke-width:2;fill:none;marker-end:url(#ah);}
+              </style>
+              <defs>
+                <marker id="ah" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#0a84ff"/></marker>
+              </defs>
+              <!-- Mosquito / sporozoite -->
+              <rect class="lc-box2" x="20" y="20" width="200" height="60" rx="10"/>
+              <text class="lc-h" x="34" y="42">Mosquito bite</text>
+              <text class="lc-s" x="34" y="60">injects sporozoites</text>
+              <!-- Liver -->
+              <rect class="lc-box" x="330" y="20" width="220" height="76" rx="10"/>
+              <text class="lc-t" x="344" y="42">Liver (exo-erythrocytic)</text>
+              <text class="lc-s" x="344" y="60">schizonts release merozoites;</text>
+              <text class="lc-s" x="344" y="76">hypnozoites (vivax/ovale) → relapse</text>
+              <!-- Blood -->
+              <rect class="lc-box3" x="640" y="20" width="200" height="76" rx="10"/>
+              <text class="lc-t" x="654" y="42">Blood (erythrocytic)</text>
+              <text class="lc-s" x="654" y="60">ring → trophozoite →</text>
+              <text class="lc-s" x="654" y="76">schizont → rupture (fever)</text>
+              <!-- cycle box -->
+              <rect class="lc-box3" x="640" y="150" width="200" height="70" rx="10"/>
+              <text class="lc-t" x="654" y="176">Asexual cycle repeats</text>
+              <text class="lc-s" x="654" y="194">every 24/48/72 h →</text>
+              <text class="lc-s" x="654" y="210">periodic fever paroxysms</text>
+              <!-- gametocytes -->
+              <rect class="lc-box" x="330" y="150" width="220" height="70" rx="10"/>
+              <text class="lc-t" x="344" y="176">Gametocytes</text>
+              <text class="lc-s" x="344" y="194">sexual forms in blood;</text>
+              <text class="lc-s" x="344" y="210">taken up by next mosquito</text>
+              <!-- mosquito gut -->
+              <rect class="lc-box2" x="20" y="150" width="200" height="70" rx="10"/>
+              <text class="lc-h" x="34" y="176">Mosquito midgut</text>
+              <text class="lc-s" x="34" y="194">sporogony →</text>
+              <text class="lc-s" x="34" y="210">sporozoites (cycle closes)</text>
+              <!-- arrows -->
+              <line class="lc-a" x1="220" y1="50" x2="330" y2="55"/>
+              <line class="lc-a" x1="550" y1="58" x2="640" y2="58"/>
+              <line class="lc-a" x1="740" y1="96" x2="740" y2="150"/>
+              <line class="lc-a" x1="640" y1="185" x2="550" y2="185"/>
+              <line class="lc-a" x1="330" y1="185" x2="220" y2="185"/>
+              <line class="lc-a" x1="120" y1="150" x2="120" y2="80"/>
+            </svg>
+            <div class="figcap">Schematic teaching diagram — human liver &amp; blood stages plus the mosquito cycle. Only blood stages appear on the film.</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Two clinical facts fall straight out of the cycle</span>
+            <strong>(1) Fever periodicity</strong> = synchronous schizont rupture (48 h tertian for <em>vivax/ovale/falciparum</em>; 72 h quartan for <em>malariae</em>). <strong>(2) Relapse</strong> occurs only with <em>vivax</em>/<em>ovale</em> because of dormant liver <em>hypnozoites</em> — hence primaquine.
+          </div>
+        </section>
+
+        <!-- 13. ASEXUAL STAGES -->
+        <section class="slide">
+          <p class="eyebrow">What the parasite looks like as it matures</p>
+          <h2>Erythrocytic stages on the film</h2>
+          <p class="deep">Inside the red cell the parasite matures through a recognisable sequence. Recognising the <em>stage</em> is as important as the species.</p>
+          <div class="figure">
+            <svg viewBox="0 0 820 210" width="820" role="img" aria-label="Malaria asexual stages">
+              <style>
+                .rbc{fill:#f7d9d4;stroke:#d98b80;stroke-width:1.5;}
+                .cyto{fill:#7fb0e8;}
+                .chrom{fill:#b3005a;}
+                .pig{fill:#5a3a1a;}
+                .st{font:600 13px -apple-system,sans-serif;fill:#1d1d1f;text-anchor:middle;}
+                .ss{font:11.5px -apple-system,sans-serif;fill:#6e6e73;text-anchor:middle;}
+              </style>
+              <!-- ring -->
+              <circle class="rbc" cx="90" cy="70" r="46"/>
+              <circle cx="90" cy="70" r="18" fill="none" stroke="#7fb0e8" stroke-width="5"/>
+              <circle class="chrom" cx="105" cy="58" r="5"/>
+              <text class="st" x="90" y="150">Ring (early troph)</text>
+              <text class="ss" x="90" y="170">thin blue ring,</text>
+              <text class="ss" x="90" y="186">1–2 red chromatin dots</text>
+              <!-- trophozoite -->
+              <circle class="rbc" cx="290" cy="70" r="46"/>
+              <path class="cyto" d="M270 55 q20 -14 34 4 q14 20 -6 30 q-24 12 -34 -6 q-8 -18 6 -28 z"/>
+              <circle class="chrom" cx="292" cy="62" r="6"/>
+              <circle class="pig" cx="300" cy="82" r="3"/>
+              <text class="st" x="290" y="150">Trophozoite</text>
+              <text class="ss" x="290" y="170">amoeboid/growing,</text>
+              <text class="ss" x="290" y="186">pigment appears</text>
+              <!-- schizont -->
+              <circle class="rbc" cx="500" cy="70" r="46"/>
+              <g class="chrom">
+                <circle cx="486" cy="52" r="6"/><circle cx="514" cy="52" r="6"/>
+                <circle cx="472" cy="72" r="6"/><circle cx="528" cy="72" r="6"/>
+                <circle cx="486" cy="92" r="6"/><circle cx="514" cy="92" r="6"/>
+                <circle cx="500" cy="66" r="6"/><circle cx="500" cy="86" r="6"/>
+              </g>
+              <circle class="pig" cx="500" cy="74" r="5"/>
+              <text class="st" x="500" y="150">Schizont</text>
+              <text class="ss" x="500" y="170">merozoites +</text>
+              <text class="ss" x="500" y="186">clumped pigment</text>
+              <!-- gametocyte -->
+              <path d="M690 40 q60 30 0 60 q-26 -30 0 -60 z" fill="#8aa9d6" stroke="#4a6fa5" stroke-width="1.5"/>
+              <circle class="chrom" cx="700" cy="70" r="7"/>
+              <text class="st" x="710" y="150">Gametocyte</text>
+              <text class="ss" x="710" y="170">sexual form;</text>
+              <text class="ss" x="710" y="186">banana-shaped in falciparum</text>
+            </svg>
+            <div class="figcap">Schematic — ring → trophozoite → schizont → gametocyte. Red = chromatin (nucleus); blue = cytoplasm; brown = malarial pigment (haemozoin).</div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The falciparum exception — remember this</span>
+            In <em>P. falciparum</em>, only <strong>rings and the crescent (banana) gametocyte</strong> are normally seen in peripheral blood — trophozoites and schizonts are sequestered in deep capillaries. Seeing all stages argues <em>against</em> falciparum; seeing mature stages + banana gametocytes confirms it.
+          </div>
+        </section>
+
+
+        <!-- 14. READING THE MALARIA FILM -->
+        <section class="slide">
+          <p class="eyebrow">A checklist for species identification</p>
+          <h2>Reading the malaria film: the five questions</h2>
+          <p class="deep">Species identification is a disciplined comparison of the parasite <em>and its host red cell</em>. Ask these five, every time:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">📏</div><h3>1 · Is the RBC enlarged?</h3><p><strong>Enlarged &amp; pale</strong> → <em>vivax</em>/<em>ovale</em>. <strong>Normal/small</strong> → <em>falciparum</em>/<em>malariae</em>/<em>knowlesi</em>.</p></div>
+            <div class="card"><div class="ic">✨</div><h3>2 · Any stippling / dots?</h3><p><strong>Schüffner's dots</strong> → <em>vivax</em>/<em>ovale</em>. Maurer's clefts → <em>falciparum</em>. Faint Ziemann's → <em>malariae</em>.</p></div>
+            <div class="card"><div class="ic">🔄</div><h3>3 · Which stages present?</h3><p>Only rings + banana gametocytes → <em>falciparum</em>. All stages → the others. Band forms → <em>malariae</em>/<em>knowlesi</em>.</p></div>
+            <div class="card"><div class="ic">💍</div><h3>4 · Ring appearance &amp; number</h3><p>Multiple rings/cell, appliqué (marginal) forms, double chromatin dots → <em>falciparum</em>.</p></div>
+            <div class="card"><div class="ic">🌼</div><h3>5 · Schizont merozoite count</h3><p>~16 (vivax), ~8 rosette/daisy (malariae), 8 (ovale), 8–24 (falciparum, rarely seen).</p></div>
+            <div class="card" style="background:#f3f8ff;border-color:var(--mac-accent);"><div class="ic">🎯</div><h3>+ Parasitaemia</h3><p>High % with only rings strongly suggests <em>falciparum</em> (or <em>knowlesi</em>).</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Discipline beats pattern-matching</span>
+            Beginners guess from the first ring they see. Experts run all five questions and cross-check — because <em>falciparum</em> can look trivial (a few tiny rings) yet be the one that kills.
+          </div>
+        </section>
+
+        <!-- 15. P. FALCIPARUM -->
+        <section class="slide">
+          <p class="eyebrow">Species 1 · the dangerous one</p>
+          <h2><em>Plasmodium falciparum</em></h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Morphology</h3>
+              <ul>
+                <li><strong>RBC:</strong> normal size; may show <strong>Maurer's clefts</strong> (few, coarse, red dots).</li>
+                <li><strong>Rings:</strong> small, delicate, often <strong>multiple per cell</strong>; <strong>double chromatin dots</strong> ("headphone"); <strong>appliqué / accolé</strong> forms hugging the cell margin.</li>
+                <li><strong>Trophozoites &amp; schizonts:</strong> usually <strong>absent</strong> (sequestered) — their presence signals a very heavy infection.</li>
+                <li><strong>Gametocyte:</strong> unmistakable <strong>banana / crescent</strong> shape.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Clues &amp; consequences</h3>
+              <ul>
+                <li><strong>High parasitaemia</strong> — can exceed 10–20%; multiply-infected cells.</li>
+                <li>Only <strong>rings + crescent gametocytes</strong> on the peripheral film.</li>
+                <li><strong>Malignant tertian</strong> malaria; causes cerebral malaria, severe haemolysis, blackwater fever.</li>
+                <li>Sequestration &amp; rosetting → microvascular obstruction (the reason mature forms vanish from blood).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">Report as critical</span>
+            <em>Falciparum</em> (or high-parasitaemia unspeciated malaria) is a critical result — telephone the clinician, state the <strong>% parasitaemia</strong>, and flag the possibility of severe malaria.
+          </div>
+        </section>
+
+        <!-- 16. P. VIVAX -->
+        <section class="slide">
+          <p class="eyebrow">Species 2 · the relapser</p>
+          <h2><em>Plasmodium vivax</em></h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Morphology</h3>
+              <ul>
+                <li><strong>RBC:</strong> <strong>enlarged &amp; pale</strong>, often distorted; carries <strong>Schüffner's dots</strong> (fine, numerous, pink-red stippling).</li>
+                <li><strong>Ring:</strong> large, thick — occupies ~⅓ of the cell.</li>
+                <li><strong>Trophozoite:</strong> large, <strong>amoeboid</strong> ("spread-out") with fine brown pigment.</li>
+                <li><strong>Schizont:</strong> ~<strong>12–24 merozoites</strong> (classically ~16), irregularly arranged.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Clues &amp; consequences</h3>
+              <ul>
+                <li><strong>All stages</strong> present simultaneously on the film.</li>
+                <li>Prefers <strong>young RBCs (reticulocytes)</strong> → parasitaemia usually low.</li>
+                <li><strong>Benign tertian</strong> malaria (48 h); <strong>relapses</strong> from hypnozoites.</li>
+                <li>Can still cause severe disease &amp; splenic rupture — not always "benign".</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The pairing to memorise</span>
+            <strong>Enlarged red cell + Schüffner's dots + amoeboid trophozoite = <em>vivax</em></strong> (or <em>ovale</em>). This is the single most useful gestalt for the non-falciparum species.
+          </div>
+        </section>
+
+        <!-- 17. P. OVALE -->
+        <section class="slide">
+          <p class="eyebrow">Species 3 · the mimic of vivax</p>
+          <h2><em>Plasmodium ovale</em></h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Morphology</h3>
+              <ul>
+                <li><strong>RBC:</strong> enlarged, often <strong>oval</strong> with a ragged/<strong>fimbriated</strong> (frayed) end; prominent <strong>Schüffner's (James') dots</strong> appearing even in ring stage.</li>
+                <li><strong>Trophozoite:</strong> more <strong>compact</strong> and less amoeboid than <em>vivax</em>.</li>
+                <li><strong>Schizont:</strong> ~<strong>8 merozoites</strong> around a central pigment clump.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Clues &amp; consequences</h3>
+              <ul>
+                <li>West Africa; mild <strong>tertian</strong> disease.</li>
+                <li><strong>Relapses</strong> — hypnozoites, like <em>vivax</em> → needs primaquine.</li>
+                <li>Distinguishing feature from <em>vivax</em>: <strong>oval, fimbriated cells + more compact parasite + fewer merozoites</strong>.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">In practice</span>
+            <em>ovale</em> and <em>vivax</em> overlap heavily. If the cell is oval/fimbriated with dots and the parasite is compact, favour <em>ovale</em>; molecular testing settles genuinely ambiguous cases.
+          </div>
+        </section>
+
+        <!-- 18. P. MALARIAE -->
+        <section class="slide">
+          <p class="eyebrow">Species 4 · the slow, chronic one</p>
+          <h2><em>Plasmodium malariae</em></h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Morphology</h3>
+              <ul>
+                <li><strong>RBC:</strong> normal size or slightly <strong>small</strong>; no enlargement; faint <strong>Ziemann's dots</strong> (need strong staining).</li>
+                <li><strong>Trophozoite:</strong> compact; classic <strong>"band" form</strong> stretching across the cell; coarse dark pigment.</li>
+                <li><strong>Schizont:</strong> ~<strong>6–12 merozoites</strong> in a <strong>rosette / "daisy-head"</strong> around central pigment.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Clues &amp; consequences</h3>
+              <ul>
+                <li><strong>Quartan</strong> fever (72 h cycle).</li>
+                <li>Prefers <strong>old RBCs</strong> → very <strong>low parasitaemia</strong>.</li>
+                <li>No relapse (no hypnozoites) but can <strong>recrudesce for years/decades</strong>.</li>
+                <li>Associated with <strong>quartan malarial nephropathy</strong> (immune-complex).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The two signatures</span>
+            <strong>Band-form trophozoite</strong> and <strong>daisy-head schizont</strong> in a normal-sized cell = <em>malariae</em>. But beware: <em>knowlesi</em> looks identical (next slide).
+          </div>
+        </section>
+
+        <!-- 19. P. KNOWLESI -->
+        <section class="slide">
+          <p class="eyebrow">Species 5 · the zoonotic impostor</p>
+          <h2><em>Plasmodium knowlesi</em></h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Morphology</h3>
+              <ul>
+                <li><strong>Early forms</strong> resemble <em>falciparum</em> (delicate rings, double chromatin, appliqué, multiply-infected cells).</li>
+                <li><strong>Later forms</strong> resemble <em>malariae</em> (band trophozoites, compact schizonts).</li>
+                <li>RBC not enlarged; no Schüffner's dots.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Why it is dangerous</h3>
+              <ul>
+                <li>Zoonosis from <strong>macaque monkeys</strong>; Southeast Asia (Borneo/Malaysia).</li>
+                <li><strong>Shortest cycle (~24 h, quotidian)</strong> → parasitaemia can climb fast.</li>
+                <li>Can cause <strong>severe, fatal</strong> malaria despite "malariae-like" morphology.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">The trap</span>
+            A "malariae" film with <strong>high parasitaemia</strong> in a patient from SE Asia should be treated as potential <em>knowlesi</em> and managed like severe malaria. <strong>Microscopy cannot reliably distinguish it — PCR is required</strong> for confirmation.
+          </div>
+        </section>
+
+
+        <!-- 20. SPECIES DIFFERENTIATION TABLE -->
+        <section class="slide">
+          <p class="eyebrow">The one table to know cold</p>
+          <h2>Differentiating the Plasmodium species</h2>
+          <table class="cmp">
+            <thead>
+              <tr><th>Feature</th><th class="hl">falciparum</th><th class="hl">vivax</th><th class="hl">ovale</th><th class="hl">malariae</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>RBC size</strong></td><td>Normal</td><td>Enlarged</td><td>Enlarged, oval/fimbriated</td><td>Normal / small</td></tr>
+              <tr><td><strong>Stippling</strong></td><td>Maurer's clefts</td><td>Schüffner's (fine, many)</td><td>Schüffner's (early, prominent)</td><td>Ziemann's (faint)</td></tr>
+              <tr><td><strong>Stages in blood</strong></td><td class="bad">Rings + banana gametocyte only</td><td class="good">All stages</td><td class="good">All stages</td><td class="good">All stages</td></tr>
+              <tr><td><strong>Trophozoite</strong></td><td>Rarely seen</td><td>Large, amoeboid</td><td>Compact</td><td>Band form</td></tr>
+              <tr><td><strong>Schizont merozoites</strong></td><td>8–24 (rare)</td><td>12–24 (~16)</td><td>~8</td><td>6–12 rosette/daisy</td></tr>
+              <tr><td><strong>Gametocyte</strong></td><td>Crescent/banana</td><td>Round/oval</td><td>Round/oval</td><td>Round/oval</td></tr>
+              <tr><td><strong>Multiple rings/cell</strong></td><td>Common</td><td>Uncommon</td><td>Uncommon</td><td>Rare</td></tr>
+              <tr><td><strong>Parasitaemia</strong></td><td>High</td><td>Low–moderate</td><td>Low</td><td>Very low</td></tr>
+              <tr><td><strong>Fever cycle</strong></td><td>Malignant tertian (~48h)</td><td>Tertian 48h</td><td>Tertian 48h</td><td>Quartan 72h</td></tr>
+              <tr><td><strong>Relapse (hypnozoite)</strong></td><td>No</td><td class="bad">Yes</td><td class="bad">Yes</td><td>No (recrudesces)</td></tr>
+            </tbody>
+          </table>
+          <div class="src-note">Composite of features as presented in Bain, <em>Blood Cells: A Practical Guide</em>; WHO, <em>Basic Malaria Microscopy</em>; and CDC DPDx. Content rephrased for compliance with licensing restrictions.</div>
+        </section>
+
+        <!-- 21. RBC INCLUSIONS DIAGRAM -->
+        <section class="slide">
+          <p class="eyebrow">Host-cell clues — the "dots"</p>
+          <h2>Red-cell stippling in malaria</h2>
+          <p class="deep">The dots seen in the infected red cell are host-cell membrane alterations, and each pattern points to a species group.</p>
+          <div class="figure">
+            <svg viewBox="0 0 760 210" width="760" role="img" aria-label="Red cell stippling types">
+              <style>
+                .rc{stroke:#d98b80;stroke-width:1.5;}
+                .par{fill:none;stroke:#7fb0e8;stroke-width:4;}
+                .cd{fill:#b3005a;}
+                .lt{font:600 14px -apple-system,sans-serif;fill:#1d1d1f;text-anchor:middle;}
+                .ls{font:11.5px -apple-system,sans-serif;fill:#6e6e73;text-anchor:middle;}
+              </style>
+              <!-- Schuffner (vivax/ovale): enlarged pale cell, many fine dots -->
+              <circle class="rc" cx="130" cy="70" r="58" fill="#fbe9e6"/>
+              <circle class="par" cx="130" cy="70" r="16"/>
+              <circle class="cd" cx="142" cy="60" r="4"/>
+              <g fill="#e0708a">
+                <circle cx="105" cy="55" r="2.6"/><circle cx="150" cy="90" r="2.6"/><circle cx="118" cy="95" r="2.6"/><circle cx="160" cy="60" r="2.6"/><circle cx="100" cy="82" r="2.6"/><circle cx="135" cy="105" r="2.6"/><circle cx="95" cy="68" r="2.6"/><circle cx="155" cy="78" r="2.6"/><circle cx="120" cy="45" r="2.6"/>
+              </g>
+              <text class="lt" x="130" y="150">Schüffner's dots</text>
+              <text class="ls" x="130" y="170"><tspan font-style="italic">vivax</tspan> &amp; <tspan font-style="italic">ovale</tspan></text>
+              <text class="ls" x="130" y="186">many fine, even, pink-red</text>
+              <!-- Maurer (falciparum): normal cell, few coarse clefts -->
+              <circle class="rc" cx="380" cy="70" r="46" fill="#f7d9d4"/>
+              <circle class="par" cx="380" cy="70" r="13"/>
+              <circle class="cd" cx="390" cy="62" r="4"/>
+              <g fill="#a11e46">
+                <rect x="356" y="58" width="7" height="4" rx="1.5"/><rect x="398" y="82" width="7" height="4" rx="1.5"/><rect x="366" y="92" width="6" height="4" rx="1.5"/>
+              </g>
+              <text class="lt" x="380" y="150">Maurer's clefts</text>
+              <text class="ls" x="380" y="170"><tspan font-style="italic">falciparum</tspan></text>
+              <text class="ls" x="380" y="186">few, coarse, comma-shaped</text>
+              <!-- Ziemann (malariae): small cell, very faint dots -->
+              <circle class="rc" cx="620" cy="70" r="42" fill="#f7d9d4"/>
+              <path class="par" d="M588 66 h64" stroke-linecap="round"/>
+              <circle class="cd" cx="588" cy="66" r="4"/>
+              <g fill="#c98a9c" opacity="0.7">
+                <circle cx="605" cy="52" r="2"/><circle cx="632" cy="86" r="2"/><circle cx="615" cy="90" r="2"/>
+              </g>
+              <text class="lt" x="620" y="150">Ziemann's dots</text>
+              <text class="ls" x="620" y="170"><tspan font-style="italic">malariae</tspan></text>
+              <text class="ls" x="620" y="186">faint; band trophozoite</text>
+            </svg>
+            <div class="figcap">Schematic — stippling patterns and the associated species. Requires correct stain pH (≈7.2) to be visible.</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Mnemonic</span>
+            <strong>S</strong>chüffner → <strong>S</strong>ame two that relapse (viva<strong>x</strong>/ovale). <strong>M</strong>aurer → <strong>M</strong>alignant (falciparum). <strong>Z</strong>iemann → the <strong>quartan</strong> (malariae), faint like its low parasitaemia.
+          </div>
+        </section>
+
+        <!-- 22. PIGMENT & HAEM CHANGES -->
+        <section class="slide">
+          <p class="eyebrow">Beyond the parasite itself</p>
+          <h2>Malarial pigment &amp; haematological changes</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Malarial pigment (haemozoin)</h3>
+              <ul>
+                <li>Golden-brown to black <strong>birefringent</strong> crystal — the parasite's waste from digesting haemoglobin.</li>
+                <li>Seen within trophozoites/schizonts, and in <strong>monocytes &amp; neutrophils</strong> (phagocytosed) — pigment-laden leucocytes indicate a heavy/recent infection and <strong>poorer prognosis</strong>.</li>
+                <li>Distinguish from formalin/artefact pigment (that is extracellular, non-parasitic).</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Blood-count changes</h3>
+              <ul>
+                <li><strong>Thrombocytopenia</strong> — very common; a useful clue in a febrile traveller.</li>
+                <li><strong>Haemolytic anaemia</strong> — normocytic; polychromasia; ↑LDH, ↓haptoglobin, ↑bilirubin.</li>
+                <li><strong>Blackwater fever</strong> — massive intravascular haemolysis with haemoglobinuria (severe falciparum).</li>
+                <li>Often normal/low WBC; atypical lymphocytes; monocytosis.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Clue for the reporting pathologist</span>
+            In a febrile patient, <strong>unexplained thrombocytopenia + haemolysis</strong> should trigger a careful search of thick and thin films for malaria even if not specifically requested.
+          </div>
+        </section>
+
+        <!-- 23. PARASITAEMIA QUANTIFICATION -->
+        <section class="slide">
+          <p class="eyebrow">Numbers the clinician acts on</p>
+          <h2>Quantifying parasitaemia</h2>
+          <p class="deep">For <em>falciparum</em> (and <em>knowlesi</em>), the <strong>degree of parasitaemia</strong> guides severity assessment and monitoring of treatment response. Two standard methods:</p>
+          <div class="panels">
+            <div class="panel good">
+              <h3>Thin-film percentage method</h3>
+              <pre style="background:#fafafc;border:1px solid var(--mac-border);"><code style="color:#1d1d1f;">% parasitaemia =
+  (infected RBCs / total RBCs) × 100
+
+Count parasitised RBCs among
+~1000–2000 red cells.
+
+Report as % (e.g., 4.2%).</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Thick-film count vs WBC</h3>
+              <pre style="background:#fafafc;border:1px solid var(--mac-border);"><code style="color:#1d1d1f;">parasites/µL =
+  (parasites counted × WBC/µL)
+   ÷ WBCs counted
+
+Count against 200 (or 500) WBC;
+assume 8000 WBC/µL if unknown.</code></pre>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>WHO semi-quantitative code (thick film)</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>+</strong></td><td>1–10 parasites per 100 thick-film fields</td></tr>
+              <tr><td><strong>++</strong></td><td>11–100 per 100 fields</td></tr>
+              <tr><td><strong>+++</strong></td><td>1–10 per single field</td></tr>
+              <tr><td><strong>++++</strong></td><td>&gt;10 per single field</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Thresholds worth flagging</span>
+            <em>Falciparum</em> parasitaemia <strong>&gt;2%</strong> warrants concern in non-immune patients and <strong>&gt;5–10%</strong> is a criterion for <strong>severe malaria</strong> — communicate the figure explicitly.
+          </div>
+        </section>
+
+        <!-- 24. SEVERE FALCIPARUM -->
+        <section class="slide">
+          <p class="eyebrow">The film in life-threatening disease</p>
+          <h2>Clues to severe falciparum malaria</h2>
+          <p class="deep">Certain film and laboratory features mark a case that needs parenteral artesunate and intensive care. The pathologist can be the first to raise the alarm.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🔺</div><h3>High parasitaemia</h3><p>&gt;5–10% infected red cells, or heavy thick-film load.</p></div>
+            <div class="card"><div class="ic">🧫</div><h3>Mature forms in blood</h3><p>Trophozoites/schizonts of <em>falciparum</em> in peripheral blood = massive burden (loss of sequestration).</p></div>
+            <div class="card"><div class="ic">⚪</div><h3>Pigment in &gt;5% neutrophils</h3><p>Correlates with severity and worse outcome.</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Multiply-infected cells</h3><p>Two or more parasites per red cell across many cells.</p></div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">WHO severe-malaria pointers (lab)</span>
+            Severe anaemia (Hb &lt; 7 g/dL), hypoglycaemia, lactic acidosis, renal impairment, haemoglobinuria (blackwater fever), and parasitaemia &gt;10%. Any of these + <em>falciparum</em> = medical emergency; report immediately by phone.
+          </div>
+        </section>
+
+        <!-- 25. PITFALLS / PSEUDO-PARASITES -->
+        <section class="slide">
+          <p class="eyebrow">What fools the eye</p>
+          <h2>Malaria pitfalls &amp; pseudo-parasites</h2>
+          <p class="deep">A large share of malaria reporting errors are false positives from artefacts and false negatives from technique. Know the mimics:</p>
+          <table class="cmp">
+            <thead><tr><th>Mimic / artefact</th><th>Why it fools you</th><th>How to tell it apart</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Platelet on a red cell</strong></td><td>Purple body overlying RBC looks like a ring/parasite</td><td>Sits <em>on top</em>, no true ring, look for platelets elsewhere; focus up/down</td></tr>
+              <tr><td><strong>Howell–Jolly body</strong></td><td>Round red nuclear remnant resembles chromatin dot</td><td>Solid, no cytoplasm/ring; post-splenectomy context</td></tr>
+              <tr><td><strong>Stain precipitate / debris</strong></td><td>Deposits mimic parasites on/off cells</td><td>Refractile, variable size, also on background</td></tr>
+              <tr><td><strong>Basophilic stippling</strong></td><td>Diffuse dots mistaken for Schüffner's</td><td>Fine, blue, throughout cell; no parasite</td></tr>
+              <tr><td><strong>Superimposed cells / dirt</strong></td><td>Overlap suggests inclusions</td><td>Change focal plane; clean slide</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The rule that prevents both error types</span>
+            A true intra-erythrocytic parasite has <strong>both</strong> blue cytoplasm <strong>and</strong> red chromatin, and lies <em>within</em> the cell's focal plane. And remember: <strong>one negative film never excludes malaria — repeat ×3 over 48 h.</strong>
+          </div>
+        </section>
+
+        <!-- 26. ADJUNCTS: RDT / PCR / SEROLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Beyond microscopy</p>
+          <h2>Adjunctive malaria diagnostics</h2>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🧪</div><h3>Rapid diagnostic tests (RDT)</h3><p>Lateral-flow antigen tests: <strong>HRP-2</strong> (falciparum-specific) and <strong>pLDH / aldolase</strong> (pan-species). Fast, no microscope. Limitations: HRP-2 stays positive for weeks post-treatment; <strong>hrp2/3 gene deletions</strong> → false negatives; poor at low parasitaemia.</p></div>
+            <div class="card"><div class="ic">🧬</div><h3>Molecular (PCR)</h3><p>Most <strong>sensitive &amp; specific</strong>; the reference for species confirmation — essential for <em>knowlesi</em> and mixed infections. Slower, not for emergency triage.</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Serology / QBC</h3><p>Serology (antibody) is for <strong>epidemiology / screening donors</strong>, not acute diagnosis. <strong>QBC</strong> (acridine-orange buffy coat) improves detection but does not speciate well.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">How they fit together</span>
+            RDT + microscopy for the <strong>acute diagnosis</strong> (RDT triages, film speciates &amp; quantifies); <strong>PCR</strong> to confirm species / detect mixed &amp; <em>knowlesi</em>. Microscopy remains the only routine method that gives species <em>and</em> parasitaemia together.
+          </div>
+        </section>
+
+
+        <!-- 27. BABESIA OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Section 3 · Babesiosis</p>
+          <h2><em>Babesia</em> — the malaria mimic</h2>
+          <p class="deep"><em>Babesia</em> is an intra-erythrocytic protozoan transmitted by <strong>Ixodes ticks</strong> (the Lyme-disease tick), with <em>B. microti</em> the main species in North America and <em>B. divergens</em> in Europe. It is the classic <strong>look-alike of falciparum</strong> malaria.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🕷️</div><h3>Transmission</h3><p><em>Ixodes</em> tick; also blood transfusion. Reservoir: rodents/cattle.</p></div>
+            <div class="card"><div class="ic">🫀</div><h3>Who gets severe disease</h3><p><strong>Asplenic</strong>, elderly, immunocompromised — can be fulminant with massive haemolysis.</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Clinical picture</h3><p>Fever + <strong>haemolytic anaemia</strong>, haemoglobinuria; no true periodicity.</p></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Context is the tip-off</span>
+            Suspect babesiosis in a haemolytic, febrile patient with <strong>no travel to a malarious area</strong>, especially if <strong>asplenic</strong> or from a Lyme-endemic region. The film seals the diagnosis.
+          </div>
+        </section>
+
+        <!-- 28. BABESIA MORPHOLOGY & MALTESE CROSS -->
+        <section class="slide">
+          <p class="eyebrow">Telling it from malaria</p>
+          <h2><em>Babesia</em> morphology &amp; the Maltese cross</h2>
+          <div class="figure">
+            <svg viewBox="0 0 520 210" width="520" role="img" aria-label="Babesia Maltese cross tetrad">
+              <style>
+                .brc{fill:#f7d9d4;stroke:#d98b80;stroke-width:1.5;}
+                .bpy{fill:#8fb6e6;stroke:#3f6fae;stroke-width:1.2;}
+                .bcd{fill:#b3005a;}
+                .blt{font:600 13px -apple-system,sans-serif;fill:#1d1d1f;text-anchor:middle;}
+                .bls{font:11.5px -apple-system,sans-serif;fill:#6e6e73;text-anchor:middle;}
+              </style>
+              <!-- tetrad cell -->
+              <circle class="brc" cx="130" cy="80" r="56"/>
+              <!-- 4 pyriform bodies as maltese cross -->
+              <path class="bpy" d="M130 55 q10 15 0 26 q-10 -11 0 -26z"/>
+              <path class="bpy" d="M130 105 q10 -15 0 -26 q-10 11 0 26z"/>
+              <path class="bpy" d="M105 80 q15 10 26 0 q-11 -10 -26 0z"/>
+              <path class="bpy" d="M155 80 q-15 10 -26 0 q11 -10 26 0z"/>
+              <circle class="bcd" cx="130" cy="60" r="2.6"/><circle class="bcd" cx="130" cy="100" r="2.6"/>
+              <circle class="bcd" cx="110" cy="80" r="2.6"/><circle class="bcd" cx="150" cy="80" r="2.6"/>
+              <text class="blt" x="130" y="165">"Maltese cross"</text>
+              <text class="bls" x="130" y="184">tetrad — pathognomonic</text>
+              <!-- ring-form cell with extracellular form -->
+              <circle class="brc" cx="360" cy="80" r="56"/>
+              <circle cx="345" cy="72" r="12" fill="none" stroke="#8fb6e6" stroke-width="4"/>
+              <circle class="bcd" cx="354" cy="65" r="3"/>
+              <circle cx="378" cy="92" r="9" fill="none" stroke="#8fb6e6" stroke-width="3.5"/>
+              <circle class="bcd" cx="384" cy="87" r="2.6"/>
+              <!-- extracellular -->
+              <circle cx="430" cy="55" r="7" fill="none" stroke="#8fb6e6" stroke-width="3"/>
+              <circle class="bcd" cx="434" cy="51" r="2.2"/>
+              <text class="blt" x="360" y="165">Rings + extracellular forms</text>
+              <text class="bls" x="360" y="184">small, pleomorphic, NO pigment</text>
+            </svg>
+            <div class="figcap">Schematic — the <strong>tetrad ("Maltese cross")</strong> of four pyriform merozoites is diagnostic of <em>Babesia</em>; note extracellular parasites and absence of pigment.</div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Feature</th><th class="hl">Babesia</th><th>P. falciparum</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Malarial pigment</strong></td><td class="good">Absent</td><td>Present (haemozoin)</td></tr>
+              <tr><td><strong>Tetrad (Maltese cross)</strong></td><td class="good">Present (diagnostic)</td><td>Never</td></tr>
+              <tr><td><strong>Gametocytes / schizonts</strong></td><td>Absent</td><td>Banana gametocytes present</td></tr>
+              <tr><td><strong>Extracellular forms</strong></td><td>Common</td><td>Uncommon</td></tr>
+              <tr><td><strong>Ring shape</strong></td><td>Small, pleomorphic, vacuolated</td><td>More uniform</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 29. MICROFILARIAE OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Section 4 · Filariasis</p>
+          <h2>Microfilariae on the blood film</h2>
+          <p class="deep">Microfilariae are the <strong>larval stage</strong> of filarial nematodes, released by adult worms into blood or lymphatics and transmitted by biting insects. On the film they are unmistakable — <strong>far larger than any blood cell</strong>, worm-like, and often distorting surrounding cells as they lie across the smear.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">📐</div><h3>What to assess</h3><p><strong>Sheath</strong> present or not; <strong>pattern of tail nuclei</strong>; body curves; length. These three name the species.</p></div>
+            <div class="card"><div class="ic">🕐</div><h3>Periodicity</h3><p>Nocturnal (<em>Wuchereria</em>, <em>Brugia</em>) vs diurnal (<em>Loa loa</em>) vs non-periodic (<em>Mansonella</em>) — decides when to draw blood.</p></div>
+            <div class="card"><div class="ic">🦟</div><h3>Disease</h3><p>Lymphatic filariasis (elephantiasis), loiasis, mansonellosis — plus marked <strong>eosinophilia</strong>.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The two-feature key</span>
+            For blood microfilariae, almost everything hinges on: <strong>(1) Is there a sheath?</strong> and <strong>(2) Do the nuclei run into the tip of the tail?</strong> Master those two and the species table (slide after next) becomes easy.
+          </div>
+        </section>
+
+        <!-- 30. WUCHERERIA -->
+        <section class="slide">
+          <p class="eyebrow">The main cause of lymphatic filariasis</p>
+          <h2><em>Wuchereria bancrofti</em></h2>
+          <div class="figure">
+            <svg viewBox="0 0 720 150" width="720" role="img" aria-label="Wuchereria bancrofti microfilaria">
+              <style>
+                .sh{fill:none;stroke:#c9a2d6;stroke-width:9;stroke-linecap:round;opacity:0.6;}
+                .bod{fill:none;stroke:#5e5ce6;stroke-width:4;stroke-linecap:round;}
+                .nu{fill:#b3005a;}
+                .wlt{font:12px -apple-system,sans-serif;fill:#6e6e73;}
+                .wlb{font:700 12px -apple-system,sans-serif;fill:#0a84ff;}
+              </style>
+              <!-- sheath (extends beyond body, hyaline) -->
+              <path class="sh" d="M30 80 C 180 30, 320 120, 470 70 S 640 60, 690 78"/>
+              <!-- body with graceful curves -->
+              <path class="bod" d="M40 80 C 180 40, 320 115, 470 72 S 630 66, 665 78"/>
+              <!-- nuclei column stopping short of tail tip -->
+              <g class="nu">
+                <circle cx="70" cy="72" r="3.4"/><circle cx="95" cy="66" r="3.4"/><circle cx="120" cy="60" r="3.4"/><circle cx="150" cy="55" r="3.4"/><circle cx="185" cy="55" r="3.4"/><circle cx="225" cy="62" r="3.4"/><circle cx="270" cy="74" r="3.4"/><circle cx="320" cy="88" r="3.4"/><circle cx="370" cy="92" r="3.4"/><circle cx="420" cy="86" r="3.4"/><circle cx="470" cy="74" r="3.4"/><circle cx="520" cy="70" r="3.4"/><circle cx="565" cy="70" r="3.4"/><circle cx="600" cy="73" r="3.4"/>
+              </g>
+              <!-- tail tip nucleus-free -->
+              <line x1="620" y1="76" x2="665" y2="78" stroke="#5e5ce6" stroke-width="4" stroke-linecap="round"/>
+              <text class="wlb" x="150" y="120">sheath (hyaline, extends beyond body)</text>
+              <text class="wlb" x="600" y="110">tail tip:</text>
+              <text class="wlt" x="560" y="128">nuclei do NOT reach the tip</text>
+            </svg>
+            <div class="figcap">Schematic — sheathed microfilaria with graceful curves; the column of body nuclei stops short of a <strong>nucleus-free tail tip</strong>.</div>
+          </div>
+          <ul>
+            <li><strong>Sheathed</strong>; sheath does <strong>not</strong> stain with Giemsa (may appear as a clear halo).</li>
+            <li><strong>Gentle, graceful body curves</strong>; nuclei discrete and countable.</li>
+            <li><strong>Tail tapers to a point; nuclei do NOT extend to the tip.</strong></li>
+            <li><strong>Nocturnal periodicity</strong> → draw blood ~22:00–02:00.</li>
+            <li>Causes <strong>lymphatic filariasis</strong> → lymphoedema / elephantiasis, hydrocele.</li>
+          </ul>
+        </section>
+
+        <!-- 31. BRUGIA -->
+        <section class="slide">
+          <p class="eyebrow">The other lymphatic filaria</p>
+          <h2><em>Brugia malayi</em></h2>
+          <div class="figure">
+            <svg viewBox="0 0 720 150" width="720" role="img" aria-label="Brugia malayi microfilaria">
+              <style>
+                .bsh{fill:none;stroke:#f0a6c0;stroke-width:9;stroke-linecap:round;opacity:0.65;}
+                .bbod{fill:none;stroke:#5e5ce6;stroke-width:4;stroke-linecap:round;}
+                .bnu{fill:#b3005a;}
+                .blt2{font:12px -apple-system,sans-serif;fill:#6e6e73;}
+                .blb2{font:700 12px -apple-system,sans-serif;fill:#0a84ff;}
+              </style>
+              <!-- kinky sheath (stains pink) -->
+              <path class="bsh" d="M30 80 C 150 20, 250 130, 360 60 S 520 130, 600 60 S 680 90, 695 80"/>
+              <path class="bbod" d="M40 80 C 150 30, 250 122, 360 66 S 520 122, 596 66 S 665 88, 675 80"/>
+              <g class="bnu">
+                <circle cx="70" cy="70" r="3.2"/><circle cx="100" cy="58" r="3.2"/><circle cx="140" cy="58" r="3.2"/><circle cx="190" cy="80" r="3.2"/><circle cx="250" cy="98" r="3.2"/><circle cx="320" cy="82" r="3.2"/><circle cx="390" cy="70" r="3.2"/><circle cx="460" cy="88" r="3.2"/><circle cx="530" cy="98" r="3.2"/><circle cx="590" cy="72" r="3.2"/>
+              </g>
+              <!-- two terminal nuclei at the very tip, separated -->
+              <circle class="bnu" cx="650" cy="78" r="4.2"/><circle class="bnu" cx="672" cy="80" r="4.2"/>
+              <text class="blb2" x="140" y="122">sheath stains pink with Giemsa · secondary "kinks"</text>
+              <text class="blb2" x="560" y="118">two separate terminal nuclei</text>
+            </svg>
+            <div class="figcap">Schematic — kinky/angular body; sheath stains pink; <strong>two distinct terminal nuclei</strong> in the tail tip, separated from the main column.</div>
+          </div>
+          <ul>
+            <li><strong>Sheathed</strong>; the sheath <strong>stains pink</strong> with Giemsa (unlike <em>Wuchereria</em>).</li>
+            <li>Stiffer, more <strong>angular/kinky secondary curves</strong>.</li>
+            <li><strong>Two distinct nuclei at the very tip</strong> of the tail, set apart from the body-nuclei column — the key feature.</li>
+            <li><strong>Nocturnal periodicity</strong>; causes lymphatic filariasis (Southeast &amp; South Asia).</li>
+          </ul>
+        </section>
+
+
+        <!-- 32. LOA LOA -->
+        <section class="slide">
+          <p class="eyebrow">The eye worm</p>
+          <h2><em>Loa loa</em></h2>
+          <div class="figure">
+            <svg viewBox="0 0 720 140" width="720" role="img" aria-label="Loa loa microfilaria">
+              <style>
+                .lsh{fill:none;stroke:#c9a2d6;stroke-width:9;stroke-linecap:round;opacity:0.55;}
+                .lbod{fill:none;stroke:#5e5ce6;stroke-width:4;stroke-linecap:round;}
+                .lnu{fill:#b3005a;}
+                .llb{font:700 12px -apple-system,sans-serif;fill:#0a84ff;}
+                .llt{font:12px -apple-system,sans-serif;fill:#6e6e73;}
+              </style>
+              <path class="lsh" d="M30 75 C 190 35, 330 110, 480 68 S 650 70, 690 78"/>
+              <path class="lbod" d="M40 75 C 190 40, 330 105, 480 70 S 650 72, 678 78"/>
+              <g class="lnu">
+                <circle cx="70" cy="68" r="3.3"/><circle cx="105" cy="60" r="3.3"/><circle cx="145" cy="56" r="3.3"/><circle cx="190" cy="58" r="3.3"/><circle cx="240" cy="66" r="3.3"/><circle cx="295" cy="80" r="3.3"/><circle cx="350" cy="88" r="3.3"/><circle cx="410" cy="84" r="3.3"/><circle cx="470" cy="74" r="3.3"/><circle cx="525" cy="72" r="3.3"/><circle cx="580" cy="74" r="3.3"/><circle cx="625" cy="77" r="3.3"/>
+                <!-- nuclei continue right to the tip -->
+                <circle cx="655" cy="78" r="3.3"/><circle cx="675" cy="79" r="3.3"/>
+              </g>
+              <text class="llb" x="150" y="115">sheath present (does not stain with Giemsa)</text>
+              <text class="llb" x="560" y="108">nuclei extend to the very tip</text>
+            </svg>
+            <div class="figcap">Schematic — sheathed microfilaria in which the <strong>column of nuclei continues into the tip</strong> of the tail (contrast with <em>Wuchereria</em>).</div>
+          </div>
+          <ul>
+            <li><strong>Sheathed</strong>; sheath does <strong>not</strong> stain with Giemsa.</li>
+            <li><strong>Nuclei extend continuously to the tip of the tail</strong> — the defining feature.</li>
+            <li><strong>Diurnal periodicity</strong> → draw blood around <strong>midday</strong>.</li>
+            <li>Causes <strong>loiasis</strong>: transient <strong>Calabar swellings</strong> and the adult worm crossing the <strong>conjunctiva</strong> ("eye worm"); central/west Africa; marked eosinophilia.</li>
+          </ul>
+        </section>
+
+        <!-- 33. MANSONELLA -->
+        <section class="slide">
+          <p class="eyebrow">The unsheathed ones</p>
+          <h2><em>Mansonella</em> species</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3><em>M. perstans</em></h3>
+              <ul>
+                <li><strong>Unsheathed.</strong></li>
+                <li><strong>Blunt, rounded tail</strong> with <strong>nuclei extending to the tip.</strong></li>
+                <li><strong>Non-periodic.</strong></li>
+                <li>Usually mild / often asymptomatic; Africa &amp; South America.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3><em>M. ozzardi</em></h3>
+              <ul>
+                <li><strong>Unsheathed.</strong></li>
+                <li><strong>Long, pointed tail</strong> with <strong>nuclei NOT reaching the tip.</strong></li>
+                <li><strong>Non-periodic.</strong></li>
+                <li>New World (Latin America/Caribbean).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Where they sit in the key</span>
+            The <em>Mansonella</em> species are the main <strong>blood microfilariae without a sheath</strong>. After you establish "no sheath," the tail (blunt with nuclei to tip = <em>perstans</em>; pointed without nuclei to tip = <em>ozzardi</em>) separates them. <em>Onchocerca volvulus</em> is unsheathed too but lives in <strong>skin</strong>, not blood — diagnosed by skin snip, not film.
+          </div>
+        </section>
+
+        <!-- 34. MICROFILARIA DIFFERENTIATION TABLE -->
+        <section class="slide">
+          <p class="eyebrow">The microfilaria master key</p>
+          <h2>Differentiating blood microfilariae</h2>
+          <table class="cmp">
+            <thead>
+              <tr><th>Species</th><th class="hl">Sheath</th><th class="hl">Sheath stain (Giemsa)</th><th class="hl">Tail nuclei</th><th>Periodicity</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong><em>W. bancrofti</em></strong></td><td class="good">Sheathed</td><td>Does not stain</td><td>Do <strong>not</strong> reach tip (tip clear)</td><td>Nocturnal</td></tr>
+              <tr><td><strong><em>B. malayi</em></strong></td><td class="good">Sheathed</td><td>Stains pink</td><td><strong>Two separate</strong> terminal nuclei at tip</td><td>Nocturnal</td></tr>
+              <tr><td><strong><em>Loa loa</em></strong></td><td class="good">Sheathed</td><td>Does not stain</td><td>Continuous <strong>to the tip</strong></td><td>Diurnal (midday)</td></tr>
+              <tr><td><strong><em>M. perstans</em></strong></td><td class="bad">Unsheathed</td><td>—</td><td>To tip; <strong>blunt</strong> tail</td><td>Non-periodic</td></tr>
+              <tr><td><strong><em>M. ozzardi</em></strong></td><td class="bad">Unsheathed</td><td>—</td><td><strong>Not</strong> to tip; pointed tail</td><td>Non-periodic</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Decision path</span>
+            <strong>Sheath?</strong> → No: <em>Mansonella</em> (tail decides perstans vs ozzardi). Yes → <strong>nuclei to the tip?</strong> Yes = <em>Loa</em>. No = <em>Wuchereria</em> (clear tip) or <em>Brugia</em> (two terminal nuclei + pink sheath).
+          </div>
+          <div class="src-note">Features compiled from Garcia, <em>Diagnostic Medical Parasitology</em>, and CDC DPDx. Content rephrased for compliance with licensing restrictions.</div>
+        </section>
+
+        <!-- 35. PERIODICITY & CONCENTRATION -->
+        <section class="slide">
+          <p class="eyebrow">Getting the parasite into the specimen</p>
+          <h2>Periodicity &amp; concentration techniques</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Timing the draw (periodicity)</h3>
+              <ul>
+                <li><strong>Nocturnal</strong> (<em>W. bancrofti</em>, <em>B. malayi</em>): sample <strong>22:00–02:00</strong>.</li>
+                <li><strong>Diurnal</strong> (<em>Loa loa</em>): sample around <strong>midday</strong>.</li>
+                <li><strong>Non-periodic</strong> (<em>Mansonella</em>): any time.</li>
+                <li>Wrong timing is a common cause of a falsely negative film.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Concentration methods (low counts)</h3>
+              <ul>
+                <li><strong>Knott's concentration</strong> — centrifuge blood in 2% formalin; examine the deposit.</li>
+                <li><strong>Membrane (Nuclepore) filtration</strong> — filter blood; microfilariae trapped on membrane.</li>
+                <li><strong>Thick film + Giemsa</strong> — routine screening.</li>
+                <li><strong>DEC provocation test</strong> — diethylcarbamazine draws nocturnal microfilariae into peripheral blood by day (use with caution in <em>Loa</em> — risk of severe reactions).</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Safety note the pathologist should know</span>
+            High <em>Loa loa</em> microfilarial loads carry a risk of <strong>encephalopathy</strong> with DEC or ivermectin — quantifying the microfilarial density before treatment is clinically important, another reason accurate counts matter.
+          </div>
+        </section>
+
+        <!-- 36. TRYPANOSOMES OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Section 5 · Flagellate protozoa</p>
+          <h2>Trypanosomes — the extracellular flagellates</h2>
+          <p class="deep">Trypanosomes are <strong>free-swimming</strong> flagellated protozoa seen <em>between</em> the blood cells (trypomastigote form). Two clinically distinct groups:</p>
+          <table class="cmp">
+            <thead><tr><th></th><th class="hl">African trypanosomiasis</th><th class="hl">American trypanosomiasis</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Organism</strong></td><td><em>T. brucei gambiense</em> (chronic, West/Central Africa) &amp; <em>rhodesiense</em> (acute, East Africa)</td><td><em>T. cruzi</em></td></tr>
+              <tr><td><strong>Disease</strong></td><td>Sleeping sickness</td><td>Chagas disease</td></tr>
+              <tr><td><strong>Vector</strong></td><td>Tsetse fly (<em>Glossina</em>)</td><td>Reduviid / "kissing" bug (triatomine), faecal</td></tr>
+              <tr><td><strong>Sign</strong></td><td>Winterbottom's sign (posterior cervical nodes); chancre</td><td>Romaña's sign (unilateral periorbital oedema)</td></tr>
+              <tr><td><strong>In blood film</strong></td><td>Trypomastigotes readily seen (esp. <em>rhodesiense</em>)</td><td>Trypomastigotes in <strong>acute</strong> phase; scanty in chronic</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Where the parasite hides in Chagas</span>
+            In <strong>chronic Chagas</strong>, blood trypomastigotes are scarce; the parasite persists intracellularly as <strong>amastigotes</strong> in cardiac and smooth muscle — diagnosis then relies on serology/PCR, not the film.
+          </div>
+        </section>
+
+        <!-- 37. TRYPANOSOME MORPHOLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Recognising the trypomastigote</p>
+          <h2>Trypanosome morphology &amp; diagnosis</h2>
+          <div class="figure">
+            <svg viewBox="0 0 640 190" width="640" role="img" aria-label="Trypomastigote structure">
+              <style>
+                .tbody{fill:#bcd3f0;stroke:#3f6fae;stroke-width:2;}
+                .tmemb{fill:none;stroke:#5e5ce6;stroke-width:2;stroke-dasharray:2 3;}
+                .tnuc{fill:#7fb0e8;stroke:#3f6fae;stroke-width:1;}
+                .tkin{fill:#b3005a;}
+                .tflag{fill:none;stroke:#0a84ff;stroke-width:2.5;stroke-linecap:round;}
+                .tlb{font:700 12px -apple-system,sans-serif;fill:#0a84ff;}
+                .tlt{font:12px -apple-system,sans-serif;fill:#6e6e73;}
+                .tln{stroke:#6e6e73;stroke-width:1;}
+              </style>
+              <!-- elongated body -->
+              <path class="tbody" d="M120 110 C 200 70, 380 70, 470 105 C 400 120, 220 125, 120 110 Z"/>
+              <!-- undulating membrane -->
+              <path class="tmemb" d="M140 108 C 210 82, 250 128, 310 96 C 360 74, 400 116, 455 104"/>
+              <!-- nucleus (central) -->
+              <ellipse class="tnuc" cx="300" cy="100" rx="16" ry="12"/>
+              <!-- kinetoplast (posterior) -->
+              <circle class="tkin" cx="140" cy="110" r="7"/>
+              <!-- free flagellum anterior -->
+              <path class="tflag" d="M470 105 C 520 96, 560 88, 600 80"/>
+              <!-- labels -->
+              <line class="tln" x1="140" y1="110" x2="120" y2="160"/><text class="tlb" x="60" y="175">kinetoplast (posterior)</text>
+              <line class="tln" x1="300" y1="100" x2="300" y2="45"/><text class="tlb" x="270" y="38">nucleus</text>
+              <line class="tln" x1="250" y1="118" x2="230" y2="160"/><text class="tlt" x="170" y="175">undulating membrane</text>
+              <text class="tlb" x="520" y="66">free flagellum</text>
+            </svg>
+            <div class="figcap">Schematic trypomastigote — elongated body, central nucleus, posterior <strong>kinetoplast</strong>, an <strong>undulating membrane</strong> along the body, and a <strong>free anterior flagellum</strong>.</div>
+          </div>
+          <div class="twocol">
+            <div class="colbox a"><h3>Distinguishing the two</h3><ul><li><em>T. cruzi</em>: often <strong>C- or U-shaped</strong>, large kinetoplast.</li><li><em>T. brucei</em>: more slender; kinetoplast small.</li></ul></div>
+            <div class="colbox b"><h3>Diagnosis</h3><ul><li>Thick/thin film, <strong>buffy coat</strong>, wet prep (motile organisms).</li><li>Lymph-node aspirate, CSF (staging African disease); serology/PCR.</li></ul></div>
+          </div>
+        </section>
+
+
+        <!-- 38. LEISHMANIA OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Section 6 · Intracellular protozoa</p>
+          <h2>Visceral leishmaniasis &amp; LD bodies</h2>
+          <p class="deep"><em>Leishmania donovani</em> (visceral leishmaniasis / <strong>kala-azar</strong>) is transmitted by the <strong>sandfly</strong> (<em>Phlebotomus</em>). In the human host it lives as the <strong>amastigote</strong> — the <strong>Leishman–Donovan (LD) body</strong> — inside macrophages of the spleen, liver, and bone marrow.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🩻</div><h3>Clinical picture</h3><p>Fever, massive <strong>splenomegaly</strong>, weight loss, darkening of skin (kala-azar = "black fever").</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Blood picture</h3><p><strong>Pancytopenia</strong> (hypersplenism + marrow involvement); marked <strong>polyclonal hypergammaglobulinaemia</strong> → very high ESR, rouleaux.</p></div>
+            <div class="card"><div class="ic">🔬</div><h3>Best specimens</h3><p><strong>Splenic aspirate</strong> (highest sensitivity, but risky) &gt; <strong>bone marrow</strong> &gt; lymph node; buffy-coat smears in HIV co-infection.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">When to think of it</span>
+            A marrow examined for <strong>unexplained pancytopenia with splenomegaly</strong>, especially in a patient from an endemic area (Indian subcontinent, East Africa, Mediterranean, Brazil), should be scrutinised for LD bodies within macrophages.
+          </div>
+        </section>
+
+        <!-- 39. LEISHMANIA MORPHOLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Recognising the amastigote</p>
+          <h2>LD-body morphology in the marrow</h2>
+          <div class="figure">
+            <svg viewBox="0 0 520 210" width="520" role="img" aria-label="Leishman-Donovan bodies in a macrophage">
+              <style>
+                .mphi{fill:#eaf1fb;stroke:#8aa9d6;stroke-width:2;}
+                .mphn{fill:#9db8e0;stroke:#5e7cb0;stroke-width:1;}
+                .amb{fill:#cfe0f5;stroke:#4a6fa5;stroke-width:1;}
+                .amn{fill:#7a1440;}
+                .amk{fill:#b3005a;}
+                .glt{font:600 13px -apple-system,sans-serif;fill:#1d1d1f;text-anchor:middle;}
+                .gls{font:11.5px -apple-system,sans-serif;fill:#6e6e73;text-anchor:middle;}
+                .glb{font:700 11.5px -apple-system,sans-serif;fill:#0a84ff;}
+                .gln{stroke:#6e6e73;stroke-width:0.8;}
+              </style>
+              <!-- macrophage -->
+              <ellipse class="mphi" cx="180" cy="100" rx="120" ry="80"/>
+              <ellipse class="mphn" cx="120" cy="70" rx="26" ry="20"/>
+              <!-- amastigotes: oval, with nucleus + rod-like kinetoplast -->
+              <g>
+                <g transform="translate(170,90)"><ellipse class="amb" cx="0" cy="0" rx="12" ry="8"/><circle class="amn" cx="-3" cy="0" r="3.2"/><rect class="amk" x="4" y="-2" width="6" height="2.4" rx="1"/></g>
+                <g transform="translate(210,120)"><ellipse class="amb" cx="0" cy="0" rx="12" ry="8"/><circle class="amn" cx="-3" cy="0" r="3.2"/><rect class="amk" x="4" y="-2" width="6" height="2.4" rx="1"/></g>
+                <g transform="translate(150,130)"><ellipse class="amb" cx="0" cy="0" rx="12" ry="8"/><circle class="amn" cx="-3" cy="0" r="3.2"/><rect class="amk" x="4" y="-2" width="6" height="2.4" rx="1"/></g>
+                <g transform="translate(230,80)"><ellipse class="amb" cx="0" cy="0" rx="12" ry="8"/><circle class="amn" cx="-3" cy="0" r="3.2"/><rect class="amk" x="4" y="-2" width="6" height="2.4" rx="1"/></g>
+                <g transform="translate(120,110)"><ellipse class="amb" cx="0" cy="0" rx="12" ry="8"/><circle class="amn" cx="-3" cy="0" r="3.2"/><rect class="amk" x="4" y="-2" width="6" height="2.4" rx="1"/></g>
+              </g>
+              <!-- enlarged single amastigote -->
+              <g transform="translate(420,90)">
+                <ellipse class="amb" cx="0" cy="0" rx="42" ry="30"/>
+                <circle class="amn" cx="-12" cy="-2" r="11"/>
+                <rect class="amk" x="8" y="-6" width="20" height="7" rx="3"/>
+                <line class="gln" x1="-12" y1="-2" x2="-30" y2="-40"/><text class="glb" x="-52" y="-46">nucleus</text>
+                <line class="gln" x1="18" y1="-2" x2="34" y2="-40"/><text class="glb" x="18" y="-46">kinetoplast</text>
+              </g>
+              <text class="glt" x="180" y="200">Macrophage packed with LD bodies</text>
+              <text class="gls" x="420" y="150">amastigote (enlarged)</text>
+            </svg>
+            <div class="figcap">Schematic — small oval <strong>amastigotes (LD bodies)</strong> filling a macrophage; each has a round nucleus plus a rod-shaped <strong>kinetoplast</strong> ("double dot") and no external flagellum.</div>
+          </div>
+          <ul>
+            <li><strong>2–4 µm oval bodies</strong>, intracellular (macrophage) or extracellular if the cell has ruptured.</li>
+            <li><strong>Two-dot sign</strong>: round <strong>nucleus</strong> + smaller rod-like <strong>kinetoplast</strong> — the pair is the key to identification.</li>
+            <li>Confirm with culture (NNN medium), <strong>rK39 serology</strong>, or PCR; the amastigote in a marrow macrophage is diagnostic.</li>
+          </ul>
+        </section>
+
+        <!-- 40. TOXOPLASMA & OTHERS -->
+        <section class="slide">
+          <p class="eyebrow">Rare but important</p>
+          <h2>Other organisms in blood / marrow</h2>
+          <div class="cards">
+            <div class="card"><div class="ic">🧠</div><h3><em>Toxoplasma gondii</em></h3><p>Crescentic <strong>tachyzoites</strong> occasionally in buffy coat/marrow of the <strong>severely immunocompromised</strong>. Usually diagnosed serologically/PCR, not on film.</p></div>
+            <div class="card"><div class="ic">🍄</div><h3>Histoplasma (mimic!)</h3><p><em>Histoplasma capsulatum</em> yeasts inside macrophages closely <strong>mimic LD bodies</strong> — but have a <strong>clear halo</strong> and <strong>no kinetoplast</strong>. A classic trap in HIV marrows.</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Microsporidia / others</h3><p>Rarely relevant to the blood film; mentioned for completeness in immunodeficiency.</p></div>
+            <div class="card"><div class="ic">🐛</div><h3><em>Strongyloides</em> (hyperinfection)</h3><p>Larvae rarely in sputum/stool, not blood — but causes <strong>eosinophilia</strong> and, in hyperinfection, Gram-negative sepsis.</p></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The single most important distinction here</span>
+            <strong>LD body vs Histoplasma:</strong> the amastigote has a <strong>kinetoplast</strong> (the extra rod/dot) and lies directly in cytoplasm; <em>Histoplasma</em> has a surrounding clear halo (artefactual capsule) and <strong>no kinetoplast</strong>. Get this wrong and the treatment is completely different.
+          </div>
+        </section>
+
+        <!-- 41. INTESTINAL HELMINTHS -->
+        <section class="slide">
+          <p class="eyebrow">Parasites that never appear on the film</p>
+          <h2>Gut parasites with haematological effects</h2>
+          <p class="deep">These organisms live in the intestine, yet the <strong>haematologist meets them as an anaemia</strong> whose cause is only found on stool examination.</p>
+          <table class="cmp">
+            <thead><tr><th>Parasite</th><th>Mechanism</th><th class="hl">Blood picture</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Hookworm</strong> (<em>Ancylostoma</em>, <em>Necator</em>)</td><td>Chronic intestinal blood loss (worms feed on mucosa)</td><td class="hl">Iron-deficiency anaemia — microcytic, hypochromic; ± eosinophilia</td></tr>
+              <tr><td><strong><em>Diphyllobothrium latum</em></strong> (fish tapeworm)</td><td>Competes for / absorbs vitamin B<sub>12</sub></td><td class="hl">Megaloblastic (macrocytic) anaemia; hypersegmented neutrophils</td></tr>
+              <tr><td><strong><em>Trichuris trichiura</em></strong> (whipworm)</td><td>Mucosal damage / blood loss in heavy load</td><td class="hl">Iron-deficiency anaemia (children); ± eosinophilia</td></tr>
+              <tr><td><strong><em>Schistosoma</em></strong></td><td>Chronic GI/urinary blood loss; hypersplenism</td><td class="hl">Iron-deficiency anaemia; anaemia of chronic disease; eosinophilia</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Two clean associations to remember</span>
+            <strong>Hookworm → iron deficiency (microcytic)</strong>; <strong>fish tapeworm → B<sub>12</sub> deficiency (macrocytic).</strong> A microcytic anaemia with eosinophilia in an endemic-area patient should prompt a stool examination for ova.
+          </div>
+        </section>
+
+        <!-- 42. HAEMATOLOGICAL CONSEQUENCES -->
+        <section class="slide">
+          <p class="eyebrow">The systemic blood response</p>
+          <h2>How parasites disturb the blood</h2>
+          <div class="cards">
+            <div class="card"><div class="ic">📉</div><h3>Anaemia — many mechanisms</h3><p><strong>Haemolysis</strong> (malaria, babesia), <strong>blood loss</strong> (hookworm), <strong>marrow suppression/dyserythropoiesis</strong>, <strong>hypersplenism</strong> (kala-azar), and nutrient loss (B<sub>12</sub>/iron).</p></div>
+            <div class="card"><div class="ic">🔺</div><h3>Eosinophilia</h3><p>Hallmark of <strong>tissue-invasive helminths</strong> (filariae, hookworm, strongyloides, schistosomes). Protozoa (malaria, leishmania) usually do <strong>not</strong> raise eosinophils.</p></div>
+            <div class="card"><div class="ic">🩸</div><h3>Thrombocytopenia</h3><p>Very common in malaria; also seen in visceral leishmaniasis (hypersplenism).</p></div>
+            <div class="card"><div class="ic">🔥</div><h3>Haemophagocytosis / HLH</h3><p>Malaria, leishmaniasis and other infections can trigger <strong>haemophagocytic lymphohistiocytosis</strong> — macrophages engulfing blood cells in the marrow.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">A quick discriminator</span>
+            <strong>Eosinophilia points to worms, not protozoa.</strong> So a febrile patient with prominent eosinophilia is more likely to have filariasis/strongyloidiasis than malaria — a useful steer when the film is not obviously positive.
+          </div>
+        </section>
+
+        <!-- 43. BONE MARROW -->
+        <section class="slide">
+          <p class="eyebrow">When the film isn't enough</p>
+          <h2>Bone marrow examination for parasites</h2>
+          <p class="deep">The marrow is a key specimen when organisms are intracellular or scanty in blood. What the pathologist looks for:</p>
+          <ul>
+            <li><strong>Leishmania (LD bodies)</strong> within macrophages — the leading indication; examine oil-immersion of aspirate smears and touch imprints systematically.</li>
+            <li><strong>Haemophagocytosis</strong> — macrophages engulfing red cells, platelets and precursors (infection-associated HLH).</li>
+            <li><strong>Malarial pigment</strong> in marrow macrophages (heavy/treated malaria); dyserythropoiesis.</li>
+            <li><strong>Toxoplasma / Histoplasma</strong> in immunocompromised (remember the LD-body mimic).</li>
+            <li>Reactive changes: plasmacytosis (kala-azar), erythroid hyperplasia (haemolysis) or hypoplasia.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Technique tip</span>
+            For LD bodies, scan the <strong>tails and edges</strong> of the smear where intact macrophages settle, and always at <strong>×100 oil</strong>. A negative aspirate does not exclude visceral leishmaniasis — sensitivity is highest for splenic aspirate, then marrow.
+          </div>
+        </section>
+
+
+        <!-- 44. CONCENTRATION & SPECIAL TECHNIQUES -->
+        <section class="slide">
+          <p class="eyebrow">Section 7 · Laboratory methods</p>
+          <h2>Concentration &amp; special techniques</h2>
+          <p class="deep">When organisms are scanty, concentration boosts sensitivity. Match the method to the target:</p>
+          <table class="cmp">
+            <thead><tr><th>Technique</th><th>Target</th><th>Principle</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Thick film</strong></td><td>Malaria, microfilariae, trypanosomes</td><td>Concentrates ~10–20× blood volume; lyses RBCs</td></tr>
+              <tr><td><strong>Buffy-coat smear</strong></td><td>Trypanosomes, <em>Leishmania</em>, microfilariae</td><td>Concentrates WBC/parasite layer after centrifugation</td></tr>
+              <tr><td><strong>QBC (acridine orange)</strong></td><td>Malaria, trypanosomes, microfilariae</td><td>Fluorescent DNA stain in a spun capillary; sensitive but no speciation</td></tr>
+              <tr><td><strong>Knott's concentration</strong></td><td>Microfilariae</td><td>Lyse in 2% formalin, centrifuge, examine deposit</td></tr>
+              <tr><td><strong>Membrane filtration</strong></td><td>Microfilariae</td><td>Blood filtered through polycarbonate membrane</td></tr>
+              <tr><td><strong>Culture (NNN)</strong></td><td><em>Leishmania</em>, <em>T. cruzi</em></td><td>Grows promastigotes/epimastigotes from aspirates</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Principle behind them all</span>
+            You either <strong>increase the volume examined</strong> (thick film, filtration), <strong>physically concentrate</strong> the parasite (buffy coat, Knott's), or <strong>amplify the signal</strong> (fluorescence, PCR). Concentration methods improve sensitivity but most sacrifice the morphology needed for species ID — hence a thin film alongside.
+          </div>
+        </section>
+
+        <!-- 45. MOLECULAR / SEROLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Non-morphological methods</p>
+          <h2>Antigen, antibody &amp; molecular tests</h2>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🧪</div><h3>Antigen detection</h3><p>Malaria <strong>RDTs</strong> (HRP-2, pLDH, aldolase); circulating filarial antigen (CFA) for <em>W. bancrofti</em>. Fast, field-usable.</p></div>
+            <div class="card"><div class="ic">💉</div><h3>Antibody (serology)</h3><p><strong>rK39</strong> for visceral leishmaniasis; serology for Chagas &amp; toxoplasmosis. Good for chronic/low-parasite states; cannot distinguish past vs active for some.</p></div>
+            <div class="card"><div class="ic">🧬</div><h3>Molecular (PCR)</h3><p>Highest sensitivity/specificity; species confirmation (essential for <em>P. knowlesi</em>, mixed malaria), and low-level chronic Chagas.</p></div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Situation</th><th class="hl">Preferred confirmatory test</th></tr></thead>
+            <tbody>
+              <tr><td>Acute malaria triage</td><td>RDT + microscopy</td></tr>
+              <tr><td>Malaria species uncertainty / knowlesi / mixed</td><td>PCR</td></tr>
+              <tr><td>Visceral leishmaniasis (immunocompetent)</td><td>rK39 serology + marrow/splenic aspirate</td></tr>
+              <tr><td>Chronic Chagas</td><td>Serology (≥2 methods) ± PCR</td></tr>
+              <tr><td>Lymphatic filariasis</td><td>Night film + circulating filarial antigen</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 46. REPORTING -->
+        <section class="slide">
+          <p class="eyebrow">Communicating the result</p>
+          <h2>Reporting parasites — what to include</h2>
+          <p class="deep">A parasitology report is a clinical instruction, not just an observation. For malaria in particular it must be complete and rapid.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🦟</div><h3>Malaria report</h3><p>State <strong>(1) parasite seen</strong>, <strong>(2) species</strong> (or "species to be confirmed"), <strong>(3) stages present</strong> (esp. gametocytes), and <strong>(4) % parasitaemia / density.</strong></p></div>
+            <div class="card"><div class="ic">📞</div><h3>Critical communication</h3><p><em>P. falciparum</em>, high parasitaemia, or any severe-malaria clue → <strong>telephone the clinician</strong> and document the call. Treat as a critical/panic result.</p></div>
+            <div class="card"><div class="ic">🪱</div><h3>Microfilaria report</h3><p>Species + <strong>sheath</strong> and <strong>tail-nuclei</strong> features that support it; note periodicity/time of sample; density if relevant (esp. <em>Loa</em>).</p></div>
+            <div class="card"><div class="ic">⏱️</div><h3>Negative but suspected</h3><p>State that a single negative film does <strong>not exclude</strong> malaria and recommend <strong>repeat films ×3 over 48 h</strong> and/or antigen/PCR.</p></div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">Never do this</span>
+            Never issue a bare "malaria parasites seen" without species (or a "to be confirmed") and a parasitaemia figure for <em>falciparum</em>. The number changes whether the patient goes home or to intensive care.
+          </div>
+        </section>
+
+        <!-- 47. QC & MIMICS -->
+        <section class="slide">
+          <p class="eyebrow">Quality &amp; error prevention</p>
+          <h2>Quality control, mimics &amp; common errors</h2>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Sources of error</h3>
+              <ul>
+                <li><strong>Wrong stain pH</strong> → dots absent → species missed.</li>
+                <li><strong>Old EDTA blood</strong> → distorted parasites, platelet clumps, gametocyte exflagellation.</li>
+                <li><strong>Thick film too thick / heat-fixed</strong> → washes off.</li>
+                <li><strong>Under-examination</strong> → declaring negative after too few fields (examine ≥100–200 thick-film fields).</li>
+                <li><strong>Inexperience with imported species</strong> in non-endemic labs.</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>Good-practice safeguards</h3>
+              <ul>
+                <li>Buffer water to <strong>pH 7.2</strong>; run stain QC with known positives.</li>
+                <li>Make films <strong>promptly</strong> from fresh blood.</li>
+                <li>Always pair <strong>thick + thin</strong>; keep an atlas at the bench.</li>
+                <li><strong>Repeat films ×3</strong> before excluding malaria.</li>
+                <li>Second-reader / reference-lab confirmation for species and for knowlesi.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The two-way error to fear most</span>
+            A <strong>false negative</strong> in falciparum can be fatal; a <strong>false positive</strong> from a platelet-on-RBC leads to unnecessary toxic therapy. Discipline in technique and the "blue cytoplasm + red chromatin, in-plane" rule prevents both.
+          </div>
+        </section>
+
+        <!-- 48. MASTER SUMMARY TABLE -->
+        <section class="slide">
+          <p class="eyebrow">One-glance revision</p>
+          <h2>Master summary — organism at a glance</h2>
+          <table class="cmp">
+            <thead><tr><th>Organism</th><th class="hl">Where on specimen</th><th class="hl">Key feature</th><th>Best test</th></tr></thead>
+            <tbody>
+              <tr><td><strong><em>Plasmodium</em></strong></td><td>Inside RBC</td><td>Rings/pigment; species by RBC size, dots, stages</td><td>Thick+thin film; RDT; PCR</td></tr>
+              <tr><td><strong><em>Babesia</em></strong></td><td>Inside RBC</td><td>Maltese-cross tetrad; <strong>no pigment</strong>; extracellular forms</td><td>Thin film; PCR; serology</td></tr>
+              <tr><td><strong>Microfilariae</strong></td><td>Free in plasma (large)</td><td>Sheath ± ; tail-nuclei pattern</td><td>Night/day film; Knott's; filtration; CFA</td></tr>
+              <tr><td><strong><em>Trypanosoma</em></strong></td><td>Extracellular (plasma)</td><td>Kinetoplast + undulating membrane + flagellum</td><td>Film; buffy coat; serology/PCR</td></tr>
+              <tr><td><strong><em>Leishmania</em></strong></td><td>Inside macrophage (marrow/spleen)</td><td>LD body — nucleus + kinetoplast ("two dots")</td><td>Marrow/splenic aspirate; rK39; PCR</td></tr>
+              <tr><td><strong>Hookworm / <em>D. latum</em></strong></td><td>Not on film</td><td>Anaemia: iron-deficiency / B<sub>12</sub></td><td>Stool for ova</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">If you remember one line per organism</span>
+            Malaria = pigment + rings; Babesia = Maltese cross, no pigment; Microfilaria = big + sheath/tail key; Trypanosome = kinetoplast + undulating membrane; Leishmania = two-dot amastigote in a macrophage.
+          </div>
+        </section>
+
+        <!-- 49. DIAGNOSTIC ALGORITHM RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Putting it together</p>
+          <h2>Diagnostic algorithm — the whole session on one slide</h2>
+          <div class="flow vert" style="max-width:760px;margin:10px auto;">
+            <div class="flow-box" style="min-width:460px;">Febrile / anaemic patient + relevant travel/exposure</div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box alt" style="min-width:460px;">Thick + thin films (Giemsa pH 7.2) · consider RDT · buffy coat</div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow" style="justify-content:center;gap:12px;">
+              <div class="flow-box green">Intra-RBC<span class="sm">pigment+rings → malaria (speciate, quantify) · tetrad/no pigment → Babesia</span></div>
+              <div class="flow-box amber">Extracellular<span class="sm">large worm → microfilaria (sheath/tail) · flagellate → trypanosome</span></div>
+              <div class="flow-box" style="border-color:#5e5ce6;background:#f3f1ff;">In macrophage<span class="sm">marrow/spleen → Leishmania LD bodies</span></div>
+            </div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box warn" style="min-width:460px;">Film negative but suspicion high? → repeat ×3 / 48h · PCR · serology · stool for ova</div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box green" style="min-width:460px;">Report with species, stage &amp; parasitaemia · phone critical malaria results</div>
+          </div>
+        </section>
+
+        <!-- 50. REFERENCES -->
+        <section class="slide">
+          <p class="eyebrow">Standard sources for pathology residents</p>
+          <h2>Key references</h2>
+          <p class="deep">Content in this deck is a teaching synthesis of the following standard textbooks and reference resources. Consult them (and their photomicrograph atlases) for authoritative detail and images:</p>
+          <ol class="ref-list">
+            <li><strong>Bain BJ.</strong> <em>Blood Cells: A Practical Guide.</em> Wiley-Blackwell — the reference for blood-film morphology, including malaria &amp; microfilariae.</li>
+            <li><strong>Bain BJ, Bates I, Laffan MA.</strong> <em>Dacie and Lewis Practical Haematology.</em> Elsevier — film preparation, staining &amp; parasite detection methods.</li>
+            <li><strong>Greer JP et al. (eds).</strong> <em>Wintrobe's Clinical Hematology.</em> Wolters Kluwer — haematological effects of parasitic disease.</li>
+            <li><strong>Hoffman R et al.</strong> <em>Hematology: Basic Principles and Practice.</em> Elsevier.</li>
+            <li><strong>Kumar V, Abbas AK, Aster JC.</strong> <em>Robbins &amp; Cotran Pathologic Basis of Disease.</em> Elsevier — pathology of malaria, leishmaniasis, filariasis.</li>
+            <li><strong>Garcia LS.</strong> <em>Diagnostic Medical Parasitology.</em> ASM Press — morphology &amp; identification keys.</li>
+            <li><strong>World Health Organization.</strong> <em>Basic Malaria Microscopy</em> (Parts I &amp; II) &amp; <em>Guidelines for Malaria.</em></li>
+            <li><strong>CDC DPDx</strong> — Laboratory Identification of Parasites of Public Health Concern (open-access image atlas &amp; keys).</li>
+          </ol>
+          <div class="src-note">All descriptive content on the preceding slides was paraphrased and reorganised for teaching. Content was rephrased for compliance with licensing restrictions; consult the primary sources for verbatim text and original photomicrographs.</div>
+        </section>
+
+        <!-- 51. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Theory</span>
+            <h1>Now, to the microscope.</h1>
+            <div class="sub">The blood film rewards a disciplined eye: know where each organism lives, ask the five questions for malaria, and let the sheath-and-tail key name the microfilaria. When in doubt — repeat the film, and pick up the phone for falciparum.</div>
+            <div class="meta">Parasites in Haematology &nbsp;&nbsp;•&nbsp;&nbsp; Pathology Residency Teaching &nbsp;&nbsp;•&nbsp;&nbsp; Questions &amp; case films to follow.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Parasites in Haematology — Pathology Teaching</span>
+          <span>Haematology · Blood &amp; Marrow Parasites</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 51</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
