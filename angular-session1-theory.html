@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 1 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(147,39,240,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #f8f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Component tree visual (Angular's parent-child structure) */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #dd0031; }
+    .stack-row.l2 { border-left-color: #9327f0; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* Version timeline */
+    .timeline { position: relative; margin-top: 18px; padding: 0; list-style: none; }
+    .timeline::before {
+      content: ""; position: absolute; left: 14px; top: 8px; bottom: 8px;
+      width: 2px; background: linear-gradient(180deg, #dd0031, #9327f0);
+    }
+    .timeline li { position: relative; padding: 7px 0 7px 46px; font-size: 16.5px; margin: 0; }
+    .timeline li::before {
+      content: ""; position: absolute; left: 8px; top: 14px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--mac-accent);
+    }
+    .timeline li .yr { font-weight: 800; color: var(--mac-accent); margin-right: 10px; font-variant-numeric: tabular-nums; }
+
+    /* Mock browser preview — shows what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin-top: 14px; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+
+    /* Data-flow direction map (used for the four binding types) */
+    .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
+    .bindmap .side {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fafafc;
+    }
+    .bindmap .side h3 { margin: 0 0 6px; font-size: 16px; }
+    .bindmap .side p { font-size: 14.5px; margin: 0; }
+    .bindmap .dir { text-align: center; color: var(--mac-accent); font-weight: 700; font-size: 13px; min-width: 90px; }
+    .bindmap .dir .a { font-size: 24px; display: block; line-height: 1.1; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(221,0,49,0.09);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #dd0031, #9327f0);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session1-theory.html — Angular Session 1</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 1 of 4 — Angular Series</span>
+            <h1>TypeScript &amp; Angular Basics</h1>
+            <div class="sub">From "what even is a framework?" to your own Angular app running in the browser — and the language, TypeScript, that makes it all work.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. THE DESTINATION -->
+        <section class="slide">
+          <p class="eyebrow">Before we start — where are we going?</p>
+          <h2>The four-session journey</h2>
+          <p class="deep">It helps enormously to see the destination on day one. Over four sessions we build <strong>one application</strong>, adding a layer each time. Nothing is thrown away — every session's work becomes the foundation of the next.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1 · Today</span>
+              <span class="desc">TypeScript fundamentals + your first running Angular app. <strong>Output:</strong> a Hello World app you edited yourself.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2</span>
+              <span class="desc">Components, templates, the four kinds of data binding, directives &amp; pipes. <strong>Output:</strong> a colour-coded employee table + a login form.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3</span>
+              <span class="desc">Forms (both styles), validation, services, HttpClient, Observables. <strong>Output:</strong> data moves from a hardcoded array to a service, then to a live API.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4</span>
+              <span class="desc">Routing + a complete Customer Management CRUD app. <strong>Output:</strong> a multi-page, navigable, service-backed application.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">How today is delivered</span>
+            These slides stay on the main screen. The <strong>lab sheet stays open on your machine</strong>, and every lab task is tagged with the slide it belongs to — so we explain, then you build, in lockstep. You are expected to be typing, not just watching.
+          </div>
+        </section>
+
+        <!-- 3. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Session 1 roadmap</h2>
+          <ul class="agenda">
+            <li><span class="num">1</span> What Angular is, and what a single-page application means</li>
+            <li><span class="num">2</span> Angular versions — and why "AngularJS" is a different thing</li>
+            <li><span class="num">3</span> Why Angular? A JSP/Servlet app vs the same app in Angular</li>
+            <li><span class="num">4</span> TypeScript: types, interfaces, optionals, unions, loops, arrays, tuples, classes</li>
+            <li><span class="num">5</span> Environment setup — Node.js and the Angular CLI</li>
+            <li><span class="num">6</span> Your first app: <code>ng new</code> → <code>ng serve</code> → the browser</li>
+            <li><span class="num">7</span> Anatomy of a generated project — what all those files do</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be <strong>read on its own afterwards</strong>, not just watched live. Every slide carries the full explanation of its topic, so you can revise from these slides alone without needing notes. If a slide feels long, that's deliberate — it's your reference copy.
+          </div>
+        </section>
+
+        <!-- 4. WHAT IS ANGULAR -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1</p>
+          <h2>What is Angular?</h2>
+          <p class="deep">Angular is an <strong>open-source front-end framework</strong>, written in TypeScript and maintained by <strong>Google</strong>. Its purpose is to build <strong>single-page applications</strong> — rich, app-like websites that run in the browser.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🅰️</div><h3>Written in TypeScript</h3><p>You also write your Angular code in TypeScript. The framework and your app speak the same language.</p></div>
+            <div class="card"><div class="ic">🏢</div><h3>Backed by Google</h3><p>Used in Google's own products. Predictable release cadence, long-term support, huge ecosystem.</p></div>
+            <div class="card"><div class="ic">🧩</div><h3>Component-based</h3><p>From Angular 2 onwards, everything is a <strong>component</strong>. Your app is a tree of them — a parent with children, each child with its own children.</p></div>
+            <div class="card"><div class="ic">🔋</div><h3>Batteries included</h3><p>Routing, forms, HTTP, testing and a CLI all ship as part of the framework. You don't assemble them from ten libraries.</p></div>
+          </div>
+          <p class="deep" style="margin-top:14px;">That last point is the one to hold on to. In Angular you never build "a page" — you build small, self-contained components and then <strong>nest</strong> them inside each other until they form a page.</p>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            Have you used a website built with Angular (or React/Vue) before — Gmail, a banking dashboard, a booking site? What felt <em>different</em> about it compared to an older website?
+          </div>
+        </section>
+
+        <!-- 5. SPA EXPLAINED -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — the idea Angular is built around</p>
+          <h2>What is a single-page application?</h2>
+          <p class="deep">In a <strong>traditional multi-page application</strong> (JSP, Servlets, PHP, ASP.NET Web Forms), every click asks the server for a brand-new HTML page. The browser throws away everything it had and re-paints from scratch — you see the flash, the spinner, the scroll position jumping back to the top.</p>
+          <p class="deep">In a <strong>single-page application</strong>, the browser loads <em>one</em> HTML page — literally one file, <code>index.html</code> — exactly once. After that, JavaScript swaps pieces of the screen in and out. When new data is needed, only the <strong>data</strong> travels over the network (as JSON), not a whole new page.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Multi-page (the old way)</h3>
+              <ul>
+                <li>Every click = a full page reload</li>
+                <li>Server re-renders the entire HTML each time</li>
+                <li>Visible flicker; state is lost between pages</li>
+                <li>Server is responsible for the UI</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>Single-page (Angular)</h3>
+              <ul>
+                <li>One page load, then only sections change</li>
+                <li>Browser renders; server just returns JSON</li>
+                <li>Smooth, app-like, state survives navigation</li>
+                <li>Server is a pure API — reusable by mobile too</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why this matters to you as a Java developer</span>
+            This is a <strong>split of responsibility</strong>. Your Spring Boot REST API stops producing HTML and starts producing JSON. Angular consumes that JSON and owns the entire user interface. The same API can then serve a web app, an Android app and an iOS app without change — that's the real payoff.
+          </div>
+        </section>
+
+        <!-- 6. VERSIONS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3</p>
+          <h2>Angular versions — a short history</h2>
+          <ul class="timeline">
+            <li><span class="yr">2010</span><strong>AngularJS 1.x</strong> — the original. JavaScript-based, MVC architecture, used <code>$scope</code> and controllers. Still alive in legacy projects, but end-of-life.</li>
+            <li><span class="yr">2016</span><strong>Angular 2</strong> — a <em>complete rewrite</em>, not an upgrade. TypeScript, component-based, mobile-friendly, dramatically faster. This is where "modern Angular" begins.</li>
+            <li><span class="yr">2016–17</span><strong>Angular 4 &amp; 5</strong> — smaller bundles, the new HttpClient, faster compilation. (There is no Angular 3 — the router package had already reached v3, so they skipped the number to keep versions aligned.)</li>
+            <li><span class="yr">2018–19</span><strong>Angular 6, 7, 8</strong> — <code>ng update</code>, the CLI matures, differential loading, lazy loading improvements.</li>
+            <li><span class="yr">2020</span><strong>Angular 9 &amp; 10</strong> — the <strong>Ivy</strong> renderer becomes the default: smaller, faster, better error messages.</li>
+            <li><span class="yr">2021–22</span><strong>Angular 11 → 14</strong> — strict typing by default, standalone components introduced, typed reactive forms.</li>
+            <li><span class="yr">2023+</span><strong>Angular 15 → 17+</strong> — standalone APIs become the recommended default, signals, new control-flow syntax. Everything you learn here still applies.</li>
+          </ul>
+          <div class="warnbox">
+            <span class="lbl">Beginner note — the naming trap</span>
+            <strong>"AngularJS" means version 1.x only.</strong> <strong>"Angular"</strong> with no "JS" means version 2 and everything after it. They are different frameworks with different architectures — code does not port between them. When you search online, a StackOverflow answer using <code>$scope</code> is AngularJS and will not help you. Add the version number to your searches.
+          </div>
+          <p class="muted">Angular ships a major version roughly every six months. Don't be alarmed by high version numbers — the core concepts in these four sessions (components, binding, directives, services, routing) have been stable since Angular 2.</p>
+        </section>
+
+        <!-- 7. ANGULARJS VS ANGULAR -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 continued</p>
+          <h2>AngularJS (1.x) vs Angular (2+)</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:22%">Aspect</th><th>AngularJS 1.x</th><th>Angular 2+</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Language</strong></td><td class="bad">JavaScript</td><td class="good">TypeScript (compiles to JavaScript)</td></tr>
+              <tr><td><strong>Architecture</strong></td><td class="bad">MVC — controllers, <code>$scope</code>, directives</td><td class="good">Component-based — a tree of components</td></tr>
+              <tr><td><strong>Mobile support</strong></td><td class="bad">Not designed for mobile</td><td class="good">Mobile-first; works with Ionic/Cordova</td></tr>
+              <tr><td><strong>Performance</strong></td><td class="bad">Slower — two-way binding on everything, digest cycles</td><td class="good">Much faster — one-way data flow by default, Ivy renderer</td></tr>
+              <tr><td><strong>Dependency injection</strong></td><td>String-based, error-prone</td><td class="good">Type-based, hierarchical injector</td></tr>
+              <tr><td><strong>Tooling</strong></td><td class="bad">No official CLI</td><td class="good">Angular CLI — scaffold, serve, build, test</td></tr>
+              <tr><td><strong>Structure</strong></td><td>Loose — you invent your own</td><td class="good">Opinionated — same layout in every project</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Why the rewrite was worth it</span>
+            AngularJS's two-way-binding-everywhere model was magical for small apps and painful for large ones — it became almost impossible to reason about what changed what. Angular 2's component tree with explicit, directional data flow is the fix: data flows <em>down</em> into children, events flow <em>up</em> to parents. You always know where a change came from.
+          </div>
+        </section>
+
+        <!-- 8. WHY ANGULAR -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — the case for Angular</p>
+          <h2>Why Angular? A concrete comparison</h2>
+          <p class="deep">Imagine an <strong>employee management</strong> screen. Here's how the same feature set looks built two ways.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>❌ The JSP / Servlet version</h3>
+              <ul>
+                <li><code>list.jsp</code> — show all employees</li>
+                <li><code>search.jsp</code> — a search form + its results</li>
+                <li><code>insert.jsp</code> — add a new employee</li>
+                <li><code>update.jsp</code> — edit an existing one</li>
+                <li><code>delete.jsp</code> — confirm and delete</li>
+              </ul>
+              <p style="font-size:15px;"><strong>Five separate pages.</strong> Each click is a full round-trip and a full page reload. The HTML for the table is duplicated across files. Styling is hand-rolled. To add a column, you edit several JSPs.</p>
+            </div>
+            <div class="panel good">
+              <h3>✅ The Angular version</h3>
+              <ul>
+                <li>One <code>employee-list</code> component — the table</li>
+                <li>One <code>employee-form</code> component — reused for insert <em>and</em> update</li>
+                <li>Search is a filter on data already in memory — no server hit</li>
+                <li>Delete removes a row in place, no reload</li>
+                <li>Bootstrap/Material gives a polished UI for free</li>
+              </ul>
+              <p style="font-size:15px;"><strong>A handful of reusable components.</strong> To add a column you change one template. No page ever reloads.</p>
+            </div>
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            So what's the real advantage of Angular over a JSP/Servlet app? <span class="muted">(Look for: no reloads, reusable components, clean separation of UI and API, one backend serving many clients, and far less duplicated markup.)</span>
+          </div>
+        </section>
+
+        <!-- 9. WHERE ANGULAR SITS -->
+        <section class="slide">
+          <p class="eyebrow">The bigger picture</p>
+          <h2>Where Angular sits in your stack</h2>
+          <p class="deep">Angular is a <strong>front-end</strong> framework — it runs in the user's browser, not on your server. Your Spring Boot application becomes a pure JSON API sitting behind it.</p>
+          <div class="arch" id="archContainer">
+            <div class="arch-node"><div class="t">Browser</div><div class="d">Chrome / Edge / Safari</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">Angular App</div><div class="d">components, templates, services</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">HttpClient</div><div class="d">GET / POST / PUT / DELETE</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">REST API</div><div class="d">Spring Boot @RestController</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">Database</div><div class="d">MySQL / H2 / Oracle</div></div>
+          </div>
+          <div class="arch-fallback">Browser → Angular app → HttpClient → Spring Boot REST API → Database. Data returns along the same path as JSON.</div>
+          <div class="keybox">
+            <span class="lbl">The handshake</span>
+            Angular sends an HTTP request; Spring Boot answers with <strong>JSON</strong>; Angular turns that JSON into what the user sees. Everything you built in the Spring Boot sessions is the right-hand side of this diagram. Today we start building the left-hand side.
+          </div>
+          <p class="muted">Note that Angular never talks to the database directly. It has no credentials, no SQL — all of that stays safely on the server. This is a security feature, not a limitation.</p>
+        </section>
+
+        <!-- 10. WHAT IS TYPESCRIPT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 — the language</p>
+          <h2>What is TypeScript?</h2>
+          <p class="deep">JavaScript is <strong>loosely typed</strong> (also called dynamically typed): a variable has no fixed type, and can silently change from a number to a string to a boolean. The language allows it and says nothing.</p>
+          <pre><code>// Plain JavaScript — all three lines are legal
+let age = 42;        // a number
+age = "Anoop";       // now a string  (?!)
+age = true;          // now a boolean (?!)</code></pre>
+          <p class="deep">That flexibility is convenient in a five-line script and <strong>disastrous</strong> in a fifty-thousand-line application. A variable named <code>age</code> holding <code>true</code> will not crash where the mistake was made — it will crash somewhere far away, at runtime, in front of a user.</p>
+          <p class="deep"><strong>TypeScript</strong>, released by <strong>Microsoft in 2012</strong>, is a <span class="term">superset of JavaScript</span>: all valid JavaScript is valid TypeScript, plus TypeScript adds <strong>static typing</strong> on top. The same code above now fails immediately, in your editor, before you even save:</p>
+          <pre><code>// TypeScript
+let age = 42;
+age = "Anoop";
+// ✖ Error: Type 'string' is not assignable to type 'number'.</code></pre>
+          <div class="keybox">
+            <span class="lbl">"Superset" — what that means in practice</span>
+            You are not learning a new language from scratch. TypeScript is JavaScript <strong>plus type annotations</strong>. If you know Java, the type-checking part will feel immediately familiar; if you know JavaScript, everything you know still works.
+          </div>
+        </section>
+
+        <!-- 11. TS VS JS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 continued</p>
+          <h2>TypeScript vs JavaScript</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:24%">Aspect</th><th>JavaScript</th><th>TypeScript</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Typing</strong></td><td class="bad">Dynamic — types decided at runtime</td><td class="good">Static — types checked before the code runs</td></tr>
+              <tr><td><strong>Runs in the browser?</strong></td><td class="good">Directly</td><td>Must be <strong>compiled</strong> (transpiled) to JavaScript first</td></tr>
+              <tr><td><strong>When errors surface</strong></td><td class="bad">At runtime, in front of the user</td><td class="good">At compile time, in your editor</td></tr>
+              <tr><td><strong>IDE support</strong></td><td>Guesswork autocomplete</td><td class="good">Precise autocomplete, safe rename, jump-to-definition</td></tr>
+              <tr><td><strong>OOP features</strong></td><td>Classes only (ES6+)</td><td class="good">Classes, interfaces, generics, enums, access modifiers</td></tr>
+              <tr><td><strong>Best for</strong></td><td>Small scripts</td><td class="good">Large, long-lived, team-owned applications</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">The one-sentence summary</span>
+            TypeScript's types exist <strong>only at development time</strong> — they are stripped away during compilation, and the browser runs ordinary JavaScript. Types cost you nothing at runtime and save you enormous amounts of debugging. That is why Angular is written in TypeScript and why your Angular code will be too.
+          </div>
+        </section>
+
+        <!-- 12. TS: INFERENCE & DECLARED -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 1 of 7</p>
+          <h2>Type inference vs declared types</h2>
+          <p class="deep">There are two ways a TypeScript variable gets its type. Both give you full type safety — the difference is only whether <em>you</em> write the type or the compiler works it out.</p>
+          <h3>Inference — the compiler guesses from the initial value</h3>
+          <pre><code>let str = "Hello World";   // TS infers: string
+str = "Goodbye";           // ✔ fine — still a string
+str = 100;                 // ✖ Error: Type 'number' is not assignable to type 'string'</code></pre>
+          <h3>Declaration — you state the type explicitly with <code>: type</code></h3>
+          <pre><code>let name: string = "Anoop";
+let age: number = 40;
+let isActive: boolean = true;
+let anything: any = "could be anything";   // opts OUT of type checking</code></pre>
+          <table class="cmp">
+            <thead><tr><th>Type</th><th>Holds</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>string</code></td><td>Text</td><td><code>"Trivandrum"</code></td></tr>
+              <tr><td><code>number</code></td><td>Integers <em>and</em> decimals (no separate <code>int</code>/<code>float</code>)</td><td><code>25000.50</code></td></tr>
+              <tr><td><code>boolean</code></td><td>true / false</td><td><code>true</code></td></tr>
+              <tr><td><code>any</code></td><td>Anything — disables checking for that variable</td><td><code>let x: any;</code></td></tr>
+              <tr><td><code>void</code></td><td>Used for functions that return nothing</td><td><code>function log(): void</code></td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Use <code>any</code> sparingly</span>
+            <code>any</code> switches off the very feature you came for. It's an escape hatch for awkward third-party data, not a default. If your file is full of <code>any</code>, you're writing JavaScript with extra steps.
+          </div>
+        </section>
+
+        <!-- 13. TS: INTERFACES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 2 of 7</p>
+          <h2>Interfaces — giving an object a shape</h2>
+          <p class="deep">Types like <code>string</code> describe single values. An <span class="term">interface</span> describes the <strong>shape of an object</strong>: which properties it must have, and of what type.</p>
+          <pre><code>interface Person {
+  name: string;
+  city: string;
+  age: number;
+}
+
+let myData: Person = {
+  name: "Anoop",
+  city: "Trivandrum",
+  age: 40
+};
+
+console.log(myData.name);   // Anoop  — and the editor autocompletes '.name'</code></pre>
+          <p class="deep">Now the compiler protects you in three ways:</p>
+          <pre><code>let bad1: Person = { name: "Anoop", city: "Trivandrum" };
+// ✖ Property 'age' is missing
+
+let bad2: Person = { name: "Anoop", city: "Trivandrum", age: "forty" };
+// ✖ Type 'string' is not assignable to type 'number'
+
+let bad3: Person = { name: "Anoop", city: "Trivandrum", age: 40, pin: 695001 };
+// ✖ Object literal may only specify known properties — 'pin' does not exist on 'Person'</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why this matters for Angular</span>
+            When your API returns a list of employees, you'll declare <code>interface Employee { ... }</code> and type the response as <code>Employee[]</code>. From that moment on, the editor autocompletes every field, and a typo like <code>emp.nmae</code> is caught instantly instead of rendering as <code>undefined</code> in the browser. You'll do exactly this in Session 2.
+          </div>
+        </section>
+
+        <!-- 14. TS: OPTIONAL -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 3 of 7</p>
+          <h2>Optional properties — the <code>?</code> marker</h2>
+          <p class="deep">Real data is often incomplete: a user hasn't filled in their age, a middle name doesn't exist. Adding <code>?</code> after a property name makes it <strong>optional</strong> — present or absent, both valid.</p>
+          <pre><code>interface Person {
+  name: string;
+  city: string;
+  age?: number;      // ← optional
+}
+
+let p1: Person = { name: "Anoop", city: "Trivandrum", age: 40 };  // ✔ with age
+let p2: Person = { name: "Ajay",  city: "Chennai" };              // ✔ without age
+
+console.log(p2.age);   // undefined — not an error, just absent</code></pre>
+          <div class="note">
+            <span class="lbl">Required vs optional — the mental rule</span>
+            Ask: "could a valid object of this type genuinely be missing this field?" If yes, mark it <code>?</code>. If no, leave it required so the compiler forces you to supply it. Don't mark things optional just to silence an error — that only moves the bug to runtime.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The catch</span>
+            An optional property may be <code>undefined</code>, so guard before using it: <code>if (p2.age) { ... }</code>. This is exactly the discipline that prevents "cannot read property of undefined" — the single most common error in front-end development.
+          </div>
+        </section>
+
+        <!-- 15. TS: UNIONS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 4 of 7</p>
+          <h2>Union types — "one of these"</h2>
+          <p class="deep">Sometimes a value legitimately has more than one possible type. A <span class="term">union type</span>, written with the pipe <code>|</code>, says "any one of these types is acceptable — and nothing else."</p>
+          <pre><code>interface Person {
+  name: string;
+  city: string;
+  age: number | string;      // ← a number OR a string
+}
+
+let p1: Person = { name: "Anoop", city: "Trivandrum", age: 40 };        // ✔
+let p2: Person = { name: "Ajay",  city: "Chennai",    age: "Forty" };   // ✔
+let p3: Person = { name: "Rekha", city: "Kochi",      age: true };      // ✖ boolean not allowed</code></pre>
+          <h3>The genuinely useful form: literal unions</h3>
+          <pre><code>let status: "Active" | "Inactive";
+status = "Active";     // ✔
+status = "active";     // ✖ wrong case — caught at compile time!
+status = "Pending";    // ✖ not one of the allowed values</code></pre>
+          <div class="keybox">
+            <span class="lbl">This is better than an enum for simple cases</span>
+            A literal union gives you a fixed set of allowed strings with full autocomplete and zero runtime code. You'll use exactly this in Session 2 for the employee <code>status</code> field that drives the green/red row colouring.
+          </div>
+        </section>
+
+        <!-- 16. TS: LOOPS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 5 of 7</p>
+          <h2>Three ways to loop</h2>
+          <pre><code>let arr = [10, 20, 30, 40];</code></pre>
+          <h3>1 · Classic <code>for</code> — you control the index</h3>
+          <pre><code>for (let i = 0; i &lt; arr.length; i++) {
+  console.log(i + " → " + arr[i]);
+}
+// 0 → 10 · 1 → 20 · 2 → 30 · 3 → 40</code></pre>
+          <h3>2 · <code>for...of</code> — gives you the VALUES</h3>
+          <pre><code>for (let value of arr) {
+  console.log(value);
+}
+// 10 · 20 · 30 · 40</code></pre>
+          <h3>3 · <code>for...in</code> — gives you the KEYS / INDICES</h3>
+          <pre><code>for (let index in arr) {
+  console.log(index);        // "0" · "1" · "2" · "3"  ← strings, not numbers!
+  console.log(arr[index]);   // 10 · 20 · 30 · 40
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The mistake almost everyone makes once</span>
+            <code>for...of</code> = values. <code>for...in</code> = keys. Writing <code>for (let x in arr) console.log(x)</code> when you wanted the values prints <code>0 1 2 3</code> and leaves people staring at the screen. Memorise it as: "<strong>in</strong>dex" for <code>for...in</code>. For arrays, prefer <code>for...of</code>.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Where you'll see this again</span>
+            Angular's <code>*ngFor="let emp of employees"</code> is deliberately <code>of</code>, not <code>in</code> — it iterates the values. Knowing the difference here means that syntax will make immediate sense in Session 2.
+          </div>
+        </section>
+
+        <!-- 17. TS: ARRAYS & TUPLES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 6 of 7</p>
+          <h2>Typed arrays &amp; tuples</h2>
+          <h3>Arrays — many values, all the same type</h3>
+          <pre><code>let numbersArray: number[] = [1, 2, 3];
+numbersArray.push(4);         // ✔
+numbersArray.push("five");    // ✖ Argument of type 'string' is not assignable
+
+let names: string[] = ["Anoop", "Ajay", "Rekha"];
+let mixed: (number | string)[] = [1, "two", 3, "four"];   // union array
+let people: Person[] = [];    // an array of objects — the Angular workhorse</code></pre>
+          <h3>Tuples — a fixed length, with a fixed type per position</h3>
+          <pre><code>let employee: [number, string, string, number];
+employee = [1001, 'Anoop', 'Software Engineer', 25000.00];   // ✔ exact match
+
+employee = ['Anoop', 1001, 'Software Engineer', 25000.00];   // ✖ wrong order
+employee = [1001, 'Anoop', 'Software Engineer'];             // ✖ wrong length
+
+console.log(employee[1]);   // 'Anoop' — TS knows position 1 is a string</code></pre>
+          <table class="cmp">
+            <thead><tr><th>&nbsp;</th><th>Array</th><th>Tuple</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Length</strong></td><td>Grows and shrinks freely</td><td>Fixed at declaration</td></tr>
+              <tr><td><strong>Types</strong></td><td>One type (or a union) throughout</td><td>A specific type per position</td></tr>
+              <tr><td><strong>Use it for</strong></td><td>Lists — employees, products, results</td><td>A fixed record — a coordinate pair, a CSV row</td></tr>
+            </tbody>
+          </table>
+          <p class="muted">In practice you'll use arrays constantly and tuples rarely. Know tuples exist so you recognise them; reach for an <code>interface</code> whenever the data has meaningful field names.</p>
+        </section>
+
+        <!-- 18. TS: CLASSES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript basics · 7 of 7</p>
+          <h2>Classes — because every Angular component is one</h2>
+          <p class="deep">This is the piece that connects TypeScript to Angular. Every component, every service you write is a TypeScript <strong>class</strong>. The syntax will look very familiar coming from Java.</p>
+          <pre><code>class Employee {
+  // properties, with types
+  id: number;
+  name: string;
+  private salary: number;         // private — only usable inside this class
+
+  constructor(id: number, name: string, salary: number) {
+    this.id = id;
+    this.name = name;
+    this.salary = salary;
+  }
+
+  // a method — note the return type after the parentheses
+  getDetails(): string {
+    return this.id + " - " + this.name;
+  }
+}
+
+let e1 = new Employee(1001, "Anoop", 25000);
+console.log(e1.getDetails());    // 1001 - Anoop
+console.log(e1.salary);          // ✖ Property 'salary' is private</code></pre>
+          <h3>The constructor shorthand you'll see everywhere in Angular</h3>
+          <pre><code>// These two classes are IDENTICAL. TypeScript declares AND assigns
+// the property for you when you put an access modifier on the parameter.
+class Employee {
+  constructor(public id: number, public name: string) { }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Remember this shorthand</span>
+            In Session 3 you will write <code>constructor(private employeeService: EmployeeService) { }</code> and it will look like nothing is happening. It is: that one line declares a private field <em>and</em> assigns Angular's injected service to it. This shorthand is the single most common line of code in a real Angular app.
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Modifier</th><th>Visible where</th></tr></thead>
+            <tbody>
+              <tr><td><code>public</code> (the default)</td><td>Everywhere — including the component's HTML template</td></tr>
+              <tr><td><code>private</code></td><td>Only inside the same class</td></tr>
+              <tr><td><code>protected</code></td><td>The class and its subclasses</td></tr>
+              <tr><td><code>readonly</code></td><td>Assignable once, in the constructor; never again</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Angular-specific gotcha</span>
+            A component's HTML template can only see <strong>public</strong> members. If you mark a property <code>private</code> and then use it in your template with <code>{{ }}</code>, the build fails. Keep template-bound properties public.
+          </div>
+        </section>
+
+        <!-- 19. TS: FUNCTIONS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript bonus — you'll need this in Session 3</p>
+          <h2>Functions &amp; arrow functions</h2>
+          <p class="deep">Typed parameters and a typed return value turn a function into a contract the compiler enforces at every call site.</p>
+          <pre><code>// Normal function: typed parameters, typed return
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+// Optional parameter (?) and a default value
+function greet(name: string, title?: string): string {
+  return title ? title + " " + name : name;
+}
+
+// void = returns nothing
+function logIt(msg: string): void {
+  console.log(msg);
+}</code></pre>
+          <h3>Arrow functions — the compact form Angular uses constantly</h3>
+          <pre><code>// long form
+let double = function (n: number): number { return n * 2; };
+
+// arrow form — identical behaviour
+let double2 = (n: number): number =&gt; n * 2;
+
+// This shape is what you'll write when subscribing to HTTP calls:
+this.http.get('/api/users').subscribe(
+  data =&gt; { this.users = data; },        // success handler
+  error =&gt; { console.log(error); }       // error handler
+);</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why arrow functions matter in Angular specifically</span>
+            An arrow function keeps <code>this</code> pointing at your component. A traditional <code>function () { }</code> callback does <em>not</em> — inside it, <code>this</code> becomes something else entirely and <code>this.users = data</code> silently fails. Always use arrow functions for callbacks in Angular. This one habit prevents a genuinely baffling class of bug.
+          </div>
+        </section>
+
+        <!-- 20. COMPILATION -->
+        <section class="slide">
+          <p class="eyebrow">How it actually runs</p>
+          <h2>From TypeScript to a running page</h2>
+          <p class="deep">Browsers do not understand TypeScript. Something has to translate it — and the Angular CLI does this for you, automatically, every time you save a file.</p>
+          <div class="flow">
+            <div class="flow-box">You write <span class="sm">.ts files</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">TS compiler <span class="sm">checks types, strips them</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Angular compiler <span class="sm">templates → render code</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Bundled JS <span class="sm">served to the browser</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">Two things are worth internalising here:</p>
+          <ul>
+            <li><strong>Types vanish.</strong> The JavaScript that reaches the browser has no type annotations at all. Types are a development-time safety net with zero runtime cost.</li>
+            <li><strong>Type errors stop the build.</strong> If your types don't line up, <code>ng serve</code> prints the error and the browser shows the previous working version. That red text in the terminal is your friend — read it, it names the file and line.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">You will never run the compiler by hand</span>
+            <code>ng serve</code> starts a watcher: save a file → recompile → the browser refreshes itself in under a second. That loop is what makes front-end development feel fast, and it's the first thing you'll verify in the lab.
+          </div>
+        </section>
+
+        <!-- 21. SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Setup · step 1</p>
+          <h2>Environment setup</h2>
+          <p class="deep">Exactly two installs. Node.js first, then the Angular CLI — in that order, because the CLI is installed <em>by</em> Node's package manager.</p>
+          <h3>1 · Install Node.js (choose the LTS version)</h3>
+          <p class="deep">Download from <code>nodejs.org</code>. Node gives you two commands: <code>node</code> (a JavaScript runtime outside the browser) and <code>npm</code> (Node Package Manager — the Maven of the JavaScript world). Verify:</p>
+          <pre><code>node -v      # e.g. v20.11.1
+npm -v       # e.g. 10.2.4</code></pre>
+          <h3>2 · Install the Angular CLI, globally</h3>
+          <pre><code>npm install -g @angular/cli
+
+ng version   # confirms the install</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">npm install</div><div>Download and install a package</div></div>
+            <div class="anno-row"><div class="anno-tag">-g</div><div><strong>Globally</strong> — available from any folder, not just one project. Needed here because you run <code>ng new</code> <em>before</em> a project exists.</div></div>
+            <div class="anno-row"><div class="anno-tag">@angular/cli</div><div>The package name. The <code>@angular/</code> prefix is a "scope" — Angular's official namespace on npm.</div></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">If <code>ng</code> is "not recognised" after installing</span>
+            <strong>Close and reopen your terminal.</strong> The PATH is only read when a shell starts. On macOS/Linux you may need <code>sudo npm install -g @angular/cli</code>. Behind a corporate proxy, set <code>npm config set proxy http://your-proxy:port</code> first.
+          </div>
+        </section>
+
+        <!-- 22. HELLO WORLD -->
+        <section class="slide">
+          <p class="eyebrow">Setup · step 2</p>
+          <h2>Your first app — three commands</h2>
+          <pre><code>ng new hello-world
+cd hello-world
+ng serve</code></pre>
+          <p class="deep"><code>ng new</code> asks you two or three questions. For today:</p>
+          <table class="cmp">
+            <thead><tr><th>Prompt</th><th>Answer</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>Would you like to add Angular routing?</td><td><strong>No</strong> (press N)</td><td>We add routing deliberately in Session 4, so you see what it does.</td></tr>
+              <tr><td>Which stylesheet format?</td><td><strong>CSS</strong> (press Enter)</td><td>Plain CSS — no extra syntax to learn on day one.</td></tr>
+              <tr><td>Share usage data with Google?</td><td>Either</td><td>Doesn't affect anything.</td></tr>
+            </tbody>
+          </table>
+          <p class="deep">Then <code>ng serve</code> compiles the app, starts a development web server, and watches your files:</p>
+          <pre><code>✔ Compiled successfully.
+** Angular Live Development Server is listening on localhost:4200 **</code></pre>
+          <p class="deep">Open <code>http://localhost:4200</code> and you'll see Angular's welcome page:</p>
+          <div class="browser">
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200</span>
+            </div>
+            <div class="viewport" style="text-align:center;">
+              <p style="font-size:22px;font-weight:700;margin:6px 0 2px;">🅰️ hello-world app is running!</p>
+              <p class="muted" style="font-size:14px;">Resources · Next Steps · More Angular …</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why port 4200?</span>
+            It's simply Angular's default development port — nothing magic. Add <code>--port 4300</code> if 4200 is taken. <code>ng serve</code> keeps running: leave that terminal open all session and use a second one for other commands.
+          </div>
+        </section>
+
+        <!-- 23. PROJECT ANATOMY -->
+        <section class="slide">
+          <p class="eyebrow">Understanding what you just generated</p>
+          <h2>Anatomy of a generated project</h2>
+          <div class="tree">hello-world/
+├── <span class="c">node_modules/</span>        <span class="c">← every downloaded library (huge; never edit, never commit)</span>
+├── src/                 <span class="c">← YOUR CODE LIVES HERE. 95% of your time is in this folder.</span>
+│   ├── app/
+│   │   ├── app.component.css       <span class="c">styles for this component only</span>
+│   │   ├── app.component.html      <span class="c">the TEMPLATE — what the user sees</span>
+│   │   ├── app.component.spec.ts   <span class="c">unit tests for this component</span>
+│   │   ├── app.component.ts        <span class="c">the CLASS — data &amp; logic</span>
+│   │   └── app.module.ts           <span class="c">declares what belongs to this app</span>
+│   ├── assets/          <span class="c">images, fonts, static files</span>
+│   ├── index.html       <span class="c">the ONE page of the single-page app</span>
+│   ├── main.ts          <span class="c">the entry point — starts Angular</span>
+│   └── styles.css       <span class="c">global styles, applied app-wide</span>
+├── angular.json         <span class="c">CLI/build configuration</span>
+├── package.json         <span class="c">dependencies + scripts (the pom.xml of npm)</span>
+└── tsconfig.json        <span class="c">TypeScript compiler settings</span></div>
+          <div class="warnbox">
+            <span class="lbl">Beginner note — "why are there so many files?!"</span>
+            Your Hello World has a dozen-plus files, whereas a Java Hello World is one class with a <code>main()</code>. That's normal and it's a trade: Angular front-loads structure so that a <em>large</em> app stays organised. Every project you ever open will have this same layout — which means you'll always know where to look. You'll only touch <code>src/app/</code> today.
+          </div>
+        </section>
+
+        <!-- 24. THE FIVE FILES -->
+        <section class="slide">
+          <p class="eyebrow">The five files that matter today</p>
+          <h2>Inside <code>src/app/</code></h2>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">app.component.ts</span><span class="desc">The <strong>class</strong>. Properties (data) and methods (behaviour), plus the <code>@Component</code> decorator that links it to its template and styles.</span></div>
+            <div class="stack-row l2"><span class="layer">app.component.html</span><span class="desc">The <strong>template</strong>. The HTML the user actually sees, with Angular syntax like <code>{{ title }}</code> woven in.</span></div>
+            <div class="stack-row l3"><span class="layer">app.component.css</span><span class="desc">Styles <strong>scoped to this component only</strong>. A rule here cannot leak out and break another component — a genuinely valuable guarantee.</span></div>
+            <div class="stack-row l4"><span class="layer">app.component.spec.ts</span><span class="desc">Unit tests for this component. Generated for you; safe to ignore for these four sessions.</span></div>
+            <div class="stack-row l2"><span class="layer">app.module.ts</span><span class="desc">The <strong>manifest</strong>. Declares which components belong to the app, which Angular modules it imports (e.g. <code>FormsModule</code>), and which component to boot first.</span></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Notice the naming pattern — it is rigidly consistent and worth learning now:</p>
+          <div class="keybox">
+            <span class="lbl">The naming convention</span>
+            <code>&lt;name&gt;.component.&lt;type&gt;</code> — so <code>login.component.ts</code>, <code>login.component.html</code>, <code>login.component.css</code>, <code>login.component.spec.ts</code>. Services follow the same idea: <code>employee.service.ts</code>. Every Angular developer in the world uses this, and the CLI enforces it.
+          </div>
+        </section>
+
+        <!-- 25. HOW IT BOOTS -->
+        <section class="slide">
+          <p class="eyebrow">Deep dive — the question everyone asks</p>
+          <h2>How does the browser find your component?</h2>
+          <p class="deep">You open <code>index.html</code> and there's almost nothing in it. So how does your app appear? Follow the chain:</p>
+          <div class="flow vert" style="max-width:760px;">
+            <div class="flow-box">1 · <code>index.html</code> loads <span class="sm">its &lt;body&gt; contains just: &lt;app-root&gt;&lt;/app-root&gt;</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">2 · <code>main.ts</code> runs <span class="sm">bootstrapModule(AppModule) — hands control to Angular</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">3 · <code>app.module.ts</code> is read <span class="sm">bootstrap: [AppComponent] — "start with this component"</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">4 · <code>AppComponent</code> renders <span class="sm">its selector is 'app-root', so its template replaces that tag</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">That's the whole mechanism. The <code>selector</code> in the <code>@Component</code> decorator is a <strong>custom HTML tag name</strong>. Wherever that tag appears, Angular renders that component's template.</p>
+          <pre><code>@Component({
+  selector: 'app-root',                 // ← matches &lt;app-root&gt; in index.html
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'hello-world';
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The unlock for Session 2</span>
+            Once you see that a component is just "a tag plus a template", nesting becomes obvious. Generate a <code>header</code> component, drop <code>&lt;app-header&gt;&lt;/app-header&gt;</code> into another template, and it appears there. That's how the component tree is built — and it's the first thing you'll do in Session 2's lab.
+          </div>
+        </section>
+
+        <!-- 26. CLI CHEATSHEET -->
+        <section class="slide">
+          <p class="eyebrow">Your daily toolbox</p>
+          <h2>Angular CLI commands worth knowing</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:34%">Command</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>ng new my-app</code></td><td>Creates a complete new project, folder structure and all</td></tr>
+              <tr><td><code>ng serve</code></td><td>Compiles and serves at <code>localhost:4200</code>, watching for changes</td></tr>
+              <tr><td><code>ng serve -o</code></td><td>Same, and opens your browser automatically</td></tr>
+              <tr><td><code>ng generate component login</code></td><td>Creates a component's four files <em>and</em> registers it in the module</td></tr>
+              <tr><td><code>ng g c login</code></td><td>The short form of the line above — what you'll actually type</td></tr>
+              <tr><td><code>ng generate service employee</code></td><td>Creates a service (Session 3)</td></tr>
+              <tr><td><code>ng build</code></td><td>Produces optimised files in <code>dist/</code> ready to deploy</td></tr>
+              <tr><td><code>ng test</code></td><td>Runs the unit tests</td></tr>
+              <tr><td><code>ng version</code></td><td>Prints Angular, CLI, Node and TypeScript versions — the first thing to check when something's odd</td></tr>
+              <tr><td><code>ng --help</code></td><td>Lists every command; add <code>--help</code> to any command for its options</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why the CLI is a big deal</span>
+            <code>ng generate</code> doesn't just create files — it creates them with the right names, the right boilerplate, and it <strong>wires them into <code>app.module.ts</code> for you</strong>. Hand-creating components is where beginners lose an hour to "component not found" errors. Let the CLI do it, always.
+          </div>
+        </section>
+
+        <!-- 27. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Recap</p>
+          <h2>What you now know</h2>
+          <ul class="checklist">
+            <li>Angular is a Google-built, TypeScript-based framework for <strong>single-page applications</strong>, structured as a <strong>tree of components</strong>.</li>
+            <li>"AngularJS" = 1.x (legacy, JavaScript, MVC). "Angular" = 2+ (modern, TypeScript, components). Different frameworks.</li>
+            <li>Angular replaces five reloading JSPs with a few reusable components, and turns your Spring Boot app into a clean JSON API.</li>
+            <li>TypeScript = JavaScript + static types, so mistakes surface in your editor instead of in production.</li>
+            <li>You can declare types, define <strong>interfaces</strong>, mark properties <strong>optional</strong> with <code>?</code>, allow several types with <strong>unions</strong>, loop three ways, and type <strong>arrays</strong> and <strong>tuples</strong>.</li>
+            <li>Every Angular component is a TypeScript <strong>class</strong> — including the constructor shorthand you'll rely on in Session 3.</li>
+            <li>Two installs (Node, then the CLI) and three commands (<code>ng new</code>, <code>cd</code>, <code>ng serve</code>) give you a running app on port 4200.</li>
+            <li>You can name every file in <code>src/app/</code> and explain the boot chain: <code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code>.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Now go and build it</span>
+            Everything on this slide is in today's lab sheet as a hands-on task — the TypeScript drills, the install, the Hello World, the file hunt, and your first live-reload edit. Open <code>angular-session1-lab.html</code> and work down it. Target: the green checkpoint at the bottom.
+          </div>
+        </section>
+
+        <!-- 28. NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed</p>
+          <h2>Coming up in Session 2</h2>
+          <p class="deep">With TypeScript and a running project in place, Session 2 is where Angular starts to feel powerful — you'll make the screen react to your data.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🧱</div><h3>Components in depth</h3><p>Class + metadata + template. Generating them, nesting them, building a tree.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>The four data bindings</h3><p>Interpolation, property binding, event binding and two-way binding with <code>ngModel</code>.</p></div>
+            <div class="card"><div class="ic">🔀</div><h3>Directives</h3><p><code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code> to shape the DOM; <code>ngClass</code>/<code>ngStyle</code> to style it conditionally.</p></div>
+            <div class="card"><div class="ic">🎨</div><h3>Pipes</h3><p>Transform what's displayed — uppercase, dates, currency — without touching your data.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Bring this with you</span>
+            Keep your <code>hello-world</code> project — Session 2 builds directly on top of it. If <code>ng serve</code> still runs and you can edit the title text, you're ready.
+          </div>
+        </section>
+
+        <!-- 29. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 1</span>
+            <h1>Questions?</h1>
+            <div class="sub">Then open the lab sheet — let's get Angular running on your machine.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 2 — Components, binding &amp; directives.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Angular · Session 1 — TypeScript &amp; Angular Basics</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
