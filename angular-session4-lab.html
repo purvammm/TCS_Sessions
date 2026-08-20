@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 4 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(221,0,49,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dd0031, #9327f0, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff5f7, #fbeef4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(147,39,240,0.09);
+      border: 1px solid rgba(147,39,240,0.3);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffd0da;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(221,0,49,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #dd0031; }
+    details.exp.lab2 { border-left-color: #9327f0; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#9327f0; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Mock browser preview — shows exactly what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin: 14px 0; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session4-lab.html — Angular Session 4</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🧭</div>
+        <div>
+          <h1>Angular — Session 4 Hands-on Lab</h1>
+          <p class="section-intro">Routing, a nav menu, and a complete Customer Management CRUD app. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet — the final lab</span>
+          Five tasks. The first two turn your single scrolling page into a proper multi-screen app with a nav menu.
+          Tasks 3 and 4 build the <strong>Customer Management</strong> case study — list, search, insert, delete, then
+          update. Task 5 refactors all of it onto a service with <code>HttpClient</code>. By the end you'll have a
+          complete application, not a demo.
+        </div>
+        <div class="observe">
+          <span class="lbl">Pace yourself deliberately today</span>
+          Tasks 3 and 4 are the longest of the whole series. If you fall behind, <strong>get Tasks 1–4 finished
+          first</strong> — Task 5 is the refactor, and it's the most valuable thing to do properly rather than quickly.
+          The stretch task is genuinely optional.
+        </div>
+      </section>
+
+      <!-- ===== PREREQS ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slide 2</span></summary>
+          <div class="exp-body">
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Session 3's project runs</strong> with <code>ng serve</code>
+                <span class="verify">You should see the header, login, both registration forms, the employee table and the API user list all stacked on one page. That's what we're about to fix.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong><code>FormsModule</code> and <code>HttpClientModule</code></strong> are both in <code>app.module.ts</code> <code>imports</code>
+                <span class="verify">Tasks 3–4 need <code>FormsModule</code> for <code>[(ngModel)]</code>; Task 5 needs <code>HttpClientModule</code>.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Your <code>EmployeeService</code> works</strong> and the employee table renders from it
+                <span class="verify">Task 5 reuses that exact pattern for customers, so it's worth confirming.</span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Missed a session? Here's the minimum to catch up</span>
+              You need: an Angular project with <code>FormsModule</code> and <code>HttpClientModule</code> imported, plus
+              at least two components to route between. <code>ng new hello-world</code> (answer <strong>N</strong> to
+              routing) then <code>ng g c employee-list</code> and <code>ng g c registration</code> gets you there in five
+              minutes. Tasks 3–5 are self-contained.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">Part 1 — Routing</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Add Routing to the App<span class="sync">Theory slides 4–6</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Give each feature its own URL. Because we answered <strong>no</strong> to routing back in Session 1, you'll
+              build the routing module by hand — which means you'll understand every line of it, rather than inheriting
+              a file you've never read.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Generate the two new components you'll route to: <code>customer-management</code> and <code>not-found</code>.</li>
+                <li>Create <code>src/app/app-routing.module.ts</code> by hand and paste the file below.</li>
+                <li>Import <code>AppRoutingModule</code> in <code>app.module.ts</code>.</li>
+                <li>Replace <code>app.component.html</code> with the shell containing <code>&lt;router-outlet&gt;</code>.</li>
+                <li>Test by typing URLs directly — <code>/employees</code>, <code>/register</code>, <code>/customers</code>, <code>/nonsense</code>.</li>
+              </ol>
+            </div>
+
+            <div class="codewrap"><pre><code>ng generate component customer-management
+ng generate component not-found</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Both components generated and registered in <code>declarations</code>.</span>
+            </label>
+
+            <h3>① The routing module — create this file by hand</h3>
+            <p>Create <code>src/app/app-routing.module.ts</code> (right-click the <code>app</code> folder → New File).</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app-routing.module.ts</span><span class="fb-tag">NEW FILE</span></div>
+            <div class="codewrap"><pre><code>import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { RegistrationComponent } from './registration/registration.component';
+import { ReactiveRegistrationComponent } from './reactive-registration/reactive-registration.component';
+import { UserListComponent } from './user-list/user-list.component';
+import { CustomerManagementComponent } from './customer-management/customer-management.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+
+const routes: Routes = [
+  { path: '',           redirectTo: '/employees', pathMatch: 'full' },
+  { path: 'employees',  component: EmployeeListComponent },
+  { path: 'register',   component: RegistrationComponent },
+  { path: 'reactive',   component: ReactiveRegistrationComponent },
+  { path: 'api-users',  component: UserListComponent },
+  { path: 'customers',  component: CustomerManagementComponent },
+  { path: '**',         component: NotFoundComponent }    // MUST be last
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">If a component name doesn't exist in your project</span>
+              Delete that import and its route entry. The file only needs to reference components you actually have — a
+              wrong import name is a compile error, and the terminal will name the exact line.
+            </div>
+
+            <h3>② Import the routing module</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.module.ts</span><span class="fb-tag">EDIT — two lines</span></div>
+            <div class="codewrap"><pre><code>import { AppRoutingModule } from './app-routing.module';   // ①
+
+  imports: [
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    AppRoutingModule                                       // ②
+  ],</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>AppRoutingModule</code> is imported and in the <code>imports</code> array, and the app still compiles.</span>
+            </label>
+
+            <h3>③ The app shell — where routed components appear</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;app-header&gt;&lt;/app-header&gt;
+
+&lt;!-- the routed component renders HERE, and nowhere else --&gt;
+&lt;div class="page"&gt;
+  &lt;router-outlet&gt;&lt;/router-outlet&gt;
+&lt;/div&gt;
+
+&lt;footer class="app-footer"&gt;
+  Angular Training — Session 4 &nbsp;·&nbsp; Purvam Prajapati, Faculty — AHD
+&lt;/footer&gt;</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.css</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>.page { padding: 18px 4px; min-height: 320px; }
+
+.app-footer {
+  border-top: 1px solid #d2d2d7;
+  margin-top: 22px;
+  padding-top: 12px;
+  color: #6e6e73;
+  font-size: 13px;
+  text-align: center;
+}</code></pre></div>
+
+            <h3>④ A friendly 404 page</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/not-found/not-found.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;div class="nf"&gt;
+  &lt;h2&gt;404 — page not found&lt;/h2&gt;
+  &lt;p&gt;That URL doesn't match any route in this app.&lt;/p&gt;
+  &lt;a routerLink="/employees"&gt;← Back to Employees&lt;/a&gt;
+&lt;/div&gt;</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/not-found/not-found.component.css</span><span class="fb-tag">PASTE</span></div>
+            <div class="codewrap"><pre><code>.nf {
+  background: #fff4f6;
+  border: 1px solid #ffd0da;
+  border-radius: 12px;
+  padding: 22px 26px;
+  max-width: 480px;
+}
+
+.nf h2 { margin-top: 0; color: #dd0031; }
+.nf a  { color: #dd0031; font-weight: 600; }</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — type each URL directly into the address bar</span>
+              <table class="issues" style="margin-top:8px;">
+                <thead><tr><th>URL</th><th>What should render</th></tr></thead>
+                <tbody>
+                  <tr><td><code>localhost:4200/</code></td><td>Redirects to <code>/employees</code> and shows the employee table</td></tr>
+                  <tr><td><code>localhost:4200/employees</code></td><td>The employee table only — no login, no forms</td></tr>
+                  <tr><td><code>localhost:4200/register</code></td><td>The template-driven registration form only</td></tr>
+                  <tr><td><code>localhost:4200/customers</code></td><td>"customer-management works!"</td></tr>
+                  <tr><td><code>localhost:4200/nonsense</code></td><td>Your 404 page</td></tr>
+                </tbody>
+              </table>
+              The header and footer stay on <strong>every</strong> route — that's the proof that only the outlet's
+              contents change.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Typing each URL directly loads the right component, and the header/footer persist across all of them.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>localhost:4200/</code> redirects to <code>/employees</code> instead of showing a blank page.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">An unknown URL shows the 404 page.</span>
+            </label>
+            <div class="tryit">
+              <span class="lbl">Prove why the wildcard must be last</span>
+              Move the <code>{ path: '**', ... }</code> entry to the <strong>top</strong> of the routes array and save.
+              <em>Every</em> URL now shows the 404 page, including valid ones. Routes are matched top to bottom and the
+              first match wins — and <code>'**'</code> matches everything. Move it back to the bottom.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I moved the wildcard to the top, saw everything 404, and moved it back.</span>
+            </label>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>'router-outlet' is not a known element</code></td><td><code>AppRoutingModule</code> not imported in <code>app.module.ts</code></td><td>Add it to the <code>imports</code> array.</td></tr>
+                <tr><td>URL changes but nothing renders</td><td>No <code>&lt;router-outlet&gt;</code> in the template</td><td>Add it to <code>app.component.html</code>.</td></tr>
+                <tr><td>Blank page at <code>localhost:4200</code></td><td>No route for the empty path</td><td>Add the <code>path: ''</code> redirect with <code>pathMatch: 'full'</code>.</td></tr>
+                <tr><td>Infinite redirect / app hangs</td><td><code>redirectTo</code> on an empty path without <code>pathMatch: 'full'</code></td><td>Add <code>pathMatch: 'full'</code>.</td></tr>
+                <tr><td>Everything shows the 404</td><td><code>'**'</code> isn't last</td><td>Move it to the end of the array.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Build the Navigation Menu<span class="sync">Theory slides 5–6</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Add a clickable nav bar using <code>routerLink</code>, with the current page highlighted automatically by
+              <code>routerLinkActive</code>. Then prove that <code>href</code> would have broken everything.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the nav bar to <code>app.component.html</code>, between the header and the outlet.</li>
+                <li>Paste the nav CSS.</li>
+                <li>Click every link. Then use the browser's <strong>Back</strong> button.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;app-header&gt;&lt;/app-header&gt;
+
+&lt;nav class="main-nav"&gt;
+  &lt;a routerLink="/employees" routerLinkActive="active"&gt;Employees&lt;/a&gt;
+  &lt;a routerLink="/customers" routerLinkActive="active"&gt;Customers&lt;/a&gt;
+  &lt;a routerLink="/register"  routerLinkActive="active"&gt;Register (template)&lt;/a&gt;
+  &lt;a routerLink="/reactive"  routerLinkActive="active"&gt;Register (reactive)&lt;/a&gt;
+  &lt;a routerLink="/api-users" routerLinkActive="active"&gt;API Users&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;div class="page"&gt;
+  &lt;router-outlet&gt;&lt;/router-outlet&gt;
+&lt;/div&gt;
+
+&lt;footer class="app-footer"&gt;
+  Angular Training — Session 4 &nbsp;·&nbsp; Purvam Prajapati, Faculty — AHD
+&lt;/footer&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.css</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>.main-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  border-bottom: 2px solid #dd0031;
+  margin-top: 16px;
+  padding-bottom: 0;
+}
+
+.main-nav a {
+  text-decoration: none;
+  color: #6e6e73;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+}
+
+.main-nav a:hover {
+  background: #fff4f6;
+  color: #dd0031;
+}
+
+/* routerLinkActive adds this class to the link for the current URL */
+.main-nav a.active {
+  background: #dd0031;
+  color: #fff;
+}
+
+.page { padding: 18px 4px; min-height: 320px; }
+
+.app-footer {
+  border-top: 1px solid #d2d2d7;
+  margin-top: 22px;
+  padding-top: 12px;
+  color: #6e6e73;
+  font-size: 13px;
+  text-align: center;
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — a real tabbed application</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200/customers</span></div>
+                <div class="viewport">
+                  <div style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:12px 16px;border-radius:10px;margin-bottom:10px;">
+                    <p style="margin:0;font-size:19px;font-weight:700;">Employee Management System</p>
+                  </div>
+                  <div class="navbar"><span>Employees</span><span class="on">Customers ●</span><span>Register (template)</span><span>Register (reactive)</span><span>API Users</span></div>
+                  <p style="font-weight:700;">customer-management works!</p>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Clicking each link switches the view <strong>with no page reload</strong> — no white flash, no spinner in the browser tab.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The current tab is highlighted, and the highlight moves as I navigate.
+                <span class="verify">That's <code>routerLinkActive="active"</code> adding the CSS class for you — no TypeScript required.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The browser's <strong>Back</strong> and <strong>Forward</strong> buttons move between views correctly.
+                <span class="verify">The router integrates with browser history — you get this for free, and users absolutely expect it.</span>
+              </span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">The <code>href</code> experiment — do this one, it's the clearest lesson in the lab</span>
+              Change the first link to <code>&lt;a href="/employees"&gt;Employees&lt;/a&gt;</code>. Open DevTools →
+              <strong>Network</strong>, tick "Disable cache", and click it. You'll see the browser download
+              <strong>the entire application again</strong> — every JS bundle, from scratch. Compare with a
+              <code>routerLink</code> click, which produces <em>no network traffic at all</em>. That is the difference
+              between a single-page app and a website pretending to be one. Change it back.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I compared <code>href</code> and <code>routerLink</code> in the Network tab and saw the full reload.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 ===== -->
+      <div class="section-band">Part 2 — Customer Management CRUD</div>
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> List, Search, Insert &amp; Delete<span class="sync">Theory slides 9–11, 15</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build the array-based half of the case study: a customer table, a live search, an insert form and a
+              delete-with-confirmation. Three of the four CRUD letters, all against an in-memory array so nothing is
+              asynchronous yet.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Create the <code>Customer</code> model file.</li>
+                <li>Paste the component class — read the comments as you go, they explain each decision.</li>
+                <li>Paste the template and the CSS.</li>
+                <li>Navigate to <code>/customers</code> and test all three operations.</li>
+              </ol>
+            </div>
+
+            <h3>① The model</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/models/customer.ts</span><span class="fb-tag">NEW FILE</span></div>
+            <div class="codewrap"><pre><code>export interface Customer {
+  id: number;
+  name: string;
+  age: number;
+  mobile: string;
+}</code></pre></div>
+
+            <h3>② The component class</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { Customer } from '../models/customer';
+
+@Component({
+  selector: 'app-customer-management',
+  templateUrl: './customer-management.component.html',
+  styleUrls: ['./customer-management.component.css']
+})
+export class CustomerManagementComponent implements OnInit {
+
+  // the MASTER list — never filtered in place
+  customers: Customer[] = [
+    { id: 1, name: 'Anoop',  age: 40, mobile: '9876543210' },
+    { id: 2, name: 'Ajay',   age: 32, mobile: '9123456780' },
+    { id: 3, name: 'Rekha',  age: 28, mobile: '9988776655' },
+    { id: 4, name: 'Suresh', age: 45, mobile: '9001122334' }
+  ];
+
+  // what the table renders — a VIEW of the master list
+  filtered: Customer[] = [];
+
+  searchTerm: string = '';
+  message: string = '';
+
+  // the insert form is bound to this object
+  newCustomer: Customer = { id: 0, name: '', age: 0, mobile: '' };
+
+  ngOnInit(): void {
+    this.filtered = this.customers;
+  }
+
+  // ---------- SEARCH ----------
+  onSearch(): void {
+    const term = this.searchTerm.toLowerCase().trim();
+    if (term === '') {
+      this.filtered = this.customers;
+      return;
+    }
+    this.filtered = this.customers.filter(c =&gt;
+      c.name.toLowerCase().includes(term) || c.mobile.includes(term)
+    );
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.onSearch();
+  }
+
+  // ---------- INSERT ----------
+  insertCustomer(): void {
+    if (!this.newCustomer.name.trim() || !this.newCustomer.mobile.trim()) {
+      this.message = '⚠ Name and mobile are required.';
+      return;
+    }
+    if (this.newCustomer.age &lt; 1 || this.newCustomer.age &gt; 120) {
+      this.message = '⚠ Please enter a realistic age.';
+      return;
+    }
+
+    // next id = highest existing + 1 (never reuse a deleted id)
+    const nextId = this.customers.length === 0
+      ? 1
+      : Math.max(...this.customers.map(c =&gt; c.id)) + 1;
+
+    // spread = push a COPY, so the form can't keep editing the new row
+    this.customers.push({ ...this.newCustomer, id: nextId });
+
+    this.onSearch();
+    this.resetForm();
+    this.message = '✓ Customer added with id ' + nextId + '.';
+  }
+
+  resetForm(): void {
+    this.newCustomer = { id: 0, name: '', age: 0, mobile: '' };
+  }
+
+  // ---------- DELETE ----------
+  deleteCustomer(c: Customer): void {
+    const ok = confirm('Delete customer ' + c.id + ' — ' + c.name + '?');
+    if (!ok) {
+      this.message = 'Delete cancelled.';
+      return;
+    }
+
+    // find by ID in the MASTER list, not by index in the filtered view
+    const index = this.customers.findIndex(x =&gt; x.id === c.id);
+    if (index !== -1) {
+      this.customers.splice(index, 1);
+    }
+
+    this.onSearch();
+    this.message = '✓ Customer ' + c.id + ' deleted.';
+  }
+}</code></pre></div>
+
+            <h3>③ The template</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;Customer Management&lt;/h2&gt;
+
+&lt;p class="msg" *ngIf="message"&gt;{{ message }}&lt;/p&gt;
+
+&lt;!-- ============ SEARCH ============ --&gt;
+&lt;div class="panel"&gt;
+  &lt;h3&gt;Search&lt;/h3&gt;
+  &lt;div class="row"&gt;
+    &lt;input type="text"
+           [(ngModel)]="searchTerm"
+           (input)="onSearch()"
+           placeholder="Search by name or mobile..."&gt;
+    &lt;button class="ghost" (click)="clearSearch()"&gt;Clear&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;small class="hint"&gt;
+    Showing {{ filtered.length }} of {{ customers.length }} customers
+  &lt;/small&gt;
+&lt;/div&gt;
+
+&lt;!-- ============ INSERT ============ --&gt;
+&lt;div class="panel"&gt;
+  &lt;h3&gt;Add a customer&lt;/h3&gt;
+  &lt;div class="row"&gt;
+    &lt;input type="text"   [(ngModel)]="newCustomer.name"   placeholder="Name"&gt;
+    &lt;input type="number" [(ngModel)]="newCustomer.age"    placeholder="Age"&gt;
+    &lt;input type="text"   [(ngModel)]="newCustomer.mobile" placeholder="Mobile"&gt;
+    &lt;button (click)="insertCustomer()"&gt;Add&lt;/button&gt;
+    &lt;button class="ghost" (click)="resetForm()"&gt;Reset&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;small class="hint"&gt;ID is generated automatically — you never type it.&lt;/small&gt;
+&lt;/div&gt;
+
+&lt;!-- ============ LIST ============ --&gt;
+&lt;table class="cust-table" *ngIf="filtered.length &gt; 0; else noRows"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;#&lt;/th&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Age&lt;/th&gt;&lt;th&gt;Mobile&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr *ngFor="let c of filtered; let i = index"&gt;
+      &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+      &lt;td&gt;{{ c.id }}&lt;/td&gt;
+      &lt;td&gt;{{ c.name }}&lt;/td&gt;
+      &lt;td&gt;{{ c.age }}&lt;/td&gt;
+      &lt;td&gt;{{ c.mobile }}&lt;/td&gt;
+      &lt;td&gt;
+        &lt;button class="tiny danger" (click)="deleteCustomer(c)"&gt;Delete&lt;/button&gt;
+      &lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;ng-template #noRows&gt;
+  &lt;p class="empty"&gt;No customers match your search.&lt;/p&gt;
+&lt;/ng-template&gt;</code></pre></div>
+
+            <h3>④ The styles</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.css</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>h2 { margin-top: 0; }
+
+.panel {
+  border: 1px solid #d2d2d7;
+  border-left: 5px solid #dd0031;
+  border-radius: 10px;
+  background: #fafafc;
+  padding: 12px 18px;
+  margin: 14px 0;
+  max-width: 900px;
+}
+
+.panel h3 { margin: 0 0 8px; font-size: 16px; }
+
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.row input {
+  padding: 8px 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 7px;
+  min-width: 150px;
+}
+
+.hint { display: block; color: #6e6e73; font-size: 12.5px; margin-top: 8px; }
+
+button {
+  background: #dd0031; color: #fff; border: none;
+  border-radius: 7px; padding: 8px 16px; font-size: 14px; cursor: pointer;
+}
+
+button.ghost  { background: #fff; color: #dd0031; border: 1px solid #dd0031; }
+button.tiny   { padding: 4px 11px; font-size: 12.5px; }
+button.danger { background: #b00027; }
+button:disabled { background: #c9c9cf; cursor: not-allowed; }
+
+.cust-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 900px;
+  font-size: 15px;
+  margin-top: 6px;
+}
+
+.cust-table th,
+.cust-table td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.cust-table thead th { background: #e8e8ea; font-weight: 700; }
+.cust-table tbody tr:nth-child(even) { background: #fafafc; }
+.cust-table tbody tr:hover { background: #fff4f6; }
+
+.msg {
+  background: #fff4f6;
+  border: 1px solid #ffd0da;
+  border-radius: 9px;
+  padding: 9px 14px;
+  max-width: 900px;
+  font-weight: 600;
+}
+
+.empty {
+  background: #fffdf3; border: 1px solid #f0e3a8;
+  border-radius: 10px; padding: 14px 18px; max-width: 900px;
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected at <code>/customers</code></span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200/customers</span></div>
+                <div class="viewport">
+                  <div class="navbar"><span>Employees</span><span class="on">Customers ●</span><span>Register (template)</span></div>
+                  <p style="font-weight:700;">Customer Management</p>
+                  <p><span class="fld">Search by name or mobile...</span> <span class="btn">Clear</span></p>
+                  <p style="font-size:13px;color:#6e6e73;">Showing 4 of 4 customers</p>
+                  <table>
+                    <tr><th>#</th><th>ID</th><th>Name</th><th>Age</th><th>Mobile</th><th>Actions</th></tr>
+                    <tr><td>1</td><td>1</td><td>Anoop</td><td>40</td><td>9876543210</td><td>Delete</td></tr>
+                    <tr><td>2</td><td>2</td><td>Ajay</td><td>32</td><td>9123456780</td><td>Delete</td></tr>
+                    <tr><td>3</td><td>3</td><td>Rekha</td><td>28</td><td>9988776655</td><td>Delete</td></tr>
+                    <tr><td>4</td><td>4</td><td>Suresh</td><td>45</td><td>9001122334</td><td>Delete</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>List:</strong> all four customers render with serial numbers and a Delete button per row.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Search:</strong> typing <code>an</code> narrows the list; typing <code>99</code> finds by mobile; clearing restores all four.
+                <span class="verify">The count line "Showing X of Y" should track your filtering.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Insert:</strong> adding a customer appends a new row with the next id, and the form clears afterwards.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Insert validation:</strong> clicking Add with an empty name shows the warning and does <em>not</em> add a row.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Delete:</strong> a confirm dialogue appears naming the customer; <strong>Cancel leaves the row in place</strong>; OK removes it.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Test the two subtle bugs this code avoids — genuinely worth 3 minutes</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Search then delete.</strong> Search for <code>an</code> so only some rows show, then delete
+                    one. The <em>correct</em> row disappears — because we look up by <code>id</code> in the master list,
+                    not by index in the filtered view. Had we used the filtered index, you'd have deleted the wrong
+                    customer.</li>
+                <li><strong>Insert then keep typing.</strong> Add a customer, then immediately type in the Name box
+                    <em>without</em> clicking Reset. The new table row stays unchanged — because we pushed
+                    <code>{ ...this.newCustomer }</code>, a copy. Remove the spread (push
+                    <code>this.newCustomer</code> directly), save, and try again: now typing rewrites the row you just
+                    added, live. Put the spread back.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I tested both scenarios and understand why <code>findIndex</code> by id and the spread operator matter.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Update — with Read-only ID &amp; Name<span class="sync">Theory slide 12, 15</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Complete the CRUD set. Clicking a row opens an edit panel; <strong>ID and Name are read-only</strong> (the
+              business rule from the case study); Age and Mobile are editable; Save writes back and <strong>Cancel truly
+              cancels</strong>.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the three edit methods and the <code>editCustomer</code> property to the component.</li>
+                <li>Add the edit panel to the template, plus an Edit button on each row.</li>
+                <li>Test: edit → save; edit → cancel; and try to change ID or Name.</li>
+              </ol>
+            </div>
+
+            <h3>① Add to the component class</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.ts</span><span class="fb-tag">ADD — inside the class, after deleteCustomer</span></div>
+            <div class="codewrap"><pre><code>  // ---------- UPDATE ----------
+
+  // null when not editing; a COPY of the row when editing
+  editCustomer: Customer | null = null;
+
+  selectForEdit(c: Customer): void {
+    // edit a COPY so Cancel genuinely discards the changes
+    this.editCustomer = { ...c };
+    this.message = 'Editing customer ' + c.id + ' — ID and Name are locked.';
+  }
+
+  saveEdit(): void {
+    if (!this.editCustomer) { return; }
+
+    if (this.editCustomer.age &lt; 1 || this.editCustomer.age &gt; 120) {
+      this.message = '⚠ Please enter a realistic age.';
+      return;
+    }
+    if (!this.editCustomer.mobile.trim()) {
+      this.message = '⚠ Mobile cannot be empty.';
+      return;
+    }
+
+    const index = this.customers.findIndex(x =&gt; x.id === this.editCustomer!.id);
+    if (index !== -1) {
+      this.customers[index] = { ...this.editCustomer };   // write the copy back
+    }
+
+    this.message = '✓ Customer ' + this.editCustomer.id + ' updated.';
+    this.editCustomer = null;      // close the panel
+    this.onSearch();               // refresh the view
+  }
+
+  cancelEdit(): void {
+    this.editCustomer = null;
+    this.message = 'Edit cancelled — nothing was changed.';
+  }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">What's that <code>!</code> in <code>this.editCustomer!.id</code>?</span>
+              The <strong>non-null assertion operator</strong>. Inside the arrow function TypeScript can't prove
+              <code>editCustomer</code> is still non-null, even though we checked it three lines up. The <code>!</code>
+              says "trust me, it isn't null here". Use it sparingly and only when you've genuinely already checked —
+              it switches off a safety feature.
+            </div>
+
+            <h3>② Add the edit panel to the template</h3>
+            <p>Insert this block <strong>after</strong> the "Add a customer" panel and <strong>before</strong> the table:</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.html</span><span class="fb-tag">INSERT — before the table</span></div>
+            <div class="codewrap"><pre><code>&lt;!-- ============ UPDATE ============ --&gt;
+&lt;!-- the whole panel only exists while editCustomer is not null --&gt;
+&lt;div class="panel editing" *ngIf="editCustomer"&gt;
+  &lt;h3&gt;Edit customer&lt;/h3&gt;
+  &lt;div class="row"&gt;
+
+    &lt;label class="locked"&gt;
+      ID (read-only)
+      &lt;!-- [value] is ONE-WAY: displays it, no path back --&gt;
+      &lt;input type="text" [value]="editCustomer.id" readonly&gt;
+    &lt;/label&gt;
+
+    &lt;label class="locked"&gt;
+      Name (read-only)
+      &lt;input type="text" [value]="editCustomer.name" readonly&gt;
+    &lt;/label&gt;
+
+    &lt;label&gt;
+      Age
+      &lt;!-- [(ngModel)] is TWO-WAY: this one IS editable --&gt;
+      &lt;input type="number" [(ngModel)]="editCustomer.age"&gt;
+    &lt;/label&gt;
+
+    &lt;label&gt;
+      Mobile
+      &lt;input type="text" [(ngModel)]="editCustomer.mobile"&gt;
+    &lt;/label&gt;
+
+    &lt;button (click)="saveEdit()"&gt;Save&lt;/button&gt;
+    &lt;button class="ghost" (click)="cancelEdit()"&gt;Cancel&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <h3>③ Add an Edit button to each row</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.html</span><span class="fb-tag">EDIT — the Actions cell</span></div>
+            <div class="codewrap"><pre><code>      &lt;td&gt;
+        &lt;button class="tiny" (click)="selectForEdit(c)"&gt;Edit&lt;/button&gt;
+        &lt;button class="tiny danger" (click)="deleteCustomer(c)"&gt;Delete&lt;/button&gt;
+      &lt;/td&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.css</span><span class="fb-tag">APPEND</span></div>
+            <div class="codewrap"><pre><code>.panel.editing { border-left-color: #9327f0; background: #faf5ff; }
+
+.row label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #6e6e73;
+  gap: 3px;
+}
+
+.row label.locked input {
+  background: #ececee;
+  color: #6e6e73;
+  cursor: not-allowed;
+}
+
+.cust-table td button + button { margin-left: 6px; }</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the edit panel while editing</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200/customers</span></div>
+                <div class="viewport">
+                  <p style="font-weight:700;margin-top:0;">Edit customer</p>
+                  <p>
+                    <span style="font-size:12px;color:#6e6e73;font-weight:700;">ID (read-only)</span>
+                    <span class="fld" style="background:#ececee;color:#6e6e73;min-width:60px;">2</span>
+                    <span style="font-size:12px;color:#6e6e73;font-weight:700;">Name (read-only)</span>
+                    <span class="fld" style="background:#ececee;color:#6e6e73;min-width:90px;">Ajay</span>
+                  </p>
+                  <p>
+                    <span style="font-size:12px;color:#6e6e73;font-weight:700;">Age</span>
+                    <span class="fld" style="min-width:60px;">33</span>
+                    <span style="font-size:12px;color:#6e6e73;font-weight:700;">Mobile</span>
+                    <span class="fld">9123456799</span>
+                    <span class="btn">Save</span>
+                  </p>
+                  <table>
+                    <tr><th>ID</th><th>Name</th><th>Age</th><th>Mobile</th><th>Actions</th></tr>
+                    <tr><td>1</td><td>Anoop</td><td>40</td><td>9876543210</td><td>Edit · Delete</td></tr>
+                    <tr class="row-active"><td>2</td><td>Ajay</td><td>33</td><td>9123456799</td><td>Edit · Delete</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Clicking <strong>Edit</strong> on a row opens the purple edit panel, pre-filled with that customer's values.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">ID and Name are visibly greyed out and <strong>cannot be typed into</strong>; Age and Mobile can.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Save</strong> updates the table row and closes the panel.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Cancel</strong> discards the changes — the row is <em>exactly</em> as it was.
+                <span class="verify">This is the copy paying off. Edit the age to something wild, then Cancel, and confirm the table is untouched.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Saving with an empty mobile shows the warning and does not save.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Prove why we edit a copy (the most instructive 60 seconds in this lab)</span>
+              Change <code>selectForEdit</code> from <code>this.editCustomer = { ...c };</code> to
+              <code>this.editCustomer = c;</code> and save. Now click Edit, change the age, and press
+              <strong>Cancel</strong>. <strong>The table row has already changed.</strong> There was nothing left to
+              cancel, because you were editing the live object the table renders. Put the spread back — and remember this
+              pattern for every edit form you ever build.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I removed the spread, watched Cancel fail to cancel, and restored it.</span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Why <code>[value]</code> + <code>readonly</code> instead of <code>[(ngModel)]</code>?</span>
+              <code>[value]</code> is <strong>one-way</strong>: the value is displayed, with no path back into the object.
+              <code>readonly</code> stops the user typing. Using <code>[(ngModel)]</code> on a field you call "read-only"
+              is a contradiction — and if someone later removes the <code>readonly</code> attribute, edits would silently
+              start flowing through. Make the binding itself express the intent.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <div class="section-band">Part 3 — Refactor onto a service</div>
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Move CRUD onto a Service + <code>HttpClient</code><span class="sync">Theory slides 13–14</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Take the working CRUD from Tasks 3–4 and route every operation through a service that calls
+              <code>HttpClient</code>. Same features, same UI — completely different data source. This is the single most
+              valuable exercise in the series, because it's exactly what you'll do on a real project when the backend
+              becomes available.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li><code>ng g s customer</code> and paste the service.</li>
+                <li>Replace the component class with the HTTP version. <strong>The template does not change at all.</strong></li>
+                <li>Navigate to <code>/customers</code> and watch the Network tab as you use each operation.</li>
+              </ol>
+            </div>
+
+            <div class="codewrap"><pre><code>ng generate service customer</code></pre></div>
+
+            <h3>① The service — the only file that knows the URL</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer.service.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Customer } from './models/customer';
+
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+
+  // A free fake REST API. Swap this ONE line for your own backend, e.g.
+  //   private baseUrl = 'http://localhost:8080/api/customers';
+  private baseUrl = 'https://jsonplaceholder.typicode.com/users';
+
+  constructor(private http: HttpClient) { }
+
+  /** READ — all customers */
+  getAll(): Observable&lt;Customer[]&gt; {
+    return this.http.get&lt;Customer[]&gt;(this.baseUrl);
+  }
+
+  /** READ — one customer */
+  getById(id: number): Observable&lt;Customer&gt; {
+    return this.http.get&lt;Customer&gt;(`${this.baseUrl}/${id}`);
+  }
+
+  /** CREATE — the SERVER assigns the id */
+  add(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.post&lt;Customer&gt;(this.baseUrl, customer);
+  }
+
+  /** UPDATE */
+  update(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.put&lt;Customer&gt;(`${this.baseUrl}/${customer.id}`, customer);
+  }
+
+  /** DELETE */
+  remove(id: number): Observable&lt;any&gt; {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">About the test API's data shape</span>
+              JSONPlaceholder's <code>/users</code> returns objects with <code>id</code>, <code>name</code>,
+              <code>email</code>, <code>phone</code> — so <code>age</code> will be <code>undefined</code> and mobile
+              comes from a different field. That's fine and realistic: <strong>the API rarely matches your model
+              exactly.</strong> The component below maps the response into <code>Customer</code> shape, which is
+              precisely what you'd do in production.
+            </div>
+
+            <h3>② The component — now asynchronous</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { Customer } from '../models/customer';
+import { CustomerService } from '../customer.service';
+
+@Component({
+  selector: 'app-customer-management',
+  templateUrl: './customer-management.component.html',
+  styleUrls: ['./customer-management.component.css']
+})
+export class CustomerManagementComponent implements OnInit {
+
+  customers: Customer[] = [];
+  filtered: Customer[] = [];
+
+  searchTerm: string = '';
+  message: string = '';
+  loading: boolean = false;
+
+  newCustomer: Customer = { id: 0, name: '', age: 0, mobile: '' };
+  editCustomer: Customer | null = null;
+
+  // INJECT the service — no 'new', no URL in this file
+  constructor(private customerService: CustomerService) { }
+
+  ngOnInit(): void {
+    this.loadAll();
+  }
+
+  // ---------- READ ----------
+  loadAll(): void {
+    this.loading = true;
+    this.customerService.getAll().subscribe({
+      next: (data: any[]) =&gt; {
+        // map the API's shape into OUR model
+        this.customers = data.map(u =&gt; ({
+          id: u.id,
+          name: u.name,
+          age: u.age ?? 30,                        // the API has no age
+          mobile: (u.phone || u.mobile || '')      // it calls it 'phone'
+                    .toString().replace(/[^0-9]/g, '').slice(0, 10)
+        }));
+        this.onSearch();
+        this.loading = false;
+        this.message = '✓ Loaded ' + this.customers.length + ' customers from the API.';
+      },
+      error: (err) =&gt; {
+        this.loading = false;
+        this.message = '✖ Could not load customers.';
+        console.error(err);
+      }
+    });
+  }
+
+  // ---------- SEARCH (still local — filtering in-memory is correct here) ----------
+  onSearch(): void {
+    const term = this.searchTerm.toLowerCase().trim();
+    this.filtered = term === ''
+      ? this.customers
+      : this.customers.filter(c =&gt;
+          c.name.toLowerCase().includes(term) || c.mobile.includes(term));
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.onSearch();
+  }
+
+  // ---------- CREATE ----------
+  insertCustomer(): void {
+    if (!this.newCustomer.name.trim() || !this.newCustomer.mobile.trim()) {
+      this.message = '⚠ Name and mobile are required.';
+      return;
+    }
+
+    this.customerService.add(this.newCustomer).subscribe({
+      next: (created) =&gt; {
+        // the SERVER decided the id — use what it returned
+        this.customers.push({ ...this.newCustomer, id: created.id });
+        this.onSearch();
+        this.resetForm();
+        this.message = '✓ Created via POST — server assigned id ' + created.id + '.';
+      },
+      error: (err) =&gt; {
+        this.message = '✖ Create failed.';
+        console.error(err);
+      }
+    });
+  }
+
+  resetForm(): void {
+    this.newCustomer = { id: 0, name: '', age: 0, mobile: '' };
+  }
+
+  // ---------- UPDATE ----------
+  selectForEdit(c: Customer): void {
+    this.editCustomer = { ...c };
+    this.message = 'Editing customer ' + c.id + ' — ID and Name are locked.';
+  }
+
+  saveEdit(): void {
+    if (!this.editCustomer) { return; }
+    const toSave = { ...this.editCustomer };
+
+    this.customerService.update(toSave).subscribe({
+      next: () =&gt; {
+        const i = this.customers.findIndex(x =&gt; x.id === toSave.id);
+        if (i !== -1) { this.customers[i] = toSave; }
+        this.editCustomer = null;
+        this.onSearch();
+        this.message = '✓ Updated via PUT — customer ' + toSave.id + '.';
+      },
+      error: (err) =&gt; {
+        this.message = '✖ Update failed.';
+        console.error(err);
+      }
+    });
+  }
+
+  cancelEdit(): void {
+    this.editCustomer = null;
+    this.message = 'Edit cancelled — nothing was changed.';
+  }
+
+  // ---------- DELETE ----------
+  deleteCustomer(c: Customer): void {
+    if (!confirm('Delete customer ' + c.id + ' — ' + c.name + '?')) {
+      this.message = 'Delete cancelled.';
+      return;
+    }
+
+    this.customerService.remove(c.id).subscribe({
+      next: () =&gt; {
+        const i = this.customers.findIndex(x =&gt; x.id === c.id);
+        if (i !== -1) { this.customers.splice(i, 1); }
+        this.onSearch();
+        this.message = '✓ Deleted via DELETE — customer ' + c.id + '.';
+      },
+      error: (err) =&gt; {
+        this.message = '✖ Delete failed.';
+        console.error(err);
+      }
+    });
+  }
+}</code></pre></div>
+
+            <h3>③ One small template addition — a loading state</h3>
+            <p>Add these two lines just under the <code>&lt;h2&gt;</code>. Everything else in the template stays
+               <strong>exactly</strong> as it was:</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/customer-management/customer-management.component.html</span><span class="fb-tag">ADD — after the h2</span></div>
+            <div class="codewrap"><pre><code>&lt;p class="msg" *ngIf="loading"&gt;Loading customers from the API…&lt;/p&gt;
+&lt;button class="ghost" (click)="loadAll()"&gt;Reload from API&lt;/button&gt;</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — same UI, real HTTP underneath</span>
+              Ten customers load from the API instead of four hardcoded ones. Search, insert, update and delete all still
+              work — but now every operation fires a request. In DevTools → <strong>Network</strong> you should see:
+              <table class="issues" style="margin-top:8px;">
+                <thead><tr><th>Action</th><th>Request</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr><td>Page load / Reload</td><td><code>GET /users</code></td><td><code>200</code></td></tr>
+                  <tr><td>Add</td><td><code>POST /users</code></td><td><code>201</code></td></tr>
+                  <tr><td>Save an edit</td><td><code>PUT /users/2</code></td><td><code>200</code></td></tr>
+                  <tr><td>Delete</td><td><code>DELETE /users/2</code></td><td><code>200</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The table now loads from the API — I can see the <code>GET</code> request and its JSON response in the Network tab.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Add fires a <code>POST</code> and the new row uses the <strong>server-assigned id</strong>, not one I calculated.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Saving an edit fires a <code>PUT</code> to <code>/users/{id}</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Delete fires a <code>DELETE</code> to <code>/users/{id}</code> and only removes the row on success.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Every operation has an <code>error</code> handler, and I tested at least one failure path by breaking the URL.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The template barely changed</strong> — I only added a loading line and a reload button.
+                <span class="verify">That's the payoff of separating concerns. A well-structured UI doesn't care where its data comes from.</span>
+              </span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Reload the page and notice something</span>
+              Your added customer is <strong>gone</strong>. JSONPlaceholder is a fake API — it validates your request,
+              returns a correct-looking response, and stores nothing. That's exactly what you want from a public test
+              endpoint. With your own Spring Boot API and a real database, the data would persist.
+            </div>
+            <div class="tryit">
+              <span class="lbl">The real finale — point it at your own Spring Boot API</span>
+              If you have a Spring Boot CRUD API from the earlier sessions:
+              <ol style="margin:6px 0 0;">
+                <li>Add <code>@CrossOrigin(origins = "http://localhost:4200")</code> to your <code>@RestController</code>.</li>
+                <li>Start it on port 8080.</li>
+                <li>Change <strong>one line</strong> in <code>customer.service.ts</code>:
+                    <code>private baseUrl = 'http://localhost:8080/api/customers';</code></li>
+                <li>Reload the Angular app.</li>
+              </ol>
+              That's it — <strong>one line</strong>, and you have a genuine full-stack application you built end to end.
+              If you skip the <code>@CrossOrigin</code> step you'll get a CORS error in the console; that's the browser
+              doing its job, and it can only be fixed on the server.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">(If available) I connected the app to my own Spring Boot API by changing one line.</span>
+            </label>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>No provider for HttpClient!</code></td><td><code>HttpClientModule</code> missing</td><td>Add it to <code>app.module.ts</code> <code>imports</code>.</td></tr>
+                <tr><td>Table stays empty, no request sent</td><td>Forgot <code>.subscribe()</code></td><td>Observables are lazy — subscribe.</td></tr>
+                <tr><td>Mobile column shows blank</td><td>The API field is <code>phone</code>, not <code>mobile</code></td><td>That's what the <code>.map()</code> in <code>loadAll()</code> handles — check you pasted it.</td></tr>
+                <tr><td><code>Blocked by CORS policy</code></td><td>Your own backend doesn't allow the Angular origin</td><td><code>@CrossOrigin(origins="http://localhost:4200")</code> on the controller.</td></tr>
+                <tr><td>Delete removes the row even when the server fails</td><td>Array mutation placed outside <code>next</code></td><td>Only update local state inside the <code>next</code> handler.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> A Live Search Against an External API<span class="sync">Optional</span></summary>
+          <div class="exp-body">
+            <p>Optional. Builds a search box that queries a public API as you type — the pattern behind every
+               typeahead you've ever used.</p>
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li><code>ng g c post-search</code> and add a route + nav link for it (Tasks 1–2 pattern).</li>
+                <li>Paste the component below. It searches posts by title using JSONPlaceholder.</li>
+                <li>Type and watch results appear.</li>
+              </ol>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/post-search/post-search.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+interface Post { id: number; title: string; body: string; }
+
+@Component({
+  selector: 'app-post-search',
+  templateUrl: './post-search.component.html'
+})
+export class PostSearchComponent implements OnInit {
+
+  allPosts: Post[] = [];
+  results: Post[] = [];
+  term: string = '';
+  loading = false;
+
+  constructor(private http: HttpClient) { }
+
+  ngOnInit(): void {
+    this.loading = true;
+    this.http.get&lt;Post[]&gt;('https://jsonplaceholder.typicode.com/posts')
+      .subscribe({
+        next: (data) =&gt; { this.allPosts = data; this.results = data.slice(0, 10); this.loading = false; },
+        error: (e) =&gt; { console.error(e); this.loading = false; }
+      });
+  }
+
+  search(): void {
+    const t = this.term.toLowerCase().trim();
+    this.results = t === ''
+      ? this.allPosts.slice(0, 10)
+      : this.allPosts.filter(p =&gt; p.title.toLowerCase().includes(t)).slice(0, 20);
+  }
+}</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/post-search/post-search.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;Search posts (live API data)&lt;/h2&gt;
+
+&lt;input [(ngModel)]="term" (input)="search()" placeholder="Search titles..."&gt;
+
+&lt;p *ngIf="loading"&gt;Loading 100 posts…&lt;/p&gt;
+&lt;p *ngIf="!loading"&gt;{{ results.length }} result(s)&lt;/p&gt;
+
+&lt;div *ngFor="let p of results" style="border-bottom:1px solid #d2d2d7; padding:8px 0;"&gt;
+  &lt;b&gt;{{ p.id }}. {{ p.title }}&lt;/b&gt;
+  &lt;p style="font-size:14px; color:#6e6e73; margin:4px 0 0;"&gt;{{ p.body | slice:0:110 }}…&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              100 posts load once, then typing filters them instantly with no further network calls.
+            </div>
+            <div class="observe">
+              <span class="lbl">The real-world version of this</span>
+              For a large dataset you'd query the <em>server</em> on every keystroke instead — but firing a request per
+              character is wasteful. The professional solution uses RxJS operators:
+              <code>debounceTime(300)</code> (wait until typing pauses), <code>distinctUntilChanged()</code> (ignore
+              repeats) and <code>switchMap()</code> (cancel the previous in-flight request). That's the natural next
+              thing to learn after this series.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — live external results filter as I type.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Final checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End of Session 4 — and end of the course</span>
+          <ol style="margin:6px 0 0;">
+            <li>The app has <strong>routes</strong> for every feature, a <strong>default redirect</strong>, and a <strong>404 page</strong>.</li>
+            <li>A <strong>nav menu</strong> switches views with <code>routerLink</code>, highlights the current page, and works with Back/Forward.</li>
+            <li><strong>Customer Management</strong> supports list, search, insert, update and delete.</li>
+            <li>Update keeps <strong>ID and Name read-only</strong>, and <strong>Cancel genuinely cancels</strong>.</li>
+            <li>Delete asks for <strong>confirmation</strong> and respects Cancel.</li>
+            <li>All CRUD is <strong>backed by a service</strong> using <code>HttpClient</code>, with error handling on every call.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have completed the Angular series.</strong>
+            <span class="verify">You've built a routed, service-backed, full-CRUD Angular application from an empty folder. That's a genuinely employable skill set.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — Session 4 terms</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:30%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Router</strong></td><td>The Angular service that maps URLs to components</td></tr>
+                <tr><td><strong><code>Routes</code></strong></td><td>The array of <code>{ path, component }</code> mappings</td></tr>
+                <tr><td><strong><code>RouterModule.forRoot()</code></strong></td><td>Registers the app's root routes — used once</td></tr>
+                <tr><td><strong><code>&lt;router-outlet&gt;</code></strong></td><td>The placeholder where the matched component renders</td></tr>
+                <tr><td><strong><code>routerLink</code></strong></td><td>Navigates without reloading the page (never use <code>href</code>)</td></tr>
+                <tr><td><strong><code>routerLinkActive</code></strong></td><td>Adds a CSS class to the link matching the current URL</td></tr>
+                <tr><td><strong><code>redirectTo</code> + <code>pathMatch</code></strong></td><td>Sends one path to another; <code>'full'</code> is required for the empty path</td></tr>
+                <tr><td><strong>Wildcard route <code>'**'</code></strong></td><td>Catches unmatched URLs — your 404. Must be last</td></tr>
+                <tr><td><strong>Route parameter</strong></td><td><code>:id</code> in a path, read via <code>ActivatedRoute</code></td></tr>
+                <tr><td><strong><code>Router.navigate()</code></strong></td><td>Navigating from TypeScript rather than a template</td></tr>
+                <tr><td><strong>CRUD</strong></td><td>Create, Read, Update, Delete</td></tr>
+                <tr><td><strong>Spread operator <code>{...obj}</code></strong></td><td>Makes a copy of an object — essential before editing</td></tr>
+                <tr><td><strong><code>findIndex</code></strong></td><td>Finds an item's position by a condition (use the id, not the view index)</td></tr>
+                <tr><td><strong><code>splice(i, 1)</code></strong></td><td>Removes one item at a position</td></tr>
+                <tr><td><strong>Non-null assertion <code>!</code></strong></td><td>"Trust me, this isn't null" — use only after you've checked</td></tr>
+                <tr><td><strong>CORS</strong></td><td>Browser rule blocking cross-origin calls; fixed on the server</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Final Self-Check — the whole series</summary>
+          <div class="exp-body">
+            <p>Ten questions spanning all four sessions. If you can answer these, you can build an Angular app.</p>
+            <ol class="steps">
+              <li>Why must the <code>'**'</code> route be last, and what happens if it isn't?</li>
+              <li>What's wrong with using <code>href="/customers"</code> for internal navigation?</li>
+              <li>The URL changes but nothing renders. What have you forgotten?</li>
+              <li>Why keep both a <code>customers</code> and a <code>filtered</code> array?</li>
+              <li>Why do we delete by looking up the <code>id</code> rather than using the row index?</li>
+              <li>Why does <code>selectForEdit</code> use <code>{ ...c }</code> instead of <code>c</code>?</li>
+              <li>Why <code>[value]</code> + <code>readonly</code> for a locked field rather than <code>[(ngModel)]</code>?</li>
+              <li>After the HTTP refactor, why must the array update live <em>inside</em> the <code>next</code> handler?</li>
+              <li>Which single line do you change to point the whole app at your own Spring Boot API — and what must the server add?</li>
+              <li>Name the nine core Angular concepts this application is built from.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all ten final self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card — Routing &amp; CRUD</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Routing</h3>
+              <table>
+                <thead><tr><th>Code</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td><code>{ path: 'x', component: X }</code></td><td>Map <code>/x</code> to a component</td></tr>
+                  <tr><td><code>{ path: '', redirectTo: '/x', pathMatch: 'full' }</code></td><td>Default route</td></tr>
+                  <tr><td><code>{ path: '**', component: NotFound }</code></td><td>404 — must be last</td></tr>
+                  <tr><td><code>{ path: 'x/:id', component: D }</code></td><td>Route with a parameter</td></tr>
+                  <tr><td><code>RouterModule.forRoot(routes)</code></td><td>Register root routes</td></tr>
+                  <tr><td><code>&lt;router-outlet&gt;</code></td><td>Where the component renders</td></tr>
+                  <tr><td><code>routerLink="/x"</code></td><td>Navigate — no reload</td></tr>
+                  <tr><td><code>routerLinkActive="active"</code></td><td>Highlight the current link</td></tr>
+                  <tr><td><code>route.snapshot.paramMap.get('id')</code></td><td>Read a route parameter</td></tr>
+                  <tr><td><code>router.navigate(['/x', id])</code></td><td>Navigate from code</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>CRUD — array vs HTTP</h3>
+              <table>
+                <thead><tr><th>Op</th><th>Array</th><th>HTTP</th></tr></thead>
+                <tbody>
+                  <tr><td>Read</td><td><code>this.items</code></td><td><code>http.get&lt;T[]&gt;(url)</code></td></tr>
+                  <tr><td>Create</td><td><code>items.push({...o})</code></td><td><code>http.post(url, o)</code></td></tr>
+                  <tr><td>Update</td><td><code>items[i] = {...o}</code></td><td><code>http.put(url+'/'+id, o)</code></td></tr>
+                  <tr><td>Delete</td><td><code>items.splice(i,1)</code></td><td><code>http.delete(url+'/'+id)</code></td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Patterns to remember</h3>
+              <table>
+                <thead><tr><th>Pattern</th><th>Why</th></tr></thead>
+                <tbody>
+                  <tr><td><code>{ ...obj }</code> before editing</td><td>So Cancel can actually cancel</td></tr>
+                  <tr><td><code>findIndex(x =&gt; x.id === id)</code></td><td>Immune to filtered views</td></tr>
+                  <tr><td>Master list + filtered view</td><td>Search never destroys data</td></tr>
+                  <tr><td><code>confirm()</code> before delete</td><td>Destructive actions need consent</td></tr>
+                  <tr><td>Update state inside <code>next</code></td><td>Only change the UI on success</td></tr>
+                  <tr><td>URLs only in services</td><td>One place to change the backend</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">The whole series on one line each</h3>
+          <table>
+            <thead><tr><th>Session</th><th>What you can now do</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td>Write TypeScript, scaffold and run an Angular app, and explain its file structure</td></tr>
+              <tr><td><strong>2</strong></td><td>Build components and bind data four ways; use directives and pipes</td></tr>
+              <tr><td><strong>3</strong></td><td>Build and validate both form types; create services; call REST APIs with Observables</td></tr>
+              <tr><td><strong>4</strong></td><td>Route between screens and build a complete, service-backed CRUD application</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Where to go from here</span>
+          The most valuable next step isn't another library — it's <strong>connecting this app to your own Spring Boot
+          API</strong> and deploying it. After that, in rough order of usefulness: standalone components (modern Angular
+          without <code>NgModule</code>), route guards and HTTP interceptors for authentication, Angular Material for
+          production-quality UI, more RxJS operators (<code>debounceTime</code>, <code>switchMap</code>) for real
+          typeaheads, and signals for simpler component state. And if mobile interests you — Ionic runs on exactly the
+          Angular, TypeScript and reactive-forms knowledge you now have.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Angular — Session 4 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+          &nbsp;·&nbsp; <strong>End of the series — thank you!</strong>
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

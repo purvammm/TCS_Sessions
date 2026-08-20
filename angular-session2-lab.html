@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 2 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(221,0,49,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dd0031, #9327f0, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff5f7, #fbeef4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(147,39,240,0.09);
+      border: 1px solid rgba(147,39,240,0.3);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffd0da;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(221,0,49,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #dd0031; }
+    details.exp.lab2 { border-left-color: #9327f0; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#9327f0; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Mock browser preview — shows exactly what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin: 14px 0; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session2-lab.html — Angular Session 2</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🧱</div>
+        <div>
+          <h1>Angular — Session 2 Hands-on Lab</h1>
+          <p class="section-intro">Build real components, a working login form, and a colour-coded employee table. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          Same as last session: theory on the main screen, this sheet on your machine. Each task carries a
+          <strong>"Theory slides …"</strong> badge showing where it belongs in the talk. Copy the snippets rather
+          than retyping them, tick the boxes, and watch the progress bar. <strong>Today everything you build stays
+          in the app</strong> — Session 3 and Session 4 extend this exact project, so don't delete anything.
+        </div>
+        <div class="observe">
+          <span class="lbl">Working habit for today</span>
+          Keep <code>ng serve</code> running in one terminal and your browser beside your editor. After <em>every</em>
+          paste, glance at the browser. If something breaks, you'll know it was the last thing you changed — which
+          makes fixing it a ten-second job instead of a ten-minute hunt.
+        </div>
+      </section>
+
+      <!-- ===== PREREQS ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slide 2</span></summary>
+          <div class="exp-body">
+            <p>You need Session 1's project. If you missed Session 1 or lost the folder, run
+               <code>ng new hello-world</code> now (answer <strong>N</strong> to routing, <strong>CSS</strong> for
+               styles) and you'll catch up in three minutes.</p>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Session 1's <code>hello-world</code> project exists</strong> on this machine
+                <span class="verify">Open a terminal, <code>cd</code> into it, and confirm you can see <code>src/app/</code>.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong><code>ng serve</code> runs</strong> and the app loads at <code>localhost:4200</code>
+                <span class="verify">Run it from the project root. Expect "✔ Compiled successfully." Leave it running for the whole session.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>cd hello-world
+ng serve</code></pre></div>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>The project is open in your editor</strong> beside the browser
+                <span class="verify">From the project folder: <code>code .</code></span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Recommended: install Bootstrap for a nicer-looking result (2 minutes, optional)</span>
+              Everything in this lab works with plain CSS. But if you'd like the tables and forms to look polished
+              with no styling effort, add Bootstrap's stylesheet to <code>src/index.html</code> inside
+              <code>&lt;head&gt;</code>, then use classes like <code>table table-striped</code> and
+              <code>form-control</code>:
+              <div class="codewrap"><pre><code>&lt;link
+  href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+  rel="stylesheet"&gt;</code></pre></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">The tasks</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Generate Components &amp; Build a Tree<span class="sync">Theory slides 5–9</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Get two real components into the app, then make them <strong>appear</strong> by placing their selector
+              tags in <code>app.component.html</code>. By the end of this task you will have built your first
+              component tree — and understood why a generated component doesn't show up on its own.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open a <strong>second terminal</strong> in the project root (leave <code>ng serve</code> running in the first).</li>
+                <li>Generate two components with the commands below.</li>
+                <li><strong>Read the CLI output.</strong> Note the four <code>CREATE</code> lines and — importantly —
+                    the <code>UPDATE src/app/app.module.ts</code> line.</li>
+                <li>Open <code>src/app/app.module.ts</code> and find your two new class names inside
+                    <code>declarations</code>. The CLI put them there.</li>
+                <li>Replace <code>src/app/app.component.html</code> with the version below and save.</li>
+              </ol>
+            </div>
+
+            <div class="codewrap"><pre><code>ng generate component header
+ng generate component employee-list</code></pre></div>
+            <div class="observe">
+              <span class="lbl">The short form</span>
+              <code>ng g c header</code> is identical to <code>ng generate component header</code>. Use whichever you
+              prefer — but type the long form at least once so the short form makes sense.
+            </div>
+            <div class="term-out">CREATE src/app/header/header.component.css (0 bytes)
+CREATE src/app/header/header.component.html (21 bytes)
+CREATE src/app/header/header.component.spec.ts (585 bytes)
+CREATE src/app/header/header.component.ts (275 bytes)
+<span class="ok">UPDATE src/app/app.module.ts (467 bytes)</span>
+
+CREATE src/app/employee-list/employee-list.component.css (0 bytes)
+CREATE src/app/employee-list/employee-list.component.html (28 bytes)
+CREATE src/app/employee-list/employee-list.component.spec.ts (639 bytes)
+CREATE src/app/employee-list/employee-list.component.ts (317 bytes)
+<span class="ok">UPDATE src/app/app.module.ts (562 bytes)</span></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Both components generated, and I found <code>HeaderComponent</code> and <code>EmployeeListComponent</code> inside <code>declarations</code> in <code>app.module.ts</code>.
+                <span class="verify">This registration is what makes a component usable. The CLI did it for you — hand-created components need it done manually.</span>
+              </span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Notice: nothing changed in the browser</span>
+              You created two components and the page looks exactly the same. That's correct. Angular has no idea
+              <em>where</em> you want them. They appear the moment you write their selector tags — which is the next step.
+            </div>
+
+            <h3>Now make them visible</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;app-header&gt;&lt;/app-header&gt;
+
+&lt;hr&gt;
+
+&lt;app-employee-list&gt;&lt;/app-employee-list&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected — both placeholders render</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <p>header works!</p>
+                  <hr>
+                  <p>employee-list works!</p>
+                </div>
+              </div>
+              Those two lines came from the generated <code>.html</code> files. You are now rendering a component tree:
+              <code>AppComponent</code> is the root, with <code>HeaderComponent</code> and
+              <code>EmployeeListComponent</code> as its children.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Both components' placeholder text renders on the page.</span>
+            </label>
+
+            <h3>Give the header some real content</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/header/header.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent {
+  appTitle: string = 'Employee Management System';
+  subTitle: string = 'Angular Training — Session 2';
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/header/header.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;div class="app-header"&gt;
+  &lt;h1&gt;{{ appTitle }}&lt;/h1&gt;
+  &lt;p&gt;{{ subTitle }}&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/header/header.component.css</span><span class="fb-tag">PASTE — it's empty</span></div>
+            <div class="codewrap"><pre><code>.app-header {
+  background: linear-gradient(135deg, #dd0031, #9327f0);
+  color: #fff;
+  padding: 18px 24px;
+  border-radius: 10px;
+}
+
+.app-header h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.app-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 15px;
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <div style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:14px 18px;border-radius:10px;">
+                    <p style="margin:0 0 4px;font-size:22px;font-weight:700;">Employee Management System</p>
+                    <p style="margin:0;opacity:0.9;font-size:14px;">Angular Training — Session 2</p>
+                  </div>
+                  <hr>
+                  <p>employee-list works!</p>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The header renders with a gradient banner and both interpolated strings.</span>
+            </label>
+            <div class="tryit">
+              <span class="lbl">Prove the scoping (20 seconds)</span>
+              That <code>.app-header h1</code> rule lives in <code>header.component.css</code>. Add an
+              <code>&lt;h1&gt;Test&lt;/h1&gt;</code> to <code>employee-list.component.html</code> and confirm it is
+              <strong>not</strong> styled by it. Component CSS cannot leak — that's a guarantee, not a coincidence.
+            </div>
+
+            <h3 style="margin-top:18px;">Common issues</h3>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>'app-header' is not a known element</code></td>
+                  <td>The component isn't in <code>declarations</code> — usually because it was hand-created rather than generated.</td>
+                  <td>Delete it and run <code>ng g c header</code>, or add <code>HeaderComponent</code> to <code>declarations</code> and import it at the top of <code>app.module.ts</code>.</td>
+                </tr>
+                <tr>
+                  <td>Nothing appears, no error</td>
+                  <td>The selector tag isn't in a template that's currently rendering.</td>
+                  <td>Add it to <code>app.component.html</code>. Also check the spelling — it's <code>app-employee-list</code>, not <code>app-employeeList</code>.</td>
+                </tr>
+                <tr>
+                  <td>The component appears but is unstyled</td>
+                  <td>CSS was pasted into <code>styles.css</code> or the wrong component's CSS file.</td>
+                  <td>Component styles must go in <em>that component's own</em> <code>.css</code> file.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> A Working Login Form — Two-way + Event Binding<span class="sync">Theory slides 7–8, 16–19</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Combine <strong>two-way binding</strong> (<code>[(ngModel)]</code>) with <strong>event binding</strong>
+              (<code>(click)</code>) in one small feature. This is the shape of almost every form you'll ever write in
+              Angular, so it's worth getting muscle memory for.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Generate the component: <code>ng g c login</code></li>
+                <li><strong>Import <code>FormsModule</code></strong> in <code>app.module.ts</code> — both steps, as shown below. <em>Do this before anything else or the form will silently do nothing.</em></li>
+                <li>Replace <code>login.component.ts</code> and <code>login.component.html</code> with the files below.</li>
+                <li>Add <code>&lt;app-login&gt;&lt;/app-login&gt;</code> to <code>app.component.html</code>.</li>
+                <li>Test with <code>admin</code> / <code>admin123</code>, then with anything else.</li>
+              </ol>
+            </div>
+
+            <div class="codewrap"><pre><code>ng generate component login</code></pre></div>
+
+            <h3>① Import <code>FormsModule</code> — the step everyone forgets</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.module.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';        // ① import it
+
+import { AppComponent } from './app.component';
+import { HeaderComponent } from './header/header.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { LoginComponent } from './login/login.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    EmployeeListComponent,
+    LoginComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule                                      // ② list it here
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Both lines are required</span>
+              The <code>import</code> at the top makes the name available to this file. Adding
+              <code>FormsModule</code> to the <code>imports</code> <strong>array</strong> is what actually switches
+              on <code>ngModel</code> for your templates. One without the other does nothing.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>FormsModule</code> is both imported at the top <em>and</em> listed in the <code>imports</code> array.</span>
+            </label>
+
+            <h3>② The login component class</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/login/login.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+
+  uname: string = '';
+  pass: string = '';
+  message: string = '';
+  isSuccess: boolean = false;
+
+  performLogin(): void {
+    if (this.uname === 'admin' &amp;&amp; this.pass === 'admin123') {
+      this.isSuccess = true;
+      this.message = 'Login successful. Welcome, ' + this.uname + '!';
+    } else {
+      this.isSuccess = false;
+      this.message = 'Invalid username or password.';
+    }
+  }
+
+  reset(): void {
+    this.uname = '';
+    this.pass = '';
+    this.message = '';
+  }
+}</code></pre></div>
+
+            <h3>③ The login template</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/login/login.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;div class="login-card"&gt;
+  &lt;h2&gt;Login&lt;/h2&gt;
+
+  &lt;label&gt;Username&lt;/label&gt;
+  &lt;input type="text" [(ngModel)]="uname" placeholder="admin"&gt;
+
+  &lt;label&gt;Password&lt;/label&gt;
+  &lt;input type="password" [(ngModel)]="pass" placeholder="admin123"&gt;
+
+  &lt;div class="actions"&gt;
+    &lt;button (click)="performLogin()"&gt;Login&lt;/button&gt;
+    &lt;button class="ghost" (click)="reset()"&gt;Reset&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;!-- interpolation + ngClass: the message styles itself by outcome --&gt;
+  &lt;p *ngIf="message"
+     [ngClass]="{ 'ok': isSuccess, 'bad': !isSuccess }"&gt;
+    {{ message }}
+  &lt;/p&gt;
+
+  &lt;!-- live proof that two-way binding works, both ways --&gt;
+  &lt;p class="debug"&gt;You typed: &lt;b&gt;{{ uname }}&lt;/b&gt; ({{ uname.length }} characters)&lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/login/login.component.css</span><span class="fb-tag">PASTE — it's empty</span></div>
+            <div class="codewrap"><pre><code>.login-card {
+  max-width: 340px;
+  border: 1px solid #d2d2d7;
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 18px 0;
+  background: #fafafc;
+}
+
+.login-card h2 { margin-top: 0; }
+
+.login-card label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 7px;
+  margin-top: 4px;
+}
+
+.actions { margin-top: 16px; display: flex; gap: 10px; }
+
+button {
+  background: #dd0031;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 8px 18px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+button.ghost {
+  background: #fff;
+  color: #dd0031;
+  border: 1px solid #dd0031;
+}
+
+.ok  { color: #1a9e34; font-weight: 600; }
+.bad { color: #dd0031; font-weight: 600; }
+.debug { color: #6e6e73; font-size: 13px; }</code></pre></div>
+
+            <h3>④ Show it on the page</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;app-header&gt;&lt;/app-header&gt;
+
+&lt;app-login&gt;&lt;/app-login&gt;
+
+&lt;app-employee-list&gt;&lt;/app-employee-list&gt;</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — success path (admin / admin123)</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <p style="font-weight:700;margin-top:0;">Login</p>
+                  <p>Username <span class="fld">admin</span></p>
+                  <p>Password <span class="fld">••••••••</span></p>
+                  <p><span class="btn">Login</span></p>
+                  <p style="color:#1a9e34;font-weight:600;">Login successful. Welcome, admin!</p>
+                  <p style="color:#6e6e73;font-size:13px;">You typed: <b>admin</b> (5 characters)</p>
+                </div>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected — failure path (anything else)</span>
+              The same card, with the message in red: <strong>"Invalid username or password."</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Correct credentials show the green success message.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Wrong credentials show the red failure message.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The "You typed:" line updates <strong>as I type</strong>, and the character count keeps up.
+                <span class="verify">This is two-way binding proving itself — the view is writing into the class on every keystroke.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Reset</strong> clears both boxes.
+                <span class="verify">And this is the other direction: the class writing back into the view. Same binding, both ways.</span>
+              </span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Deliberately break it — this one is important</span>
+              Comment out <code>FormsModule</code> in the <code>imports</code> array and save. The terminal now says
+              <em>"Can't bind to 'ngModel' since it isn't a known property of 'input'."</em> <strong>Read that message
+              and remember it.</strong> It is the error you're most likely to hit in Session 3, and now you'll recognise
+              it instantly. Put <code>FormsModule</code> back.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered the "can't bind to ngModel" error on purpose and fixed it.</span>
+            </label>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Typing in the box does nothing</td><td><code>FormsModule</code> missing from the <code>imports</code> array</td><td>Add it. This is the cause roughly 90% of the time.</td></tr>
+                <tr><td><code>Can't bind to 'ngModel'…</code></td><td>Same as above</td><td>Same as above</td></tr>
+                <tr><td>Nothing happens on click</td><td>Wrote <code>click</code> instead of <code>(click)</code>, or the method name doesn't match</td><td>Check the round brackets and the exact spelling of <code>performLogin()</code>.</td></tr>
+                <tr><td><code>Property 'uname' does not exist…</code></td><td>Template references a property the class doesn't have</td><td>Check spelling and that the property is declared (and <strong>not</strong> <code>private</code>).</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> The Employee Table with <code>*ngFor</code><span class="sync">Theory slides 22, 24</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Render an array as an HTML table with <strong>one</strong> <code>&lt;tr&gt;</code> in your markup. This
+              is the single most-used pattern in Angular, and it reuses the <code>interface</code> idea from Session 1.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Create a shared model file for the <code>Employee</code> interface (a real project always separates its models).</li>
+                <li>Replace <code>employee-list.component.ts</code> with the version below.</li>
+                <li>Replace <code>employee-list.component.html</code> with the table.</li>
+                <li>Paste the CSS, save, and check the browser.</li>
+              </ol>
+            </div>
+
+            <h3>① The model — create this file by hand</h3>
+            <p>Create a new folder <code>src/app/models/</code> and inside it a file called
+               <code>employee.ts</code>. (In VS Code: right-click the <code>app</code> folder → New Folder →
+               <code>models</code>, then right-click that → New File → <code>employee.ts</code>.)</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/models/employee.ts</span><span class="fb-tag">NEW FILE</span></div>
+            <div class="codewrap"><pre><code>export interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+  status: 'Active' | 'Inactive';    // a literal union — Session 1, drill E
+  joinDate: Date;
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Why a separate file?</span>
+              In Session 3 the <code>EmployeeService</code> will need this same type, and in Session 4 so will other
+              components. One shared definition means one place to change. Note the <code>export</code> — without it
+              nothing else can import it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>src/app/models/employee.ts</code> exists and exports the <code>Employee</code> interface.</span>
+            </label>
+
+            <h3>② The component class</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent {
+
+  employees: Employee[] = [
+    { id: 1001, name: 'Anoop',  designation: 'Software Engineer', salary: 25000, status: 'Active',   joinDate: new Date('2022-08-15') },
+    { id: 1002, name: 'Ajay',   designation: 'Team Lead',         salary: 45000, status: 'Inactive', joinDate: new Date('2019-03-01') },
+    { id: 1003, name: 'Rekha',  designation: 'Tester',            salary: 22000, status: 'Active',   joinDate: new Date('2023-01-10') },
+    { id: 1004, name: 'Suresh', designation: 'Architect',         salary: 65000, status: 'Inactive', joinDate: new Date('2015-11-23') }
+  ];
+}</code></pre></div>
+
+            <h3>③ The template</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;Employees ({{ employees.length }})&lt;/h2&gt;
+
+&lt;table class="emp-table"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;#&lt;/th&gt;
+      &lt;th&gt;ID&lt;/th&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Designation&lt;/th&gt;
+      &lt;th&gt;Salary&lt;/th&gt;
+      &lt;th&gt;Status&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;!-- ONE row of markup produces ALL the rows --&gt;
+    &lt;tr *ngFor="let emp of employees; let i = index"&gt;
+      &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.id }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.salary }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.status }}&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.css</span><span class="fb-tag">PASTE — it's empty</span></div>
+            <div class="codewrap"><pre><code>.emp-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 760px;
+  font-size: 15px;
+}
+
+.emp-table th,
+.emp-table td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.emp-table thead th {
+  background: #e8e8ea;
+  font-weight: 700;
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — four rows from one <code>&lt;tr&gt;</code></span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <p style="font-weight:700;margin-top:0;">Employees (4)</p>
+                  <table>
+                    <tr><th>#</th><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr>
+                    <tr><td>1</td><td>1001</td><td>Anoop</td><td>Software Engineer</td><td>25000</td><td>Active</td></tr>
+                    <tr><td>2</td><td>1002</td><td>Ajay</td><td>Team Lead</td><td>45000</td><td>Inactive</td></tr>
+                    <tr><td>3</td><td>1003</td><td>Rekha</td><td>Tester</td><td>22000</td><td>Active</td></tr>
+                    <tr><td>4</td><td>1004</td><td>Suresh</td><td>Architect</td><td>65000</td><td>Inactive</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four employees render, each in the correct column, with a serial number in the first cell.</span>
+            </label>
+            <div class="tryit">
+              <span class="lbl">Try it — 30 seconds, and genuinely satisfying</span>
+              Add a fifth employee to the array in the <code>.ts</code> file and save. A fifth row appears and the
+              heading count becomes 5 — <strong>with zero changes to your HTML</strong>. That's the payoff of
+              <code>*ngFor</code>, and it's why the JSP version needed five files while this needs one.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Adding a fifth employee to the array made a fifth row appear automatically.</span>
+            </label>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Four separate tables instead of four rows</td><td><code>*ngFor</code> is on the <code>&lt;table&gt;</code></td><td>Move it onto the <code>&lt;tr&gt;</code> — put it on the element you want repeated.</td></tr>
+                <tr><td>Nothing renders inside the table</td><td>Wrote <code>let emp in employees</code></td><td>It's <code>of</code>, not <code>in</code>.</td></tr>
+                <tr><td>Only one row appears</td><td>The asterisk is missing: <code>ngFor</code> instead of <code>*ngFor</code></td><td>Add the asterisk — without it there's no repetition and no error either.</td></tr>
+                <tr><td><code>Property 'status' does not exist on type…</code></td><td>The interface and the objects don't match</td><td>Ensure every object supplies every required field, spelled identically.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Conditional Styling — <code>*ngIf</code> + <code>ngClass</code><span class="sync">Theory slides 21, 25–26</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Make the table <strong>react to its data</strong>: green rows for Active employees, red for Inactive, and
+              a friendly "no employees" message when the list is empty. Two directives, a real visual result.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add a <code>clearAll()</code> method and a <code>reload()</code> method to the component so you can
+                    empty the array on demand and watch <code>*ngIf</code> switch over.</li>
+                <li>Wrap the table in <code>*ngIf</code> with an <code>else</code> branch.</li>
+                <li>Add <code>[ngClass]</code> to the <code>&lt;tr&gt;</code> and define the two classes in the CSS.</li>
+              </ol>
+            </div>
+
+            <h3>① Add the two methods</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent {
+
+  employees: Employee[] = [];
+
+  constructor() {
+    this.reload();
+  }
+
+  reload(): void {
+    this.employees = [
+      { id: 1001, name: 'Anoop',  designation: 'Software Engineer', salary: 25000, status: 'Active',   joinDate: new Date('2022-08-15') },
+      { id: 1002, name: 'Ajay',   designation: 'Team Lead',         salary: 45000, status: 'Inactive', joinDate: new Date('2019-03-01') },
+      { id: 1003, name: 'Rekha',  designation: 'Tester',            salary: 22000, status: 'Active',   joinDate: new Date('2023-01-10') },
+      { id: 1004, name: 'Suresh', designation: 'Architect',         salary: 65000, status: 'Inactive', joinDate: new Date('2015-11-23') }
+    ];
+  }
+
+  clearAll(): void {
+    this.employees = [];
+  }
+
+  toggleStatus(emp: Employee): void {
+    emp.status = emp.status === 'Active' ? 'Inactive' : 'Active';
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Why move the data into a method?</span>
+              Two reasons. First, you can now empty and restore the list at will to test <code>*ngIf</code>. Second —
+              and this is the real point — <strong>this is the exact shape Session 3 refactors</strong>: that
+              <code>reload()</code> body becomes a call to <code>employeeService.getEmployees()</code>. You're already
+              writing code that's ready for a service.
+            </div>
+
+            <h3>② The template — <code>*ngIf</code> with else, plus <code>ngClass</code></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;Employees ({{ employees.length }})&lt;/h2&gt;
+
+&lt;div class="toolbar"&gt;
+  &lt;button (click)="reload()"&gt;Reload data&lt;/button&gt;
+  &lt;button class="ghost" (click)="clearAll()"&gt;Clear all&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- show the table only when there IS data; otherwise the empty state --&gt;
+&lt;table class="emp-table" *ngIf="employees.length &gt; 0; else noData"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;#&lt;/th&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Designation&lt;/th&gt;&lt;th&gt;Salary&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;th&gt;&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr *ngFor="let emp of employees; let i = index"
+        [ngClass]="{
+          'row-active':   emp.status === 'Active',
+          'row-inactive': emp.status === 'Inactive'
+        }"&gt;
+      &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.id }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.salary }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.status }}&lt;/td&gt;
+      &lt;td&gt;&lt;button class="tiny" (click)="toggleStatus(emp)"&gt;Toggle&lt;/button&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;ng-template #noData&gt;
+  &lt;p class="empty"&gt;No employees to display. Click &lt;b&gt;Reload data&lt;/b&gt; to bring them back.&lt;/p&gt;
+&lt;/ng-template&gt;</code></pre></div>
+
+            <h3>③ The two classes</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.css</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>.emp-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 860px;
+  font-size: 15px;
+}
+
+.emp-table th,
+.emp-table td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.emp-table thead th {
+  background: #e8e8ea;
+  font-weight: 700;
+}
+
+/* ngClass targets these two */
+.row-active {
+  background: #eefcf1;
+  color: #14762b;
+}
+
+.row-inactive {
+  background: #fff0ef;
+  color: #b00027;
+}
+
+.toolbar { margin: 12px 0; display: flex; gap: 10px; }
+
+button {
+  background: #dd0031; color: #fff; border: none;
+  border-radius: 7px; padding: 7px 16px; cursor: pointer; font-size: 14px;
+}
+
+button.ghost { background: #fff; color: #dd0031; border: 1px solid #dd0031; }
+button.tiny  { padding: 3px 10px; font-size: 12px; }
+
+.empty {
+  background: #fffdf3; border: 1px solid #f0e3a8;
+  border-radius: 10px; padding: 14px 18px; max-width: 860px;
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — colour-coded rows</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <p style="font-weight:700;margin-top:0;">Employees (4)</p>
+                  <p><span class="btn">Reload data</span></p>
+                  <table>
+                    <tr><th>#</th><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr>
+                    <tr class="row-active"><td>1</td><td>1001</td><td>Anoop</td><td>Software Engineer</td><td>25000</td><td>Active</td></tr>
+                    <tr class="row-inactive"><td>2</td><td>1002</td><td>Ajay</td><td>Team Lead</td><td>45000</td><td>Inactive</td></tr>
+                    <tr class="row-active"><td>3</td><td>1003</td><td>Rekha</td><td>Tester</td><td>22000</td><td>Active</td></tr>
+                    <tr class="row-inactive"><td>4</td><td>1004</td><td>Suresh</td><td>Architect</td><td>65000</td><td>Inactive</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Active rows are green, Inactive rows are red.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Clicking <strong>Toggle</strong> on a row flips its status <em>and</em> its colour instantly.
+                <span class="verify">Nothing re-renders the whole page — Angular notices the property changed and re-evaluates just that <code>ngClass</code>.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Clear all</strong> hides the table and shows the "No employees" message; <strong>Reload data</strong> brings it back.
+                <span class="verify">Open DevTools (F12) while the list is empty — the <code>&lt;table&gt;</code> is genuinely gone from the DOM, not just hidden.</span>
+              </span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Bonus — try <code>ngStyle</code> for comparison</span>
+              Add this to the <code>&lt;tr&gt;</code> alongside <code>ngClass</code> and save:
+              <div class="codewrap"><pre><code>[ngStyle]="{ 'font-weight': emp.salary &gt; 40000 ? 'bold' : 'normal' }"</code></pre></div>
+              High earners go bold. Now compare the two approaches: <code>ngClass</code> named a <em>meaning</em>
+              ("this row is active") and put the styling in the stylesheet; <code>ngStyle</code> put a style decision
+              directly in your markup. That's exactly why <code>ngClass</code> is the default choice.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I tried <code>ngStyle</code> and can explain when I'd choose it over <code>ngClass</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Apply Pipes to the Table<span class="sync">Theory slide 27</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Transform how values are <strong>displayed</strong> without changing the data behind them. Four pipes,
+              four visible improvements, zero changes to your TypeScript.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li>In <code>employee-list.component.html</code>, change only the four <code>&lt;td&gt;</code> cells shown below.</li>
+                <li>Add the <code>Joined</code> column header to <code>&lt;thead&gt;</code> so the columns still line up.</li>
+                <li>Save and compare the before/after in the browser.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/employee-list/employee-list.component.html</span><span class="fb-tag">EDIT — these cells only</span></div>
+            <div class="codewrap"><pre><code>&lt;!-- in &lt;thead&gt;, add one more header before the empty one: --&gt;
+&lt;th&gt;Joined&lt;/th&gt;
+
+&lt;!-- in the *ngFor row, change these cells: --&gt;
+&lt;td&gt;{{ emp.name | uppercase }}&lt;/td&gt;
+&lt;td&gt;{{ emp.designation | slice:0:12 }}&lt;/td&gt;
+&lt;td&gt;{{ emp.salary | currency:'INR':'symbol':'1.2-2' }}&lt;/td&gt;
+&lt;td&gt;{{ emp.status }}&lt;/td&gt;
+&lt;td&gt;{{ emp.joinDate | date:'dd MMM yyyy' }}&lt;/td&gt;</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the same data, formatted</span>
+              <div class="browser">
+                <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+                <div class="viewport">
+                  <table>
+                    <tr><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th><th>Joined</th></tr>
+                    <tr class="row-active"><td>ANOOP</td><td>Software Engi</td><td>₹25,000.00</td><td>Active</td><td>15 Aug 2022</td></tr>
+                    <tr class="row-inactive"><td>AJAY</td><td>Team Lead</td><td>₹45,000.00</td><td>Inactive</td><td>01 Mar 2019</td></tr>
+                    <tr class="row-active"><td>REKHA</td><td>Tester</td><td>₹22,000.00</td><td>Active</td><td>10 Jan 2023</td></tr>
+                    <tr class="row-inactive"><td>SURESH</td><td>Architect</td><td>₹65,000.00</td><td>Inactive</td><td>23 Nov 2015</td></tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Names display in uppercase, salaries with a ₹ symbol and thousands separators, and dates as <code>15 Aug 2022</code>.</span>
+            </label>
+            <div class="observe">
+              <span class="lbl">The crucial thing to verify</span>
+              Look back at your <code>.ts</code> file: <code>name</code> is still <code>'Anoop'</code>, not
+              <code>'ANOOP'</code>. <code>salary</code> is still the number <code>25000</code>, so you can still do
+              arithmetic on it. <strong>A pipe changes the display, never the data.</strong> That's precisely why you'd
+              never do this by mutating the property.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I confirmed my underlying data is unchanged — only the display was transformed.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try the debugging pipe — worth remembering forever</span>
+              Add this line anywhere in the template:
+              <div class="codewrap"><pre><code>&lt;pre&gt;{{ employees | json }}&lt;/pre&gt;</code></pre></div>
+              Your entire array prints as formatted JSON on the page. When something isn't rendering and you can't
+              see why, <code>| json</code> answers "what is actually in this variable?" faster than anything else.
+              You will use this constantly in Session 3 when API responses aren't the shape you expected.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used <code>| json</code> to dump the array on screen.</span>
+            </label>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>InvalidPipeArgument</code> for the date pipe</td><td>The value is a string, not a <code>Date</code></td><td>Use <code>new Date('2022-08-15')</code> in your data, or <code>{{ str | date }}</code> only on ISO-format strings.</td></tr>
+                <tr><td>Currency shows <code>$</code> instead of <code>₹</code></td><td>No currency code passed</td><td><code>currency:'INR'</code> — the code is required for anything other than USD.</td></tr>
+                <tr><td><code>The pipe 'uppercase' could not be found</code></td><td>Very rare — <code>CommonModule</code>/<code>BrowserModule</code> missing</td><td>Ensure <code>BrowserModule</code> is in <code>app.module.ts</code> <code>imports</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> A Day-of-Week Badge with <code>*ngSwitch</code><span class="sync">Optional — theory slide 23</span></summary>
+          <div class="exp-body">
+            <p>Optional. Nothing in Session 3 depends on this — it's here for anyone who finished early.</p>
+            <div class="codewrap"><pre><code>ng generate component day-badge</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/day-badge/day-badge.component.ts</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-day-badge',
+  templateUrl: './day-badge.component.html',
+  styleUrls: ['./day-badge.component.css']
+})
+export class DayBadgeComponent {
+
+  // 0 = Sunday ... 6 = Saturday
+  dayNumber: number = new Date().getDay();
+
+  next(): void {
+    this.dayNumber = (this.dayNumber + 1) % 7;
+  }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/day-badge/day-badge.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
+            <div class="codewrap"><pre><code>&lt;div class="badge-box" [ngSwitch]="dayNumber"&gt;
+  &lt;span *ngSwitchCase="0"&gt;🌞 Sunday — weekend&lt;/span&gt;
+  &lt;span *ngSwitchCase="1"&gt;☕ Monday — sprint planning&lt;/span&gt;
+  &lt;span *ngSwitchCase="2"&gt;💻 Tuesday — heads down&lt;/span&gt;
+  &lt;span *ngSwitchCase="3"&gt;🚀 Wednesday — mid-sprint demo&lt;/span&gt;
+  &lt;span *ngSwitchCase="4"&gt;🧪 Thursday — testing day&lt;/span&gt;
+  &lt;span *ngSwitchCase="5"&gt;🎉 Friday — release&lt;/span&gt;
+  &lt;span *ngSwitchCase="6"&gt;🛌 Saturday — weekend&lt;/span&gt;
+  &lt;span *ngSwitchDefault&gt;❓ Unknown day&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;button (click)="next()"&gt;Next day&lt;/button&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/day-badge/day-badge.component.css</span><span class="fb-tag">PASTE</span></div>
+            <div class="codewrap"><pre><code>.badge-box {
+  display: inline-block;
+  background: #fff4f6;
+  border: 1px solid #ffd0da;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-weight: 600;
+  margin: 12px 0;
+}</code></pre></div>
+
+            <p>Then add <code>&lt;app-day-badge&gt;&lt;/app-day-badge&gt;</code> to <code>app.component.html</code>.</p>
+            <div class="expected">
+              <span class="lbl">Expected</span>
+              A pill showing today's label. Clicking <strong>Next day</strong> cycles through all seven — proving only
+              the matching <code>*ngSwitchCase</code> is ever in the DOM.
+            </div>
+            <div class="observe">
+              <span class="lbl">Note the quoting difference</span>
+              Here the cases are <strong>numbers</strong>, so <code>*ngSwitchCase="0"</code> is correct. If you switch
+              on a <em>string</em> you need inner quotes: <code>*ngSwitchCase="'Active'"</code>. Getting this wrong is
+              the classic <code>ngSwitch</code> bug — nothing matches and nothing renders.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — the badge shows the right day and cycles on click.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End-of-lab checkpoint — all five must be true</span>
+          <ol style="margin:6px 0 0;">
+            <li>A styled <strong>header component</strong> renders at the top of the page.</li>
+            <li>A working <strong>login form</strong> uses <code>[(ngModel)]</code> and <code>(click)</code>, and gives success/failure feedback.</li>
+            <li>The <strong>employee table</strong> renders from an array via <code>*ngFor</code>, typed by the <code>Employee</code> interface.</li>
+            <li>Rows are <strong>colour-coded</strong> by status with <code>ngClass</code>, and an empty list shows the <code>*ngIf</code> fallback.</li>
+            <li>At least one <strong>pipe</strong> is applied and I can explain that it changes display only.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have reached the Session 2 checkpoint.</strong>
+            <span class="verify">Session 3 refactors this exact code. If something isn't working, flag it now rather than next session.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — Session 2 terms</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Component</strong></td><td>Class + <code>@Component</code> metadata + template = one reusable piece of UI</td></tr>
+                <tr><td><strong>Selector</strong></td><td>The custom tag that renders a component, e.g. <code>&lt;app-login&gt;</code></td></tr>
+                <tr><td><strong>Declarations</strong></td><td>The list in <code>app.module.ts</code> of components this app owns</td></tr>
+                <tr><td><strong>Data binding</strong></td><td>The automatic link between a component's class and its template</td></tr>
+                <tr><td><strong>Interpolation</strong></td><td><code>{{ }}</code> — display a value as text (class → view)</td></tr>
+                <tr><td><strong>Property binding</strong></td><td><code>[prop]="expr"</code> — set an element property (class → view)</td></tr>
+                <tr><td><strong>Event binding</strong></td><td><code>(event)="method()"</code> — react to user actions (view → class)</td></tr>
+                <tr><td><strong>Two-way binding</strong></td><td><code>[(ngModel)]</code> — both directions at once; "banana in a box"</td></tr>
+                <tr><td><strong>FormsModule</strong></td><td>The Angular module that provides <code>ngModel</code>; must be in <code>imports</code></td></tr>
+                <tr><td><strong>Directive</strong></td><td>An instruction in your HTML that tells Angular to change that element</td></tr>
+                <tr><td><strong>Structural directive</strong></td><td>Adds/removes DOM elements — <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code> (asterisk!)</td></tr>
+                <tr><td><strong>Attribute directive</strong></td><td>Restyles an existing element — <code>ngClass</code>, <code>ngStyle</code> (no asterisk)</td></tr>
+                <tr><td><strong>ng-template</strong></td><td>A block of markup Angular renders only when told to — used for <code>*ngIf … else</code></td></tr>
+                <tr><td><strong>Pipe</strong></td><td><code>|</code> — transforms a value on its way to the screen</td></tr>
+                <tr><td><strong>$event</strong></td><td>The event object passed from a template into a method</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>Answer all eight and you're ready for Session 3.</p>
+            <ol class="steps">
+              <li>What are the three parts of every component, and what does the decorator contribute?</li>
+              <li>You ran <code>ng g c report</code> and nothing appeared on the page. Why — and what's the fix?</li>
+              <li>Which two things does <code>ng generate component</code> do that hand-creating files does not?</li>
+              <li>When must you use <code>[ ]</code> rather than <code>{{ }}</code>?</li>
+              <li>Two-way binding isn't working. What's the very first thing you check?</li>
+              <li>Which directives take an asterisk, and which don't — and why?</li>
+              <li>What's the difference between <code>*ngIf="false"</code> and CSS <code>display: none</code>?</li>
+              <li><code>{{ name | uppercase }}</code> is on screen. What is the value of <code>name</code> in the class?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all eight self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>The four bindings</h3>
+              <table>
+                <thead><tr><th>Syntax</th><th>Direction &amp; use</th></tr></thead>
+                <tbody>
+                  <tr><td><code>{{ prop }}</code></td><td>Class → view, as text</td></tr>
+                  <tr><td><code>[prop]="expr"</code></td><td>Class → view, sets a property</td></tr>
+                  <tr><td><code>(event)="fn()"</code></td><td>View → class, on user action</td></tr>
+                  <tr><td><code>[(ngModel)]="prop"</code></td><td>Both ways (needs <code>FormsModule</code>)</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Directives</h3>
+              <table>
+                <thead><tr><th>Directive</th><th>Does</th></tr></thead>
+                <tbody>
+                  <tr><td><code>*ngIf="cond"</code></td><td>Adds/removes the element</td></tr>
+                  <tr><td><code>*ngIf="c; else t"</code></td><td>With an <code>&lt;ng-template #t&gt;</code> fallback</td></tr>
+                  <tr><td><code>*ngFor="let x of arr"</code></td><td>Repeats the element per item</td></tr>
+                  <tr><td><code>; let i = index</code></td><td>Adds the position (also <code>first</code>, <code>last</code>, <code>even</code>, <code>odd</code>)</td></tr>
+                  <tr><td><code>[ngSwitch]</code> + <code>*ngSwitchCase</code></td><td>Renders one matching branch</td></tr>
+                  <tr><td><code>[ngClass]="{cls: cond}"</code></td><td>Toggles CSS classes</td></tr>
+                  <tr><td><code>[ngStyle]="{prop: val}"</code></td><td>Sets inline styles</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Built-in pipes</h3>
+              <table>
+                <thead><tr><th>Pipe</th><th>Example output</th></tr></thead>
+                <tbody>
+                  <tr><td><code>uppercase</code> / <code>lowercase</code></td><td>ANOOP / anoop</td></tr>
+                  <tr><td><code>date:'dd MMM yyyy'</code></td><td>15 Aug 2022</td></tr>
+                  <tr><td><code>currency:'INR'</code></td><td>₹25,000.00</td></tr>
+                  <tr><td><code>number:'1.2-2'</code></td><td>25,000.00</td></tr>
+                  <tr><td><code>percent</code></td><td>75%</td></tr>
+                  <tr><td><code>slice:0:12</code></td><td>Software Engi</td></tr>
+                  <tr><td><code>json</code></td><td>The whole object — best debugging tool there is</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">CLI commands used today</h3>
+              <table>
+                <thead><tr><th>Command</th><th>Result</th></tr></thead>
+                <tbody>
+                  <tr><td><code>ng g c header</code></td><td>4 files + registers in <code>app.module.ts</code></td></tr>
+                  <tr><td><code>ng g c employee-list</code></td><td>Selector becomes <code>app-employee-list</code></td></tr>
+                  <tr><td><code>ng serve</code></td><td>Dev server on port 4200, watching files</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Error → cause, at a glance</h3>
+          <table>
+            <thead><tr><th>Message</th><th>What it really means</th></tr></thead>
+            <tbody>
+              <tr><td><code>'app-x' is not a known element</code></td><td>Component isn't in <code>declarations</code> — generate it with the CLI</td></tr>
+              <tr><td><code>Can't bind to 'ngModel'…</code></td><td><code>FormsModule</code> missing from <code>imports</code></td></tr>
+              <tr><td><code>Property 'x' does not exist on type…</code></td><td>Template references something the class doesn't have (or it's <code>private</code>)</td></tr>
+              <tr><td>Element always shows despite <code>ngIf</code></td><td>The asterisk is missing</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 3</span>
+          Your employee data is hardcoded inside a component — which is fine for learning and wrong for a real app.
+          Session 3 builds proper <strong>forms</strong> (template-driven <em>and</em> reactive), adds
+          <strong>validation</strong>, then extracts that array into an injectable <code>EmployeeService</code> so the
+          component stops owning data it has no business owning. Finally, <code>HttpClient</code> fetches
+          <strong>live data from a real API</strong> and renders it. <strong>Bring today's project exactly as it is.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Angular — Session 2 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

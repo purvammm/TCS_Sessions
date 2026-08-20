@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 4 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(147,39,240,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #f8f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Component tree visual (Angular's parent-child structure) */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #dd0031; }
+    .stack-row.l2 { border-left-color: #9327f0; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* Version timeline */
+    .timeline { position: relative; margin-top: 18px; padding: 0; list-style: none; }
+    .timeline::before {
+      content: ""; position: absolute; left: 14px; top: 8px; bottom: 8px;
+      width: 2px; background: linear-gradient(180deg, #dd0031, #9327f0);
+    }
+    .timeline li { position: relative; padding: 7px 0 7px 46px; font-size: 16.5px; margin: 0; }
+    .timeline li::before {
+      content: ""; position: absolute; left: 8px; top: 14px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--mac-accent);
+    }
+    .timeline li .yr { font-weight: 800; color: var(--mac-accent); margin-right: 10px; font-variant-numeric: tabular-nums; }
+
+    /* Mock browser preview — shows what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin-top: 14px; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+
+    /* Data-flow direction map (used for the four binding types) */
+    .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
+    .bindmap .side {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fafafc;
+    }
+    .bindmap .side h3 { margin: 0 0 6px; font-size: 16px; }
+    .bindmap .side p { font-size: 14.5px; margin: 0; }
+    .bindmap .dir { text-align: center; color: var(--mac-accent); font-weight: 700; font-size: 13px; min-width: 90px; }
+    .bindmap .dir .a { font-size: 24px; display: block; line-height: 1.1; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(221,0,49,0.09);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #dd0031, #9327f0);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session4-theory.html — Angular Session 4</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 4 of 4 — Angular Series</span>
+            <h1>Routing &amp; Full CRUD</h1>
+            <div class="sub">Turn your single screen into a navigable application, then build Create, Read, Update and Delete end to end — twice.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. RECAP + ROADMAP -->
+        <section class="slide">
+          <p class="eyebrow">Where we left off</p>
+          <h2>Recap of Session 3, and today's roadmap</h2>
+          <div class="note">
+            <span class="lbl">You already know</span>
+            Both form styles and how to validate them. Services, <code>@Injectable</code>, and dependency injection.
+            <code>HttpClient</code> for GET/POST/PUT/DELETE, and Observables with <code>subscribe()</code>. Your
+            employee data now lives in a service, and you've rendered live data from a real API.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">One thing is still obviously wrong</span>
+            Your app is <strong>one long scrolling page</strong> with the header, login form, two registration forms, the
+            employee table and the user list all stacked on top of each other. Real applications have <em>screens</em>,
+            each with its own URL, reachable from a menu. That's what routing gives you — and it's the last major piece.
+          </div>
+          <ul class="agenda">
+            <li><span class="num">1</span> Why routing exists in a single-page application</li>
+            <li><span class="num">2</span> Defining routes, <code>&lt;router-outlet&gt;</code> and <code>routerLink</code></li>
+            <li><span class="num">3</span> Adding a route end to end, plus route parameters and a 404 page</li>
+            <li><span class="num">4</span> CRUD two ways — in-memory array, then service + HTTP</li>
+            <li><span class="num">5</span> The Customer Management case study: list, search, insert, update, delete</li>
+            <li><span class="num">6</span> Wrap-up: the full four-session journey and where to go next</li>
+          </ul>
+        </section>
+
+        <!-- 3. WHY ROUTING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1</p>
+          <h2>Why routing?</h2>
+          <p class="deep">Here's the apparent contradiction: a <strong>single</strong>-page application… with multiple pages? The trick is that the "pages" are never fetched from the server. Angular's <span class="term">router</span> watches the URL and swaps which component is rendered — instantly, in the browser, with no reload.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Traditional multi-page navigation</h3>
+              <ul>
+                <li>Click a link → browser requests a whole new HTML page</li>
+                <li>Everything is torn down and rebuilt</li>
+                <li>Visible flash; scroll position lost</li>
+                <li>All in-memory state is gone</li>
+                <li>Every navigation is a network round trip</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>Angular router navigation</h3>
+              <ul>
+                <li>Click a link → the router swaps one component</li>
+                <li>The page never reloads</li>
+                <li>Instant, smooth, no flicker</li>
+                <li>Services keep their state (they're singletons)</li>
+                <li>Zero network traffic unless data is needed</li>
+              </ul>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:16px;">And crucially, you keep everything users expect from real URLs:</p>
+          <ul>
+            <li><strong>Bookmarkable</strong> — <code>/customers</code> can be saved and shared.</li>
+            <li><strong>Back and forward buttons work</strong> — the router integrates with browser history.</li>
+            <li><strong>Deep-linkable</strong> — <code>/customers/1003</code> opens straight to that record.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">The one-line summary</span>
+            Routing gives you the <strong>navigation model of a multi-page site</strong> with the
+            <strong>speed and smoothness of a desktop application</strong>. That combination is why single-page apps took over.
+          </div>
+        </section>
+
+        <!-- 4. DEFINING ROUTES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 · step 1 — define</p>
+          <h2>Defining routes</h2>
+          <p class="deep">Routes live in a dedicated module: a simple array mapping <strong>URL paths to components</strong>.</p>
+          <div class="fname">src/app/app-routing.module.ts</div>
+          <pre><code>import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { RegistrationComponent } from './registration/registration.component';
+import { CustomerManagementComponent } from './customer-management/customer-management.component';
+import { NotFoundComponent } from './not-found/not-found.component';
+
+const routes: Routes = [
+  { path: '',          redirectTo: '/employees', pathMatch: 'full' },
+  { path: 'employees', component: EmployeeListComponent },
+  { path: 'register',  component: RegistrationComponent },
+  { path: 'customers', component: CustomerManagementComponent },
+  { path: '**',        component: NotFoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">path: 'employees'</div><div>Matches <code>/employees</code>. <strong>No leading slash</strong> in the definition — a very common slip.</div></div>
+            <div class="anno-row"><div class="anno-tag">path: ''</div><div>The empty path is the default route. Here it redirects, so landing on <code>/</code> doesn't show a blank screen.</div></div>
+            <div class="anno-row"><div class="anno-tag">pathMatch: 'full'</div><div>Required with <code>redirectTo</code> on an empty path — without it the redirect matches everything and loops.</div></div>
+            <div class="anno-row"><div class="anno-tag">path: '**'</div><div>The wildcard. Matches anything unmatched — your 404 page. <strong>It must be last</strong>: routes are evaluated top to bottom, first match wins.</div></div>
+            <div class="anno-row"><div class="anno-tag">forRoot(routes)</div><div>Registers these as the application's root routes. Used once, in this module only.</div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">If you answered "yes" to routing in <code>ng new</code></span>
+            The CLI already created this file and imported it in <code>app.module.ts</code>. We deliberately answered
+            <strong>no</strong> in Session 1 so that you'd build it yourself today and see every moving part.
+          </div>
+        </section>
+
+        <!-- 5. ROUTER OUTLET -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 · step 2 — render &amp; navigate</p>
+          <h2><code>&lt;router-outlet&gt;</code> and <code>routerLink</code></h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>Where the component renders</h3>
+              <pre><code>&lt;!-- app.component.html --&gt;
+
+&lt;app-header&gt;&lt;/app-header&gt;
+
+&lt;nav&gt;...links...&lt;/nav&gt;
+
+&lt;!-- the matched component appears HERE --&gt;
+&lt;router-outlet&gt;&lt;/router-outlet&gt;
+
+&lt;footer&gt;© 2026&lt;/footer&gt;</code></pre>
+              <p style="font-size:15px;">Everything outside the outlet — header, nav, footer — stays put on every route. Only the outlet's contents change.</p>
+            </div>
+            <div class="panel">
+              <h3>How you navigate</h3>
+              <pre><code>&lt;nav&gt;
+  &lt;a routerLink="/employees"
+     routerLinkActive="active"&gt;Employees&lt;/a&gt;
+
+  &lt;a routerLink="/register"
+     routerLinkActive="active"&gt;Register&lt;/a&gt;
+
+  &lt;a routerLink="/customers"
+     routerLinkActive="active"&gt;Customers&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+              <p style="font-size:15px;"><code>routerLinkActive</code> adds a CSS class to the link matching the current URL — that's how you highlight the current tab for free.</p>
+            </div>
+          </div>
+          <div class="browser">
+            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200/customers</span></div>
+            <div class="viewport">
+              <div class="navbar"><span>Employees</span><span>Register</span><span class="on">Customers ●</span></div>
+              <p class="muted" style="font-size:14px;">↑ nav stays &nbsp;·&nbsp; ↓ router-outlet content changes</p>
+              <p style="font-weight:700;">Customer Management</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Use <code>routerLink</code>, never <code>href</code></span>
+            <code>&lt;a href="/customers"&gt;</code> triggers a <strong>full page reload</strong> — the browser throws your
+            entire application away and downloads it again. It looks like it works, but it destroys the whole point of a
+            single-page app. If a click causes a visible flash, you've used <code>href</code> somewhere.
+          </div>
+        </section>
+
+        <!-- 6. END TO END -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 · step 3 — the full checklist</p>
+          <h2>Adding a route, end to end</h2>
+          <p class="deep">Here's the complete sequence for adding a brand-new screen. Miss any step and the symptom is different, so it's worth knowing all five.</p>
+          <div class="flow vert" style="max-width:820px;">
+            <div class="flow-box">1 · Generate the component <span class="sm">ng g c reports</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">2 · Import it in <code>app-routing.module.ts</code> <span class="sm">import { ReportsComponent } from './reports/reports.component';</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">3 · Add its route <span class="sm">{ path: 'reports', component: ReportsComponent } — ABOVE the '**' wildcard</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">4 · Add a nav link <span class="sm">&lt;a routerLink="/reports"&gt;Reports&lt;/a&gt;</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">5 · Test both ways <span class="sm">click the link, AND type the URL directly</span></div>
+          </div>
+          <table class="cmp" style="margin-top:18px;">
+            <thead><tr><th style="width:38%">Symptom</th><th>Which step you missed</th></tr></thead>
+            <tbody>
+              <tr><td>The URL changes but nothing renders</td><td>No <code>&lt;router-outlet&gt;</code> in <code>app.component.html</code></td></tr>
+              <tr><td>Everything goes to the 404 page</td><td>The route is <em>below</em> the <code>'**'</code> wildcard — move it up</td></tr>
+              <tr><td>Clicking the link reloads the whole app</td><td>Used <code>href</code> instead of <code>routerLink</code></td></tr>
+              <tr><td>Blank screen on <code>localhost:4200</code></td><td>No default <code>path: ''</code> route defined</td></tr>
+              <tr><td><code>'router-outlet' is not a known element</code></td><td><code>AppRoutingModule</code> not imported in <code>app.module.ts</code></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 7. ROUTE PARAMS -->
+        <section class="slide">
+          <p class="eyebrow">Routing — going further</p>
+          <h2>Route parameters &amp; navigating from code</h2>
+          <p class="deep">Real apps need URLs like <code>/customers/1003</code> — "show me <em>this</em> record". A colon in the path declares a parameter.</p>
+          <pre><code>// in the routes array
+{ path: 'customers/:id', component: CustomerDetailComponent }</code></pre>
+          <div class="panels">
+            <div class="panel">
+              <h3>Reading the parameter</h3>
+              <pre><code>import { ActivatedRoute } from '@angular/router';
+
+constructor(
+  private route: ActivatedRoute,
+  private customerService: CustomerService
+) { }
+
+ngOnInit(): void {
+  // snapshot: fine when the component
+  // is recreated for each id
+  const id = Number(
+    this.route.snapshot.paramMap.get('id')
+  );
+  this.customer =
+    this.customerService.getById(id);
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Navigating from TypeScript</h3>
+              <pre><code>import { Router } from '@angular/router';
+
+constructor(private router: Router) { }
+
+viewCustomer(id: number): void {
+  this.router.navigate(['/customers', id]);
+}
+
+afterSave(): void {
+  // e.g. return to the list after saving
+  this.router.navigate(['/customers']);
+}</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Two navigation styles, two purposes</span>
+            <strong><code>routerLink</code></strong> in a template — for links the user clicks.
+            <strong><code>Router.navigate()</code></strong> in TypeScript — for navigation your <em>code</em> decides:
+            after a successful save, after login, after a delete. Both go through the same router; neither reloads the page.
+          </div>
+          <div class="note">
+            <span class="lbl"><code>snapshot</code> vs subscribing</span>
+            <code>route.snapshot.paramMap</code> reads the parameter <strong>once</strong>. If the user can move from
+            <code>/customers/1</code> to <code>/customers/2</code> <em>without</em> the component being destroyed, Angular
+            reuses it and the snapshot never updates. In that case subscribe instead:
+            <code>this.route.paramMap.subscribe(p =&gt; ...)</code>. Snapshot is fine for these sessions — just know why the
+            other form exists.
+          </div>
+        </section>
+
+        <!-- 8. CRUD TWO WAYS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — CRUD</p>
+          <h2>CRUD, two ways</h2>
+          <p class="deep"><span class="term">CRUD</span> — Create, Read, Update, Delete — is the backbone of almost every business application. Today you'll implement the same four operations twice, and the second time will feel almost identical. That's the point.</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">1️⃣</div><h3>Strategy A — in-memory array</h3>
+              <p>All four operations mutate a local array inside the component. No server needed.</p>
+              <p style="margin-top:8px;"><strong>Why start here:</strong> you see the UI logic clearly with nothing async to confuse it. Everything is instant and synchronous.</p>
+              <p><strong>Downside:</strong> refresh the page and it's all gone.</p>
+            </div>
+            <div class="card">
+              <div class="ic">2️⃣</div><h3>Strategy B — service + <code>HttpClient</code></h3>
+              <p>The same four operations, routed through a service that calls GET / POST / PUT / DELETE.</p>
+              <p style="margin-top:8px;"><strong>Why finish here:</strong> this is how real applications work. Data persists, and multiple users see the same thing.</p>
+              <p><strong>Cost:</strong> everything becomes asynchronous.</p>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th style="width:16%">Operation</th><th>Array-based</th><th>Service + HTTP</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Read</strong></td><td><code>this.customers</code></td><td><code>http.get&lt;Customer[]&gt;(url)</code></td></tr>
+              <tr><td><strong>Create</strong></td><td><code>this.customers.push(c)</code></td><td><code>http.post(url, c)</code></td></tr>
+              <tr><td><strong>Update</strong></td><td><code>this.customers[i] = c</code></td><td><code>http.put(`${url}/${id}`, c)</code></td></tr>
+              <tr><td><strong>Delete</strong></td><td><code>this.customers.splice(i, 1)</code></td><td><code>http.delete(`${url}/${id}`)</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The insight this ordering is designed to give you</span>
+            When you do the refactor in the lab, notice how little of the <strong>template</strong> changes — often nothing
+            at all. Good structure means swapping the data source touches the service and a few subscribe blocks, not the UI.
+          </div>
+        </section>
+
+        <!-- 9. ARRAY CRUD LIST/SEARCH -->
+        <section class="slide">
+          <p class="eyebrow">Array-based CRUD · Read &amp; Search</p>
+          <h2>List and search</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class</h3>
+              <pre><code>export interface Customer {
+  id: number;
+  name: string;
+  age: number;
+  mobile: string;
+}
+
+// the master list
+customers: Customer[] = [
+  { id: 1, name: 'Anoop',  age: 40, mobile: '9876543210' },
+  { id: 2, name: 'Ajay',   age: 32, mobile: '9123456780' },
+  { id: 3, name: 'Rekha',  age: 28, mobile: '9988776655' }
+];
+
+// what the table actually renders
+filtered: Customer[] = [];
+searchTerm: string = '';
+
+ngOnInit(): void {
+  this.filtered = this.customers;
+}
+
+onSearch(): void {
+  const t = this.searchTerm.toLowerCase().trim();
+  this.filtered = !t
+    ? this.customers
+    : this.customers.filter(c =&gt;
+        c.name.toLowerCase().includes(t) ||
+        c.mobile.includes(t));
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;input [(ngModel)]="searchTerm"
+       (input)="onSearch()"
+       placeholder="Search name or mobile"&gt;
+
+&lt;table *ngIf="filtered.length &gt; 0; else empty"&gt;
+  &lt;tr&gt;
+    &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+    &lt;th&gt;Age&lt;/th&gt;&lt;th&gt;Mobile&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr *ngFor="let c of filtered"&gt;
+    &lt;td&gt;{{ c.id }}&lt;/td&gt;
+    &lt;td&gt;{{ c.name }}&lt;/td&gt;
+    &lt;td&gt;{{ c.age }}&lt;/td&gt;
+    &lt;td&gt;{{ c.mobile }}&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;ng-template #empty&gt;
+  &lt;p&gt;No customers match.&lt;/p&gt;
+&lt;/ng-template&gt;</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why keep two arrays?</span>
+            <code>customers</code> is the truth; <code>filtered</code> is the view. If you filtered
+            <code>customers</code> in place, the records you filtered out would be <strong>permanently deleted</strong> —
+            clearing the search box couldn't bring them back. Keeping the master list intact is the single most important
+            design decision in a searchable list.
+          </div>
+        </section>
+
+        <!-- 10. ARRAY CRUD INSERT -->
+        <section class="slide">
+          <p class="eyebrow">Array-based CRUD · Create</p>
+          <h2>Insert a new record</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class</h3>
+              <pre><code>newCustomer: Customer =
+  { id: 0, name: '', age: 0, mobile: '' };
+
+message: string = '';
+
+insertCustomer(): void {
+  // basic guard
+  if (!this.newCustomer.name ||
+      !this.newCustomer.mobile) {
+    this.message = 'Name and mobile are required.';
+    return;
+  }
+
+  // generate the next id
+  const nextId = this.customers.length === 0
+    ? 1
+    : Math.max(...this.customers.map(c =&gt; c.id)) + 1;
+
+  this.customers.push({
+    ...this.newCustomer,      // spread = copy the values
+    id: nextId
+  });
+
+  this.onSearch();            // refresh the filtered view
+  this.resetForm();
+  this.message = 'Customer added.';
+}
+
+resetForm(): void {
+  this.newCustomer =
+    { id: 0, name: '', age: 0, mobile: '' };
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;h3&gt;Add a customer&lt;/h3&gt;
+
+&lt;input [(ngModel)]="newCustomer.name"
+       placeholder="Name"&gt;
+
+&lt;input type="number"
+       [(ngModel)]="newCustomer.age"
+       placeholder="Age"&gt;
+
+&lt;input [(ngModel)]="newCustomer.mobile"
+       placeholder="Mobile"&gt;
+
+&lt;button (click)="insertCustomer()"&gt;Add&lt;/button&gt;
+
+&lt;p *ngIf="message"&gt;{{ message }}&lt;/p&gt;</code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Why <code>{ ...this.newCustomer }</code> and not just <code>this.newCustomer</code>?</span>
+            Objects are held <strong>by reference</strong>. Pushing the object itself means the array holds the <em>same</em>
+            object the form is still bound to — so typing in the form would silently edit the row you just added. The
+            spread operator <code>...</code> makes a copy. <strong>This is a genuinely common bug, and it looks like
+            magic when it happens.</strong>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice the id generation</span>
+            <code>Math.max(...ids) + 1</code> avoids reusing an id after a delete — <code>length + 1</code> would collide.
+            In the API-based version you delete this logic entirely: the <strong>server</strong> assigns the id, which is
+            the only safe place to do it.
+          </div>
+        </section>
+
+        <!-- 11. ARRAY CRUD DELETE -->
+        <section class="slide">
+          <p class="eyebrow">Array-based CRUD · Delete</p>
+          <h2>Delete, with a confirmation step</h2>
+          <pre><code>deleteCustomer(c: Customer): void {
+  const ok = confirm(
+    'Delete customer ' + c.id + ' — ' + c.name + '?'
+  );
+  if (!ok) { return; }                          // user cancelled
+
+  const index = this.customers.findIndex(x =&gt; x.id === c.id);
+  if (index !== -1) {
+    this.customers.splice(index, 1);            // remove 1 item at that position
+  }
+
+  this.onSearch();                              // refresh the filtered view
+  this.message = 'Customer ' + c.id + ' deleted.';
+}</code></pre>
+          <pre><code>&lt;td&gt;
+  &lt;button (click)="deleteCustomer(c)"&gt;Delete&lt;/button&gt;
+&lt;/td&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">Never delete without asking</span>
+            Deletion is <strong>irreversible</strong> and always one mis-click away. <code>confirm()</code> is the
+            browser's built-in dialogue — ugly, but it works everywhere with no setup, which makes it perfect for a lab.
+            In production you'd use a styled modal, but the <em>principle</em> never changes: destructive actions require
+            explicit confirmation.
+          </div>
+          <div class="note">
+            <span class="lbl">Delete by id, not by index</span>
+            <code>splice(i, 1)</code> needs the position in the <strong>master</strong> array. If you passed the index
+            from the <em>filtered</em> table, it would point at the wrong record as soon as a search was active — and you'd
+            delete the wrong customer. Passing the whole object and looking up its id with <code>findIndex</code> is
+            immune to that. It's a small detail that prevents a serious bug.
+          </div>
+        </section>
+
+        <!-- 12. ARRAY CRUD UPDATE -->
+        <section class="slide">
+          <p class="eyebrow">Array-based CRUD · Update</p>
+          <h2>Update — click a row, edit, save</h2>
+          <p class="deep">The flow: clicking a row copies it into an edit form; <strong>ID and Name become read-only</strong> once populated (business rule from the case study); Age and Mobile stay editable; Save writes the change back.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class</h3>
+              <pre><code>editCustomer: Customer | null = null;
+
+// clicking a row starts editing
+selectForEdit(c: Customer): void {
+  this.editCustomer = { ...c };   // edit a COPY
+}
+
+saveEdit(): void {
+  if (!this.editCustomer) { return; }
+
+  const i = this.customers.findIndex(
+    x =&gt; x.id === this.editCustomer!.id
+  );
+  if (i !== -1) {
+    this.customers[i] = { ...this.editCustomer };
+  }
+
+  this.editCustomer = null;       // close the form
+  this.onSearch();
+  this.message = 'Customer updated.';
+}
+
+cancelEdit(): void {
+  this.editCustomer = null;
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;!-- the edit panel appears only while editing --&gt;
+&lt;div *ngIf="editCustomer"&gt;
+  &lt;h3&gt;Edit customer&lt;/h3&gt;
+
+  &lt;label&gt;ID (read-only)&lt;/label&gt;
+  &lt;input [value]="editCustomer.id" readonly&gt;
+
+  &lt;label&gt;Name (read-only)&lt;/label&gt;
+  &lt;input [value]="editCustomer.name" readonly&gt;
+
+  &lt;label&gt;Age&lt;/label&gt;
+  &lt;input type="number"
+         [(ngModel)]="editCustomer.age"&gt;
+
+  &lt;label&gt;Mobile&lt;/label&gt;
+  &lt;input [(ngModel)]="editCustomer.mobile"&gt;
+
+  &lt;button (click)="saveEdit()"&gt;Save&lt;/button&gt;
+  &lt;button (click)="cancelEdit()"&gt;Cancel&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- on each row --&gt;
+&lt;td&gt;&lt;button (click)="selectForEdit(c)"&gt;Edit&lt;/button&gt;&lt;/td&gt;</code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two design decisions worth understanding</span>
+            <strong>1 · Edit a copy.</strong> <code>{ ...c }</code> means <strong>Cancel actually cancels</strong>. Bind
+            straight to the row object and every keystroke edits the live table — there'd be nothing to cancel.<br>
+            <strong>2 · <code>[value]</code> + <code>readonly</code> for locked fields.</strong> One-way binding displays
+            the value with no path back, and <code>readonly</code> stops the user typing. Using
+            <code>[(ngModel)]</code> on a "read-only" field is a contradiction waiting to bite you.
+          </div>
+        </section>
+
+        <!-- 13. API CRUD -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 · Strategy B</p>
+          <h2>The same CRUD, through a service</h2>
+          <div class="fname">src/app/customer.service.ts</div>
+          <pre><code>import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Customer } from './models/customer';
+
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+
+  private baseUrl = 'https://jsonplaceholder.typicode.com/users';
+  // with your own backend: 'http://localhost:8080/api/customers'
+
+  constructor(private http: HttpClient) { }
+
+  getAll(): Observable&lt;Customer[]&gt; {
+    return this.http.get&lt;Customer[]&gt;(this.baseUrl);
+  }
+
+  add(c: Customer): Observable&lt;Customer&gt; {
+    return this.http.post&lt;Customer&gt;(this.baseUrl, c);
+  }
+
+  update(c: Customer): Observable&lt;Customer&gt; {
+    return this.http.put&lt;Customer&gt;(`${this.baseUrl}/${c.id}`, c);
+  }
+
+  remove(id: number): Observable&lt;any&gt; {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">One file knows the URL. That's the whole design.</span>
+            Point <code>baseUrl</code> at your Spring Boot API and every operation follows. Components never change —
+            they don't know an HTTP call is happening at all.
+          </div>
+        </section>
+
+        <!-- 14. API CRUD COMPONENT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 · Strategy B continued</p>
+          <h2>What changes in the component</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>Before — synchronous array</h3>
+              <pre><code>insertCustomer(): void {
+  this.customers.push({
+    ...this.newCustomer, id: nextId
+  });
+  this.resetForm();
+  this.message = 'Added.';
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>After — asynchronous HTTP</h3>
+              <pre><code>insertCustomer(): void {
+  this.customerService.add(this.newCustomer)
+    .subscribe({
+      next: (created) =&gt; {
+        this.customers.push(created);
+        this.onSearch();
+        this.resetForm();
+        this.message = 'Added (id ' + created.id + ').';
+      },
+      error: (err) =&gt; {
+        this.message = 'Save failed.';
+        console.error(err);
+      }
+    });
+}</code></pre>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Three things to internalise about the change:</p>
+          <ul>
+            <li><strong>The work moves inside <code>next</code>.</strong> Anything that must happen "after the save" has to be in the callback — code after <code>subscribe()</code> runs too early.</li>
+            <li><strong>The server owns the id.</strong> You no longer compute it. Use <code>created.id</code> from the response.</li>
+            <li><strong>Failure is now possible.</strong> An array push can't fail; a network call can. Every operation needs an <code>error</code> handler and a message the user can understand.</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">Two update strategies after a successful call</span>
+            <strong>Optimistic-ish (used above):</strong> update the local array from the response. Fast, no extra request.
+            <strong>Re-fetch:</strong> call <code>getAll()</code> again in <code>next</code>. Slower but guaranteed to match
+            the server, which matters when several users edit the same data. Both are legitimate — choose deliberately.
+          </div>
+        </section>
+
+        <!-- 15. CASE STUDY -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — what you're about to build</p>
+          <h2>Case study: Customer Management</h2>
+          <p class="deep">The full requirements for the lab. Read them as a specification — this is deliberately close to how a real requirement would reach you.</p>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">📋 List</span><span class="desc">Show all customers in a table: <strong>ID, Name, Age, Mobile</strong>, plus a serial number and per-row Edit and Delete buttons.</span></div>
+            <div class="stack-row l2"><span class="layer">🔍 Search</span><span class="desc">A single text box filtering by <strong>name or mobile</strong>, case-insensitive, updating as the user types. Clearing it restores the full list.</span></div>
+            <div class="stack-row l3"><span class="layer">➕ Insert</span><span class="desc">A form for Name, Age and Mobile. ID is <strong>generated, never typed</strong>. Name and mobile are required. The form clears after a successful add.</span></div>
+            <div class="stack-row l4"><span class="layer">✏️ Update</span><span class="desc">Clicking a row populates an edit panel. <strong>ID and Name are read-only</strong>; only Age and Mobile may change. Save writes back; Cancel discards.</span></div>
+            <div class="stack-row l1"><span class="layer">🗑️ Delete</span><span class="desc">A per-row Delete button with a <strong>confirmation prompt</strong> naming the customer. Cancelling changes nothing.</span></div>
+          </div>
+          <div class="browser">
+            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200/customers</span></div>
+            <div class="viewport">
+              <div class="navbar"><span>Employees</span><span>Register</span><span class="on">Customers ●</span></div>
+              <p><span class="fld">Search name or mobile</span></p>
+              <table>
+                <tr><th>#</th><th>ID</th><th>Name</th><th>Age</th><th>Mobile</th><th>Actions</th></tr>
+                <tr><td>1</td><td>1</td><td>Anoop</td><td>40</td><td>9876543210</td><td>Edit · Delete</td></tr>
+                <tr><td>2</td><td>2</td><td>Ajay</td><td>32</td><td>9123456780</td><td>Edit · Delete</td></tr>
+                <tr><td>3</td><td>3</td><td>Rekha</td><td>28</td><td>9988776655</td><td>Edit · Delete</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            Why would a business make <strong>ID and Name read-only</strong> on edit? <span class="muted">(Look for:
+            the ID is the primary key — changing it isn't an edit, it's creating a different record. And a name change is
+            usually a governed process, not a casual field edit. Encoding rules like this in the UI is part of the job.)</span>
+          </div>
+        </section>
+
+        <!-- 16. ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">The finished application</p>
+          <h2>Everything you've built, in one diagram</h2>
+          <div class="tree-vis" data-label="Your Angular app">
+            <div class="tv-row">
+              <div class="node root"><div class="bn">app-root</div><div class="bd">header + nav + router-outlet</div></div>
+            </div>
+            <div class="tv-tick">│ &nbsp; router swaps one of these ↓</div>
+            <div class="tv-row">
+              <div class="node"><div class="bn">/employees</div><div class="bd">EmployeeListComponent</div></div>
+              <div class="node"><div class="bn">/register</div><div class="bd">RegistrationComponent</div></div>
+              <div class="node"><div class="bn">/customers</div><div class="bd">CustomerManagementComponent</div></div>
+              <div class="node"><div class="bn">/**</div><div class="bd">NotFoundComponent</div></div>
+            </div>
+            <div class="tv-tick">│ &nbsp; components inject ↓</div>
+            <div class="tv-row">
+              <div class="node"><div class="bn">EmployeeService</div><div class="bd">@Injectable, singleton</div></div>
+              <div class="node"><div class="bn">CustomerService</div><div class="bd">CRUD via HttpClient</div></div>
+              <div class="node"><div class="bn">UserService</div><div class="bd">live API calls</div></div>
+            </div>
+            <div class="tv-note">Templates display · components coordinate · services fetch · HttpClient talks to the API</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Look at how few concepts this needs</span>
+            Components, bindings, directives, forms, services, DI, HttpClient, Observables and routing. <strong>Nine
+            ideas</strong> — and they compose into a complete, professional front-end architecture. Everything else you
+            learn in Angular is a refinement of these nine.
+          </div>
+        </section>
+
+        <!-- 17. BEST PRACTICES -->
+        <section class="slide">
+          <p class="eyebrow">Habits worth carrying forward</p>
+          <h2>Do these, avoid those</h2>
+          <div class="panels">
+            <div class="panel good">
+              <h3>✅ Do</h3>
+              <ul>
+                <li>Generate everything with the <strong>CLI</strong> — it never forgets the module registration</li>
+                <li>Keep API URLs in <strong>services</strong>, never in components</li>
+                <li><strong>Type everything</strong> with interfaces — no <code>any[]</code> for API responses</li>
+                <li>Fetch data in <strong><code>ngOnInit</code></strong>, inject in the constructor</li>
+                <li>Handle <strong>both</strong> <code>next</code> and <code>error</code> on every subscribe</li>
+                <li>Show <strong>loading</strong> and <strong>empty</strong> states — users need to know what's happening</li>
+                <li>Copy objects with <code>{ ...obj }</code> before editing them</li>
+                <li>Guard optional data with <code>*ngIf</code> before reading its properties</li>
+                <li>Confirm before anything destructive</li>
+              </ul>
+            </div>
+            <div class="panel bad">
+              <h3>❌ Avoid</h3>
+              <ul>
+                <li><code>href</code> for internal links — it reloads the whole app</li>
+                <li>Putting the <code>'**'</code> wildcard route anywhere but <strong>last</strong></li>
+                <li>Business logic in templates — keep them declarative</li>
+                <li>Heavy method calls inside <code>{{ }}</code> — they re-run constantly</li>
+                <li>Filtering your master array in place — the data is then gone</li>
+                <li>Trusting client-side validation as security</li>
+                <li>Reading <code>this.data</code> on the line after <code>subscribe()</code></li>
+                <li><code>private</code> properties used in templates — the build fails</li>
+                <li><code>any</code> everywhere — you lose the whole point of TypeScript</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">If you remember only one thing from this slide</span>
+            <strong>Components display; services fetch.</strong> Almost every Angular architecture problem is a
+            violation of that one sentence.
+          </div>
+        </section>
+
+        <!-- 18. JOURNEY RECAP -->
+        <section class="slide">
+          <p class="eyebrow">The full journey</p>
+          <h2>Four sessions, one application</h2>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">Session 1</span><span class="desc">TypeScript — types, interfaces, optionals, unions, loops, arrays, tuples, classes. Angular CLI, <code>ng new</code>, <code>ng serve</code>, and the boot chain from <code>index.html</code> to your component.</span></div>
+            <div class="stack-row l2"><span class="layer">Session 2</span><span class="desc">Components, templates, and all four bindings. Structural directives (<code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code>), attribute directives (<code>ngClass</code>, <code>ngStyle</code>) and pipes.</span></div>
+            <div class="stack-row l3"><span class="layer">Session 3</span><span class="desc">Template-driven and reactive forms with validation. Services, <code>@Injectable</code> and dependency injection. <code>HttpClient</code> and Observables.</span></div>
+            <div class="stack-row l4"><span class="layer">Session 4</span><span class="desc">Routing with <code>&lt;router-outlet&gt;</code> and <code>routerLink</code>, route parameters, and a complete CRUD application — array-based, then service-backed.</span></div>
+          </div>
+          <ul class="checklist">
+            <li>You can scaffold, run and structure an Angular application from nothing.</li>
+            <li>You can build UI as reusable components and wire data to it in all four directions.</li>
+            <li>You can collect and validate user input in either form style, and justify your choice.</li>
+            <li>You can separate concerns properly with services and dependency injection.</li>
+            <li>You can consume a REST API — GET, POST, PUT, DELETE — and handle both success and failure.</li>
+            <li>You can build a multi-screen, navigable, full-CRUD application end to end.</li>
+          </ul>
+        </section>
+
+        <!-- 19. WHERE NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where to go next</p>
+          <h2>Beyond these four sessions</h2>
+          <p class="deep">You now have the foundation the rest of the ecosystem builds on. In roughly the order that makes sense to learn them:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🧩</div><h3>Standalone components</h3><p>Modern Angular can skip <code>NgModule</code> entirely — components declare their own imports. The recommended default in Angular 15+. Same concepts, less ceremony.</p></div>
+            <div class="card"><div class="ic">🔐</div><h3>Route guards &amp; interceptors</h3><p><code>CanActivate</code> to protect routes behind login; HTTP interceptors to attach auth tokens to every request automatically.</p></div>
+            <div class="card"><div class="ic">🎨</div><h3>Angular Material</h3><p>A complete, accessible component library — data tables with sorting and paging, dialogs, date pickers. Stop hand-rolling UI.</p></div>
+            <div class="card"><div class="ic">🌊</div><h3>More RxJS</h3><p><code>map</code>, <code>filter</code>, <code>debounceTime</code>, <code>switchMap</code> — the operators that turn a search box into a proper typeahead.</p></div>
+            <div class="card"><div class="ic">📶</div><h3>Signals</h3><p>Angular's newer reactivity model. Simpler than Observables for component state, and increasingly the idiomatic choice.</p></div>
+            <div class="card"><div class="ic">📱</div><h3>Ionic / Cordova</h3><p>Build native mobile apps with the Angular you already know. <strong>Angular + reactive forms + TypeScript are the prerequisites</strong> — which you now have. (Not covered in these four sessions.)</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The most valuable next step, though, isn't a library</span>
+            <strong>Point your Angular app at your own Spring Boot API.</strong> Change one <code>baseUrl</code>, add
+            <code>@CrossOrigin</code> on the controller, and you have a genuine full-stack application built entirely by
+            you. That's the exercise that makes all eight of these sessions click into place.
+          </div>
+        </section>
+
+        <!-- 20. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of the Angular Series</span>
+            <h1>Thank you!</h1>
+            <div class="sub">From <code>ng new</code> to a full CRUD application in four sessions. Now open the final lab and finish it.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Questions are always welcome.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Angular · Session 4 — Routing &amp; CRUD</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
