@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 4 — Set, Map &amp; File I/O (Theory)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(83,130,161,0.09);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #3c6480; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.sm, table.cmp.sm td, table.cmp.sm th { font-size: 14.5px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #eef4f9; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Class hierarchy / tree visual */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .node.checked { border-color: #0a84ff; background: #f0f7ff; }
+    .node.checked .bn { color: #0a6dd8; }
+    .node.unchecked { border-color: #ff9f0a; background: #fff8ec; }
+    .node.unchecked .bn { color: #b3700a; }
+    .node.err { border-color: var(--tl-red); background: #fff0ef; }
+    .node.err .bn { color: #c0392b; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #e76f00; }
+    .stack-row.l2 { border-left-color: #5382a1; }
+    .stack-row.l3 { border-left-color: #28c840; }
+    .stack-row.l4 { border-left-color: #bf5af2; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Java-specific visuals === */
+
+    /* Call stack frames — used for exception propagation and unwinding */
+    .callstack {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 16px;
+      max-width: 620px;
+    }
+    .csf {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--mac-border);
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      background: #fafafc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .csf:last-child { border-bottom: none; }
+    .csf .tagx {
+      margin-left: auto;
+      font-family: var(--mac-font);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--mac-text-muted);
+      white-space: nowrap;
+    }
+    .csf.throwing { background: #fff0ea; color: #b3430b; }
+    .csf.throwing .tagx { color: #b3430b; }
+    .csf.catching { background: #eefcf1; color: #1a7f2e; }
+    .csf.catching .tagx { color: #1a7f2e; }
+    .csf.dead { background: #f4f4f6; color: var(--mac-text-muted); text-decoration: line-through; }
+
+    /* Array / list cells — memory layout visuals */
+    .cells { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; align-items: flex-start; }
+    .cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      min-width: 58px;
+      padding: 10px 8px;
+      text-align: center;
+      background: #fff;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+    .cell .idx { display: block; font-size: 11px; color: var(--mac-text-muted); margin-top: 4px; font-family: var(--mac-font); }
+    .cell.filled { background: var(--mac-accent-soft); border-color: var(--mac-accent); }
+    .cell.empty { color: var(--mac-text-muted); border-style: dashed; }
+    .cell.hit { background: #eefcf1; border-color: #28c840; }
+    .cell.gone { background: #fff0ef; border-color: var(--tl-red); color: #c0392b; }
+    .cells-label { font-size: 14px; color: var(--mac-text-muted); margin-top: 12px; font-weight: 600; }
+
+    /* Hash bucket table — HashSet / HashMap internals */
+    .buckets { display: grid; gap: 8px; margin-top: 16px; }
+    .bkt { display: flex; align-items: center; gap: 10px; }
+    .bkt .bi {
+      flex: 0 0 auto; width: 92px;
+      font-family: var(--mac-mono); font-size: 13px;
+      color: var(--mac-text-muted); text-align: right;
+    }
+    .bkt .chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .bkt .ent {
+      border: 1px solid var(--mac-accent);
+      background: var(--mac-accent-soft);
+      border-radius: 7px; padding: 5px 10px;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .bkt .ent.clash { border-color: var(--tl-red); background: #fff0ef; }
+    .bkt .lnk { color: var(--mac-text-muted); font-size: 13px; }
+    .bkt .nil { color: var(--mac-text-muted); font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Linked-node chain — LinkedList internals */
+    .chainviz { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 16px; }
+    .lnode {
+      border: 1px solid var(--mac-accent); border-radius: 9px;
+      background: #fff; display: flex; overflow: hidden;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .lnode span { padding: 8px 10px; }
+    .lnode .pv, .lnode .nx { background: #f4f4f6; color: var(--mac-text-muted); font-size: 11.5px; }
+    .lnode .val { background: var(--mac-accent-soft); font-weight: 700; border-left: 1px solid var(--mac-border); border-right: 1px solid var(--mac-border); }
+    .chainviz .dbl { color: var(--mac-accent); font-size: 18px; font-weight: 700; }
+
+    /* Decision flowchart for "which collection?" */
+    .decide { margin-top: 16px; }
+    .dq {
+      border: 1px solid var(--mac-border); border-left: 5px solid var(--mac-accent-2);
+      border-radius: 10px; background: #fafafc;
+      padding: 12px 18px; margin: 9px 0; font-size: 16.5px;
+    }
+    .dq .q { font-weight: 700; }
+    .dq .a { color: var(--mac-text-muted); font-size: 15.5px; margin-top: 4px; display: block; }
+    .dq .a code { font-weight: 700; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .slide pre.sm code { font-size: 13px; }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    /* Console output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(231,111,0,0.10);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #e76f00, #5382a1);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session4-theory.html — Java Core Session 4</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 4 of 4 — Java Core Series</span>
+            <h1>Set, Map &amp; Basic File I/O</h1>
+            <div class="sub">Guaranteed uniqueness, instant lookup by key, and finally — data that survives the program being closed.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. WHERE WE ARE -->
+        <section class="slide">
+          <p class="eyebrow">The final session</p>
+          <h2>Everything comes together today</h2>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1 ✓</span>
+              <span class="desc"><strong>Exceptions.</strong> Needed today: every file operation throws a <em>checked</em> <code>IOException</code>, and try-with-resources is how we close files safely.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2 ✓</span>
+              <span class="desc"><strong>equals &amp; hashCode.</strong> Needed today: they are <em>literally</em> the mechanism that makes <code>HashSet</code> and <code>HashMap</code> work. You'll finally see the buckets behind that broken HashSet.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3 ✓</span>
+              <span class="desc"><strong>Collections &amp; relationships.</strong> Needed today: <code>Set</code> and <code>Map</code> sit beside <code>List</code> in the same framework, and we'll store our model in them.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4 · Today</span>
+              <span class="desc"><strong>Set, Map &amp; File I/O.</strong> Output: a bank application that guarantees unique account numbers, finds any account instantly, and <em>survives a restart</em>.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Two problems we're solving</span>
+            <strong>1.</strong> Nothing stops two accounts sharing a number, and finding one means scanning the entire list. → <code>Set</code> and <code>Map</code>.<br>
+            <strong>2.</strong> Close the program and everything you entered is gone forever. → <strong>File I/O</strong>.
+          </div>
+        </section>
+
+        <!-- 3. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">Session 4</p>
+          <h2>Agenda</h2>
+          <ol class="agenda">
+            <li><span class="num">1</span><span>Why <code>Set</code> — and the <code>equals</code>/<code>hashCode</code> contract, properly</span></li>
+            <li><span class="num">2</span><span>How <code>HashSet</code> works inside — buckets, hashing, collisions</span></li>
+            <li><span class="num">3</span><span><code>HashSet</code> vs <code>LinkedHashSet</code> vs <code>TreeSet</code></span></li>
+            <li><span class="num">4</span><span>Why <code>Map</code> — and why it isn't a <code>Collection</code></span></li>
+            <li><span class="num">5</span><span><code>HashMap</code> internals, load factor, and treeification</span></li>
+            <li><span class="num">6</span><span>The Map API worth knowing, and iterating a Map</span></li>
+            <li><span class="num">7</span><span>Choosing a collection — the decision flowchart</span></li>
+            <li><span class="num">8</span><span>File I/O: byte vs character streams, and buffering</span></li>
+            <li><span class="num">9</span><span>Modern NIO.2 — <code>Path</code> and <code>Files</code></span></li>
+            <li><span class="num">10</span><span>CSV round-trip, serialization &amp; <code>.properties</code></span></li>
+          </ol>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "You have 100,000 users in a <code>List</code> and need to find one by email. How many comparisons?" — up to 100,000. "With a <code>Map</code>?" — <strong>essentially one.</strong> That's today's headline.
+          </div>
+        </section>
+
+        <!-- 4. WHY SET -->
+        <section class="slide">
+          <p class="eyebrow">Uniqueness, for free</p>
+          <h2>Why <code>Set</code></h2>
+          <p class="deep">A <code>Set</code> is a collection that <strong>cannot contain duplicates</strong>. Add something twice and the second attempt is silently ignored — and <code>add()</code> returns <code>false</code> to tell you.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Enforcing uniqueness with a List</h3>
+              <pre class="sm"><code>List&lt;String&gt; ids = new ArrayList&lt;&gt;();
+
+void addId(String id) {
+    if (!ids.contains(id)) {   // O(n) scan
+        ids.add(id);
+    }
+}
+// 10,000 adds = up to 50 million
+// comparisons. And you must
+// remember the check EVERY time.</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ A Set does it structurally</h3>
+              <pre class="sm"><code>Set&lt;String&gt; ids = new HashSet&lt;&gt;();
+
+ids.add(id);       // that's it
+// Duplicate? Ignored automatically.
+// contains() is O(1), not O(n).
+// Impossible to forget the rule,
+// because it isn't your job.</code></pre>
+            </div>
+          </div>
+          <pre><code>Set&lt;String&gt; accountNumbers = new HashSet&lt;&gt;();
+
+System.out.println(accountNumbers.add("AC1001"));   // true  - added
+System.out.println(accountNumbers.add("AC1002"));   // true  - added
+System.out.println(accountNumbers.add("AC1001"));   // false - already present!
+System.out.println(accountNumbers.size());          // 2
+
+// The return value of add() is how you DETECT a duplicate:
+if (!accountNumbers.add(newNumber)) {
+    throw new DuplicateAccountException("Account " + newNumber + " already exists");
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Three things a Set gives you</span>
+            <strong>1.</strong> Guaranteed uniqueness, enforced by the data structure rather than by your discipline.
+            <strong>2.</strong> <code>contains()</code> in O(1) instead of O(n).
+            <strong>3.</strong> A meaningful return from <code>add()</code> so you can react to duplicates.
+          </div>
+        </section>
+
+        <!-- 5. THE CONTRACT -->
+        <section class="slide">
+          <p class="eyebrow">The most important slide in this deck</p>
+          <h2>The <code>equals</code> / <code>hashCode</code> contract</h2>
+          <p class="deep">A <code>Set</code> has to answer "have I seen this before?". For <code>String</code> and <code>Integer</code> that's already handled. <strong>For your own classes, you must tell it how</strong> — and if you get it wrong, nothing warns you.</p>
+          <div class="keybox">
+            <span class="lbl">The contract</span>
+            <strong>1.</strong> If <code>a.equals(b)</code> then <code>a.hashCode() == b.hashCode()</code>. <em>(Mandatory.)</em><br>
+            <strong>2.</strong> If <code>a.hashCode() == b.hashCode()</code>, <code>a.equals(b)</code> <em>may</em> be false — that's a <strong>collision</strong>, and it's perfectly legal.<br>
+            <strong>3.</strong> <code>hashCode()</code> must return the same value every time, as long as the object doesn't change.
+          </div>
+          <pre><code>public class Account {
+    private final String accountNumber;      // the identity
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return accountNumber.equals(((Account) o).accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountNumber);   // SAME field as equals()
+    }
+}</code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:38%">What you wrote</th><th>What happens in a HashSet</th></tr></thead>
+            <tbody>
+              <tr><td>Both, on the same fields</td><td class="good">Works correctly</td></tr>
+              <tr><td><code>equals</code> only</td><td class="bad">Duplicates get stored. <code>contains()</code> returns false for objects that are in there</td></tr>
+              <tr><td><code>hashCode</code> only</td><td class="bad">Every object is treated as distinct — duplicates again</td></tr>
+              <tr><td>Different fields in each</td><td class="bad">Unpredictable, and very hard to debug</td></tr>
+              <tr><td>Neither</td><td>Reference identity only — two "identical" objects are seen as different</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Session 2's lab, explained</span>
+            Remember the <code>HashSet</code> that held two equal customers and couldn't find one it contained? <strong>That was this.</strong> The next slide shows exactly why.
+          </div>
+        </section>
+
+        <!-- 6. HASHSET INTERNALS -->
+        <section class="slide">
+          <p class="eyebrow">Look inside</p>
+          <h2>How <code>HashSet</code> actually works</h2>
+          <p class="deep">A <code>HashSet</code> is an array of <span class="term">buckets</span>. To store an element it computes <code>hashCode()</code>, reduces that to a bucket index, and puts the element there. Lookup does exactly the same arithmetic — so it goes <strong>straight</strong> to the right bucket instead of searching.</p>
+          <div class="buckets">
+            <div class="bkt"><span class="bi">bucket 0</span><span class="chain"><span class="nil">null</span></span></div>
+            <div class="bkt"><span class="bi">bucket 1</span><span class="chain"><span class="ent">"AC1001"</span></span></div>
+            <div class="bkt"><span class="bi">bucket 2</span><span class="chain"><span class="nil">null</span></span></div>
+            <div class="bkt"><span class="bi">bucket 3</span><span class="chain"><span class="ent clash">"AC1004"</span><span class="lnk">→</span><span class="ent clash">"AC1009"</span><span class="lnk">← collision, chained</span></span></div>
+            <div class="bkt"><span class="bi">bucket 4</span><span class="chain"><span class="ent">"AC1002"</span></span></div>
+            <div class="bkt"><span class="bi">bucket 5</span><span class="chain"><span class="nil">null</span></span></div>
+          </div>
+          <div class="flow">
+            <div class="flow-box">add(x)</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">x.hashCode()<span class="sm">e.g. -1029384</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">index<span class="sm">hash &amp; (n-1)</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">bucket empty?<span class="sm">store it</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">else compare<br>with equals()<span class="sm">match = duplicate,<br>reject</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Now the Session 2 bug makes sense</span>
+            Two equal customers with <em>different</em> hash codes land in <strong>different buckets</strong>. <code>contains()</code> computes the hash, goes to that one bucket, finds nothing, and returns <code>false</code> — <strong><code>equals()</code> is never even called.</strong> That's why a broken <code>hashCode</code> fails silently: the lookup never reaches the comparison step.
+          </div>
+          <div class="note">
+            <span class="lbl">Why O(1)</span>
+            Good hash distribution means most buckets hold 0 or 1 elements, so a lookup is: one hash calculation, one array index, at most a couple of <code>equals</code> calls. That's constant time regardless of whether the set holds 10 items or 10 million.
+          </div>
+        </section>
+
+        <!-- 7. SET IMPLEMENTATIONS -->
+        <section class="slide">
+          <p class="eyebrow">Three flavours</p>
+          <h2>Choosing a <code>Set</code></h2>
+          <table class="cmp">
+            <thead><tr><th style="width:19%"></th><th><code>HashSet</code></th><th><code>LinkedHashSet</code></th><th><code>TreeSet</code></th></tr></thead>
+            <tbody>
+              <tr><td><strong>Order</strong></td><td class="bad">None — looks random</td><td class="good">Insertion order</td><td class="good">Sorted order</td></tr>
+              <tr><td><strong>Backed by</strong></td><td>Hash table</td><td>Hash table + linked list</td><td>Red-black tree</td></tr>
+              <tr><td><strong>add / contains / remove</strong></td><td class="good">O(1)</td><td class="good">O(1)</td><td>O(log n)</td></tr>
+              <tr><td><strong>Needs</strong></td><td><code>equals</code> + <code>hashCode</code></td><td><code>equals</code> + <code>hashCode</code></td><td><code>Comparable</code> or a <code>Comparator</code></td></tr>
+              <tr><td><strong><code>null</code> allowed</strong></td><td>One</td><td>One</td><td class="bad">No — throws NPE</td></tr>
+              <tr><td><strong>Use when</strong></td><td><strong>Default.</strong> You just need uniqueness</td><td>Uniqueness <em>and</em> predictable order</td><td>You need it sorted, or range queries</td></tr>
+            </tbody>
+          </table>
+          <pre><code>List&lt;String&gt; input = List.of("Rahul", "Priya", "Anita", "Priya", "Deepa");
+
+new HashSet&lt;&gt;(input);         // [Rahul, Anita, Priya, Deepa]  - arbitrary order
+new LinkedHashSet&lt;&gt;(input);   // [Rahul, Priya, Anita, Deepa]  - as inserted
+new TreeSet&lt;&gt;(input);         // [Anita, Deepa, Priya, Rahul]  - alphabetical</code></pre>
+          <pre><code>// TreeSet's extra powers (NavigableSet) - impossible with a HashSet
+TreeSet&lt;Integer&gt; scores = new TreeSet&lt;&gt;(List.of(45, 67, 72, 88, 91));
+scores.first();              // 45
+scores.last();               // 91
+scores.higher(72);           // 88   - strictly greater
+scores.floor(70);            // 67   - greatest value &lt;= 70
+scores.headSet(72);          // [45, 67]
+scores.subSet(60, 90);       // [67, 72, 88]  - RANGE QUERY
+scores.descendingSet();      // [91, 88, 72, 67, 45]</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The mutable-key trap</span>
+            If you put an object in a <code>HashSet</code> and then <strong>change a field used by <code>hashCode()</code></strong>, the object is now sitting in the wrong bucket. You will never find it again — <code>contains()</code> returns false even though it's right there. <strong>Only use immutable fields in <code>hashCode</code>.</strong>
+          </div>
+        </section>
+
+        <!-- 8. SET OPERATIONS -->
+        <section class="slide">
+          <p class="eyebrow">Mathematical set operations</p>
+          <h2>Union, intersection &amp; difference</h2>
+          <pre><code>Set&lt;String&gt; javaDevs   = new HashSet&lt;&gt;(Set.of("Priya", "Rahul", "Anita"));
+Set&lt;String&gt; pythonDevs = new HashSet&lt;&gt;(Set.of("Anita", "Deepa", "Vikram"));
+
+// UNION - everyone
+Set&lt;String&gt; all = new HashSet&lt;&gt;(javaDevs);
+all.addAll(pythonDevs);              // [Priya, Rahul, Anita, Deepa, Vikram]
+
+// INTERSECTION - knows both
+Set&lt;String&gt; both = new HashSet&lt;&gt;(javaDevs);
+both.retainAll(pythonDevs);          // [Anita]
+
+// DIFFERENCE - Java only
+Set&lt;String&gt; javaOnly = new HashSet&lt;&gt;(javaDevs);
+javaOnly.removeAll(pythonDevs);      // [Priya, Rahul]
+
+// SYMMETRIC DIFFERENCE - one but not both
+Set&lt;String&gt; exclusive = new HashSet&lt;&gt;(all);
+exclusive.removeAll(both);           // [Priya, Rahul, Deepa, Vikram]
+
+// SUBSET test
+javaDevs.containsAll(Set.of("Priya", "Rahul"));    // true</code></pre>
+          <div class="warnbox">
+            <span class="lbl">All three mutate the set you call them on</span>
+            <code>addAll</code>, <code>retainAll</code> and <code>removeAll</code> change the receiver in place. That's why every example above starts with <code>new HashSet&lt;&gt;(original)</code> — <strong>copy first, then operate</strong>, or you'll destroy your source data.
+          </div>
+          <div class="note">
+            <span class="lbl">Practical uses</span>
+            Deduplicating a list in one line: <code>new ArrayList&lt;&gt;(new LinkedHashSet&lt;&gt;(list))</code> — removes duplicates and keeps the original order. Also: finding which permissions a user is missing, which tags two articles share, which records exist in one file but not another.
+          </div>
+        </section>
+
+        <!-- 9. WHY MAP -->
+        <section class="slide">
+          <p class="eyebrow">The most useful data structure in programming</p>
+          <h2>Why <code>Map</code></h2>
+          <p class="deep">A <code>Map</code> stores <strong>key → value</strong> pairs. Give it a key, get the value back — instantly, without searching.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Finding an account in a List</h3>
+              <pre class="sm"><code>Account find(String number) {
+    for (Account a : accounts) {
+        if (a.getAccountNumber()
+             .equals(number)) {
+            return a;
+        }
+    }
+    return null;
+}
+// O(n). 100,000 accounts =
+// up to 100,000 comparisons,
+// every single lookup.</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ With a Map</h3>
+              <pre class="sm"><code>Map&lt;String, Account&gt; byNumber
+    = new HashMap&lt;&gt;();
+
+byNumber.put(a.getAccountNumber(), a);
+
+Account found = byNumber.get("AC1001");
+// O(1). Same speed with 100
+// accounts or 100 million.</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl"><code>Map</code> is NOT a <code>Collection</code></span>
+            Look back at Session 3's hierarchy diagram: <code>Map</code> sits on its own branch. It does not extend <code>Collection</code>, so it has no <code>add()</code> and you cannot for-each over it directly. It holds <em>pairs</em>, not elements — a fundamentally different shape. You get collection <em>views</em> of it: <code>keySet()</code>, <code>values()</code>, <code>entrySet()</code>.
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th style="width:34%">Real-world use</th><th>Key → Value</th></tr></thead>
+            <tbody>
+              <tr><td>Account lookup</td><td>account number → <code>Account</code></td></tr>
+              <tr><td>Word frequency count</td><td>word → count</td></tr>
+              <tr><td>Caching</td><td>request → cached response</td></tr>
+              <tr><td>Grouping</td><td>account type → list of accounts</td></tr>
+              <tr><td>Configuration</td><td>property name → setting</td></tr>
+              <tr><td>HTTP request parameters</td><td>parameter name → value</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 10. HASHMAP INTERNALS -->
+        <section class="slide">
+          <p class="eyebrow">Look inside</p>
+          <h2><code>HashMap</code> internals</h2>
+          <p class="deep">Same bucket mechanism as <code>HashSet</code> — in fact <code>HashSet</code> is literally a <code>HashMap</code> where every value is a dummy object. Here each bucket holds <code>Entry</code> objects containing both key and value.</p>
+          <div class="buckets">
+            <div class="bkt"><span class="bi">bucket 0</span><span class="chain"><span class="nil">null</span></span></div>
+            <div class="bkt"><span class="bi">bucket 1</span><span class="chain"><span class="ent">"AC1001" → Account@a1</span></span></div>
+            <div class="bkt"><span class="bi">bucket 2</span><span class="chain"><span class="ent clash">"AC1004" → Account@b2</span><span class="lnk">→</span><span class="ent clash">"AC1009" → Account@c3</span></span></div>
+            <div class="bkt"><span class="bi">bucket 3</span><span class="chain"><span class="ent">"AC1002" → Account@d4</span></span></div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th style="width:30%">Detail</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr><td>Default capacity</td><td>16 buckets</td></tr>
+              <tr><td><strong>Load factor 0.75</strong></td><td>When 75% full (12 of 16), the table <strong>doubles</strong> and everything is rehashed</td></tr>
+              <tr><td>Collision handling</td><td>A linked list in the bucket</td></tr>
+              <tr><td><strong>Treeification</strong></td><td>Java 8+: if one bucket exceeds <strong>8</strong> entries it becomes a balanced tree, so worst case is O(log n) instead of O(n)</td></tr>
+              <tr><td>Key requirements</td><td>Correct <code>equals</code> + <code>hashCode</code>, and <strong>ideally immutable</strong></td></tr>
+              <tr><td><code>null</code></td><td>One <code>null</code> key allowed, many <code>null</code> values</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Why <code>String</code> is the ideal key</span>
+            It's <strong>immutable</strong> (so its hash can never go stale), it <strong>caches its hash code</strong> after the first computation, and it has a well-distributed <code>hashCode</code>. That combination is why the overwhelming majority of real-world maps are keyed by String.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "What if I wrote <code>hashCode() { return 1; }</code>?" — Legal! The contract holds. But every entry lands in bucket 1, so lookups degrade to a linear scan. <strong>You've turned an O(1) structure into an O(n) one</strong> while remaining technically correct.
+          </div>
+        </section>
+
+        <!-- 11. MAP API -->
+        <section class="slide">
+          <p class="eyebrow">Beyond put and get</p>
+          <h2>The <code>Map</code> API worth knowing</h2>
+          <pre><code>Map&lt;String, Account&gt; accounts = new HashMap&lt;&gt;();
+
+// ===== Basics =====
+accounts.put("AC1001", savings);          // insert or OVERWRITE
+accounts.get("AC1001");                   // the value, or null if absent
+accounts.get("NOPE");                     // null - not an exception
+accounts.containsKey("AC1001");           // O(1)
+accounts.containsValue(savings);          // O(n) - scans every value
+accounts.remove("AC1001");                // removes and returns the old value
+accounts.size();  accounts.isEmpty();
+
+// ===== The methods that make code much cleaner =====
+accounts.getOrDefault("NOPE", emptyAccount);   // a fallback instead of null
+accounts.putIfAbsent("AC1001", other);         // only if not already there
+
+// The classic counter, three ways:
+Map&lt;String, Integer&gt; counts = new HashMap&lt;&gt;();
+
+//  verbose
+Integer c = counts.get(word);
+counts.put(word, c == null ? 1 : c + 1);
+
+//  better
+counts.put(word, counts.getOrDefault(word, 0) + 1);
+
+//  best
+counts.merge(word, 1, Integer::sum);
+
+// Grouping - computeIfAbsent creates the list only when needed
+Map&lt;String, List&lt;Account&gt;&gt; byType = new HashMap&lt;&gt;();
+byType.computeIfAbsent(account.accountType(), k -&gt; new ArrayList&lt;&gt;())
+      .add(account);
+
+accounts.forEach((key, value) -&gt; System.out.println(key + " -&gt; " + value));</code></pre>
+          <div class="keybox">
+            <span class="lbl">Two methods worth memorising today</span>
+            <strong><code>merge(key, 1, Integer::sum)</code></strong> — counting anything, in one line.<br>
+            <strong><code>computeIfAbsent(key, k -&gt; new ArrayList&lt;&gt;()).add(item)</code></strong> — grouping into a map of lists, in one line. These two patterns cover a large share of everyday Map work.
+          </div>
+        </section>
+
+        <!-- 12. ITERATING A MAP -->
+        <section class="slide">
+          <p class="eyebrow">Three views</p>
+          <h2>Iterating a <code>Map</code></h2>
+          <pre><code>Map&lt;String, Double&gt; balances = new LinkedHashMap&lt;&gt;();
+balances.put("AC1001", 52000.0);
+balances.put("AC1002", 80000.0);
+
+// 1. keySet() - keys only
+for (String key : balances.keySet()) {
+    System.out.println(key);
+}
+
+// 2. values() - values only
+for (Double value : balances.values()) {
+    System.out.println(value);
+}
+
+// 3. entrySet() - BOTH. The efficient choice when you need both.
+for (Map.Entry&lt;String, Double&gt; entry : balances.entrySet()) {
+    System.out.println(entry.getKey() + " = " + entry.getValue());
+}
+
+// 4. forEach + lambda - cleanest for a simple action
+balances.forEach((key, value) -&gt; System.out.println(key + " = " + value));</code></pre>
+          <div class="warnbox">
+            <span class="lbl">Don't do this</span>
+            <code>for (String k : map.keySet()) { map.get(k); }</code> — that's <strong>two</strong> lookups per iteration (one to walk, one to fetch). Use <code>entrySet()</code> and you get both halves in one pass. It's the single most common inefficiency in beginner Map code.
+          </div>
+          <div class="note">
+            <span class="lbl">These are live views, not copies</span>
+            <code>keySet()</code>, <code>values()</code> and <code>entrySet()</code> are <strong>views backed by the map</strong>. <code>map.keySet().remove(k)</code> genuinely removes the entry from the map. And modifying the map while iterating a view throws <code>ConcurrentModificationException</code> — exactly as with <code>List</code> in Session 3. Use <code>entrySet().removeIf(...)</code> instead.
+          </div>
+        </section>
+
+        <!-- 13. MAP IMPLEMENTATIONS -->
+        <section class="slide">
+          <p class="eyebrow">Four flavours</p>
+          <h2>Choosing a <code>Map</code></h2>
+          <table class="cmp">
+            <thead><tr><th style="width:17%"></th><th><code>HashMap</code></th><th><code>LinkedHashMap</code></th><th><code>TreeMap</code></th><th><code>Hashtable</code></th></tr></thead>
+            <tbody>
+              <tr><td><strong>Order</strong></td><td class="bad">None</td><td class="good">Insertion (or access) order</td><td class="good">Sorted by key</td><td class="bad">None</td></tr>
+              <tr><td><strong>get/put</strong></td><td class="good">O(1)</td><td class="good">O(1)</td><td>O(log n)</td><td>O(1) but synchronised</td></tr>
+              <tr><td><strong>null key</strong></td><td>One allowed</td><td>One allowed</td><td class="bad">No</td><td class="bad">No</td></tr>
+              <tr><td><strong>Thread-safe</strong></td><td>No</td><td>No</td><td>No</td><td>Yes — but slow</td></tr>
+              <tr><td><strong>Use when</strong></td><td><strong>Default</strong></td><td>You need predictable iteration order, or an LRU cache</td><td>Sorted keys or range queries</td><td class="bad">Never — legacy. Use <code>ConcurrentHashMap</code></td></tr>
+            </tbody>
+          </table>
+          <pre><code>// TreeMap's navigation methods
+TreeMap&lt;String, Double&gt; sorted = new TreeMap&lt;&gt;(balances);
+sorted.firstKey();  sorted.lastKey();
+sorted.headMap("AC1003");            // all entries with keys before AC1003
+sorted.subMap("AC1001", "AC1004");   // a range of entries
+sorted.descendingMap();
+
+// LinkedHashMap as an LRU cache - 3 lines, genuinely useful
+Map&lt;String, String&gt; lru = new LinkedHashMap&lt;&gt;(16, 0.75f, true) {
+    @Override protected boolean removeEldestEntry(Map.Entry&lt;String, String&gt; e) {
+        return size() &gt; 100;         // keep only the 100 most recently used
+    }
+};</code></pre>
+          <div class="keybox">
+            <span class="lbl">Practical advice</span>
+            Use <code>HashMap</code>. Reach for <code>LinkedHashMap</code> when output order matters (reports, JSON responses, anything a human reads), and <code>TreeMap</code> when you need sorting or ranges. If it's shared across threads, use <code>ConcurrentHashMap</code> — never <code>Hashtable</code>.
+          </div>
+        </section>
+
+        <!-- 14. CHOOSING -->
+        <section class="slide">
+          <p class="eyebrow">Decision aid</p>
+          <h2>Which collection should I use?</h2>
+          <div class="decide">
+            <div class="dq"><span class="q">Do I need key → value pairs?</span><span class="a">Yes → a <strong>Map</strong>. <code>HashMap</code> by default; <code>LinkedHashMap</code> for order; <code>TreeMap</code> for sorting</span></div>
+            <div class="dq"><span class="q">Must every element be unique?</span><span class="a">Yes → a <strong>Set</strong>. <code>HashSet</code> by default; <code>LinkedHashSet</code> for order; <code>TreeSet</code> for sorting</span></div>
+            <div class="dq"><span class="q">Do I need duplicates, index access, or a specific order?</span><span class="a">Yes → a <strong>List</strong>. <code>ArrayList</code> by default</span></div>
+            <div class="dq"><span class="q">Do I only add and remove at the ends?</span><span class="a">Yes → <strong><code>ArrayDeque</code></strong> as a stack or queue</span></div>
+            <div class="dq"><span class="q">Do I need the smallest/largest item first, repeatedly?</span><span class="a">Yes → <strong><code>PriorityQueue</code></strong></span></div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th style="width:22%">I need to…</th><th>Use</th><th style="width:24%">Why</th></tr></thead>
+            <tbody>
+              <tr><td>Store 50 accounts in order</td><td><code>ArrayList&lt;Account&gt;</code></td><td>Ordered, indexed</td></tr>
+              <tr><td>Guarantee unique account numbers</td><td><code>HashSet&lt;String&gt;</code></td><td>Structural uniqueness</td></tr>
+              <tr><td>Find an account by its number</td><td><code>HashMap&lt;String, Account&gt;</code></td><td>O(1) lookup</td></tr>
+              <tr><td>Count word occurrences</td><td><code>HashMap&lt;String, Integer&gt;</code></td><td><code>merge</code></td></tr>
+              <tr><td>Group accounts by type</td><td><code>Map&lt;String, List&lt;Account&gt;&gt;</code></td><td><code>computeIfAbsent</code></td></tr>
+              <tr><td>Show a leaderboard in order</td><td><code>TreeMap</code> or sorted <code>List</code></td><td>Sorted by key</td></tr>
+              <tr><td>Remove duplicates, keep order</td><td><code>LinkedHashSet</code></td><td>Both at once</td></tr>
+              <tr><td>Undo/redo</td><td><code>ArrayDeque</code></td><td>Stack behaviour</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 15. FILE IO INTRO -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">Part 2 of today</span>
+            <h1>Basic File I/O</h1>
+            <div class="sub">Everything you've built so far vanishes when the program ends. Time to fix that — and to put Session 1's exception handling to real work.</div>
+            <div class="meta">Streams · Readers &amp; Writers · Buffering · NIO.2 · CSV</div>
+          </div>
+        </section>
+
+        <!-- 16. WHY FILE IO -->
+        <section class="slide">
+          <p class="eyebrow">Persistence</p>
+          <h2>Why file I/O</h2>
+          <p class="deep">Everything in your collections lives in <strong>RAM</strong> — memory that is wiped the moment the JVM exits. Files live on <strong>disk</strong>, and survive.</p>
+          <div class="flow">
+            <div class="flow-box warn">Program runs<span class="sm">data in RAM</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">Program exits<span class="sm">RAM cleared</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">Everything gone<span class="sm">retype it all</span></div>
+          </div>
+          <div class="flow">
+            <div class="flow-box green">Program runs<span class="sm">data in RAM</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Write to disk<span class="sm">save()</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Program exits</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">Restart &amp; load<span class="sm">data restored</span></div>
+          </div>
+          <div class="cards c3">
+            <div class="card"><div class="ic">💾</div><h3>Save state</h3><p>Accounts, settings, progress — anything the user shouldn't have to re-enter.</p></div>
+            <div class="card"><div class="ic">📊</div><h3>Import &amp; export</h3><p>CSV in and out of Excel — genuinely the most common file task in business software.</p></div>
+            <div class="card"><div class="ic">📝</div><h3>Logs &amp; config</h3><p>Audit trails, and <code>.properties</code> files so settings aren't hardcoded.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Session 1 becomes mandatory here</span>
+            <strong>Every</strong> file operation throws <code>IOException</code> — a <em>checked</em> exception. The compiler will not let you ignore it. And files must be <strong>closed</strong>, or you leak OS handles and your writes may never reach the disk. This is precisely what try-with-resources exists for.
+          </div>
+        </section>
+
+        <!-- 17. STREAMS VS READERS -->
+        <section class="slide">
+          <p class="eyebrow">The fundamental split</p>
+          <h2>Byte streams vs character streams</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:18%"></th><th>Byte streams</th><th>Character streams</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Base classes</strong></td><td><code>InputStream</code> / <code>OutputStream</code></td><td><code>Reader</code> / <code>Writer</code></td></tr>
+              <tr><td><strong>Unit</strong></td><td>Raw bytes (8 bits)</td><td>Characters, with an encoding</td></tr>
+              <tr><td><strong>Use for</strong></td><td>Images, PDFs, ZIPs, audio — <strong>binary</strong></td><td>Text: <code>.txt</code>, <code>.csv</code>, <code>.json</code>, <code>.xml</code></td></tr>
+              <tr><td><strong>Typical classes</strong></td><td><code>FileInputStream</code>, <code>FileOutputStream</code>, <code>ObjectOutputStream</code></td><td><code>FileReader</code>, <code>FileWriter</code>, <code>BufferedReader</code>, <code>BufferedWriter</code></td></tr>
+            </tbody>
+          </table>
+          <div class="tree">java.io
+├── InputStream          <span class="c">bytes in</span>
+│   ├── FileInputStream
+│   └── ObjectInputStream        <span class="c">deserialization</span>
+├── OutputStream         <span class="c">bytes out</span>
+│   ├── FileOutputStream
+│   └── ObjectOutputStream
+├── Reader               <span class="c">characters in</span>
+│   ├── FileReader
+│   ├── BufferedReader           <span class="c">adds readLine()</span>
+│   └── InputStreamReader        <span class="c">the BRIDGE: bytes -&gt; chars</span>
+└── Writer               <span class="c">characters out</span>
+    ├── FileWriter
+    ├── BufferedWriter           <span class="c">adds newLine()</span>
+    └── PrintWriter              <span class="c">adds println(), printf()</span></div>
+          <div class="keybox">
+            <span class="lbl">The rule</span>
+            <strong>Text → Reader/Writer. Binary → InputStream/OutputStream.</strong> Using a byte stream for text will corrupt any non-ASCII character (Hindi, accented letters, emoji, the ₹ symbol), because a single character may be several bytes.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Always specify the encoding</span>
+            <code>new FileWriter("f.txt")</code> uses the <em>platform default</em> encoding, which differs between your laptop and the server. Write <code>new FileWriter("f.txt", StandardCharsets.UTF_8)</code> — this class of bug is miserable to diagnose.
+          </div>
+        </section>
+
+        <!-- 18. WRITING AND READING -->
+        <section class="slide">
+          <p class="eyebrow">The core operations</p>
+          <h2>Writing and reading text</h2>
+          <pre><code>import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+// ===== WRITE (overwrites the file) =====
+try (BufferedWriter writer = new BufferedWriter(
+        new FileWriter("accounts.txt", StandardCharsets.UTF_8))) {
+    writer.write("AC1001,Priya Sharma,52000.00");
+    writer.newLine();                        // platform-correct line ending
+    writer.write("AC1002,Rahul Verma,80000.00");
+    writer.newLine();
+}                                            // closed automatically - and FLUSHED
+
+// ===== APPEND (note the 'true') =====
+try (BufferedWriter writer = new BufferedWriter(
+        new FileWriter("accounts.txt", StandardCharsets.UTF_8, true))) {
+    writer.write("AC1003,Anita Desai,214000.00");
+    writer.newLine();
+}
+
+// ===== READ line by line =====
+try (BufferedReader reader = new BufferedReader(
+        new FileReader("accounts.txt", StandardCharsets.UTF_8))) {
+    String line;
+    while ((line = reader.readLine()) != null) {     // null means end of file
+        String[] parts = line.split(",");
+        System.out.println(parts[1] + " has " + parts[2]);
+    }
+} catch (FileNotFoundException e) {
+    System.out.println("File not found - starting with an empty list");
+} catch (IOException e) {
+    System.out.println("Could not read the file: " + e.getMessage());
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Three things to notice</span>
+            <strong>1.</strong> <code>readLine()</code> returns <code>null</code> at end of file — that's the loop condition.<br>
+            <strong>2.</strong> <code>FileWriter</code>'s third argument <code>true</code> means <strong>append</strong>; without it you silently destroy the existing file.<br>
+            <strong>3.</strong> <code>FileNotFoundException</code> is caught <em>before</em> <code>IOException</code> — subclass first, exactly the ordering rule from Session 1.
+          </div>
+        </section>
+
+        <!-- 19. BUFFERING -->
+        <section class="slide">
+          <p class="eyebrow">Why the extra wrapper</p>
+          <h2>Why buffering matters</h2>
+          <p class="deep">A plain <code>FileWriter</code> asks the operating system to write <strong>every single character</strong> — thousands of system calls, each one slow. A buffer collects characters in memory and writes them in large blocks.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Unbuffered — one call per char</h3>
+              <pre class="sm"><code>FileWriter w =
+    new FileWriter("out.txt");
+for (int i = 0; i &lt; 100_000; i++) {
+    w.write("line " + i + "\n");
+}
+// ~100,000 trips to the OS.
+// Measurably, painfully slow.</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ Buffered — batched</h3>
+              <pre class="sm"><code>BufferedWriter w =
+    new BufferedWriter(
+        new FileWriter("out.txt"));
+for (int i = 0; i &lt; 100_000; i++) {
+    w.write("line " + i);
+    w.newLine();
+}
+// ~12 trips to the OS.
+// Often 10-50x faster.</code></pre>
+            </div>
+          </div>
+          <div class="flow">
+            <div class="flow-box">Your code<span class="sm">write()</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">Buffer<span class="sm">8192 chars in RAM</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">Buffer full<br>or flush()<span class="sm">or close()</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">One OS write<span class="sm">whole block</span></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The bug this causes: "my file is empty!"</span>
+            If you forget to <code>close()</code> a <code>BufferedWriter</code>, whatever is still sitting in the buffer is <strong>never written</strong>. Your program runs without error and the file is empty or truncated. <strong>try-with-resources closes it — and closing flushes.</strong> This is the most common file-handling bug beginners hit, and Session 1's syntax prevents it entirely.
+          </div>
+          <div class="note">
+            <span class="lbl">Bonus: <code>readLine()</code></span>
+            Buffering also gives you <code>BufferedReader.readLine()</code>. A plain <code>FileReader</code> only offers <code>read()</code> — one character at a time. Line-based reading is a buffering feature.
+          </div>
+        </section>
+
+        <!-- 20. NIO2 -->
+        <section class="slide">
+          <p class="eyebrow">The modern API</p>
+          <h2>NIO.2 — <code>Path</code> &amp; <code>Files</code></h2>
+          <p class="deep">Java 7 added <code>java.nio.file</code>, which does in one line what <code>java.io</code> needs eight for. <strong>Prefer it for new code.</strong></p>
+          <pre><code>import java.nio.file.*;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+Path path = Path.of("data", "accounts.csv");     // OS-independent separators
+
+// ===== Read the whole file into a List - one line =====
+List&lt;String&gt; lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+
+// ===== Write a whole List - one line =====
+Files.write(path, lines, StandardCharsets.UTF_8);
+
+// ===== Append =====
+Files.write(path, List.of("AC1004,Vikram Rao,1242.00"),
+            StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+
+// ===== Read/write a single String =====
+String all = Files.readString(path);
+Files.writeString(path, "hello");
+
+// ===== Stream lines - memory-efficient for huge files =====
+try (var stream = Files.lines(path)) {
+    stream.filter(l -&gt; !l.isBlank())
+          .map(l -&gt; l.split(",")[1])
+          .forEach(System.out::println);
+}
+
+// ===== Useful file operations =====
+Files.exists(path);
+Files.createDirectories(path.getParent());       // makes the whole tree
+Files.size(path);
+Files.copy(path, Path.of("backup.csv"), StandardCopyOption.REPLACE_EXISTING);
+Files.deleteIfExists(path);</code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:34%">Old <code>java.io</code></th><th>Modern <code>java.nio.file</code></th></tr></thead>
+            <tbody>
+              <tr><td><code>new File("x.txt")</code></td><td><code>Path.of("x.txt")</code></td></tr>
+              <tr><td>Loop with <code>BufferedReader</code></td><td><code>Files.readAllLines(path)</code></td></tr>
+              <tr><td><code>file.delete()</code> returns a <em>boolean</em> you'll ignore</td><td><code>Files.delete(path)</code> <strong>throws</strong> and tells you why</td></tr>
+              <tr><td><code>file.exists()</code></td><td><code>Files.exists(path)</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">When to use which</span>
+            <strong>Small-to-medium files:</strong> <code>Files.readAllLines</code> / <code>Files.write</code>. Simplest, clearest.<br>
+            <strong>Very large files:</strong> <code>Files.lines()</code> or a <code>BufferedReader</code> loop — don't load a 2GB file into a List.<br>
+            <strong>Why <code>Files.delete</code> is better:</strong> the old <code>File.delete()</code> returns <code>false</code> on failure with no explanation. The NIO version throws an exception saying <em>why</em>.
+          </div>
+        </section>
+
+        <!-- 21. CSV ROUND TRIP -->
+        <section class="slide">
+          <p class="eyebrow">The most useful file skill you'll learn</p>
+          <h2>CSV round-trip: objects → file → objects</h2>
+          <pre class="sm"><code>// ===== SAVE: objects -&gt; CSV =====
+public void save(Map&lt;String, Account&gt; accounts, Path file) throws IOException {
+    List&lt;String&gt; lines = new ArrayList&lt;&gt;();
+    lines.add("type,number,holder,balance");                 // header row
+    for (Account a : accounts.values()) {
+        lines.add(String.join(",",
+            a.accountType(),
+            a.getAccountNumber(),
+            a.getHolder(),
+            String.valueOf(a.getBalance())));
+    }
+    Files.createDirectories(file.getParent());
+    Files.write(file, lines, StandardCharsets.UTF_8);
+}
+
+// ===== LOAD: CSV -&gt; objects =====
+public Map&lt;String, Account&gt; load(Path file) throws IOException {
+    Map&lt;String, Account&gt; accounts = new LinkedHashMap&lt;&gt;();
+
+    if (!Files.exists(file)) {
+        return accounts;                    // first run - empty, not an error
+    }
+
+    List&lt;String&gt; lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+
+    for (int i = 1; i &lt; lines.size(); i++) {        // skip the header
+        String line = lines.get(i);
+        if (line.isBlank()) continue;
+
+        String[] p = line.split(",", -1);           // -1 keeps trailing empties
+        if (p.length != 4) {
+            System.err.println("Skipping malformed line " + (i + 1) + ": " + line);
+            continue;                               // one bad row must not kill the load
+        }
+        try {
+            Account a = switch (p[0]) {             // recreate the right SUBCLASS
+                case "Savings"       -&gt; new SavingsAccount(p[1], p[2], Double.parseDouble(p[3]));
+                case "Current"       -&gt; new CurrentAccount(p[1], p[2], Double.parseDouble(p[3]), 25000);
+                case "Fixed Deposit" -&gt; new FixedDepositAccount(p[1], p[2], Double.parseDouble(p[3]), 12);
+                case "Salary"        -&gt; new SalaryAccount(p[1], p[2], Double.parseDouble(p[3]));
+                default -&gt; throw new IllegalArgumentException("Unknown type: " + p[0]);
+            };
+            accounts.put(a.getAccountNumber(), a);
+        } catch (NumberFormatException | IllegalArgumentException e) {
+            System.err.println("Skipping bad line " + (i + 1) + ": " + e.getMessage());
+        }
+    }
+    return accounts;
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">All four sessions in one method</span>
+            <strong>Exceptions</strong> (Session 1) handle the file and the bad rows · <strong>polymorphism</strong> (Session 2) recreates the right subclass · <strong>collections</strong> (Session 3) hold the parsed objects · <strong>Map + File I/O</strong> (today) give O(1) lookup and persistence. <em>That's the whole course in 40 lines.</em>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Real CSV is harder than <code>split(",")</code></span>
+            What if a holder's name contains a comma? Proper CSV quotes such fields — <code>"Sharma, Priya"</code> — and <code>split(",")</code> breaks on it. For real projects use a library like OpenCSV or Apache Commons CSV. For this lab, we just avoid commas in the data.
+          </div>
+        </section>
+
+        <!-- 22. SERIALIZATION AND PROPERTIES -->
+        <section class="slide">
+          <p class="eyebrow">Two more tools</p>
+          <h2>Serialization &amp; <code>.properties</code></h2>
+          <h3>Serialization — write an object graph directly</h3>
+          <pre><code>public class Account implements Serializable {
+    private static final long serialVersionUID = 1L;   // version your format!
+    private final String accountNumber;
+    private transient String tempCache;    // 'transient' = do NOT save this field
+}
+
+// WRITE
+try (ObjectOutputStream out = new ObjectOutputStream(
+        Files.newOutputStream(Path.of("accounts.ser")))) {
+    out.writeObject(accountMap);           // the whole Map, in one call
+}
+
+// READ
+try (ObjectInputStream in = new ObjectInputStream(
+        Files.newInputStream(Path.of("accounts.ser")))) {
+    @SuppressWarnings("unchecked")
+    Map&lt;String, Account&gt; loaded = (Map&lt;String, Account&gt;) in.readObject();
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">Know it, but prefer CSV or JSON</span>
+            Serialization is Java-only (nothing else can read it), <strong>brittle</strong> (change a field and old files may fail to load), not human-readable, and has a genuine security history around deserialising untrusted data. It's on this slide because you'll meet it and it's examined — but for real interchange use CSV or JSON.
+          </div>
+          <h3>Properties — configuration without hardcoding</h3>
+          <pre><code>// app.properties:   bank.name=TCS Bank
+//                   min.balance=1000
+Properties props = new Properties();
+try (InputStream in = Files.newInputStream(Path.of("app.properties"))) {
+    props.load(in);
+}
+String name = props.getProperty("bank.name");
+double min  = Double.parseDouble(props.getProperty("min.balance", "500"));  // default</code></pre>
+          <div class="note">
+            <span class="lbl">You've seen this already</span>
+            Spring Boot's <code>application.properties</code> is exactly this mechanism. Every framework config file you'll touch builds on it.
+          </div>
+        </section>
+
+        <!-- 23. BEST PRACTICES -->
+        <section class="slide">
+          <p class="eyebrow">Do this</p>
+          <h2>Best practices</h2>
+          <h3>Set &amp; Map</h3>
+          <ul class="checklist">
+            <li><strong>Always override <code>equals</code> AND <code>hashCode</code></strong> before using a class as a Set element or Map key</li>
+            <li><strong>Use immutable keys.</strong> Never mutate a field involved in <code>hashCode</code> after insertion</li>
+            <li><strong><code>entrySet()</code> when you need both</strong> key and value — not <code>keySet()</code> plus <code>get()</code></li>
+            <li><strong><code>getOrDefault</code>, <code>merge</code>, <code>computeIfAbsent</code></strong> instead of manual null checks</li>
+            <li><strong>Declare the interface:</strong> <code>Map&lt;K,V&gt; m = new HashMap&lt;&gt;()</code></li>
+          </ul>
+          <h3>File I/O</h3>
+          <ul class="checklist">
+            <li><strong>Always try-with-resources.</strong> Never hand-roll <code>close()</code></li>
+            <li><strong>Always specify the charset</strong> — <code>StandardCharsets.UTF_8</code></li>
+            <li><strong>Prefer <code>java.nio.file</code></strong> (<code>Path</code>, <code>Files</code>) over <code>java.io.File</code></li>
+            <li><strong>Handle a missing file as a normal case</strong> — first run isn't an error</li>
+            <li><strong>Don't let one malformed row kill the whole load</strong> — log it and continue</li>
+            <li><strong>Use <code>Files.lines()</code> for very large files</strong>, not <code>readAllLines</code></li>
+            <li><strong>Write to a temp file then rename</strong> for critical saves, so a crash mid-write can't corrupt the original</li>
+          </ul>
+        </section>
+
+        <!-- 24. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Session 4</p>
+          <h2>Recap — what you can now do</h2>
+          <ul class="checklist">
+            <li>Use a <code>Set</code> for guaranteed uniqueness, and read <code>add()</code>'s return value</li>
+            <li>State the <strong><code>equals</code>/<code>hashCode</code> contract</strong> and explain the bucket mechanism behind it</li>
+            <li>Choose between <code>HashSet</code>, <code>LinkedHashSet</code> and <code>TreeSet</code> with reasons</li>
+            <li>Perform union, intersection and difference — and copy first</li>
+            <li>Use a <code>Map</code> for O(1) lookup, and explain why it isn't a <code>Collection</code></li>
+            <li>Describe <code>HashMap</code>'s load factor, resizing and treeification</li>
+            <li>Use <code>merge</code> and <code>computeIfAbsent</code> for counting and grouping</li>
+            <li>Iterate a Map properly with <code>entrySet()</code></li>
+            <li>Choose the right collection for any requirement</li>
+            <li>Read and write text files with <strong>buffering, charsets and try-with-resources</strong></li>
+            <li>Use <code>Path</code> and <code>Files</code>, and explain why buffering and closing matter</li>
+            <li><strong>Round-trip objects to CSV and back</strong>, handling malformed data gracefully</li>
+          </ul>
+        </section>
+
+        <!-- 25. THE WHOLE COURSE -->
+        <section class="slide">
+          <p class="eyebrow">All four sessions</p>
+          <h2>What you've built</h2>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1 — Exceptions</span>
+              <span class="desc">A <code>BankAccount</code> whose balance can never go negative, and an app no user input can crash. <strong>Reused today</strong> for every file operation.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2 — Inheritance</span>
+              <span class="desc">An abstract <code>Account</code> hierarchy where one loop applies four interest rates. <strong>Reused today</strong> to recreate the right subclass when loading CSV.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3 — Lists &amp; relationships</span>
+              <span class="desc">A growable, sortable model with composition, aggregation and injected dependencies. <strong>Reused today</strong> as the thing we persist.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4 — Set, Map &amp; I/O</span>
+              <span class="desc">Unique account numbers, instant lookup, and a bank that survives a restart. <strong>The finished application.</strong></span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Nothing here was academic</span>
+            Every one of these is load-bearing in real work. Spring Boot is <em>built</em> from interfaces, dependency injection, collections and exception handling. JDBC is <code>SQLException</code>, try-with-resources and mapping rows into collections. You now have the vocabulary to read that code rather than copy it.
+          </div>
+        </section>
+
+        <!-- 26. WHERE NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where to go from here</p>
+          <h2>Your next steps</h2>
+          <div class="cards">
+            <div class="card"><h3>🗄️ JDBC</h3><p>Replace your CSV file with a real database. Same collections, same exceptions, same try-with-resources — the file just becomes a table. <em>There's a JDBC session in this series.</em></p></div>
+            <div class="card"><h3>🌱 Spring Boot</h3><p>Four sessions covering REST APIs, layered architecture, DTOs and microservices. Everything from these four sessions is a prerequisite — and you'll now recognise <em>why</em>.</p></div>
+            <div class="card"><h3>🌊 Streams &amp; lambdas</h3><p><code>filter</code>, <code>map</code>, <code>collect</code>, <code>groupingBy</code>. A declarative layer over the collections you now understand properly.</p></div>
+            <div class="card"><h3>🧪 JUnit</h3><p>Test what you've built. Your <code>equals</code>/<code>hashCode</code> and exception behaviour are ideal first test subjects.</p></div>
+          </div>
+          <div class="askbox">
+            <span class="lbl">The one habit to take away</span>
+            <strong>Read the error message. Then read the code you actually wrote, not the code you meant to write.</strong> Across all four sessions, almost every bug we deliberately created announced itself clearly — a stack trace, a compiler error, a wrong count. The skill isn't avoiding mistakes; it's <em>reading</em> them.
+          </div>
+        </section>
+
+        <!-- 27. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 4 — and of the series</span>
+            <h1>Thank you</h1>
+            <div class="sub">Open the lab sheet for the last time — let's make your bank survive a restart.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Java Core: Exceptions → Inheritance → Collections → Set, Map &amp; File I/O.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java Core · Session 4 — Set, Map &amp; File I/O</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

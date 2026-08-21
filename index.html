@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spring Boot Training Series — Index</title>
+  <title>Java &amp; Spring Boot Training Series — Index</title>
   <style>
     :root {
       --mac-bg: #ececee;
@@ -100,6 +100,8 @@
     .session.s2 { border-left-color: #5e5ce6; }
     .session.s3 { border-left-color: #28c840; }
     .session.s4 { border-left-color: #ff9f0a; }
+    .session.jc { border-left-color: #e76f00; }
+    .session.legacy { border-left-color: #c7c7cc; opacity: 0.85; }
 
     .session .s-head { display: flex; align-items: center; gap: 14px; margin-bottom: 4px; flex-wrap: wrap; }
     .s-num {
@@ -112,6 +114,20 @@
     .session.s2 .s-num { background: #5e5ce6; }
     .session.s3 .s-num { background: #28c840; }
     .session.s4 .s-num { background: #ff9f0a; }
+    .session.jc .s-num { background: #e76f00; }
+    .session.legacy .s-num { background: #c7c7cc; }
+    .badge-new {
+      display: inline-block; background: rgba(231,111,0,0.12); color: #a34e00;
+      border: 1px solid rgba(231,111,0,0.35); border-radius: 20px;
+      padding: 2px 10px; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .badge-legacy {
+      display: inline-block; background: #f0f0f2; color: var(--mac-text-muted);
+      border: 1px solid var(--mac-border); border-radius: 20px;
+      padding: 2px 10px; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
     .s-title { font-size: 21px; font-weight: 700; }
     .s-desc { color: var(--mac-text-muted); font-size: 15.5px; margin: 4px 0 14px; line-height: 1.5; }
 
@@ -146,14 +162,14 @@
       <span class="traffic-light tl-red"></span>
       <span class="traffic-light tl-yellow"></span>
       <span class="traffic-light tl-green"></span>
-      <span class="mac-title">index.html — Spring Boot Training Series</span>
+      <span class="mac-title">index.html — Java &amp; Spring Boot Training Series</span>
     </div>
 
     <main class="mac-content">
       <header class="hero">
         <div class="hero-icon">🌱</div>
         <div>
-          <h1>Spring Boot Training Series</h1>
+          <h1>Java &amp; Spring Boot Training Series</h1>
           <p>Interactive slide decks and hands-on lab sheets — from a first Java program to a running microservices architecture. Authored by <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
@@ -181,13 +197,14 @@
         </div>
       </section>
 
-      <!-- Collections, Class Relationships & File I/O -->
-      <section class="session s3">
+      <!-- Collections, Class Relationships & File I/O (superseded) -->
+      <section class="session legacy">
         <div class="s-head">
           <div class="s-num">C</div>
           <div class="s-title">Collections, Class Relationships &amp; File I/O</div>
+          <span class="badge-legacy">Superseded</span>
         </div>
-        <p class="s-desc">Managing data three ways — Collections (Lists, Sets, Maps), class relationships (IS-A vs HAS-A, abstract vs interface), and basic File I/O.</p>
+        <p class="s-desc">The original single-deck version. Now split into <strong>Java Core Sessions 3 &amp; 4</strong> below, which cover the same ground in far more depth and add hands-on labs. Kept for reference.</p>
         <div class="links single">
           <a class="doc-link" href="java-collections-theory.html">
             <span class="dl-ic">📊</span>
@@ -196,6 +213,105 @@
           </a>
         </div>
       </section>
+
+      <div class="band">Java Core — 4-part series</div>
+
+      <div class="howto" style="background:#fff8f0;border-color:#ffdcbc;">
+        <span class="lbl" style="color:#e76f00;">The journey</span>
+        Four sessions that build <strong>one application</strong>: a bank that refuses to corrupt its own data
+        (Session 1), grows an account-type hierarchy (Session 2), becomes searchable and sortable (Session 3), and
+        finally survives a restart (Session 4). Each lab ends with <strong>graded take-home tasks</strong>.
+      </div>
+
+      <!-- Java Core Session 1 -->
+      <section class="session jc">
+        <div class="s-head">
+          <div class="s-num">1</div>
+          <div class="s-title">Exception Handling</div>
+          <span class="badge-new">New</span>
+        </div>
+        <p class="s-desc">Why programs crash and how to fail safely — the <code>Throwable</code> hierarchy, checked vs unchecked, try-with-resources, custom exceptions and cause chaining.</p>
+        <div class="links">
+          <a class="doc-link" href="java-core-session1-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">java-core-session1-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="java-core-session1-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">java-core-session1-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Java Core Session 2 -->
+      <section class="session jc">
+        <div class="s-head">
+          <div class="s-num">2</div>
+          <div class="s-title">Inheritance &amp; Polymorphism</div>
+          <span class="badge-new">New</span>
+        </div>
+        <p class="s-desc">One loop, many behaviours — <code>extends</code>, overriding, dynamic dispatch, abstract classes vs interfaces, and a correct <code>equals</code>/<code>hashCode</code> pair.</p>
+        <div class="links">
+          <a class="doc-link" href="java-core-session2-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">java-core-session2-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="java-core-session2-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">java-core-session2-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Java Core Session 3 -->
+      <section class="session jc">
+        <div class="s-head">
+          <div class="s-num">3</div>
+          <div class="s-title">Collections: List Classes &amp; Relationships</div>
+          <span class="badge-new">New</span>
+        </div>
+        <p class="s-desc">Escaping the fixed-size array — <code>ArrayList</code> vs <code>LinkedList</code>, generics, sorting with <code>Comparable</code>/<code>Comparator</code>, plus association, aggregation and composition.</p>
+        <div class="links">
+          <a class="doc-link" href="java-core-session3-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">java-core-session3-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="java-core-session3-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">java-core-session3-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Java Core Session 4 -->
+      <section class="session jc">
+        <div class="s-head">
+          <div class="s-num">4</div>
+          <div class="s-title">Set, Map &amp; Basic File I/O</div>
+          <span class="badge-new">New</span>
+        </div>
+        <p class="s-desc">Uniqueness, O(1) lookup and persistence — hash buckets explained, <code>merge</code> and <code>computeIfAbsent</code>, readers/writers, NIO.2, and a CSV round-trip capstone.</p>
+        <div class="links">
+          <a class="doc-link" href="java-core-session4-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">java-core-session4-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="java-core-session4-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">java-core-session4-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <div class="band">Database &amp; process</div>
 
       <!-- JDBC -->
       <section class="session s2">
@@ -305,8 +421,8 @@
       </section>
 
       <footer>
-        Spring Boot Training Series &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
-        &nbsp;·&nbsp; The full journey: from a Hello World endpoint to a microservices architecture.
+        Java &amp; Spring Boot Training Series &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        &nbsp;·&nbsp; The full journey: from a first exception to a running microservices architecture.
       </footer>
     </main>
   </div>

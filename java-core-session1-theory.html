@@ -1,0 +1,1621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 1 — Exception Handling (Theory)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(83,130,161,0.09);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #3c6480; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.sm, table.cmp.sm td, table.cmp.sm th { font-size: 14.5px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #eef4f9; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Class hierarchy / tree visual */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .node.checked { border-color: #0a84ff; background: #f0f7ff; }
+    .node.checked .bn { color: #0a6dd8; }
+    .node.unchecked { border-color: #ff9f0a; background: #fff8ec; }
+    .node.unchecked .bn { color: #b3700a; }
+    .node.err { border-color: var(--tl-red); background: #fff0ef; }
+    .node.err .bn { color: #c0392b; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #e76f00; }
+    .stack-row.l2 { border-left-color: #5382a1; }
+    .stack-row.l3 { border-left-color: #28c840; }
+    .stack-row.l4 { border-left-color: #bf5af2; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Java-specific visuals === */
+
+    /* Call stack frames — used for exception propagation and unwinding */
+    .callstack {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 16px;
+      max-width: 620px;
+    }
+    .csf {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--mac-border);
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      background: #fafafc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .csf:last-child { border-bottom: none; }
+    .csf .tagx {
+      margin-left: auto;
+      font-family: var(--mac-font);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--mac-text-muted);
+      white-space: nowrap;
+    }
+    .csf.throwing { background: #fff0ea; color: #b3430b; }
+    .csf.throwing .tagx { color: #b3430b; }
+    .csf.catching { background: #eefcf1; color: #1a7f2e; }
+    .csf.catching .tagx { color: #1a7f2e; }
+    .csf.dead { background: #f4f4f6; color: var(--mac-text-muted); text-decoration: line-through; }
+
+    /* Array / list cells — memory layout visuals */
+    .cells { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; align-items: flex-start; }
+    .cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      min-width: 58px;
+      padding: 10px 8px;
+      text-align: center;
+      background: #fff;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+    .cell .idx { display: block; font-size: 11px; color: var(--mac-text-muted); margin-top: 4px; font-family: var(--mac-font); }
+    .cell.filled { background: var(--mac-accent-soft); border-color: var(--mac-accent); }
+    .cell.empty { color: var(--mac-text-muted); border-style: dashed; }
+    .cell.hit { background: #eefcf1; border-color: #28c840; }
+    .cell.gone { background: #fff0ef; border-color: var(--tl-red); color: #c0392b; }
+    .cells-label { font-size: 14px; color: var(--mac-text-muted); margin-top: 12px; font-weight: 600; }
+
+    /* Hash bucket table — HashSet / HashMap internals */
+    .buckets { display: grid; gap: 8px; margin-top: 16px; }
+    .bkt { display: flex; align-items: center; gap: 10px; }
+    .bkt .bi {
+      flex: 0 0 auto; width: 92px;
+      font-family: var(--mac-mono); font-size: 13px;
+      color: var(--mac-text-muted); text-align: right;
+    }
+    .bkt .chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .bkt .ent {
+      border: 1px solid var(--mac-accent);
+      background: var(--mac-accent-soft);
+      border-radius: 7px; padding: 5px 10px;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .bkt .ent.clash { border-color: var(--tl-red); background: #fff0ef; }
+    .bkt .lnk { color: var(--mac-text-muted); font-size: 13px; }
+    .bkt .nil { color: var(--mac-text-muted); font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Linked-node chain — LinkedList internals */
+    .chainviz { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 16px; }
+    .lnode {
+      border: 1px solid var(--mac-accent); border-radius: 9px;
+      background: #fff; display: flex; overflow: hidden;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .lnode span { padding: 8px 10px; }
+    .lnode .pv, .lnode .nx { background: #f4f4f6; color: var(--mac-text-muted); font-size: 11.5px; }
+    .lnode .val { background: var(--mac-accent-soft); font-weight: 700; border-left: 1px solid var(--mac-border); border-right: 1px solid var(--mac-border); }
+    .chainviz .dbl { color: var(--mac-accent); font-size: 18px; font-weight: 700; }
+
+    /* Decision flowchart for "which collection?" */
+    .decide { margin-top: 16px; }
+    .dq {
+      border: 1px solid var(--mac-border); border-left: 5px solid var(--mac-accent-2);
+      border-radius: 10px; background: #fafafc;
+      padding: 12px 18px; margin: 9px 0; font-size: 16.5px;
+    }
+    .dq .q { font-weight: 700; }
+    .dq .a { color: var(--mac-text-muted); font-size: 15.5px; margin-top: 4px; display: block; }
+    .dq .a code { font-weight: 700; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .slide pre.sm code { font-size: 13px; }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    /* Console output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(231,111,0,0.10);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #e76f00, #5382a1);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session1-theory.html — Java Core Session 1</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 1 of 4 — Java Core Series</span>
+            <h1>Exception Handling</h1>
+            <div class="sub">Why programs crash, what Java throws at you when they do, and how to write code that fails <em>safely</em> instead of falling over.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. THE DESTINATION -->
+        <section class="slide">
+          <p class="eyebrow">Before we start — where are we going?</p>
+          <h2>The four-session journey</h2>
+          <p class="deep">These four sessions are the <strong>core Java</strong> foundation that everything else in your career sits on. Spring Boot, JDBC, Android, Kafka — all of it is built from exactly these pieces. We do them in this order for a reason: each session needs the one before it.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1 · Today</span>
+              <span class="desc"><strong>Exception handling.</strong> try/catch/finally, checked vs unchecked, custom exceptions, try-with-resources. <strong>Output:</strong> a bank account app that refuses to corrupt its own data.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2</span>
+              <span class="desc"><strong>Inheritance &amp; polymorphism.</strong> extends, overriding, dynamic dispatch, abstract classes &amp; interfaces. <strong>Output:</strong> an employee payroll hierarchy driven by one polymorphic loop.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3</span>
+              <span class="desc"><strong>Collections — List classes &amp; class relationships.</strong> ArrayList, LinkedList, sorting, and IS-A vs HAS-A. <strong>Output:</strong> a library system you can search and sort.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4</span>
+              <span class="desc"><strong>Set, Map &amp; File I/O.</strong> Hashing, uniqueness, key–value lookup, reading &amp; writing files. <strong>Output:</strong> a contact book that survives a restart.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why exceptions come first</span>
+            Because you cannot write a single realistic program without them. File I/O in Session 4 <em>forces</em> you to handle <code>IOException</code>. Overriding in Session 2 has rules about exceptions. Getting this right on day one makes the next three sessions much easier.
+          </div>
+        </section>
+
+        <!-- 3. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">Session 1</p>
+          <h2>Agenda</h2>
+          <ol class="agenda">
+            <li><span class="num">1</span><span>What an exception actually <em>is</em> — and reading a stack trace</span></li>
+            <li><span class="num">2</span><span>The <code>Throwable</code> hierarchy: Error vs Exception vs RuntimeException</span></li>
+            <li><span class="num">3</span><span>Checked vs unchecked — the one rule the compiler enforces</span></li>
+            <li><span class="num">4</span><span><code>try</code> / <code>catch</code> / <code>finally</code>, multi-catch and ordering</span></li>
+            <li><span class="num">5</span><span><code>try</code>-with-resources and <code>AutoCloseable</code></span></li>
+            <li><span class="num">6</span><span><code>throw</code> vs <code>throws</code> — raising and declaring</span></li>
+            <li><span class="num">7</span><span>Writing your own exception classes</span></li>
+            <li><span class="num">8</span><span>Chaining, wrapping and translating across layers</span></li>
+            <li><span class="num">9</span><span>Best practices, anti-patterns, and where Spring Boot picks this up</span></li>
+          </ol>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "Who has seen a <code>NullPointerException</code>?" — every hand goes up. "Who can tell me, precisely, what Java did to your program at that moment?" — far fewer. That gap is what today closes.
+          </div>
+        </section>
+
+        <!-- 4. MOTIVATION -->
+        <section class="slide">
+          <p class="eyebrow">The problem</p>
+          <h2>Your program will meet the real world</h2>
+          <p class="deep">Everything you write assumes things. Every one of those assumptions is a place the real world can hurt you.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🗂️</div><h3>The file isn't there</h3><p>Someone renamed it, or the path is wrong on Linux but fine on Windows.</p></div>
+            <div class="card"><div class="ic">⌨️</div><h3>The user typed nonsense</h3><p>You asked for an age. They typed <code>"twenty"</code>. Or nothing at all.</p></div>
+            <div class="card"><div class="ic">🔌</div><h3>The network blinked</h3><p>The database was there a second ago. Now the socket is closed.</p></div>
+            <div class="card"><div class="ic">➗</div><h3>The maths broke</h3><p>The divisor was <code>0</code> because the list was empty.</p></div>
+            <div class="card"><div class="ic">🫙</div><h3>Something was null</h3><p>A lookup returned nothing and you called a method on it anyway.</p></div>
+            <div class="card"><div class="ic">📏</div><h3>The index was wrong</h3><p>Classic off-by-one: <code>i &lt;= length</code> instead of <code>i &lt; length</code>.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The real question</span>
+            The question is never "how do I stop errors happening?" — you can't. The question is <strong>"when it happens, does my program lose data, or does it recover gracefully and tell someone useful?"</strong>
+          </div>
+        </section>
+
+        <!-- 5. LIFE WITHOUT EXCEPTIONS -->
+        <section class="slide">
+          <p class="eyebrow">Why the language has this feature</p>
+          <h2>Life before exceptions — return codes</h2>
+          <p class="deep">Older languages like C signal failure by <em>returning</em> a special value: <code>-1</code>, <code>NULL</code>, <code>false</code>. It works, but it rots your code.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Return-code style</h3>
+              <ul>
+                <li>Every single call must be checked</li>
+                <li>Nothing forces you to check — silence on failure</li>
+                <li>Error handling is tangled into the happy path</li>
+                <li>A valid result and an error may share a value</li>
+                <li>No room to explain <em>why</em> it failed</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ Exception style</h3>
+              <ul>
+                <li>Happy path reads top to bottom, uninterrupted</li>
+                <li>Failure can't be silently ignored</li>
+                <li>Handling lives in its own block</li>
+                <li>Carries a message, a type and a stack trace</li>
+                <li>Can travel up to whoever can actually fix it</li>
+              </ul>
+            </div>
+          </div>
+          <pre><code>// Return-code style — the check drowns the logic
+int code = openFile("data.txt");
+if (code == -1) { /* now what? */ }
+int read = readLine(code);
+if (read == -1) { /* and here too */ }
+
+// Exception style — logic first, failure handled once
+try {
+    String line = readFirstLine("data.txt");
+    System.out.println(line);
+} catch (IOException e) {
+    System.out.println("Could not read the file: " + e.getMessage());
+}</code></pre>
+        </section>
+
+        <!-- 6. WHAT IS AN EXCEPTION -->
+        <section class="slide">
+          <p class="eyebrow">The core idea</p>
+          <h2>An exception is an <em>object</em></h2>
+          <p class="deep">This is the sentence to remember: <strong>an exception is just a Java object that describes something going wrong.</strong> It is not magic. It is a normal instance of a normal class, created with <code>new</code> like anything else.</p>
+          <pre><code>// Completely ordinary object creation:
+ArithmeticException e = new ArithmeticException("/ by zero");
+
+System.out.println(e.getMessage());   // / by zero
+System.out.println(e.getClass());     // class java.lang.ArithmeticException</code></pre>
+          <p class="deep">What makes it special is the keyword <code>throw</code>. Throwing an object means: <em>stop normal execution and start looking for someone to handle this.</em></p>
+          <div class="flow">
+            <div class="flow-box">Something<br>goes wrong<span class="sm">divide by 0</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">JVM creates<br>an object<span class="sm">new ArithmeticException</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">throws it<span class="sm">normal flow stops</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">Searches for<br>a catch<span class="sm">up the call stack</span></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Every exception carries four useful things</span>
+            <strong>1.</strong> Its <em>type</em> — <code>FileNotFoundException</code> tells you the category at a glance.
+            <strong>2.</strong> A <em>message</em> — <code>getMessage()</code>, human-readable detail.
+            <strong>3.</strong> A <em>stack trace</em> — the exact path of method calls that led here.
+            <strong>4.</strong> Optionally a <em>cause</em> — the lower-level exception that triggered it.
+          </div>
+        </section>
+
+        <!-- 7. THE CALL STACK -->
+        <section class="slide">
+          <p class="eyebrow">How it travels</p>
+          <h2>The call stack &amp; stack unwinding</h2>
+          <p class="deep">Java tracks which method is running using a <span class="term">call stack</span>. Calling a method pushes a frame on top; returning pops it. When an exception is thrown, Java pops frames <strong>looking for a matching <code>catch</code></strong>. That popping is called <span class="term">unwinding</span>.</p>
+          <div class="callstack">
+            <div class="csf throwing">divide(int, int)<span class="tagx">← thrown here</span></div>
+            <div class="csf dead">calculate(int, int)<span class="tagx">no catch — popped</span></div>
+            <div class="csf dead">processOrder()<span class="tagx">no catch — popped</span></div>
+            <div class="csf catching">main(String[])<span class="tagx">catch found ✓</span></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">If <em>nobody</em> catches it, the exception reaches the top of the stack. The JVM then prints the stack trace to <code>System.err</code> and <strong>terminates that thread</strong>. In a single-threaded console program, that means your program is over.</p>
+          <div class="keybox">
+            <span class="lbl">Why this design is powerful</span>
+            The method that <em>detects</em> a problem is rarely the method that <em>knows what to do about it</em>. A low-level file reader can't decide whether to show a dialog, retry, or fall back to defaults. Unwinding lets the error travel up to a layer with enough context to decide.
+          </div>
+        </section>
+
+        <!-- 8. READING A STACK TRACE -->
+        <section class="slide">
+          <p class="eyebrow">A skill, not a nuisance</p>
+          <h2>How to read a stack trace</h2>
+          <p class="deep">Most beginners see a wall of red text and panic. Stack traces are extremely precise — they usually hand you the answer.</p>
+          <div class="term-out">Exception in thread "main" <span class="bad">java.lang.ArithmeticException</span>: <span class="warn">/ by zero</span>
+	at com.tcs.Calculator.divide(<span class="ok">Calculator.java:12</span>)
+	at com.tcs.Calculator.calculate(<span class="ok">Calculator.java:7</span>)
+	at com.tcs.Main.main(<span class="ok">Main.java:4</span>)</div>
+          <table class="cmp">
+            <thead><tr><th style="width:34%">Part</th><th>What it tells you</th></tr></thead>
+            <tbody>
+              <tr><td><code>thread "main"</code></td><td>Which thread died. In our labs this is always <code>main</code>.</td></tr>
+              <tr><td><code>java.lang.ArithmeticException</code></td><td>The <strong>type</strong> — the category of problem.</td></tr>
+              <tr><td><code>/ by zero</code></td><td>The <strong>message</strong> — the specific detail.</td></tr>
+              <tr><td><code>Calculator.java:12</code></td><td><strong>Where it was thrown.</strong> Read this line first — always.</td></tr>
+              <tr><td>Lines below</td><td>Who called whom. Read <strong>top to bottom = innermost to outermost</strong>.</td></tr>
+              <tr><td><code>Caused by: …</code></td><td>The original, underlying exception. Often the <em>real</em> answer.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Two habits that will save you hours</span>
+            <strong>1.</strong> Find the topmost line that mentions <em>your own</em> package — that's usually your bug, not the framework's.
+            <strong>2.</strong> When you see <code>Caused by:</code>, scroll to the <strong>last</strong> one. That's the root cause; everything above it is wrapping.
+          </div>
+        </section>
+
+        <!-- 9. THROWABLE HIERARCHY -->
+        <section class="slide">
+          <p class="eyebrow">The family tree</p>
+          <h2>The <code>Throwable</code> hierarchy</h2>
+          <p class="deep">Everything that can be thrown in Java descends from one class: <code>java.lang.Throwable</code>. You cannot throw a <code>String</code> or an <code>int</code> — only a <code>Throwable</code>.</p>
+          <div class="tree-vis" data-label="java.lang">
+            <div class="tv-row"><div class="node root"><div class="bn">Throwable</div><div class="bd">the root of everything throwable</div></div></div>
+            <div class="tv-tick">╱ &nbsp;&nbsp;&nbsp; ╲</div>
+            <div class="tv-row">
+              <div class="node err"><div class="bn">Error</div><div class="bd">JVM-level, do NOT catch</div></div>
+              <div class="node checked"><div class="bn">Exception</div><div class="bd">application problems</div></div>
+            </div>
+            <div class="tv-tick">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ╱ &nbsp;&nbsp; ╲</div>
+            <div class="tv-row">
+              <div class="node checked"><div class="bn">IOException, SQLException…</div><div class="bd"><strong>CHECKED</strong> — compiler enforces</div></div>
+              <div class="node unchecked"><div class="bn">RuntimeException</div><div class="bd"><strong>UNCHECKED</strong> — your bugs</div></div>
+            </div>
+            <div class="tv-note">NullPointerException, ArithmeticException, IllegalArgumentException… all live under RuntimeException</div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Error is not your business</span>
+            <code>OutOfMemoryError</code>, <code>StackOverflowError</code>, <code>NoClassDefFoundError</code> — these mean the JVM itself is in trouble. Catching them almost never helps and usually hides a serious problem. <strong>Rule: never catch <code>Error</code>, and never catch <code>Throwable</code>.</strong>
+          </div>
+        </section>
+
+        <!-- 10. CHECKED VS UNCHECKED -->
+        <section class="slide">
+          <p class="eyebrow">The single most important distinction</p>
+          <h2>Checked vs unchecked</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:20%"></th><th>Checked</th><th>Unchecked</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Extends</strong></td><td><code>Exception</code> (but not <code>RuntimeException</code>)</td><td><code>RuntimeException</code></td></tr>
+              <tr><td><strong>Compiler</strong></td><td class="bad">Forces you to <code>catch</code> or <code>throws</code> it — <em>won't compile otherwise</em></td><td class="good">Ignores it completely</td></tr>
+              <tr><td><strong>Means</strong></td><td>An expected external failure you should plan for</td><td>A programming mistake — a bug in your logic</td></tr>
+              <tr><td><strong>Examples</strong></td><td><code>IOException</code>, <code>FileNotFoundException</code>, <code>SQLException</code>, <code>ClassNotFoundException</code>, <code>InterruptedException</code></td><td><code>NullPointerException</code>, <code>ArithmeticException</code>, <code>ArrayIndexOutOfBoundsException</code>, <code>NumberFormatException</code>, <code>IllegalArgumentException</code></td></tr>
+              <tr><td><strong>Right response</strong></td><td>Handle it — retry, fall back, report</td><td><strong>Fix the code.</strong> Don't catch it, prevent it</td></tr>
+            </tbody>
+          </table>
+          <pre><code>// CHECKED — this does not compile:
+FileReader fr = new FileReader("data.txt");
+//  error: unreported exception FileNotFoundException; must be caught or declared to be thrown
+
+// UNCHECKED — compiles perfectly, then explodes at runtime:
+String s = null;
+System.out.println(s.length());   // NullPointerException</code></pre>
+          <div class="keybox">
+            <span class="lbl">The mental test</span>
+            Ask: <em>"Could a careful programmer have prevented this by writing better code?"</em> — Yes → it should be <strong>unchecked</strong>. No, the outside world simply failed → <strong>checked</strong>.
+          </div>
+        </section>
+
+        <!-- 11. COMMON EXCEPTIONS -->
+        <section class="slide">
+          <p class="eyebrow">Know these on sight</p>
+          <h2>The exceptions you'll actually meet</h2>
+          <table class="cmp sm">
+            <thead><tr><th style="width:31%">Exception</th><th>Typical cause</th><th style="width:24%">How to prevent it</th></tr></thead>
+            <tbody>
+              <tr><td><code>NullPointerException</code></td><td>Using a method or field on a <code>null</code> reference</td><td>Check for null; return empty collections, not null</td></tr>
+              <tr><td><code>ArrayIndexOutOfBoundsException</code></td><td>Index <code>&lt; 0</code> or <code>&gt;= length</code></td><td>Loop with <code>i &lt; arr.length</code></td></tr>
+              <tr><td><code>StringIndexOutOfBoundsException</code></td><td><code>charAt</code>/<code>substring</code> past the end</td><td>Validate against <code>length()</code> first</td></tr>
+              <tr><td><code>ArithmeticException</code></td><td>Integer division or modulo by zero</td><td>Guard the divisor</td></tr>
+              <tr><td><code>NumberFormatException</code></td><td><code>Integer.parseInt("abc")</code></td><td>Validate input before parsing</td></tr>
+              <tr><td><code>ClassCastException</code></td><td>Casting to an incompatible type</td><td>Use <code>instanceof</code>; use generics</td></tr>
+              <tr><td><code>IllegalArgumentException</code></td><td>A method got a value it refuses to accept</td><td>Validate at the boundary — <em>you</em> throw this one</td></tr>
+              <tr><td><code>IllegalStateException</code></td><td>Right method, wrong time (object not ready)</td><td>Enforce a valid lifecycle</td></tr>
+              <tr><td><code>ConcurrentModificationException</code></td><td>Editing a collection while for-each iterates it</td><td><code>Iterator.remove()</code> or <code>removeIf</code> — Session 3</td></tr>
+              <tr><td><code>InputMismatchException</code></td><td><code>Scanner.nextInt()</code> and the user typed text</td><td><code>hasNextInt()</code> before reading</td></tr>
+              <tr><td><code>IOException</code></td><td>Any file/stream/network failure</td><td>Checked — must be handled. Session 4</td></tr>
+              <tr><td><code>FileNotFoundException</code></td><td>Path wrong, or no permission</td><td>Check <code>Files.exists()</code>; handle it anyway</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Since Java 14: helpful NullPointerExceptions</span>
+            Modern JDKs tell you exactly which part was null — e.g. <code>Cannot invoke "String.length()" because "&lt;local1&gt;" is null</code>. If you're on JDK 14+ you get this for free, and it turns the most common exception in Java from a guessing game into a straight answer.
+          </div>
+        </section>
+
+        <!-- 12. TRY CATCH -->
+        <section class="slide">
+          <p class="eyebrow">The basic tool</p>
+          <h2><code>try</code> / <code>catch</code></h2>
+          <p class="deep"><code>try</code> marks code that might fail. <code>catch</code> says what to do if a matching exception appears.</p>
+          <pre><code>try {
+    int result = 10 / divisor;        // risky
+    System.out.println(result);       // SKIPPED if the line above throws
+} catch (ArithmeticException e) {
+    System.out.println("Cannot divide by zero.");
+}
+System.out.println("Program continues.");   // this still runs</code></pre>
+          <div class="flow">
+            <div class="flow-box">Enter <code>try</code></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">Exception<br>thrown?<span class="sm">at any line</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">Rest of try<br>is skipped<span class="sm">immediately</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">Matching catch<br>runs<span class="sm">then flow continues</span></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The bit everyone gets wrong first</span>
+            When line 2 of a <code>try</code> throws, lines 3, 4 and 5 <strong>never execute</strong>. Control jumps straight to <code>catch</code>. Students constantly assume the try block "finishes anyway" — it does not.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "If <code>divisor</code> is 2, how many lines print?" (two) "If it's 0?" (two again — but different ones). Trace it out loud before moving on.
+          </div>
+        </section>
+
+        <!-- 13. MULTIPLE CATCH -->
+        <section class="slide">
+          <p class="eyebrow">More than one thing can go wrong</p>
+          <h2>Multiple <code>catch</code> blocks — order matters</h2>
+          <p class="deep">One <code>try</code> can have many <code>catch</code> blocks. Java checks them <strong>top to bottom</strong> and runs the <strong>first one that matches</strong> — where "matches" means the exception is that type <em>or a subclass of it</em>.</p>
+          <pre><code>try {
+    int[] nums = {1, 2, 3};
+    int index = Integer.parseInt(userInput);
+    System.out.println(100 / nums[index]);
+} catch (NumberFormatException e) {          // most specific first
+    System.out.println("That wasn't a number.");
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Index must be 0-2.");
+} catch (ArithmeticException e) {
+    System.out.println("That element is zero.");
+} catch (Exception e) {                      // broadest LAST — safety net
+    System.out.println("Unexpected: " + e.getMessage());
+}</code></pre>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Won't even compile</h3>
+              <pre class="sm"><code>catch (Exception e) { }
+catch (ArithmeticException e) { }
+// error: alreadyCaught —
+// ArithmeticException has
+// already been caught</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Specific → general</h3>
+              <pre class="sm"><code>catch (ArithmeticException e) { }
+catch (Exception e) { }
+// compiles: narrow first,
+// wide net afterwards</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Rule</span>
+            <strong>Subclasses before superclasses.</strong> Java catches this mistake at compile time, which is a small mercy — the error is <code>exception X has already been caught</code>.
+          </div>
+        </section>
+
+        <!-- 14. MULTI-CATCH -->
+        <section class="slide">
+          <p class="eyebrow">Java 7+</p>
+          <h2>Multi-catch — one block, several types</h2>
+          <p class="deep">When two different failures deserve the <em>same</em> response, don't duplicate the block. Separate the types with a pipe <code>|</code>.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Duplicated</h3>
+              <pre class="sm"><code>catch (NumberFormatException e) {
+    log(e);
+    showError("Bad input");
+} catch (DateTimeParseException e) {
+    log(e);
+    showError("Bad input");
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Multi-catch</h3>
+              <pre class="sm"><code>catch (NumberFormatException
+     | DateTimeParseException e) {
+    log(e);
+    showError("Bad input");
+}</code></pre>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Two rules for multi-catch</span>
+            <strong>1.</strong> The types must not be in a parent–child relationship. <code>catch (IOException | FileNotFoundException e)</code> is a compile error — <code>FileNotFoundException</code> is already an <code>IOException</code>, so listing both is redundant.
+            <strong>2.</strong> The variable <code>e</code> is implicitly <strong>final</strong> — you can't reassign it inside the block.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "What type does the compiler give <code>e</code> in a multi-catch?" — the <strong>nearest common ancestor</strong> of the listed types. So you can only call methods that <em>both</em> types support (usually <code>getMessage()</code>).
+          </div>
+        </section>
+
+        <!-- 15. FINALLY -->
+        <section class="slide">
+          <p class="eyebrow">The cleanup block</p>
+          <h2><code>finally</code> — runs no matter what</h2>
+          <p class="deep"><code>finally</code> executes whether the <code>try</code> succeeded, threw a caught exception, threw an <em>uncaught</em> exception, or even hit a <code>return</code>. It exists for <strong>cleanup you cannot afford to skip</strong>.</p>
+          <pre><code>Connection conn = null;
+try {
+    conn = openConnection();
+    conn.save(record);
+    return true;                  // finally STILL runs before returning
+} catch (SQLException e) {
+    logger.error("Save failed", e);
+    return false;                 // finally runs here too
+} finally {
+    if (conn != null) conn.close();   // guaranteed — no leak
+}</code></pre>
+          <table class="cmp">
+            <thead><tr><th style="width:42%">Scenario</th><th>Does <code>finally</code> run?</th></tr></thead>
+            <tbody>
+              <tr><td><code>try</code> completes normally</td><td class="good">Yes</td></tr>
+              <tr><td>Exception thrown and caught</td><td class="good">Yes</td></tr>
+              <tr><td>Exception thrown and <em>not</em> caught</td><td class="good">Yes — then the exception continues up</td></tr>
+              <tr><td><code>return</code> / <code>break</code> / <code>continue</code> inside <code>try</code></td><td class="good">Yes — before control actually leaves</td></tr>
+              <tr><td><code>System.exit(0)</code> is called</td><td class="bad">No — the JVM stops immediately</td></tr>
+              <tr><td>The JVM crashes or power is lost</td><td class="bad">No</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Never <code>return</code> from a <code>finally</code> block</span>
+            A <code>return</code> in <code>finally</code> <strong>silently discards any in-flight exception</strong> and overrides the real return value. It's one of the nastiest bugs to track down. Same goes for throwing from <code>finally</code>.
+          </div>
+        </section>
+
+        <!-- 16. TRY-WITH-RESOURCES -->
+        <section class="slide">
+          <p class="eyebrow">Java 7+ — the modern way</p>
+          <h2><code>try</code>-with-resources</h2>
+          <p class="deep">The <code>finally</code>-to-close pattern was so common, and so easy to get wrong, that Java built it into the language. Declare the resource in parentheses after <code>try</code> and Java closes it for you — automatically, in reverse order, even if an exception is thrown.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Old — 9 lines of ceremony</h3>
+              <pre class="sm"><code>BufferedReader br = null;
+try {
+    br = new BufferedReader(
+        new FileReader("d.txt"));
+    System.out.println(br.readLine());
+} catch (IOException e) {
+    e.printStackTrace();
+} finally {
+    if (br != null) {
+        try { br.close(); }
+        catch (IOException ignored) { }
+    }
+}</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ New — closes itself</h3>
+              <pre class="sm"><code>try (BufferedReader br =
+        new BufferedReader(
+            new FileReader("d.txt"))) {
+    System.out.println(br.readLine());
+} catch (IOException e) {
+    e.printStackTrace();
+}
+// br.close() is called for you,
+// guaranteed, before catch runs</code></pre>
+            </div>
+          </div>
+          <pre><code>// Several resources at once — closed in REVERSE order (out, then in)
+try (FileReader in  = new FileReader("in.txt");
+     FileWriter out = new FileWriter("out.txt")) {
+    // ... copy ...
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The contract: <code>AutoCloseable</code></span>
+            Any class implementing <code>AutoCloseable</code> (one method: <code>void close()</code>) can go in the parentheses — including <strong>your own classes</strong>. You'll write one in the lab. Files, streams, sockets, JDBC connections and Scanner all already implement it.
+          </div>
+        </section>
+
+        <!-- 17. THROW -->
+        <section class="slide">
+          <p class="eyebrow">Going on the offensive</p>
+          <h2><code>throw</code> — raising an exception yourself</h2>
+          <p class="deep">So far we've been <em>catching</em>. Just as important is <em>throwing</em>. When a method is handed input it cannot honour, the worst thing it can do is quietly carry on with bad data.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Silent corruption</h3>
+              <pre class="sm"><code>void setAge(int age) {
+    this.age = age;   // -5? sure!
+}
+// Bug surfaces days later,
+// somewhere completely
+// unrelated. Good luck.</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Fail fast, at the source</h3>
+              <pre class="sm"><code>void setAge(int age) {
+    if (age &lt; 0 || age &gt; 130) {
+        throw new IllegalArgumentException(
+            "Age must be 0-130, got: "
+            + age);
+    }
+    this.age = age;
+}</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Fail fast</span>
+            Detect the problem <strong>as close as possible to where it was caused</strong>, and say clearly what was wrong. Notice the message includes the offending value — <code>"got: -5"</code>. A message without the actual value wastes everyone's time.
+          </div>
+          <div class="note">
+            <span class="lbl">Handy built-in guards</span>
+            <code>Objects.requireNonNull(name, "name must not be null")</code> throws a well-described NPE in one line. <code>IllegalArgumentException</code> for bad arguments, <code>IllegalStateException</code> for "you called this at the wrong time". Prefer these standard types over inventing your own where they fit.
+          </div>
+        </section>
+
+        <!-- 18. THROWS -->
+        <section class="slide">
+          <p class="eyebrow">Declaring, not doing</p>
+          <h2><code>throws</code> — passing the buck upward</h2>
+          <p class="deep">Sometimes a method genuinely cannot decide how to handle a failure. Rather than a pointless <code>catch</code>, it <em>declares</em> that it may fail and lets the caller deal with it.</p>
+          <pre><code>// This method does NOT handle the problem — it announces it
+public String readConfig(String path) throws IOException {
+    BufferedReader br = new BufferedReader(new FileReader(path));
+    return br.readLine();
+}
+
+// Now every caller must either catch it...
+try {
+    String cfg = readConfig("app.properties");
+} catch (IOException e) {
+    System.out.println("Using defaults instead.");
+}
+
+// ...or declare it too, and push the decision further up
+public void startup() throws IOException {
+    String cfg = readConfig("app.properties");
+}</code></pre>
+          <div class="callstack">
+            <div class="csf throwing">readConfig() <span style="color:var(--mac-text-muted);">throws IOException</span><span class="tagx">declares</span></div>
+            <div class="csf dead">startup() <span style="color:var(--mac-text-muted);">throws IOException</span><span class="tagx">propagates</span></div>
+            <div class="csf catching">main() <span style="color:var(--mac-text-muted);">try/catch</span><span class="tagx">decides ✓</span></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Don't put <code>throws Exception</code> on everything</span>
+            It compiles, and it's the laziest thing you can do. It tells callers nothing, forces them to catch everything, and destroys the type information that makes checked exceptions useful in the first place. <strong>Declare the narrowest type you actually throw.</strong>
+          </div>
+        </section>
+
+        <!-- 19. THROW VS THROWS -->
+        <section class="slide">
+          <p class="eyebrow">Guaranteed interview question</p>
+          <h2><code>throw</code> vs <code>throws</code></h2>
+          <table class="cmp">
+            <thead><tr><th style="width:22%"></th><th><code>throw</code></th><th><code>throws</code></th></tr></thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td>A statement — an <em>action</em></td><td>A clause in the method signature — a <em>declaration</em></td></tr>
+              <tr><td><strong>Where it goes</strong></td><td>Inside a method body</td><td>After the parameter list, before <code>{</code></td></tr>
+              <tr><td><strong>Followed by</strong></td><td>One exception <em>instance</em></td><td>One or more exception <em>class names</em>, comma-separated</td></tr>
+              <tr><td><strong>Effect</strong></td><td>Actually raises the exception, right now</td><td>Warns callers this method might fail</td></tr>
+              <tr><td><strong>Count</strong></td><td>Throws exactly one object</td><td>Can list many types</td></tr>
+              <tr><td><strong>Syntax</strong></td><td><code>throw new IOException("x");</code></td><td><code>void read() throws IOException, SQLException</code></td></tr>
+            </tbody>
+          </table>
+          <pre><code>public void withdraw(double amount) throws InsufficientFundsException {
+//                                 ^^^^^^ throws: "I might fail this way"
+    if (amount &gt; balance) {
+        throw new InsufficientFundsException("Short by " + (amount - balance));
+//      ^^^^^ throw: "I am failing, right now"
+    }
+    balance -= amount;
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">One-liner to memorise</span>
+            <strong><code>throws</code> is a warning label on the box. <code>throw</code> is actually setting off the alarm.</strong>
+          </div>
+        </section>
+
+        <!-- 20. CUSTOM EXCEPTIONS -->
+        <section class="slide">
+          <p class="eyebrow">Speaking your domain's language</p>
+          <h2>Writing your own exception</h2>
+          <p class="deep">Built-in types describe <em>technical</em> failures. Your application has <em>business</em> failures: insufficient funds, seat already booked, invalid IFSC code. A custom exception names the problem in the language of the business.</p>
+          <div class="fname">InsufficientFundsException.java</div>
+          <pre><code>public class InsufficientFundsException extends Exception {   // CHECKED
+
+    private final double shortfall;      // extra data the caller can use
+
+    public InsufficientFundsException(String message, double shortfall) {
+        super(message);                  // ALWAYS pass the message up
+        this.shortfall = shortfall;
+    }
+
+    public double getShortfall() { return shortfall; }
+}</code></pre>
+          <pre><code>// Throwing it
+if (amount &gt; balance) {
+    throw new InsufficientFundsException(
+        "Withdrawal of " + amount + " denied", amount - balance);
+}
+
+// Catching it — and using the extra data
+catch (InsufficientFundsException e) {
+    System.out.printf("Denied. Add %.2f more.%n", e.getShortfall());
+}</code></pre>
+          <div class="note">
+            <span class="lbl">The four standard constructors</span>
+            Good practice is to offer all four, each delegating to <code>super</code>: <code>()</code>, <code>(String message)</code>, <code>(String message, Throwable cause)</code>, and <code>(Throwable cause)</code>. The ones taking a <code>cause</code> are what make exception chaining possible — next slide but one.
+          </div>
+        </section>
+
+        <!-- 21. EXTEND WHICH? -->
+        <section class="slide">
+          <p class="eyebrow">The design decision</p>
+          <h2>Extend <code>Exception</code> or <code>RuntimeException</code>?</h2>
+          <div class="cards">
+            <div class="card" style="border-color:#0a84ff;background:#f0f7ff;">
+              <h3>extends <code>Exception</code> → checked</h3>
+              <p><strong>Use when</strong> the caller can realistically <em>recover</em> and you want the compiler to force them to think about it.</p>
+              <p style="margin-top:8px;"><strong>Good fits:</strong> <code>InsufficientFundsException</code>, <code>SeatUnavailableException</code> — the caller can offer an alternative.</p>
+            </div>
+            <div class="card" style="border-color:#ff9f0a;background:#fff8ec;">
+              <h3>extends <code>RuntimeException</code> → unchecked</h3>
+              <p><strong>Use when</strong> it signals a <em>bug</em> or a broken precondition, where there's no sensible local recovery.</p>
+              <p style="margin-top:8px;"><strong>Good fits:</strong> <code>InvalidConfigurationException</code>, <code>ResourceNotFoundException</code> in a web API.</p>
+            </div>
+          </div>
+          <pre><code>public class ResourceNotFoundException extends RuntimeException {  // UNCHECKED
+    public ResourceNotFoundException(String resource, Object id) {
+        super(resource + " not found with id: " + id);
+    }
+}
+// No throws clause needed anywhere. In Spring Boot a @ControllerAdvice
+// turns this into a clean 404 response — see Spring Boot Session 3.</code></pre>
+          <div class="askbox">
+            <span class="lbl">Ask the batch — this one divides professionals</span>
+            Modern frameworks (Spring, Hibernate) lean heavily towards <strong>unchecked</strong>, arguing checked exceptions pollute signatures throughout a codebase. The classic Java position favours checked for recoverable errors. Both are defensible. <strong>What matters is being consistent inside one project.</strong>
+          </div>
+        </section>
+
+        <!-- 22. CHAINING -->
+        <section class="slide">
+          <p class="eyebrow">Don't lose the evidence</p>
+          <h2>Exception chaining — keep the cause</h2>
+          <p class="deep">When you catch a low-level exception and throw a higher-level one, you must <strong>attach the original as the cause</strong>. Otherwise you throw away the stack trace that says what actually broke.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Evidence destroyed</h3>
+              <pre class="sm"><code>catch (SQLException e) {
+    throw new DataAccessException(
+        "Could not load user");
+}
+// Trace stops here. WHY did
+// SQL fail? Nobody will
+// ever know.</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Cause preserved</h3>
+              <pre class="sm"><code>catch (SQLException e) {
+    throw new DataAccessException(
+        "Could not load user", e);
+}                        //  ^^^
+// Full chain survives all
+// the way to the log.</code></pre>
+            </div>
+          </div>
+          <div class="term-out">com.tcs.DataAccessException: Could not load user id=42
+	at com.tcs.UserRepository.findById(UserRepository.java:31)
+	at com.tcs.UserService.getUser(UserService.java:18)
+<span class="warn">Caused by:</span> <span class="bad">java.sql.SQLException</span>: Connection refused: connect
+	at com.tcs.Db.connect(Db.java:12)
+	... 4 more                        <span class="dim">← the actual root cause</span></div>
+          <div class="keybox">
+            <span class="lbl">Rule</span>
+            Whenever you re-throw, <strong>pass the original exception in</strong> — as a constructor argument or via <code>initCause()</code>. Retrieve it later with <code>getCause()</code>. A stack trace without its cause is a bug report with the crucial page torn out.
+          </div>
+        </section>
+
+        <!-- 23. TRANSLATING ACROSS LAYERS -->
+        <section class="slide">
+          <p class="eyebrow">Architecture</p>
+          <h2>Translating exceptions across layers</h2>
+          <p class="deep">Each layer of an application should throw exceptions that make sense <em>at its own level of abstraction</em>. A web controller shouldn't be handling <code>SQLException</code> — that's a leak of database detail into the presentation layer.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Repository / DAO</span>
+              <span class="desc">Catches <code>SQLException</code> → throws <code>DataAccessException</code> (with cause)</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Service</span>
+              <span class="desc">Catches <code>DataAccessException</code> → throws <code>UserNotFoundException</code> (business language)</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Controller / UI</span>
+              <span class="desc">Catches <code>UserNotFoundException</code> → shows "User not found" / HTTP 404</span>
+            </div>
+          </div>
+          <pre><code>// Repository — technical
+catch (SQLException e) {
+    throw new DataAccessException("Query failed for id " + id, e);
+}
+
+// Service — business
+catch (DataAccessException e) {
+    throw new UserNotFoundException("No user with id " + id, e);
+}
+
+// Controller — human
+catch (UserNotFoundException e) {
+    return "error/not-found";        // and log e at this boundary
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Log once, at the boundary</span>
+            A classic mistake is logging the same exception at <em>every</em> layer, producing four copies of one problem. <strong>Log where you finally handle it</strong> — and let it propagate silently (but with its cause attached) until then.
+          </div>
+        </section>
+
+        <!-- 24. BEST PRACTICES -->
+        <section class="slide">
+          <p class="eyebrow">Do this</p>
+          <h2>Best practices</h2>
+          <ul class="checklist">
+            <li><strong>Catch the narrowest type you can.</strong> <code>catch (FileNotFoundException e)</code> beats <code>catch (Exception e)</code>.</li>
+            <li><strong>Never swallow an exception.</strong> An empty <code>catch</code> block is where bugs go to hide.</li>
+            <li><strong>Always chain the cause</strong> when re-throwing.</li>
+            <li><strong>Put context in the message</strong> — ids, filenames, the offending value.</li>
+            <li><strong>Clean up in <code>finally</code></strong>, or better, use try-with-resources.</li>
+            <li><strong>Throw early, catch late.</strong> Validate at the boundary; handle where you have enough context.</li>
+            <li><strong>Prefer standard exceptions</strong> where they fit; go custom for business rules.</li>
+            <li><strong>Keep <code>try</code> blocks small</strong> — wrap the risky line, not fifty lines.</li>
+            <li><strong>Log with the exception object</strong>, not just its message: <code>log.error("msg", e)</code>.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">The single best habit</span>
+            Before you write <code>catch</code>, answer this out loud: <em>"What will this block actually DO about it?"</em> If the honest answer is "nothing", you shouldn't be catching there — let it propagate to somewhere that can.
+          </div>
+        </section>
+
+        <!-- 25. ANTI-PATTERNS -->
+        <section class="slide">
+          <p class="eyebrow">Never do this</p>
+          <h2>Anti-patterns you will see in real code</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ 1. The silent swallow</h3>
+              <pre class="sm"><code>try {
+    saveToDatabase(order);
+} catch (Exception e) {
+    // TODO: handle this
+}</code></pre>
+              <p style="font-size:14px;color:var(--tl-red);margin-top:4px;">The order vanished. No log, no error, no clue. The worst line of code in this deck.</p>
+            </div>
+            <div class="panel good">
+              <h3>✓ Handle or propagate</h3>
+              <pre class="sm"><code>try {
+    saveToDatabase(order);
+} catch (SQLException e) {
+    log.error("Save failed for order "
+              + order.getId(), e);
+    throw new OrderSaveException(
+        "Could not save order", e);
+}</code></pre>
+            </div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th style="width:38%">Anti-pattern</th><th>Why it's harmful</th></tr></thead>
+            <tbody>
+              <tr><td><code>catch (Exception e) {}</code></td><td>Hides every bug, including ones you'd want to know about immediately</td></tr>
+              <tr><td><code>catch (Throwable t)</code></td><td>Also traps <code>OutOfMemoryError</code> — you cannot meaningfully recover</td></tr>
+              <tr><td><code>e.printStackTrace()</code> in production</td><td>Goes to stderr, unstructured, no timestamp, invisible to monitoring. Use a logger</td></tr>
+              <tr><td>Exceptions for normal control flow</td><td>Slow (stack capture) and confusing. Use <code>if</code>, or <code>Optional</code></td></tr>
+              <tr><td><code>throws Exception</code> everywhere</td><td>Destroys the information checked exceptions exist to convey</td></tr>
+              <tr><td>Catching then re-throwing unchanged</td><td>Pure noise — remove the try/catch entirely</td></tr>
+              <tr><td><code>return</code> inside <code>finally</code></td><td>Silently discards the exception in flight</td></tr>
+              <tr><td>Message with no context</td><td><code>"Error occurred"</code> helps nobody at 2am</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 26. ALTERNATIVES -->
+        <section class="slide">
+          <p class="eyebrow">Not everything deserves an exception</p>
+          <h2>When <em>not</em> to throw</h2>
+          <p class="deep">Exceptions are for the <strong>exceptional</strong>. "Not found" during a search isn't exceptional — it's a perfectly ordinary outcome. Reaching for exceptions to express normal results makes code slower and harder to read.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Exception as a return value</h3>
+              <pre class="sm"><code>try {
+    User u = findUser(name);
+    greet(u);
+} catch (NotFoundException e) {
+    showSignupPrompt();
+}
+// "not found" is normal here,
+// not an emergency</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ <code>Optional</code> says "maybe"</h3>
+              <pre class="sm"><code>Optional&lt;User&gt; u = findUser(name);
+if (u.isPresent()) {
+    greet(u.get());
+} else {
+    showSignupPrompt();
+}
+// or: u.ifPresentOrElse(
+//        this::greet,
+//        this::showSignupPrompt);</code></pre>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Three cheaper alternatives</span>
+            <strong>1. Validate first.</strong> <code>if (scanner.hasNextInt())</code> is better than parsing and catching.
+            <strong>2. Return <code>Optional&lt;T&gt;</code></strong> for "there may be no answer".
+            <strong>3. Return empty collections, never <code>null</code></strong> — this alone eliminates a large share of all NullPointerExceptions.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The performance angle</span>
+            Constructing an exception captures the whole stack trace, which is genuinely expensive. In a tight loop, exception-driven control flow can be <strong>orders of magnitude</strong> slower than an <code>if</code>. This matters in real systems.
+          </div>
+        </section>
+
+        <!-- 27. WHERE THIS GOES NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Why this pays off later</p>
+          <h2>Where you'll meet this again</h2>
+          <div class="cards">
+            <div class="card"><h3>📁 Session 4 — File I/O</h3><p>Every file operation throws <code>IOException</code>, a <em>checked</em> exception. You will be forced to use today's skills — and try-with-resources becomes your default.</p></div>
+            <div class="card"><h3>🗄️ JDBC</h3><p><code>SQLException</code> on every call. Connections <strong>must</strong> be closed in <code>finally</code> or try-with-resources, or you exhaust the connection pool.</p></div>
+            <div class="card"><h3>🌱 Spring Boot Session 3</h3><p><code>@ControllerAdvice</code> + <code>@ExceptionHandler</code> centralise all of this: one class turns your custom exceptions into clean HTTP responses.</p></div>
+            <div class="card"><h3>🔁 Session 2 — Overriding</h3><p>An overriding method may not throw <em>broader</em> checked exceptions than the method it overrides. Today's hierarchy is what makes that rule make sense.</p></div>
+          </div>
+          <pre><code>// Spring Boot Session 3 preview — your custom exception, one clean handler
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleNotFound(ResourceNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                             .body(new ErrorResponse(404, e.getMessage()));
+    }
+}
+// No try/catch in any controller. Every 404 formatted identically.</code></pre>
+        </section>
+
+        <!-- 28. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Session 1</p>
+          <h2>Recap — what you can now do</h2>
+          <ul class="checklist">
+            <li>Explain that an exception is an <strong>object</strong> that unwinds the call stack looking for a handler</li>
+            <li><strong>Read a stack trace</strong> and find the real cause, including through <code>Caused by:</code></li>
+            <li>Place any exception in the <code>Throwable</code> hierarchy and say whether it's <strong>checked or unchecked</strong></li>
+            <li>Write <code>try</code>/<code>catch</code>/<code>finally</code> with correctly <strong>ordered</strong> and multi-catch blocks</li>
+            <li>Use <strong>try-with-resources</strong> and write your own <code>AutoCloseable</code></li>
+            <li>Use <code>throw</code> to fail fast and <code>throws</code> to delegate — and explain the difference</li>
+            <li>Design <strong>custom exceptions</strong> and choose checked vs unchecked deliberately</li>
+            <li><strong>Chain causes</strong> and translate exceptions cleanly between layers</li>
+            <li>Recognise the anti-patterns — and know when <em>not</em> to use an exception at all</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Bring this with you</span>
+            Keep your <code>BankApp</code> from the lab. Session 2 refactors it into an <strong>account type hierarchy</strong> — savings, current, fixed deposit — using inheritance and polymorphism, with today's exceptions still guarding it.
+          </div>
+        </section>
+
+        <!-- 29. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 1</span>
+            <h1>Questions?</h1>
+            <div class="sub">Then open the lab sheet — time to break some code on purpose, and then make it unbreakable.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 2 — Inheritance &amp; Polymorphism.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java Core · Session 1 — Exception Handling</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

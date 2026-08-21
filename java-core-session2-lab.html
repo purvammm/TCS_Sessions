@@ -1,0 +1,2364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 2 — Inheritance &amp; Polymorphism (Lab)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(231,111,0,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e76f00, #5382a1, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff8f0, #fdf1e4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(83,130,161,0.10);
+      border: 1px solid rgba(83,130,161,0.32);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffdcbc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(231,111,0,0.22);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #e76f00; }
+    details.exp.lab2 { border-left-color: #5382a1; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.lab8 { border-left-color: #d81b60; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff8f0,#ffeedb); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f2f7fb,#e6eff6); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf3ff,#f2e8ff); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#fff0f5,#ffe3ec); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5382a1; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.lab8 .lab-tag { background:#d81b60; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit compile & run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin: 12px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Take-home assignment cards === */
+    .assign {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #bf5af2;
+      border-radius: 12px; background: #fff;
+      padding: 16px 20px 18px; margin: 16px 0;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .assign h3 {
+      margin: 0 0 8px; font-size: 19px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .assign .anum {
+      background: #bf5af2; color: #fff; border-radius: 8px;
+      padding: 3px 11px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .assign .diff {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .assign .diff.easy { background: rgba(40,200,64,0.14); color: #1a7f2e; border: 1px solid rgba(40,200,64,0.4); }
+    .assign .diff.med  { background: rgba(254,188,46,0.18); color: #96690a; border: 1px solid rgba(254,188,46,0.5); }
+    .assign .diff.hard { background: rgba(255,95,87,0.13); color: #c0392b; border: 1px solid rgba(255,95,87,0.4); }
+    .assign .brief { font-size: 16.5px; margin: 0 0 4px; }
+    .assign .rq { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mac-text-muted); margin: 12px 0 0; display: block; }
+    .assign ol.req, .assign ul.req { margin: 6px 0 0; padding-left: 24px; }
+    .assign .req li { font-size: 16.5px; margin: 5px 0; line-height: 1.55; }
+    .assign .out {
+      background: #12121c; color: #d7dae0; border-radius: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 12px 16px; margin: 10px 0 0; white-space: pre; overflow-x: auto;
+    }
+    .assign .out .ok { color: #a6e22e; }
+    .assign .out .bad { color: #ff6b6b; }
+    .assign .out .dim { color: #8b8fa3; }
+    .assign .hint {
+      background: #fafafc; border: 1px dashed var(--mac-border);
+      border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; font-size: 15.5px;
+    }
+    .assign .hint .lbl { font-weight: 700; color: var(--mac-accent-2); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+
+    /* Submission / grading panel */
+    .submit-panel {
+      background: linear-gradient(135deg,#1e1e2e,#2a2a40);
+      color: #f8f8f2; border-radius: 12px; padding: 22px 26px; margin: 18px 0 0;
+    }
+    .submit-panel h3 { color: #fff; margin: 0 0 10px; font-size: 20px; }
+    .submit-panel p, .submit-panel li { color: #d7dae0; font-size: 16px; }
+    .submit-panel code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; font-size: 14.5px; }
+    .submit-panel table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .submit-panel th, .submit-panel td {
+      border: 1px solid rgba(255,255,255,0.18); padding: 8px 12px; text-align: left; font-size: 14.5px;
+    }
+    .submit-panel th { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+      .assign .diff { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session2-lab.html — Java Core Session 2</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🧬</div>
+        <div>
+          <h1>Java Core — Session 2 Hands-on Lab</h1>
+          <p class="section-intro">Inheritance &amp; polymorphism: build a family of classes, then make one loop do five different things. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Java Core Session 2 — the theory stays on the main screen while you
+          work here on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge so you know
+          exactly which part of the talk it belongs to. Click a heading to expand it, use the <strong>Copy</strong>
+          button on any snippet instead of retyping, and tick each checkbox as you go. Aim for 100% on the progress bar.
+        </div>
+        <div class="observe">
+          <span class="lbl">Golden rule for today</span>
+          Before you run anything, <strong>predict the output out loud</strong>. Today's whole subject is "which version
+          of this method actually runs?", and the only way to build that instinct is to commit to a guess and then find
+          out whether you were right. Just running the code and nodding teaches you nothing.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–3</span></summary>
+          <div class="exp-body">
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17+ still working</strong>
+                <span class="verify">Verify: <code>javac -version</code>. Task 6 uses pattern matching for <code>instanceof</code>, which needs JDK 16 or higher.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>java -version
+javac -version</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Session 1 files to hand</strong>
+                <span class="verify">You need <code>BankAccount.java</code>, <code>InsufficientFundsException.java</code> and <code>InvalidAmountException.java</code>. Don't have them? They're reprinted in Task 6 — no problem.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A fresh working folder</strong>
+                <span class="verify">Create <code>session2-inheritance</code>. All files go directly in it, no packages, so <code>javac *.java</code> always works.</span>
+              </span>
+            </label>
+
+            <div class="dothis">
+              <span class="lbl">Set up</span>
+              <ol>
+                <li>Create the folder <code>session2-inheritance</code> and open it in your editor.</li>
+                <li>Open a terminal in that folder.</li>
+                <li>Copy your three Session 1 files in, if you have them.</li>
+                <li>Compile with <code>javac *.java</code> and run with <code>java ClassName</code> throughout.</li>
+              </ol>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">The tasks</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Your First Hierarchy<span class="sync">Theory slides 4–7</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Feel the duplication problem, then delete it with <code>extends</code>. Also prove that <code>private</code>
+              members are <strong>not</strong> accessible to a subclass, and see what <code>Object</code> gives you for free.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Employee.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class Employee {
+
+    protected String name;         // protected: visible to subclasses
+    protected int    id;
+    protected double monthlySalary;
+
+    private   String panNumber = "ABCDE1234F";   // private: NOT visible to subclasses
+
+    public Employee(String name, int id, double monthlySalary) {
+        this.name = name;
+        this.id = id;
+        this.monthlySalary = monthlySalary;
+        System.out.println("  [Employee constructor] " + name);
+    }
+
+    public double annualPay() {
+        return monthlySalary * 12;
+    }
+
+    public void printDetails() {
+        System.out.printf("%-4d %-10s annual %,10.2f%n", id, name, annualPay());
+    }
+
+    // The approved way for anyone to see a private field
+    public String getMaskedPan() {
+        return "XXXXX" + panNumber.substring(5);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Developer.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class Developer extends Employee {
+
+    private String language;
+
+    public Developer(String name, int id, double monthlySalary, String language) {
+        super(name, id, monthlySalary);        // MUST be the first statement
+        this.language = language;
+        System.out.println("  [Developer constructor] " + name);
+    }
+
+    public void writeCode() {
+        // 'name' comes from Employee - inherited, protected, works fine
+        System.out.println(name + " is writing " + language);
+    }
+
+    public void tryPrivateAccess() {
+        // System.out.println(panNumber);   // UNCOMMENT THIS to see the compile error
+        System.out.println("PAN via public method: " + getMaskedPan());
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Manager.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class Manager extends Employee {
+
+    private double bonus;
+
+    public Manager(String name, int id, double monthlySalary, double bonus) {
+        super(name, id, monthlySalary);
+        this.bonus = bonus;
+    }
+
+    public void approveLeave(String who) {
+        System.out.println(name + " approved leave for " + who);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">HierarchyDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class HierarchyDemo {
+
+    public static void main(String[] args) {
+        System.out.println("Creating a Developer:");
+        Developer dev = new Developer("Priya", 101, 90000, "Java");
+
+        System.out.println("\nCreating a Manager:");
+        Manager mgr = new Manager("Rahul", 102, 150000, 200000);
+
+        System.out.println("\nInherited method, no code duplicated:");
+        dev.printDetails();
+        mgr.printDetails();
+
+        System.out.println("\nTheir own methods:");
+        dev.writeCode();
+        mgr.approveLeave("Priya");
+
+        System.out.println("\nPrivate field access:");
+        dev.tryPrivateAccess();
+
+        System.out.println("\nWhat Object gives us for free:");
+        System.out.println("  toString():  " + dev.toString());
+        System.out.println("  getClass():  " + dev.getClass().getSimpleName());
+        System.out.println("  is it an Employee? " + (dev instanceof Employee));
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java HierarchyDemo</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">Creating a Developer:
+  [Employee constructor] Priya      <span class="dim">← parent runs FIRST</span>
+  [Developer constructor] Priya
+
+Creating a Manager:
+  [Employee constructor] Rahul
+
+Inherited method, no code duplicated:
+101  Priya      annual  1,080,000.00
+102  Rahul      annual  1,800,000.00
+
+Their own methods:
+Priya is writing Java
+Rahul approved leave for Priya
+
+Private field access:
+PAN via public method: XXXXX1234F
+
+What Object gives us for free:
+  toString():  <span class="warn">Developer@1b6d3586</span>
+  getClass():  Developer
+  is it an Employee? <span class="ok">true</span></div>
+              Note <code>printDetails()</code> was written <strong>once</strong> but works for both. And
+              <code>toString()</code> is that unhelpful default — we fix it in Task 8.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Break it on purpose</span>
+              In <code>Developer.tryPrivateAccess()</code>, uncomment the <code>panNumber</code> line and compile.
+            </div>
+            <div class="expected">
+              <span class="lbl">The error you should see</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="bad">Developer.java:18: error:</span> panNumber has private access in Employee
+        System.out.println(panNumber);
+                           ^</div>
+              The field <strong>exists</strong> inside every Developer object — but it is not accessible by name.
+              That's encapsulation. Re-comment the line.
+            </div>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Both subclasses work, and <code>printDetails()</code> exists in <strong>only one file</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered the <strong>"has private access"</strong> error deliberately.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw the parent constructor print <strong>before</strong> the child's.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> <code>super</code> &amp; Constructor Chaining<span class="sync">Theory slides 8–9</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Prove the construction order across three levels, then hit — and fix — the
+              <em>"constructor cannot be applied to given types"</em> error that every Java developer meets in week one.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Predict first</span>
+              Three classes, <code>A ← B ← C</code>, each printing in its constructor. You call <code>new C()</code>.
+              <strong>Write down the order of the three lines before you run it.</strong>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ChainDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>class A {
+    A() { System.out.println("  A constructor"); }
+}
+class B extends A {
+    B() { System.out.println("  B constructor"); }
+}
+class C extends B {
+    C() { System.out.println("  C constructor"); }
+}
+
+public class ChainDemo {
+    public static void main(String[] args) {
+        System.out.println("new C() ->");
+        new C();
+
+        System.out.println("\nsuper.method() - reuse then extend:");
+        Manager m = new Manager("Rahul", 102, 150000, 200000);
+        m.printDetails();
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">new C() -&gt;
+  A constructor      <span class="dim">← top of hierarchy first</span>
+  B constructor
+  C constructor      <span class="dim">← the one you called finishes last</span></div>
+              Java runs the <em>chain</em> upwards to <code>Object</code>, then executes the bodies downwards.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My prediction matched: <strong>A, B, C</strong> in that order.</span>
+            </label>
+
+            <h3>Now use <code>super.method()</code> to extend rather than replace</h3>
+            <p>Add these two methods to <code>Manager.java</code>:</p>
+            <div class="codewrap"><pre><code>    @Override
+    public double annualPay() {
+        return super.annualPay() + bonus;    // REUSE the parent formula, then add
+    }
+
+    @Override
+    public void printDetails() {
+        super.printDetails();                             // parent's line first
+        System.out.printf("     (includes bonus %,.2f)%n", bonus);
+    }</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">super.method() - reuse then extend:
+102  Rahul      annual  2,000,000.00
+     (includes bonus 200,000.00)</div>
+              1,800,000 salary + 200,000 bonus. The <code>* 12</code> formula lives in <strong>one place only</strong> —
+              if it ever changes, Manager gets the fix automatically.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Manager.annualPay()</code> returns 2,000,000 by <strong>calling <code>super.annualPay()</code></strong>, not by re-typing <code>* 12</code>.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Break it on purpose — the week-one error</span>
+              In <code>Manager.java</code>, comment out the whole <code>super(name, id, monthlySalary);</code> line and compile.
+            </div>
+            <div class="expected">
+              <span class="lbl">The error, and why</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="bad">Manager.java:8: error:</span> constructor Employee in class Employee cannot be applied to given types;
+  required: java.lang.String,int,double
+  found:    no arguments
+  reason: actual and formal argument lists differ in length</div>
+              Without an explicit <code>super(...)</code>, Java inserts an invisible <code>super()</code> — and
+              <code>Employee</code> has no no-arg constructor. <strong>Two possible fixes:</strong> (a) restore the
+              explicit <code>super(...)</code> call, or (b) add a no-arg constructor to <code>Employee</code>.
+              Restore the line before moving on.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered <strong>"cannot be applied to given types"</strong> and can explain the invisible <code>super()</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> Overriding &amp; the <code>@Override</code> Trap<span class="sync">Theory slides 12–13</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Experience the single most frustrating bug in Java OOP — a method that looks overridden but isn't — and
+              then watch <code>@Override</code> catch it in one second.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">OverrideTrap.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>class Notifier {
+    public void sendAlert(String msg) {
+        System.out.println("[GENERIC] " + msg);
+    }
+}
+
+class EmailNotifier extends Notifier {
+    // DELIBERATE TYPO: lowercase 'a' in sendalert. NO @Override annotation.
+    public void sendalert(String msg) {
+        System.out.println("[EMAIL] " + msg);
+    }
+}
+
+public class OverrideTrap {
+    public static void main(String[] args) {
+        Notifier n = new EmailNotifier();
+        n.sendAlert("Server is down");      // which one runs?
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Run it and be disappointed</span>
+              <ol>
+                <li><code>javac OverrideTrap.java</code> — <strong>it compiles with no errors at all</strong></li>
+                <li><code>java OverrideTrap</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you get</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="warn">[GENERIC] Server is down</span>
+
+<span class="dim">Expected [EMAIL]. You wrote a brand-new method called sendalert()
+that nobody ever calls. No error. No warning. Nothing.</span></div>
+              Imagine this buried in 200 files. This is why the next step is non-negotiable.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Now add the annotation</span>
+              Put <code>@Override</code> directly above <code>public void sendalert</code> and recompile — <em>without</em> fixing the typo.
+            </div>
+            <div class="expected">
+              <span class="lbl">Caught instantly</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="bad">OverrideTrap.java:9: error:</span> method does not override or implement a method from a supertype
+    @Override
+    ^
+1 error</div>
+              Now fix the capital <code>A</code>, recompile, and you get <code>[EMAIL] Server is down</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <code>[GENERIC]</code> print when I expected <code>[EMAIL]</code> — the silent failure.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>@Override</code> turned it into a <strong>compile error</strong>, and fixing the typo gave <code>[EMAIL]</code>.</span>
+            </label>
+
+            <h3>Bonus — the overriding rules the compiler enforces</h3>
+            <p>Try each of these in <code>EmailNotifier</code>, one at a time, and read the error:</p>
+            <div class="codewrap"><pre><code>// 1. Narrowing access - not allowed
+@Override
+private void sendAlert(String msg) { }     // error: attempting to assign weaker access
+
+// 2. Adding a broader checked exception - not allowed (ties back to Session 1!)
+@Override
+public void sendAlert(String msg) throws java.io.IOException { }
+// error: overridden method does not throw java.io.IOException
+
+// 3. Different parameter list - this is OVERLOADING, not overriding
+@Override
+public void sendAlert(String msg, int priority) { }
+// error: method does not override ... (it's a new method)</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I tested all three illegal overrides and read each compiler message.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain why an override <strong>cannot add a broader checked exception</strong> (Session 1 link).</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Dynamic Dispatch &amp; the Field-Hiding Surprise<span class="sync">Theory slides 14–16</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Prove that <strong>methods are polymorphic but fields are not</strong>. This is the most commonly
+              misunderstood behaviour in Java, and a favourite interview question.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Predict before running — write your answers down</span>
+              Given <code>Parent p = new Child();</code> where both declare a field <code>label</code> and a method
+              <code>getLabel()</code>: what does <code>p.label</code> print, and what does <code>p.getLabel()</code> print?
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">DispatchDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>class Parent {
+    String label = "PARENT-FIELD";
+
+    String getLabel()      { return "PARENT-METHOD"; }
+    static String tag()    { return "PARENT-STATIC"; }
+
+    void describe() {
+        // Called on a Child object: which versions run?
+        System.out.println("    inside describe(): field=" + label
+                           + ", method=" + getLabel());
+    }
+}
+
+class Child extends Parent {
+    String label = "CHILD-FIELD";          // HIDES the parent field - bad practice!
+
+    @Override
+    String getLabel()      { return "CHILD-METHOD"; }
+    static String tag()    { return "CHILD-STATIC"; }   // HIDES, does not override
+}
+
+public class DispatchDemo {
+    public static void main(String[] args) {
+        Parent p = new Child();       // reference type Parent, object type Child
+
+        System.out.println("Via a Parent reference to a Child object:");
+        System.out.println("  p.label       = " + p.label);        // ?
+        System.out.println("  p.getLabel()  = " + p.getLabel());   // ?
+        System.out.println("  p.getClass()  = " + p.getClass().getSimpleName());
+
+        System.out.println("\nVia a Child reference:");
+        Child c = new Child();
+        System.out.println("  c.label       = " + c.label);
+        System.out.println("  c.getLabel()  = " + c.getLabel());
+        System.out.println("  ((Parent) c).label = " + ((Parent) c).label);
+
+        System.out.println("\nInherited method calling both:");
+        p.describe();
+
+        System.out.println("\nStatic methods are NOT polymorphic:");
+        System.out.println("  Parent.tag()  = " + Parent.tag());
+        System.out.println("  Child.tag()   = " + Child.tag());
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output — the surprise is on line 2</span>
+              <div class="term-out" style="margin:8px 0 0;">Via a Parent reference to a Child object:
+  p.label       = <span class="warn">PARENT-FIELD</span>     <span class="dim">← FIELD: reference type wins!</span>
+  p.getLabel()  = <span class="ok">CHILD-METHOD</span>     <span class="dim">← METHOD: object type wins</span>
+  p.getClass()  = Child
+
+Via a Child reference:
+  c.label       = CHILD-FIELD
+  c.getLabel()  = CHILD-METHOD
+  ((Parent) c).label = <span class="warn">PARENT-FIELD</span>  <span class="dim">← same object, different answer!</span>
+
+Inherited method calling both:
+    inside describe(): field=<span class="warn">PARENT-FIELD</span>, method=<span class="ok">CHILD-METHOD</span>
+
+Static methods are NOT polymorphic:
+  Parent.tag()  = PARENT-STATIC
+  Child.tag()   = CHILD-STATIC</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Why this happens</span>
+              <strong>Field access is resolved at compile time</strong> from the <em>reference</em> type — the compiler
+              simply looks at the declared type and picks that field. <strong>Instance method calls are resolved at
+              runtime</strong> from the <em>object</em> type, via <code>invokevirtual</code>. So the very same object gives
+              two different answers for <code>label</code> depending on how you look at it.
+              <br><br>
+              <strong>The practical lesson: never shadow a field.</strong> Keep fields <code>private</code> and expose
+              them through methods, and this whole class of confusion disappears.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <code>p.label</code> give <strong>PARENT-FIELD</strong> while <code>p.getLabel()</code> gave <strong>CHILD-METHOD</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain the difference between compile-time and runtime resolution.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I understand why shadowing fields is bad practice, and that <code>static</code> methods are hidden, not overridden.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> The Abstract Account Hierarchy — the Main Build<span class="sync">Theory slides 15, 18</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              The centrepiece of today. Turn Session 1's single <code>BankAccount</code> into an <strong>abstract
+              hierarchy</strong> of four account types, then calculate interest for all of them with one loop and
+              <strong>zero <code>if</code> statements about type</strong>. Keep your Session 1 exceptions guarding it.
+            </div>
+
+            <div class="tree">session2-inheritance/
+├── InsufficientFundsException.java   <span class="c">from Session 1</span>
+├── InvalidAmountException.java       <span class="c">from Session 1</span>
+├── Account.java                      <span class="c">ABSTRACT parent</span>
+├── SavingsAccount.java               <span class="c">4% interest</span>
+├── CurrentAccount.java               <span class="c">0%, has an overdraft</span>
+├── FixedDepositAccount.java          <span class="c">7%, no withdrawals</span>
+├── SalaryAccount.java                <span class="c">3.5%, zero balance allowed</span>
+└── PortfolioDemo.java                <span class="c">the polymorphic loop</span></div>
+
+            <div class="observe">
+              <span class="lbl">Don't have your Session 1 exception files?</span>
+              Create these two quickly — that's all you need:
+              <div class="codewrap" style="margin-top:8px;"><pre><code>// InsufficientFundsException.java
+public class InsufficientFundsException extends Exception {
+    private final double shortfall;
+    public InsufficientFundsException(String m, double shortfall) {
+        super(m);
+        this.shortfall = shortfall;
+    }
+    public double getShortfall() { return shortfall; }
+}
+
+// InvalidAmountException.java
+public class InvalidAmountException extends RuntimeException {
+    public InvalidAmountException(double amount) {
+        super("Amount must be positive, got: " + amount);
+    }
+}</code></pre></div>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Account.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public abstract class Account {
+
+    private final String accountNumber;      // private + final = safe
+    private final String holder;
+    protected double balance;                // protected: subclasses adjust it
+
+    protected Account(String accountNumber, String holder, double openingBalance) {
+        if (openingBalance &lt; 0) {
+            throw new InvalidAmountException(openingBalance);
+        }
+        this.accountNumber = accountNumber;
+        this.holder = holder;
+        this.balance = openingBalance;
+    }
+
+    // ===== ABSTRACT: every concrete subclass MUST supply these =====
+    public abstract double interestRate();
+    public abstract String accountType();
+
+    // ===== TEMPLATE METHOD: the algorithm is fixed, the rate varies =====
+    public final double applyInterest() {
+        double interest = balance * interestRate();
+        balance += interest;
+        return interest;
+    }
+
+    // ===== SHARED CONCRETE BEHAVIOUR: written once =====
+    public void deposit(double amount) {
+        if (amount &lt;= 0) throw new InvalidAmountException(amount);
+        balance += amount;
+    }
+
+    // Overridable: the MINIMUM balance rule differs per account type
+    protected double minimumBalance() {
+        return 1000.0;
+    }
+
+    public void withdraw(double amount) throws InsufficientFundsException {
+        if (amount &lt;= 0) throw new InvalidAmountException(amount);
+        double allowed = balance - minimumBalance();
+        if (amount &gt; allowed) {
+            throw new InsufficientFundsException(
+                String.format("%s: cannot withdraw %.2f (min balance %.2f must remain)",
+                              accountType(), amount, minimumBalance()),
+                amount - allowed);
+        }
+        balance -= amount;
+    }
+
+    public double getBalance()       { return balance; }
+    public String getAccountNumber() { return accountNumber; }
+    public String getHolder()        { return holder; }
+
+    @Override
+    public String toString() {
+        return String.format("%-8s %-14s %-14s %12.2f  @%.2f%%",
+            accountNumber, holder, accountType(), balance, interestRate() * 100);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SavingsAccount.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class SavingsAccount extends Account {
+
+    public SavingsAccount(String number, String holder, double opening) {
+        super(number, holder, opening);
+    }
+
+    @Override public double interestRate() { return 0.04; }
+    @Override public String accountType()  { return "Savings"; }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CurrentAccount.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class CurrentAccount extends Account {
+
+    private final double overdraftLimit;
+
+    public CurrentAccount(String number, String holder, double opening, double overdraft) {
+        super(number, holder, opening);
+        this.overdraftLimit = overdraft;
+    }
+
+    @Override public double interestRate() { return 0.0; }      // no interest
+    @Override public String accountType()  { return "Current"; }
+
+    // Overdraft: the balance may legally go NEGATIVE, down to the limit
+    @Override
+    protected double minimumBalance() { return -overdraftLimit; }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">FixedDepositAccount.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class FixedDepositAccount extends Account {
+
+    private final int termMonths;
+
+    public FixedDepositAccount(String number, String holder, double opening, int termMonths) {
+        super(number, holder, opening);
+        this.termMonths = termMonths;
+    }
+
+    @Override public double interestRate() { return 0.07; }
+    @Override public String accountType()  { return "Fixed Deposit"; }
+
+    public int getTermMonths() { return termMonths; }
+
+    // An FD is locked - no withdrawals until maturity
+    @Override
+    public void withdraw(double amount) throws InsufficientFundsException {
+        throw new InsufficientFundsException(
+            "Fixed Deposit is locked for " + termMonths + " months", amount);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SalaryAccount.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class SalaryAccount extends Account {
+
+    public SalaryAccount(String number, String holder, double opening) {
+        super(number, holder, opening);
+    }
+
+    @Override public double interestRate() { return 0.035; }
+    @Override public String accountType()  { return "Salary"; }
+
+    // Zero-balance account: no minimum required
+    @Override
+    protected double minimumBalance() { return 0.0; }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">PortfolioDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class PortfolioDemo {
+
+    public static void main(String[] args) {
+
+        // ONE array, declared as the PARENT type, holding FOUR different objects
+        Account[] portfolio = {
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200)
+        };
+
+        System.out.println("=== Before interest ===");
+        for (Account a : portfolio) System.out.println(a);
+
+        // ===== THE PAYOFF: one loop, four behaviours, no 'if' about type =====
+        System.out.println("\n=== Applying interest ===");
+        double totalInterest = 0;
+        for (Account a : portfolio) {
+            double interest = a.applyInterest();      // POLYMORPHIC CALL
+            totalInterest += interest;
+            System.out.printf("%-14s credited %10.2f%n", a.accountType(), interest);
+        }
+        System.out.printf("Total interest paid out: %.2f%n", totalInterest);
+
+        System.out.println("\n=== After interest ===");
+        for (Account a : portfolio) System.out.println(a);
+
+        // ===== Overridden minimumBalance() changes withdrawal rules per type =====
+        System.out.println("\n=== Withdrawal rules differ per type ===");
+        tryWithdraw(portfolio[0], 45000);   // Savings: must keep 1000
+        tryWithdraw(portfolio[1], 95000);   // Current: overdraft allows going negative
+        tryWithdraw(portfolio[2], 1000);    // FD: always refused
+        tryWithdraw(portfolio[3], 1242);    // Salary: may go to zero
+
+        System.out.println("\n=== Final state ===");
+        for (Account a : portfolio) System.out.println(a);
+    }
+
+    static void tryWithdraw(Account account, double amount) {
+        try {
+            account.withdraw(amount);
+            System.out.printf("OK      %-14s -%.2f  -> balance %.2f%n",
+                              account.accountType(), amount, account.getBalance());
+        } catch (InsufficientFundsException e) {
+            System.out.println("DENIED  " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java PortfolioDemo</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Before interest ===
+AC1001   Priya Sharma   Savings            50000.00  @4.00%
+AC1002   Rahul Verma    Current            80000.00  @0.00%
+AC1003   Anita Desai    Fixed Deposit     200000.00  @7.00%
+AC1004   Vikram Rao     Salary              1200.00  @3.50%
+
+=== Applying interest ===
+Savings        credited    2000.00
+Current        credited       0.00
+Fixed Deposit  credited   14000.00
+Salary         credited      42.00
+Total interest paid out: 16042.00
+
+=== After interest ===
+AC1001   Priya Sharma   Savings            52000.00  @4.00%
+AC1002   Rahul Verma    Current            80000.00  @0.00%
+AC1003   Anita Desai    Fixed Deposit     214000.00  @7.00%
+AC1004   Vikram Rao     Salary              1242.00  @3.50%
+
+=== Withdrawal rules differ per type ===
+OK      Savings        -45000.00  -&gt; balance 7000.00
+OK      Current        -95000.00  -&gt; balance -15000.00     <span class="dim">← overdraft!</span>
+DENIED  Fixed Deposit is locked for 12 months
+OK      Salary         -1242.00  -&gt; balance 0.00           <span class="dim">← zero-balance</span>
+
+=== Final state ===
+AC1001   Priya Sharma   Savings             7000.00  @4.00%
+AC1002   Rahul Verma    Current           -15000.00  @0.00%
+AC1003   Anita Desai    Fixed Deposit     214000.00  @7.00%
+AC1004   Vikram Rao     Salary                 0.00  @3.50%</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Stop and appreciate what just happened</span>
+              Search <code>PortfolioDemo.java</code> for the word <code>Savings</code> or <code>instanceof</code>. It
+              appears only where objects are <em>created</em>. The interest loop and <code>tryWithdraw</code> know
+              nothing about account types at all — yet they produce four different behaviours. <strong>That is
+              polymorphism, and it means adding a fifth account type requires zero changes to this file.</strong>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Prove it — the real test of the design</span>
+              Add a <code>RecurringDepositAccount</code> with a 6.5% rate and a 5,000 minimum balance. Add one line
+              creating it in the array. <strong>You should not need to change the loops, <code>tryWithdraw</code>, or
+              <code>Account.java</code> at all.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four account types applied <strong>different interest</strong> from one loop.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The Current account went <strong>negative</strong> (overdraft) and the FD <strong>refused</strong> withdrawal — all via overriding.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I added a <strong>fifth</strong> account type <strong>without touching</strong> <code>PortfolioDemo</code>'s loops.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I tried <code>new Account(...)</code> and saw <strong>"Account is abstract; cannot be instantiated"</strong>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 6 ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> Interfaces &amp; Multiple Capabilities<span class="sync">Theory slides 19–20</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Add capabilities that <strong>cut across</strong> the hierarchy. Not every account is taxable, and not every
+              account is printable as a statement — so these belong in interfaces, not in the parent class.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Taxable.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public interface Taxable {
+
+    double TDS_RATE = 0.10;                  // implicitly public static final
+
+    double taxableIncome();                  // implicitly public abstract
+
+    // DEFAULT method: shared logic living in an interface (Java 8+)
+    default double taxDue() {
+        double income = taxableIncome();
+        return isExempt(income) ? 0.0 : income * TDS_RATE;
+    }
+
+    // STATIC helper on the interface itself
+    static boolean isExempt(double income) {
+        return income &lt; 10000;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Printable.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public interface Printable {
+    String statementLine();
+
+    default void printStatement() {
+        System.out.println("  |  " + statementLine());
+    }
+}</code></pre></div>
+
+            <div class="dothis">
+              <span class="lbl">Now wire them in — edit two existing files</span>
+              <ol>
+                <li>Make <code>FixedDepositAccount</code> implement <strong>both</strong> interfaces.</li>
+                <li>Make <code>SavingsAccount</code> implement <strong>only</strong> <code>Printable</code> — proving the capability is optional.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>// FixedDepositAccount.java - change the class declaration and add the methods
+public class FixedDepositAccount extends Account implements Taxable, Printable {
+
+    // ... keep everything you already have, then add:
+
+    @Override
+    public double taxableIncome() {
+        return getBalance() * interestRate();      // interest is taxable
+    }
+
+    @Override
+    public String statementLine() {
+        return String.format("FD %s locked %d months, matures at %.2f",
+                             getAccountNumber(), termMonths,
+                             getBalance() * (1 + interestRate()));
+    }
+}</code></pre></div>
+            <div class="codewrap"><pre><code>// SavingsAccount.java - Printable only, NOT Taxable
+public class SavingsAccount extends Account implements Printable {
+
+    public SavingsAccount(String number, String holder, double opening) {
+        super(number, holder, opening);
+    }
+
+    @Override public double interestRate() { return 0.04; }
+    @Override public String accountType()  { return "Savings"; }
+
+    @Override
+    public String statementLine() {
+        return String.format("Savings %s, available %.2f",
+                             getAccountNumber(), getBalance() - minimumBalance());
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CapabilityDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class CapabilityDemo {
+
+    public static void main(String[] args) {
+        Account[] portfolio = {
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200)
+        };
+
+        double totalTax = 0;
+
+        for (Account a : portfolio) {
+            System.out.println(a.accountType() + " (" + a.getAccountNumber() + ")");
+
+            // Pattern matching for instanceof (Java 16+): test and bind in one step
+            if (a instanceof Printable p) {
+                p.printStatement();
+            } else {
+                System.out.println("  |  (no statement available)");
+            }
+
+            if (a instanceof Taxable t) {
+                double tax = t.taxDue();
+                totalTax += tax;
+                System.out.printf("  |  taxable income %.2f, TDS due %.2f%n",
+                                  t.taxableIncome(), tax);
+            } else {
+                System.out.println("  |  not taxable");
+            }
+        }
+
+        System.out.printf("%nTotal TDS across portfolio: %.2f%n", totalTax);
+        System.out.println("Exemption threshold check: " + Taxable.isExempt(5000));
+        System.out.println("TDS_RATE constant from the interface: " + Taxable.TDS_RATE);
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">Savings (AC1001)
+  |  Savings AC1001, available 49000.00
+  |  not taxable
+Current (AC1002)
+  |  (no statement available)
+  |  not taxable
+Fixed Deposit (AC1003)
+  |  FD AC1003 locked 12 months, matures at 214000.00
+  |  taxable income 14000.00, TDS due 1400.00
+Salary (AC1004)
+  |  (no statement available)
+  |  not taxable
+
+Total TDS across portfolio: 1400.00
+Exemption threshold check: <span class="ok">true</span>
+TDS_RATE constant from the interface: 0.1</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">The design lesson</span>
+              <code>Taxable</code> could not have been a field or method on <code>Account</code> — most accounts aren't
+              taxable, and forcing them to implement <code>taxableIncome()</code> would mean returning a meaningless
+              <code>0</code> or throwing "not supported". That's the Liskov violation from theory slide 24.
+              <strong>One <code>extends</code> for what it IS; many <code>implements</code> for what it CAN DO.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">One class implements <strong>two</strong> interfaces while extending a class.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used a <code>default</code> method (<code>taxDue</code>) and a <code>static</code> interface method (<code>isExempt</code>).</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used <strong>pattern matching for <code>instanceof</code></strong> to test and bind in one step.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> <code>equals</code>, <code>hashCode</code> &amp; <code>toString</code><span class="sync">Theory slide 22</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Override the three <code>Object</code> methods properly — and see the <strong>bug you get when you
+              override <code>equals</code> but forget <code>hashCode</code></strong>. This directly prepares you for
+              Session 4, where a broken pair silently corrupts every <code>HashSet</code> and <code>HashMap</code>.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Customer.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.Objects;
+
+public class Customer {
+
+    private final int    id;
+    private final String name;
+
+    public Customer(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Customer other = (Customer) o;
+        return id == other.id &amp;&amp; Objects.equals(name, other.name);
+    }
+
+    // STEP 1: comment this whole method out and run. STEP 2: put it back and run again.
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);        // SAME fields as equals()
+    }
+
+    @Override
+    public String toString() {
+        return "Customer{id=" + id + ", name='" + name + "'}";
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">EqualsDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.HashSet;
+import java.util.Set;
+
+public class EqualsDemo {
+
+    public static void main(String[] args) {
+        Customer a = new Customer(1, "Priya");
+        Customer b = new Customer(1, "Priya");     // same VALUES, different object
+
+        System.out.println("a           = " + a);              // toString()
+        System.out.println("a == b      = " + (a == b));       // reference compare
+        System.out.println("a.equals(b) = " + a.equals(b));    // value compare
+        System.out.println("a.hashCode()= " + a.hashCode());
+        System.out.println("b.hashCode()= " + b.hashCode());
+        System.out.println("hashes match= " + (a.hashCode() == b.hashCode()));
+
+        // THE CONTRACT IN ACTION - this is what Session 4 depends on
+        Set&lt;Customer&gt; set = new HashSet&lt;&gt;();
+        set.add(a);
+        set.add(b);
+        System.out.println("\nAdded two 'equal' customers to a HashSet.");
+        System.out.println("  set.size()        = " + set.size());
+        System.out.println("  set.contains(b)   = " + set.contains(b));
+        System.out.println("  Expected: size 1, contains true");
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">WITH <code>hashCode()</code> — correct</span>
+              <div class="term-out" style="margin:8px 0 0;">a           = Customer{id=1, name='Priya'}
+a == b      = false        <span class="dim">← different objects, correctly</span>
+a.equals(b) = <span class="ok">true</span>         <span class="dim">← same values</span>
+a.hashCode()= 78591265
+b.hashCode()= 78591265
+hashes match= <span class="ok">true</span>
+
+Added two 'equal' customers to a HashSet.
+  set.size()        = <span class="ok">1</span>
+  set.contains(b)   = <span class="ok">true</span>
+  Expected: size 1, contains true</div>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Now break the contract</span>
+              Comment out the entire <code>hashCode()</code> method in <code>Customer.java</code>, recompile and run again.
+            </div>
+            <div class="expected">
+              <span class="lbl">WITHOUT <code>hashCode()</code> — silently broken</span>
+              <div class="term-out" style="margin:8px 0 0;">a.equals(b) = <span class="ok">true</span>          <span class="dim">← still says they're equal!</span>
+a.hashCode()= 1b6d3586
+b.hashCode()= 4554617c    <span class="dim">← different hashes</span>
+hashes match= <span class="bad">false</span>
+
+Added two 'equal' customers to a HashSet.
+  set.size()        = <span class="bad">2</span>       <span class="dim">← the set contains DUPLICATES</span>
+  set.contains(b)   = <span class="bad">false</span>   <span class="dim">← can't find an object it holds!</span>
+  Expected: size 1, contains true</div>
+              <strong>No exception. No warning. Just wrong answers.</strong> The <code>HashSet</code> looked in the wrong
+              bucket, so it never even got as far as calling <code>equals</code>. Put <code>hashCode()</code> back.
+            </div>
+            <div class="observe">
+              <span class="lbl">Why this is the highest-value bug in the whole lab</span>
+              This exact mistake causes real production incidents: duplicate records, cache misses, lookups that fail
+              for objects you can see are in the collection. And it is completely silent. <strong>Override
+              <code>equals</code> → always override <code>hashCode</code>, using the same fields.</strong> Session 4
+              explains the bucket mechanics that make this happen.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">With <code>hashCode()</code>: set size <strong>1</strong>, contains <strong>true</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Without it: set size <strong>2</strong>, contains <strong>false</strong> — and I saw <em>no</em> error message.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can state the <code>equals</code>/<code>hashCode</code> contract from memory.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 8 ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">TASK 8</span><span class="chevron">▶</span> Refactor an <code>instanceof</code> Chain<span class="sync">Theory slides 15, 17, 23</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Be given deliberately bad code and fix it. This is the skill interviews actually test: spotting a
+              missed polymorphism opportunity and removing the type checks.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BadShapes.java</span><span class="fb-tag">create this file — then fix it</span></div>
+            <div class="codewrap"><pre><code>// ===== DELIBERATELY BAD CODE. Your job is to refactor it. =====
+class Circle    { double radius = 3; }
+class Rectangle { double width = 4, height = 5; }
+class Triangle  { double base = 6, height = 2; }
+
+public class BadShapes {
+
+    // PROBLEM 1: a new shape means editing this method
+    // PROBLEM 2: Object parameter - no type safety at all
+    // PROBLEM 3: forget a case and you silently get 0
+    static double area(Object shape) {
+        if (shape instanceof Circle) {
+            return Math.PI * ((Circle) shape).radius * ((Circle) shape).radius;
+        } else if (shape instanceof Rectangle) {
+            Rectangle r = (Rectangle) shape;
+            return r.width * r.height;
+        } else if (shape instanceof Triangle) {
+            Triangle t = (Triangle) shape;
+            return 0.5 * t.base * t.height;
+        }
+        return 0;      // silent wrong answer for anything new
+    }
+
+    public static void main(String[] args) {
+        Object[] shapes = { new Circle(), new Rectangle(), new Triangle() };
+        for (Object s : shapes) {
+            System.out.printf("%-10s area %.2f%n", s.getClass().getSimpleName(), area(s));
+        }
+    }
+}</code></pre></div>
+
+            <div class="tryit">
+              <span class="lbl">Your task — refactor it yourself first</span>
+              Rewrite this with an interface (or abstract class) called <code>Shape</code> so that:
+              <strong>(1)</strong> there are no <code>instanceof</code> checks, <strong>(2)</strong> there are no casts,
+              <strong>(3)</strong> adding a <code>Square</code> requires <em>no changes</em> to <code>main</code>, and
+              <strong>(4)</strong> forgetting to implement <code>area()</code> is a <em>compile</em> error rather than a
+              silent <code>0</code>. Attempt it before opening the solution.
+            </div>
+
+            <details class="exp lab8" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution</summary>
+              <div class="exp-body">
+                <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">GoodShapes.java</span><span class="fb-tag">create this file</span></div>
+                <div class="codewrap"><pre><code>interface Shape {
+    double area();
+    double perimeter();
+
+    default String describe() {                 // shared, written once
+        return String.format("%-10s area %8.2f  perimeter %8.2f",
+                             getClass().getSimpleName(), area(), perimeter());
+    }
+}
+
+class Circle implements Shape {
+    private final double radius;
+    Circle(double radius) { this.radius = radius; }
+    @Override public double area()      { return Math.PI * radius * radius; }
+    @Override public double perimeter() { return 2 * Math.PI * radius; }
+}
+
+class Rectangle implements Shape {
+    private final double width, height;
+    Rectangle(double width, double height) { this.width = width; this.height = height; }
+    @Override public double area()      { return width * height; }
+    @Override public double perimeter() { return 2 * (width + height); }
+}
+
+class Triangle implements Shape {
+    private final double a, b, c;
+    Triangle(double a, double b, double c) { this.a = a; this.b = b; this.c = c; }
+    @Override public double perimeter() { return a + b + c; }
+    @Override public double area() {                       // Heron's formula
+        double s = perimeter() / 2;
+        return Math.sqrt(s * (s - a) * (s - b) * (s - c));
+    }
+}
+
+// Added LAST, with zero changes to main() below
+class Square implements Shape {
+    private final double side;
+    Square(double side) { this.side = side; }
+    @Override public double area()      { return side * side; }
+    @Override public double perimeter() { return 4 * side; }
+}
+
+public class GoodShapes {
+    public static void main(String[] args) {
+        Shape[] shapes = {                       // typed as Shape, not Object
+            new Circle(3),
+            new Rectangle(4, 5),
+            new Triangle(3, 4, 5),
+            new Square(2.5)
+        };
+
+        double total = 0;
+        for (Shape s : shapes) {                 // no instanceof, no casts
+            System.out.println(s.describe());
+            total += s.area();
+        }
+        System.out.printf("%nTotal area: %.2f%n", total);
+
+        // Bonus: sort by area - a taste of Session 3
+        java.util.Arrays.sort(shapes, java.util.Comparator.comparingDouble(Shape::area));
+        System.out.println("\nSorted by area (smallest first):");
+        for (Shape s : shapes) System.out.println(s.describe());
+    }
+}</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">Expected output</span>
+                  <div class="term-out" style="margin:8px 0 0;">Circle     area    28.27  perimeter    18.85
+Rectangle  area    20.00  perimeter    18.00
+Triangle   area     6.00  perimeter    12.00
+Square     area     6.25  perimeter    10.00
+
+Total area: 60.52
+
+Sorted by area (smallest first):
+Triangle   area     6.00  perimeter    12.00
+Square     area     6.25  perimeter    10.00
+Rectangle  area    20.00  perimeter    18.00
+Circle     area    28.27  perimeter    18.85</div>
+                </div>
+                <div class="observe">
+                  <span class="lbl">Compare the two versions honestly</span>
+                  <strong>Before:</strong> one growing <code>if-else</code> chain, three casts, <code>Object</code>
+                  parameters, and a silent <code>return 0</code> for anything unknown.
+                  <strong>After:</strong> each shape owns its own formula, <code>main</code> never mentions a concrete
+                  type, and <strong>forgetting <code>area()</code> won't compile</strong>. Adding <code>Square</code>
+                  meant writing one new class and touching nothing else.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My refactor has <strong>zero</strong> <code>instanceof</code> checks and <strong>zero</strong> casts.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I added a <code>Square</code> <strong>without editing <code>main</code></strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I confirmed that omitting <code>area()</code> is now a <strong>compile error</strong>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> For Anyone Who Finished Early<span class="sync">Optional</span></summary>
+          <div class="exp-body">
+            <p>Entirely optional. Nothing here is required for Session 3.</p>
+            <ol class="steps">
+              <li><strong>The diamond, resolved.</strong> Write two interfaces that both declare
+                  <code>default String greet()</code>, and one class implementing both. Read the compile error, then
+                  fix it with <code>InterfaceA.super.greet()</code>. You've just resolved the diamond problem by hand.</li>
+              <li><strong>Composition vs inheritance, measured.</strong> Build the <code>CountingList extends ArrayList</code>
+                  from theory slide 23 and prove <code>addAll</code> double-counts. Then rebuild it with composition
+                  and show the count is correct.</li>
+              <li><strong>Covariant return types.</strong> Give <code>Account</code> a method <code>Account copy()</code>
+                  and override it in <code>SavingsAccount</code> as <code>SavingsAccount copy()</code>. Confirm it
+                  compiles — that's covariance.</li>
+              <li><strong>Anonymous class &amp; lambda.</strong> Implement <code>Shape</code> inline with an anonymous
+                  class, then note why a lambda works for <code>Comparator</code> but not for <code>Shape</code>
+                  (hint: count the abstract methods).</li>
+              <li><strong><code>final</code> experiments.</strong> Try to extend a <code>final</code> class and override a
+                  <code>final</code> method. Then prove that <code>final List&lt;String&gt; l</code> still allows
+                  <code>l.add("x")</code>.</li>
+              <li><strong>Abstract with a constructor.</strong> Confirm an abstract class can have a constructor and
+                  explain who calls it, given you can never write <code>new Account(...)</code>.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — I resolved a default-method diamond by hand.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End-of-lab checkpoint — all six must be true</span>
+          <ol style="margin:6px 0 0;">
+            <li>My <code>Account</code> hierarchy has four concrete types and one abstract parent.</li>
+            <li>One loop applies four different interest rates with no type checks.</li>
+            <li>I can explain why <code>p.label</code> and <code>p.getLabel()</code> disagree.</li>
+            <li>I have used <code>extends</code> once and <code>implements</code> twice on the same class.</li>
+            <li>I have seen a <code>HashSet</code> misbehave because <code>hashCode()</code> was missing.</li>
+            <li>My refactored <code>Shape</code> code has no <code>instanceof</code> and no casts.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have reached the Session 2 checkpoint.</strong>
+            <span class="verify">If any of the six isn't true, flag it now — Session 3 builds directly on this hierarchy.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== TAKE-HOME TASKS ===== -->
+      <div class="section-band">Take-home tasks — submit before Session 3</div>
+      <section class="section">
+        <div class="concept" style="margin-top:14px;">
+          <span class="lbl">Read this first</span>
+          Four tasks, increasing in difficulty. <strong>Tasks 1–3 are compulsory; Task 4 is for distinction.</strong>
+          Every task must compile and run with <code>javac *.java</code>. Design choices matter as much as working code
+          here — where a task asks you to <em>justify</em> something, write it as a comment in the file. A neat design
+          with a clear justification beats a clever one with none.
+        </div>
+
+        <!-- Assignment 1 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 1</span> Vehicle Hierarchy <span class="diff easy">Easy</span></h3>
+          <p class="brief">Build a small vehicle hierarchy exercising <code>extends</code>, <code>super</code> and overriding.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Abstract class <code>Vehicle</code> with <code>private final String registration</code>, <code>protected int wheels</code>, a constructor, and an abstract method <code>double tollCharge()</code>.</li>
+            <li>Concrete subclasses <code>Car</code> (4 wheels, toll 100), <code>Bike</code> (2 wheels, toll 30), <code>Truck</code> (6 wheels, toll 100 <strong>per axle</strong> — so 300).</li>
+            <li><code>Truck</code> must also override a concrete <code>describe()</code> method from <code>Vehicle</code>, calling <code>super.describe()</code> first and then adding its load capacity.</li>
+            <li>Override <code>toString()</code> in <code>Vehicle</code> so all subclasses print neatly.</li>
+            <li>In <code>main</code>, put at least 5 vehicles in a <code>Vehicle[]</code>, loop <strong>once</strong>, and print each vehicle plus the total toll collected.</li>
+            <li>Prove <code>new Vehicle(...)</code> is impossible — include the compiler error as a comment.</li>
+          </ol>
+          <div class="out">MH12AB1234  Car     4 wheels   toll  100.00
+MH12CD5678  Bike    2 wheels   toll   30.00
+MH12EF9012  Truck   6 wheels   toll  300.00
+  └─ load capacity 12000 kg
+MH12GH3456  Car     4 wheels   toll  100.00
+MH12IJ7890  Bike    2 wheels   toll   30.00
+
+<span class="ok">Total toll collected: 560.00</span></div>
+        </div>
+
+        <!-- Assignment 2 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 2</span> Payroll with Polymorphism <span class="diff easy">Easy</span></h3>
+          <p class="brief">Extend your Task 1 <code>Employee</code> classes into a real payroll run.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Abstract <code>Employee</code> with abstract <code>double calculateSalary()</code> and a concrete <code>final</code> method <code>payslip()</code> that uses it — a <strong>template method</strong>.</li>
+            <li>Four subclasses with genuinely different formulas:
+                <code>PermanentEmployee</code> (basic + 40% HRA + 12% PF deduction),
+                <code>ContractEmployee</code> (hourly rate × hours, 10% TDS),
+                <code>Intern</code> (flat stipend, no deductions),
+                <code>SalesEmployee</code> (basic + commission% of sales achieved).</li>
+            <li>An interface <code>Bonusable</code> with a <code>default</code> method <code>bonus()</code> returning 8.33% of salary. Only <code>PermanentEmployee</code> and <code>SalesEmployee</code> implement it.</li>
+            <li>In <code>main</code>, hold all employees in one <code>Employee[]</code> and run payroll with a <strong>single loop containing no <code>instanceof</code> for salary</strong> — use <code>instanceof</code> only to check <code>Bonusable</code>.</li>
+            <li>Print a summary: total payout, total bonus, and the highest-paid employee.</li>
+            <li>Use <code>@Override</code> on every override. A missing one loses marks.</li>
+          </ol>
+          <div class="out">EMP101  Priya Sharma   Permanent    salary  110880.00   bonus  9236.30
+EMP102  Rahul Verma    Contract     salary   72000.00   <span class="dim">(no bonus)</span>
+EMP103  Anita Desai    Intern       salary   25000.00   <span class="dim">(no bonus)</span>
+EMP104  Vikram Rao     Sales        salary   95000.00   bonus  7913.50
+
+Total payout: 302880.00
+Total bonus : 17149.80
+<span class="ok">Highest paid: Priya Sharma (110880.00)</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Getting <em>exactly</em> these numbers isn't the point — pick your own sensible figures. What is marked is
+            that the payroll loop contains no type checks for salary, and that each formula lives in its own class.
+          </div>
+        </div>
+
+        <!-- Assignment 3 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 3</span> Library Media System <span class="diff med">Medium</span></h3>
+          <p class="brief">Design a hierarchy from scratch — including deciding what should be an abstract class and what should be an interface.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Abstract class <code>LibraryItem</code>: <code>id</code>, <code>title</code>, <code>isIssued</code>, abstract <code>int loanPeriodDays()</code>, abstract <code>double finePerDay()</code>.</li>
+            <li>Subclasses <code>Book</code> (14 days, ₹2/day), <code>DVD</code> (7 days, ₹10/day), <code>Magazine</code> (3 days, ₹5/day), <code>ReferenceBook</code> (<strong>cannot be issued at all</strong>).</li>
+            <li>Interface <code>Reservable</code> with <code>reserve(String memberName)</code> and a <code>default</code> method <code>cancelReservation()</code>. <code>Book</code> and <code>DVD</code> are reservable; <code>Magazine</code> and <code>ReferenceBook</code> are not.</li>
+            <li>Interface <code>Digital</code> with <code>String downloadUrl()</code>. Only <code>DVD</code> and <code>Magazine</code> implement it. <strong>At least one class must implement two interfaces.</strong></li>
+            <li><code>ReferenceBook.issue()</code> must throw a custom <code>ItemNotIssuableException</code> (reuse your Session 1 skills — and <strong>justify checked vs unchecked in a comment</strong>).</li>
+            <li>A concrete <code>final</code> method <code>calculateFine(int daysLate)</code> in <code>LibraryItem</code> that uses the abstract methods — another template method.</li>
+            <li>In <code>main</code>: one <code>LibraryItem[]</code>, a single loop that issues every item that can be issued, then calculates fines for a fixed number of days late. Handle the <code>ReferenceBook</code> failure gracefully without stopping the loop.</li>
+            <li>Correctly override <code>equals</code>, <code>hashCode</code> (using <code>id</code>) and <code>toString</code> on <code>LibraryItem</code>.</li>
+          </ol>
+          <div class="out">ISSUED   B001  Clean Code            (due in 14 days)
+ISSUED   D001  Inception             (due in 7 days)
+ISSUED   M001  National Geographic   (due in 3 days)
+<span class="bad">REFUSED  R001  Oxford Dictionary     - reference items cannot be issued</span>
+
+Fines for 5 days late:
+  B001  Clean Code             10.00
+  D001  Inception              50.00
+  M001  National Geographic    25.00
+
+Reservable items: B001, D001
+Digital items   : D001, M001
+<span class="ok">equals check: new Book("B001",...) equals existing B001 -> true</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            The interesting design question is <em>why</em> <code>Reservable</code> and <code>Digital</code> are
+            interfaces rather than fields on <code>LibraryItem</code>. Answer it in a comment — that's part of the marks.
+          </div>
+        </div>
+
+        <!-- Assignment 4 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 4</span> Refactor a Legacy Notification System <span class="diff hard">Distinction</span></h3>
+          <p class="brief">You are given bad code. Diagnose it, refactor it, and document what you changed and why.</p>
+          <span class="rq">Starting point — type this in as <code>LegacyNotifier.java</code></span>
+          <div class="out"><span class="dim">// ===== LEGACY CODE - refactor this =====</span>
+public class LegacyNotifier {
+
+    public void send(String type, String to, String message, String subject) {
+        if (type.equals("email")) {
+            System.out.println("To: " + to + " Subject: " + subject);
+            System.out.println("Body: " + message);
+        } else if (type.equals("sms")) {
+            if (message.length() &gt; 160) message = message.substring(0, 160);
+            System.out.println("SMS to " + to + ": " + message);
+        } else if (type.equals("push")) {
+            System.out.println("PUSH [" + to + "] " + message);
+        } else {
+            System.out.println("Unknown type");   <span class="dim">// silent failure</span>
+        }
+    }
+}</div>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>List, in a comment block, <strong>at least four distinct design problems</strong> with the legacy code. (Consider: what happens when a fourth channel is added? What does <code>subject</code> mean for an SMS? What happens on an unknown type?)</li>
+            <li>Refactor to an interface <code>Notifier</code> with a method <code>send(Message message)</code>, and a small <code>Message</code> class holding recipient, body and optional subject.</li>
+            <li>Implement <code>EmailNotifier</code>, SmsNotifier (enforcing the 160-character limit), and <code>PushNotifier</code>.</li>
+            <li>Add a <code>default</code> method <code>sendWithRetry(Message m, int attempts)</code> on the interface that retries on failure and gives up after <em>n</em> attempts, reporting each attempt. Make one notifier fail the first two times to prove it works.</li>
+            <li>Add <code>WhatsAppNotifier</code> <strong>without modifying any existing class</strong>. State in a comment which principle this demonstrates.</li>
+            <li>Create an abstract class <code>AbstractNotifier implements Notifier</code> holding shared logic (validation, logging) so concrete classes stay tiny. In a comment, justify <strong>why you need both an interface and an abstract class here</strong> — this is the key question of the task.</li>
+            <li>Invalid recipients must throw a custom unchecked <code>InvalidRecipientException</code>. Handle it at the boundary in <code>main</code>, and log the full chain.</li>
+            <li>Demonstrate everything from one <code>Notifier[]</code> loop with no <code>instanceof</code> and no casts.</li>
+          </ol>
+          <div class="out"><span class="dim">[EMAIL]</span> to priya@tcs.com | Subject: Server Alert
+        Body: Disk usage at 91%
+<span class="dim">[SMS  ]</span> to +919876543210 | Disk usage at 91%
+<span class="dim">[PUSH ]</span> to device-a91f | Disk usage at 91%
+<span class="dim">[WA   ]</span> to +919876543210 | Disk usage at 91%
+
+Retry demo on FlakyNotifier:
+  attempt 1 <span class="bad">failed</span> - retrying
+  attempt 2 <span class="bad">failed</span> - retrying
+  attempt 3 <span class="ok">succeeded</span>
+
+<span class="bad">Invalid recipient rejected: 'not-an-email' is not a valid email address</span>
+Sent 4 of 5 notifications.</div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            The written justifications carry real marks here. Requirement 6 is the heart of it: the interface defines
+            <em>what a notifier is</em> so anything can implement it; the abstract class supplies <em>shared plumbing</em>
+            so you don't repeat validation four times. That's exactly the <code>List</code>/<code>AbstractList</code>
+            pattern from theory slide 20.
+          </div>
+        </div>
+
+        <div class="submit-panel">
+          <h3>📦 How to submit</h3>
+          <ol>
+            <li>Create a folder named <code>&lt;your-name&gt;-session2-tasks</code>.</li>
+            <li>One sub-folder per task: <code>task1/</code> … <code>task4/</code>.</li>
+            <li><code>.java</code> source files only — no <code>.class</code> files, no IDE folders.</li>
+            <li>A <code>NOTES.md</code> at the top level with: which tasks you finished, anything broken, and your written answers to the justification questions in Tasks 3 and 4.</li>
+            <li>Zip and submit before Session 3 begins.</li>
+          </ol>
+          <p style="margin-top:14px;"><strong>How it will be assessed</strong></p>
+          <table>
+            <thead><tr><th>Criterion</th><th>Weight</th><th>What earns full marks</th></tr></thead>
+            <tbody>
+              <tr><td>Compiles and runs</td><td>15%</td><td><code>javac *.java</code> is clean</td></tr>
+              <tr><td>Correct IS-A modelling</td><td>20%</td><td>Every <code>extends</code> passes the IS-A test; capabilities are interfaces</td></tr>
+              <tr><td>Polymorphism used properly</td><td>20%</td><td>No <code>instanceof</code> chains where an override would do</td></tr>
+              <tr><td>Abstract vs interface choice</td><td>15%</td><td>Justified in writing, not arbitrary</td></tr>
+              <tr><td><code>@Override</code> discipline</td><td>10%</td><td>Present on every override, including interface methods</td></tr>
+              <tr><td>equals/hashCode/toString</td><td>10%</td><td>Correct, consistent, same fields in both</td></tr>
+              <tr><td>Written justifications</td><td>10%</td><td>Clear reasoning in your own words</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;"><strong>Instant mark loss:</strong> a missing <code>@Override</code>, an <code>equals</code> without <code>hashCode</code>, a public mutable field, or an <code>instanceof</code> chain that should have been an overridden method.</p>
+        </div>
+
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have read all four take-home tasks</strong> and know what's expected.</span>
+        </label>
+      </section>
+
+      <!-- ===== COMMON ISSUES ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Common Issues &amp; Fixes</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:40%">Symptom</th><th>Cause &amp; fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>constructor X cannot be applied to given types</code></td><td>Parent has no no-arg constructor. Add an explicit <code>super(...)</code> as the first line of your child constructor.</td></tr>
+                <tr><td><code>call to super must be first statement in constructor</code></td><td>Move <code>super(...)</code> to the very top — nothing may come before it.</td></tr>
+                <tr><td><code>X is abstract; cannot be instantiated</code></td><td>You wrote <code>new AbstractClass()</code>. Instantiate a concrete subclass instead.</td></tr>
+                <tr><td><code>X is not abstract and does not override abstract method m()</code></td><td>Your concrete subclass is missing an implementation. Add it, or declare the class <code>abstract</code> too.</td></tr>
+                <tr><td><code>method does not override or implement a method from a supertype</code></td><td>Your signature doesn't match — usually a typo or a different parameter list. This is <code>@Override</code> doing its job.</td></tr>
+                <tr><td><code>attempting to assign weaker access privileges</code></td><td>An override cannot reduce visibility. <code>public</code> stays <code>public</code>.</td></tr>
+                <tr><td><code>overridden method does not throw XException</code></td><td>You added a broader checked exception. Narrow it, or wrap it in an unchecked exception.</td></tr>
+                <tr><td><code>ClassCastException</code> at runtime</td><td>An unguarded downcast. Use <code>if (x instanceof T t)</code> before casting.</td></tr>
+                <tr><td>Override "isn't being called"</td><td>Either a typo (add <code>@Override</code>) or you're accessing a <strong>field</strong>, which isn't polymorphic. See Task 4.</td></tr>
+                <tr><td><code>HashSet</code> holds duplicates</td><td><code>equals</code> without <code>hashCode</code>. See Task 7.</td></tr>
+                <tr><td><code>error: class, interface, or enum expected</code></td><td>Usually an unbalanced brace. Check your indentation.</td></tr>
+                <tr><td><code>instanceof</code> pattern won't compile</td><td>Pattern matching needs JDK 16+. Use the classic <code>instanceof</code> + cast, or upgrade.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Inheritance</strong></td><td>A class acquiring the members of another via <code>extends</code></td></tr>
+                <tr><td><strong>Superclass / parent</strong></td><td>The class being extended</td></tr>
+                <tr><td><strong>Subclass / child</strong></td><td>The class doing the extending</td></tr>
+                <tr><td><strong>IS-A</strong></td><td>The inheritance relationship — "a Developer is an Employee"</td></tr>
+                <tr><td><strong>HAS-A</strong></td><td>Composition — "a Car has an Engine". Session 3</td></tr>
+                <tr><td><strong>Overriding</strong></td><td>Replacing an inherited method with your own, same signature</td></tr>
+                <tr><td><strong>Overloading</strong></td><td>Several methods, same name, different parameters</td></tr>
+                <tr><td><strong>Polymorphism</strong></td><td>One reference type, many possible object types and behaviours</td></tr>
+                <tr><td><strong>Dynamic dispatch</strong></td><td>The JVM choosing the method at runtime from the object's real type</td></tr>
+                <tr><td><strong>Reference type</strong></td><td>The declared type on the left — controls what you may call</td></tr>
+                <tr><td><strong>Object type</strong></td><td>What was actually <code>new</code>-ed — controls which code runs</td></tr>
+                <tr><td><strong>Upcasting</strong></td><td>Child reference → parent reference. Always safe, implicit</td></tr>
+                <tr><td><strong>Downcasting</strong></td><td>Parent → child. Needs a cast, can throw <code>ClassCastException</code></td></tr>
+                <tr><td><strong>Abstract class</strong></td><td>Can't be instantiated; may mix abstract and concrete members</td></tr>
+                <tr><td><strong>Interface</strong></td><td>A contract of capabilities; a class may implement many</td></tr>
+                <tr><td><strong>Default method</strong></td><td>An interface method <em>with</em> a body (Java 8+)</td></tr>
+                <tr><td><strong>Template method</strong></td><td>A fixed algorithm in the parent with steps filled in by children</td></tr>
+                <tr><td><strong>Field hiding</strong></td><td>A child field with the same name as the parent's — confusing, avoid</td></tr>
+                <tr><td><strong>Diamond problem</strong></td><td>The ambiguity that makes multiple class inheritance unsafe</td></tr>
+                <tr><td><strong>Liskov substitution</strong></td><td>A subclass must work anywhere the parent does, without surprises</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>If you can answer all ten, you're ready for Session 3. Try them with a neighbour rather than alone.</p>
+            <ol class="steps">
+              <li>State the IS-A test, and give an example where it correctly stops you using <code>extends</code>.</li>
+              <li>Name two things that are never inherited by a subclass.</li>
+              <li>In <code>new C()</code> where <code>C extends B extends A</code>, which constructor <em>body</em> finishes first?</li>
+              <li>Why does Java forbid <code>class D extends B, C</code> — and how do interfaces sidestep the problem?</li>
+              <li>Give three of the six rules an overriding method must obey.</li>
+              <li>Overloading is resolved at ____ time by the ____ type; overriding at ____ time by the ____ type.</li>
+              <li>Given <code>Parent p = new Child();</code> with both declaring <code>label</code> and <code>getLabel()</code>, which version does each give — and why?</li>
+              <li>When would you choose an abstract class over an interface, and vice versa?</li>
+              <li>What breaks if you override <code>equals</code> but not <code>hashCode</code>?</li>
+              <li>Your teammate wrote a 40-line <code>if-else instanceof</code> chain. What do you suggest, and why?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all ten self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Syntax</h3>
+              <table>
+                <thead><tr><th>Form</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  <tr><td><code>class B extends A</code></td><td>B IS-A A</td></tr>
+                  <tr><td><code>class B implements I, J</code></td><td>B can do I and J</td></tr>
+                  <tr><td><code>super(args)</code></td><td>Parent constructor — must be first</td></tr>
+                  <tr><td><code>super.method()</code></td><td>Parent's version of a method</td></tr>
+                  <tr><td><code>@Override</code></td><td>Compiler-verified override</td></tr>
+                  <tr><td><code>abstract class A</code></td><td>Cannot be instantiated</td></tr>
+                  <tr><td><code>abstract void m();</code></td><td>No body — children must supply one</td></tr>
+                  <tr><td><code>default void m() { }</code></td><td>Interface method with a body</td></tr>
+                  <tr><td><code>final</code></td><td>No reassign / no override / no extend</td></tr>
+                  <tr><td><code>x instanceof T t</code></td><td>Test &amp; bind (JDK 16+)</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Reference type vs object type</h3>
+              <table>
+                <thead><tr><th>Governed by reference</th><th>Governed by object</th></tr></thead>
+                <tbody>
+                  <tr><td>Which methods you may call</td><td>Which override actually runs</td></tr>
+                  <tr><td>Field access (<code>p.label</code>)</td><td><code>getClass()</code></td></tr>
+                  <tr><td><code>static</code> methods</td><td><code>toString()</code>, <code>equals()</code></td></tr>
+                  <tr><td>Compile-time errors</td><td>Runtime behaviour</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:14px;">Abstract vs interface</h3>
+              <table>
+                <thead><tr><th></th><th>Abstract</th><th>Interface</th></tr></thead>
+                <tbody>
+                  <tr><td>How many</td><td>One</td><td>Many</td></tr>
+                  <tr><td>State</td><td>Yes</td><td>Constants only</td></tr>
+                  <tr><td>Constructor</td><td>Yes</td><td>No</td></tr>
+                  <tr><td>Means</td><td>IS-A</td><td>CAN-DO</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Access modifiers</h3>
+          <table>
+            <thead><tr><th>Modifier</th><th>Same class</th><th>Same package</th><th>Subclass elsewhere</th><th>Anywhere</th></tr></thead>
+            <tbody>
+              <tr><td><code>private</code></td><td>✓</td><td>✗</td><td>✗</td><td>✗</td></tr>
+              <tr><td><em>(default)</em></td><td>✓</td><td>✓</td><td>✗</td><td>✗</td></tr>
+              <tr><td><code>protected</code></td><td>✓</td><td>✓</td><td>✓</td><td>✗</td></tr>
+              <tr><td><code>public</code></td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 3</span>
+          Right now your accounts live in a fixed-size array — you can't add a fifth without editing code. Session 3
+          fixes that with the <strong>Collections framework</strong>: <code>ArrayList</code>, <code>LinkedList</code>,
+          generics, iteration, and sorting your accounts by balance using <code>Comparable</code> and
+          <code>Comparator</code> (both interfaces — exactly what you learned today). We'll also cover the other half
+          of class design: <strong>HAS-A relationships</strong> — association, aggregation and composition — and when to
+          use them instead of inheritance. <strong>Bring your whole <code>Account</code> hierarchy.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Core — Session 2 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

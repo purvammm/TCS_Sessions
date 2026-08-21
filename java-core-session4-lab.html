@@ -1,0 +1,2894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 4 — Set, Map &amp; File I/O (Lab)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(231,111,0,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e76f00, #5382a1, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff8f0, #fdf1e4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(83,130,161,0.10);
+      border: 1px solid rgba(83,130,161,0.32);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffdcbc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(231,111,0,0.22);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #e76f00; }
+    details.exp.lab2 { border-left-color: #5382a1; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.lab8 { border-left-color: #d81b60; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff8f0,#ffeedb); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f2f7fb,#e6eff6); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf3ff,#f2e8ff); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#fff0f5,#ffe3ec); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5382a1; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.lab8 .lab-tag { background:#d81b60; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit compile & run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin: 12px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Take-home assignment cards === */
+    .assign {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #bf5af2;
+      border-radius: 12px; background: #fff;
+      padding: 16px 20px 18px; margin: 16px 0;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .assign h3 {
+      margin: 0 0 8px; font-size: 19px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .assign .anum {
+      background: #bf5af2; color: #fff; border-radius: 8px;
+      padding: 3px 11px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .assign .diff {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .assign .diff.easy { background: rgba(40,200,64,0.14); color: #1a7f2e; border: 1px solid rgba(40,200,64,0.4); }
+    .assign .diff.med  { background: rgba(254,188,46,0.18); color: #96690a; border: 1px solid rgba(254,188,46,0.5); }
+    .assign .diff.hard { background: rgba(255,95,87,0.13); color: #c0392b; border: 1px solid rgba(255,95,87,0.4); }
+    .assign .brief { font-size: 16.5px; margin: 0 0 4px; }
+    .assign .rq { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mac-text-muted); margin: 12px 0 0; display: block; }
+    .assign ol.req, .assign ul.req { margin: 6px 0 0; padding-left: 24px; }
+    .assign .req li { font-size: 16.5px; margin: 5px 0; line-height: 1.55; }
+    .assign .out {
+      background: #12121c; color: #d7dae0; border-radius: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 12px 16px; margin: 10px 0 0; white-space: pre; overflow-x: auto;
+    }
+    .assign .out .ok { color: #a6e22e; }
+    .assign .out .bad { color: #ff6b6b; }
+    .assign .out .dim { color: #8b8fa3; }
+    .assign .hint {
+      background: #fafafc; border: 1px dashed var(--mac-border);
+      border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; font-size: 15.5px;
+    }
+    .assign .hint .lbl { font-weight: 700; color: var(--mac-accent-2); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+
+    /* Submission / grading panel */
+    .submit-panel {
+      background: linear-gradient(135deg,#1e1e2e,#2a2a40);
+      color: #f8f8f2; border-radius: 12px; padding: 22px 26px; margin: 18px 0 0;
+    }
+    .submit-panel h3 { color: #fff; margin: 0 0 10px; font-size: 20px; }
+    .submit-panel p, .submit-panel li { color: #d7dae0; font-size: 16px; }
+    .submit-panel code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; font-size: 14.5px; }
+    .submit-panel table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .submit-panel th, .submit-panel td {
+      border: 1px solid rgba(255,255,255,0.18); padding: 8px 12px; text-align: left; font-size: 14.5px;
+    }
+    .submit-panel th { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+      .assign .diff { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session4-lab.html — Java Core Session 4</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🗺️</div>
+        <div>
+          <h1>Java Core — Session 4 Hands-on Lab</h1>
+          <p class="section-intro">Set, Map &amp; File I/O — the finale. Make your bank unique, instant and permanent. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Java Core Session 4 — the theory stays on the main screen while you
+          work here on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge so you know
+          exactly which part of the talk it belongs to. Click a heading to expand it, use the <strong>Copy</strong>
+          button on any snippet instead of retyping, and tick each checkbox as you go. Aim for 100%.
+        </div>
+        <div class="observe">
+          <span class="lbl">Golden rule for today</span>
+          This lab is in <strong>two halves</strong>: Tasks 1–5 are <code>Set</code> and <code>Map</code>, Tasks 6–8 are
+          File I/O. Task 8 is the <strong>capstone of the whole series</strong> — it uses material from all four
+          sessions at once. Don't run out of time before you reach it; if you're behind, skip the stretch content in
+          earlier tasks rather than rushing the finale.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–3</span></summary>
+          <div class="exp-body">
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17+ working</strong>
+                <span class="verify">Verify with <code>javac -version</code>. We use <code>Files.readString</code> (Java 11+) and arrow <code>switch</code> (Java 14+).</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>javac -version
+java -version</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Your Session 3 model</strong>
+                <span class="verify">You need the <code>Account</code> hierarchy and ideally <code>Customer</code>. Missing them? Task 1 lists the minimum set to recreate.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A fresh working folder with write permission</strong>
+                <span class="verify">Create <code>session4-setmap-io</code>. Tasks 6–8 create real files on disk, so make sure it's somewhere you can write — not a read-only or synced-locked folder.</span>
+              </span>
+            </label>
+
+            <div class="dothis">
+              <span class="lbl">Set up</span>
+              <ol>
+                <li>Create <code>session4-setmap-io</code> and open it in your editor.</li>
+                <li>Copy in your Session 2/3 <code>.java</code> files (<code>Account</code> + its four subclasses, and the exception classes).</li>
+                <li>Run <code>javac *.java</code> to confirm it all still compiles.</li>
+                <li>Open a terminal in the folder — you'll want it for inspecting the files you create later.</li>
+              </ol>
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">Part 1 — Set &amp; Map</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Set Basics &amp; Duplicate Detection<span class="sync">Theory slides 4, 7</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              See uniqueness enforced structurally rather than by your own discipline, and learn to use
+              <code>add()</code>'s return value — the neatest duplicate check in Java.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SetBasics.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+public class SetBasics {
+
+    public static void main(String[] args) {
+
+        // ===== 1. Duplicates are simply ignored =====
+        Set&lt;String&gt; accountNumbers = new HashSet&lt;&gt;();
+        System.out.println("add AC1001 -> " + accountNumbers.add("AC1001"));
+        System.out.println("add AC1002 -> " + accountNumbers.add("AC1002"));
+        System.out.println("add AC1001 -> " + accountNumbers.add("AC1001") + "   &lt;-- duplicate!");
+        System.out.println("size       -> " + accountNumbers.size());
+
+        // ===== 2. add()'s return value IS your duplicate check =====
+        System.out.println("\n--- registering accounts ---");
+        for (String candidate : List.of("AC1003", "AC1001", "AC1004", "AC1003")) {
+            if (accountNumbers.add(candidate)) {
+                System.out.println("  registered " + candidate);
+            } else {
+                System.out.println("  REJECTED " + candidate + " - already exists");
+            }
+        }
+
+        // ===== 3. contains() is O(1), not a scan =====
+        System.out.println("\ncontains AC1002? " + accountNumbers.contains("AC1002"));
+        System.out.println("contains AC9999? " + accountNumbers.contains("AC9999"));
+
+        // ===== 4. The three orderings, same input =====
+        List&lt;String&gt; input = List.of("Rahul", "Priya", "Anita", "Priya", "Deepa", "Anita");
+        System.out.println("\ninput            : " + input);
+        System.out.println("HashSet          : " + new HashSet&lt;&gt;(input));
+        System.out.println("LinkedHashSet    : " + new LinkedHashSet&lt;&gt;(input));
+        System.out.println("TreeSet          : " + new TreeSet&lt;&gt;(input));
+
+        // ===== 5. Dedupe a List, keeping the original order - one line =====
+        List&lt;String&gt; deduped = new ArrayList&lt;&gt;(new LinkedHashSet&lt;&gt;(input));
+        System.out.println("deduped, ordered : " + deduped);
+
+        // ===== 6. Set operations - COPY FIRST, they mutate =====
+        System.out.println("\n--- set operations ---");
+        Set&lt;String&gt; javaDevs   = new HashSet&lt;&gt;(Set.of("Priya", "Rahul", "Anita"));
+        Set&lt;String&gt; pythonDevs = new HashSet&lt;&gt;(Set.of("Anita", "Deepa", "Vikram"));
+
+        Set&lt;String&gt; union = new TreeSet&lt;&gt;(javaDevs);
+        union.addAll(pythonDevs);
+        System.out.println("union        : " + union);
+
+        Set&lt;String&gt; both = new TreeSet&lt;&gt;(javaDevs);
+        both.retainAll(pythonDevs);
+        System.out.println("intersection : " + both);
+
+        Set&lt;String&gt; javaOnly = new TreeSet&lt;&gt;(javaDevs);
+        javaOnly.removeAll(pythonDevs);
+        System.out.println("java only    : " + javaOnly);
+
+        System.out.println("javaDevs unchanged? " + new TreeSet&lt;&gt;(javaDevs));
+
+        // ===== 7. TreeSet's navigation powers =====
+        System.out.println("\n--- TreeSet range queries ---");
+        TreeSet&lt;Integer&gt; scores = new TreeSet&lt;&gt;(List.of(45, 67, 72, 88, 91));
+        System.out.println("all          : " + scores);
+        System.out.println("first / last : " + scores.first() + " / " + scores.last());
+        System.out.println("higher(72)   : " + scores.higher(72));
+        System.out.println("floor(70)     : " + scores.floor(70));
+        System.out.println("subSet(60,90): " + scores.subSet(60, 90));
+        System.out.println("descending   : " + scores.descendingSet());
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac SetBasics.java</code></li>
+                <li><code>java SetBasics</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">add AC1001 -&gt; true
+add AC1002 -&gt; true
+add AC1001 -&gt; <span class="bad">false</span>   &lt;-- duplicate!
+size       -&gt; 2
+
+--- registering accounts ---
+  registered AC1003
+  <span class="bad">REJECTED AC1001 - already exists</span>
+  registered AC1004
+  <span class="bad">REJECTED AC1003 - already exists</span>
+
+contains AC1002? true
+contains AC9999? false
+
+input            : [Rahul, Priya, Anita, Priya, Deepa, Anita]
+HashSet          : [Rahul, Anita, Priya, Deepa]
+LinkedHashSet    : [Rahul, Priya, Anita, Deepa]
+TreeSet          : [Anita, Deepa, Priya, Rahul]
+deduped, ordered : [Rahul, Priya, Anita, Deepa]
+
+--- set operations ---
+union        : [Anita, Deepa, Priya, Rahul, Vikram]
+intersection : [Anita]
+java only    : [Priya, Rahul]
+javaDevs unchanged? [Anita, Priya, Rahul]
+
+--- TreeSet range queries ---
+all          : [45, 67, 72, 88, 91]
+first / last : 45 / 91
+higher(72)   : 88
+floor(70)     : 67
+subSet(60,90): [67, 72]
+descending   : [91, 88, 72, 67, 45]</div>
+              Note the <code>HashSet</code> order looks arbitrary — that's expected and you must never rely on it.
+              <code>LinkedHashSet</code> preserved insertion order; <code>TreeSet</code> sorted alphabetically.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>add()</code> returned <strong>false</strong> for a duplicate, and I used that as a rejection check.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All three Set types gave <strong>different orderings</strong> from the same input.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I deduplicated a list <strong>preserving order</strong> in one line with <code>LinkedHashSet</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Set operations worked and <strong>the source set was unharmed</strong> because I copied first.</span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Try this too</span>
+              Add <code>null</code> to each of the three sets. <code>HashSet</code> and <code>LinkedHashSet</code> accept
+              one; <code>TreeSet</code> throws <code>NullPointerException</code> because it has to compare it. Also try
+              <code>new TreeSet&lt;&gt;(List.of(new Object()))</code> and read the <code>ClassCastException</code> — TreeSet
+              requires <code>Comparable</code>.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> The Bucket Mechanism — Why Session 2's Bug Happened<span class="sync">Theory slides 5–6</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              The most important task in this lab. Put your own <code>Account</code> objects in a <code>HashSet</code>,
+              <strong>see the actual bucket indices</strong>, and finally understand why a missing <code>hashCode</code>
+              breaks everything silently.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Step 1 — give <code>Account</code> identity</span>
+              <ol>
+                <li>Open <code>Account.java</code>.</li>
+                <li>Add <code>import java.util.Objects;</code> at the top.</li>
+                <li>Add the two methods below. Identity is the <strong>account number</strong> — immutable, and the natural business key.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>    // ===== Identity: two Accounts are the same if the NUMBER matches =====
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return getAccountNumber().equals(((Account) o).getAccountNumber());
+    }
+
+    // STEP 2 OF THE TASK: comment this method out, then run again.
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAccountNumber());   // SAME field as equals()
+    }</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BucketLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+public class BucketLab {
+
+    // HashMap default capacity is 16. This is the same arithmetic the JDK uses.
+    static final int CAPACITY = 16;
+
+    public static void main(String[] args) {
+
+        List&lt;Account&gt; accounts = List.of(
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200),
+            new SavingsAccount     ("AC1005", "Deepa Iyer",    30000),
+            new SavingsAccount     ("AC1009", "Arjun Mehta",   80000)
+        );
+
+        // ===== 1. Show the hash and the bucket each one lands in =====
+        System.out.println("=== Which bucket does each account go to? ===");
+        System.out.printf("%-10s %14s %12s %8s%n", "NUMBER", "hashCode()", "spread", "bucket");
+        Map&lt;Integer, List&lt;String&gt;&gt; buckets = new TreeMap&lt;&gt;();
+
+        for (Account a : accounts) {
+            int hash   = a.hashCode();
+            int spread = hash ^ (hash &gt;&gt;&gt; 16);        // what HashMap actually does
+            int bucket = spread &amp; (CAPACITY - 1);      // cheap modulo for powers of 2
+            System.out.printf("%-10s %14d %12d %8d%n",
+                              a.getAccountNumber(), hash, spread, bucket);
+            buckets.computeIfAbsent(bucket, k -&gt; new ArrayList&lt;&gt;())
+                   .add(a.getAccountNumber());
+        }
+
+        System.out.println("\n=== The bucket table ===");
+        for (int i = 0; i &lt; CAPACITY; i++) {
+            List&lt;String&gt; contents = buckets.get(i);
+            String shown = (contents == null) ? "null"
+                         : String.join(" -&gt; ", contents)
+                           + (contents.size() &gt; 1 ? "   &lt;-- COLLISION, chained" : "");
+            System.out.printf("  bucket %2d : %s%n", i, shown);
+        }
+
+        // ===== 2. The duplicate test - same number, different object =====
+        System.out.println("\n=== Duplicate detection ===");
+        Set&lt;Account&gt; set = new HashSet&lt;&gt;(accounts);
+        System.out.println("set size after adding 6 accounts : " + set.size());
+
+        Account impostor = new SavingsAccount("AC1001", "Someone Else", 999);
+        System.out.println("\nA DIFFERENT object with the SAME number:");
+        System.out.println("  equals existing?  " + impostor.equals(accounts.get(0)));
+        System.out.println("  same hashCode?    "
+                           + (impostor.hashCode() == accounts.get(0).hashCode()));
+        System.out.println("  set.contains()?   " + set.contains(impostor));
+        System.out.println("  set.add() -&gt;      " + set.add(impostor) + "  (false = rejected)");
+        System.out.println("  set size still    " + set.size());
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it — WITH hashCode()</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java BucketLab</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output — your hash numbers will differ, the behaviour won't</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Which bucket does each account go to? ===
+NUMBER         hashCode()       spread   bucket
+AC1001         1924620905   1924591849        9
+AC1002         1924620906   1924591850       10
+AC1003         1924620907   1924591851       11
+AC1004         1924620908   1924591852       12
+AC1005         1924620909   1924591853       13
+AC1009         1924620913   1924591857        1
+
+=== The bucket table ===
+  bucket  0 : null
+  bucket  1 : AC1009
+  ...
+  bucket  9 : AC1001
+  bucket 10 : AC1002
+  ...
+
+=== Duplicate detection ===
+set size after adding 6 accounts : 6
+
+A DIFFERENT object with the SAME number:
+  equals existing?  <span class="ok">true</span>
+  same hashCode?    <span class="ok">true</span>
+  set.contains()?   <span class="ok">true</span>
+  set.add() -&gt;      <span class="ok">false</span>  (false = rejected)
+  set size still    6</div>
+              A completely different object, with a different holder and balance, was correctly identified as
+              <strong>the same account</strong> — because identity is the account number.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Step 2 — now break it, exactly as in Session 2</span>
+              Comment out the whole <code>hashCode()</code> method in <code>Account.java</code>. Recompile and run again.
+              <strong>Watch the bucket numbers as well as the results.</strong>
+            </div>
+            <div class="expected">
+              <span class="lbl">WITHOUT <code>hashCode()</code> — silently broken</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Duplicate detection ===
+set size after adding 6 accounts : 6
+
+A DIFFERENT object with the SAME number:
+  equals existing?  <span class="ok">true</span>       <span class="dim">← equals still says they match</span>
+  same hashCode?    <span class="bad">false</span>      <span class="dim">← but the hashes differ...</span>
+  set.contains()?   <span class="bad">false</span>      <span class="dim">← ...so it looks in the WRONG bucket</span>
+  set.add() -&gt;      <span class="bad">true</span>       <span class="dim">← duplicate accepted!</span>
+  set size still    <span class="bad">7</span>          <span class="dim">← two AC1001s in a "unique" set</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">This is the explanation you were promised in Session 2</span>
+              <code>equals()</code> still returns <code>true</code> — the objects <em>are</em> logically equal. But
+              <code>contains()</code> computes the hash first, goes to <strong>that one bucket</strong>, finds nothing
+              there, and returns <code>false</code>. <strong><code>equals()</code> is never called.</strong> The lookup
+              never gets far enough to ask the question.
+              <br><br>
+              That's why this bug is so dangerous: no exception, no warning, just a "unique" set holding duplicates
+              and a <code>contains()</code> that lies. <strong>Restore <code>hashCode()</code> before moving on.</strong>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Optional but very illuminating — the terrible hashCode</span>
+              Temporarily change <code>hashCode()</code> to <code>return 1;</code> and run again. It's
+              <em>technically correct</em> (equal objects still have equal hashes) so duplicate detection still works —
+              but look at the bucket table: <strong>every account is chained into bucket 1</strong>. You've turned an
+              O(1) structure into a linked list.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw the <strong>actual bucket index</strong> each account maps to.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">With <code>hashCode()</code>: duplicate <strong>rejected</strong>, size stayed 6.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Without it: duplicate <strong>accepted</strong>, <code>contains()</code> returned false, size became 7 — with <strong>no error</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can now explain <strong>why <code>equals()</code> is never called</strong> when <code>hashCode</code> is wrong.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I tried <code>return 1;</code> and saw every entry collide into one bucket.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== TASK 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> The Mutable Key Trap<span class="sync">Theory slide 7</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Lose an object inside a <code>HashSet</code> — permanently — by changing a field after insertion. Short
+              task, unforgettable lesson, and it explains why real-world keys are almost always immutable Strings.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">MutableKey.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+// A DELIBERATELY BAD design: a mutable field used in hashCode()
+class Tag {
+    private String name;                      // NOT final - that's the problem
+
+    Tag(String name) { this.name = name; }
+
+    void setName(String name) { this.name = name; }   // mutation!
+    String getName()          { return name; }
+
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return Objects.equals(name, ((Tag) o).name);
+    }
+    @Override public int hashCode() { return Objects.hash(name); }
+    @Override public String toString() { return "Tag(" + name + ")";  }
+}
+
+public class MutableKey {
+
+    public static void main(String[] args) {
+        Set&lt;Tag&gt; tags = new HashSet&lt;&gt;();
+        Tag java = new Tag("java");
+        tags.add(java);
+
+        System.out.println("--- before mutation ---");
+        System.out.println("set          : " + tags);
+        System.out.println("contains?    : " + tags.contains(java));
+        System.out.println("hashCode     : " + java.hashCode());
+
+        // Change a field that hashCode() depends on
+        java.setName("kotlin");
+
+        System.out.println("\n--- after mutation ---");
+        System.out.println("set          : " + tags + "   &lt;-- it's visibly IN there");
+        System.out.println("contains?    : " + tags.contains(java) + "   &lt;-- but not findable!");
+        System.out.println("hashCode     : " + java.hashCode() + "   &lt;-- moved bucket");
+        System.out.println("size         : " + tags.size());
+        System.out.println("remove()     : " + tags.remove(java) + "   &lt;-- can't even delete it");
+        System.out.println("size after   : " + tags.size() + "   &lt;-- still there. Leaked forever.");
+
+        // Only a full scan can still find it
+        System.out.print("\nfound by iterating: ");
+        for (Tag t : tags) if (t == java) System.out.print("YES - it really is in the set");
+        System.out.println();
+
+        // ===== THE FIX: an immutable key =====
+        System.out.println("\n--- the fix: make the field final ---");
+        System.out.println("If 'name' were final, setName() could not exist,");
+        System.out.println("the hash could never change, and this bug is impossible.");
+        System.out.println("That is exactly why String makes such a good key.");
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">--- before mutation ---
+set          : [Tag(java)]
+contains?    : <span class="ok">true</span>
+hashCode     : 3254818
+
+--- after mutation ---
+set          : [Tag(kotlin)]   &lt;-- it's visibly IN there
+contains?    : <span class="bad">false</span>   &lt;-- but not findable!
+hashCode     : -1125574399   &lt;-- moved bucket
+size         : 1
+remove()     : <span class="bad">false</span>   &lt;-- can't even delete it
+size after   : 1   &lt;-- still there. Leaked forever.
+
+found by iterating: <span class="warn">YES - it really is in the set</span>
+
+--- the fix: make the field final ---
+...</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">What actually happened</span>
+              The object was stored in the bucket for hash <code>3254818</code>. Changing <code>name</code> changed its
+              hash to <code>-1125574399</code>, so every lookup now searches a <strong>different bucket</strong> —
+              one the object was never placed in. It's still physically in the set (you can print it and iterate to it)
+              but it is unreachable by <code>contains</code>, <code>remove</code>, or anything else hash-based.
+              <br><br>
+              <strong>The rule: only use immutable fields in <code>hashCode()</code>.</strong> Make them
+              <code>final</code>, and the compiler enforces it for you.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">After mutating the field, <code>contains()</code> returned <strong>false</strong> for an object visibly in the set.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>remove()</code> also failed — the object is <strong>permanently leaked</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I understand why <code>final</code> fields and immutable keys prevent this entirely.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Map — O(1) Lookup vs O(n) Scanning<span class="sync">Theory slides 9–13</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Replace "loop through the list looking for a match" with a real <code>Map</code>, then
+              <strong>measure the difference</strong> at 200,000 records. This is the task that makes Map click.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">MapLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+public class MapLab {
+
+    public static void main(String[] args) {
+
+        // ===== 1. Basic Map operations =====
+        Map&lt;String, Account&gt; byNumber = new LinkedHashMap&lt;&gt;();
+
+        List&lt;Account&gt; accounts = List.of(
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200),
+            new SavingsAccount     ("AC1005", "Deepa Iyer",    30000)
+        );
+        for (Account a : accounts) byNumber.put(a.getAccountNumber(), a);
+
+        System.out.println("=== Direct lookup ===");
+        System.out.println("get(AC1003)      : " + byNumber.get("AC1003"));
+        System.out.println("get(AC9999)      : " + byNumber.get("AC9999") + "   (null, not an exception)");
+        System.out.println("containsKey      : " + byNumber.containsKey("AC1002"));
+        System.out.println("size             : " + byNumber.size());
+
+        // ===== 2. put() OVERWRITES - a common surprise =====
+        System.out.println("\n=== put() overwrites ===");
+        Account old = byNumber.put("AC1001", new SavingsAccount("AC1001", "REPLACED", 1));
+        System.out.println("put returned the OLD value: " + old);
+        System.out.println("map now holds             : " + byNumber.get("AC1001"));
+        byNumber.put("AC1001", accounts.get(0));                 // put it back
+        System.out.println("putIfAbsent (already there): "
+                           + byNumber.putIfAbsent("AC1001", new SalaryAccount("AC1001", "X", 0)));
+        System.out.println("still the original?        : " + byNumber.get("AC1001").getHolder());
+
+        // ===== 3. The three iteration views =====
+        System.out.println("\n=== keySet() ===");
+        System.out.println("  " + byNumber.keySet());
+
+        System.out.println("=== values() - total balance ===");
+        double total = 0;
+        for (Account a : byNumber.values()) total += a.getBalance();
+        System.out.printf("  total across all accounts: %.2f%n", total);
+
+        System.out.println("=== entrySet() - the efficient way when you need both ===");
+        for (Map.Entry&lt;String, Account&gt; e : byNumber.entrySet()) {
+            System.out.printf("  %-8s -&gt; %-14s %12.2f%n",
+                              e.getKey(), e.getValue().getHolder(), e.getValue().getBalance());
+        }
+
+        System.out.println("=== forEach ===");
+        byNumber.forEach((k, v) -&gt; System.out.println("  " + k + " = " + v.accountType()));
+
+        // ===== 4. THE MEASUREMENT: List scan vs Map lookup =====
+        System.out.println("\n=== 200,000 records: List vs Map ===");
+        int n = 200_000;
+        List&lt;String&gt; bigList = new ArrayList&lt;&gt;(n);
+        Map&lt;String, Integer&gt; bigMap = new HashMap&lt;&gt;(n);
+        for (int i = 0; i &lt; n; i++) {
+            bigList.add("AC" + i);
+            bigMap.put("AC" + i, i);
+        }
+        String needle = "AC" + (n - 1);          // worst case: the very last one
+
+        long t1 = System.nanoTime();
+        boolean inList = bigList.contains(needle);
+        long listTime = System.nanoTime() - t1;
+
+        long t2 = System.nanoTime();
+        boolean inMap = bigMap.containsKey(needle);
+        long mapTime = System.nanoTime() - t2;
+
+        System.out.printf("  List.contains()   : %,10d ns  (found=%b)%n", listTime, inList);
+        System.out.printf("  Map.containsKey() : %,10d ns  (found=%b)%n", mapTime, inMap);
+        System.out.printf("  Map is roughly %,dx faster%n",
+                          mapTime == 0 ? listTime : listTime / Math.max(mapTime, 1));
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output (key parts)</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Direct lookup ===
+get(AC1003)      : AC1003   Anita Desai    Fixed Deposit        200000.00
+get(AC9999)      : null   (null, not an exception)
+containsKey      : true
+size             : 5
+
+=== put() overwrites ===
+put returned the OLD value: AC1001   Priya Sharma   Savings   50000.00
+map now holds             : AC1001   REPLACED       Savings       1.00
+putIfAbsent (already there): AC1001   Priya Sharma   Savings   50000.00
+still the original?        : Priya Sharma
+
+=== entrySet() - the efficient way when you need both ===
+  AC1001   -&gt; Priya Sharma      50000.00
+  AC1002   -&gt; Rahul Verma       80000.00
+  AC1003   -&gt; Anita Desai      200000.00
+  AC1004   -&gt; Vikram Rao         1200.00
+  AC1005   -&gt; Deepa Iyer        30000.00
+
+=== 200,000 records: List vs Map ===
+  List.contains()   :  <span class="bad">1,284,500 ns</span>  (found=true)
+  Map.containsKey() :        <span class="ok">1,200 ns</span>  (found=true)
+  Map is roughly 1,070x faster</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Read the numbers</span>
+              The <code>List</code> had to compare against up to 200,000 strings. The <code>Map</code> hashed the key
+              once and went straight to the bucket. <strong>And crucially: at 2,000,000 records the Map takes the same
+              time, while the List takes ten times longer.</strong> That's the practical meaning of O(1) versus O(n).
+            </div>
+            <div class="tryit">
+              <span class="lbl">Also worth doing</span>
+              Try <code>bigMap.containsValue(n - 1)</code> and time it. <code>containsValue</code> is <strong>O(n)</strong> —
+              it scans every value, because the hash index only works on keys. A Map is fast in <em>one direction only</em>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I replaced list-scanning with <code>map.get()</code> and measured a <strong>large</strong> speed difference.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <code>put()</code> <strong>overwrite</strong> and return the old value, and used <code>putIfAbsent</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used all three views — <code>keySet</code>, <code>values</code>, <code>entrySet</code> — and know why <code>entrySet</code> is preferred.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I confirmed <code>containsValue()</code> is O(n) — a Map is only fast on keys.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Counting &amp; Grouping — <code>merge</code> and <code>computeIfAbsent</code><span class="sync">Theory slide 11</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Master the two Map patterns you'll use most in real work: <strong>counting</strong> with
+              <code>merge</code> and <strong>grouping</strong> with <code>computeIfAbsent</code>. Both are one-liners
+              that replace five lines of null-checking.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CountGroupLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+public class CountGroupLab {
+
+    public static void main(String[] args) {
+
+        // ================= COUNTING: word frequency =================
+        String text = """
+                the quick brown fox jumps over the lazy dog
+                the dog barks and the fox runs
+                the quick dog wins the race
+                """;
+
+        String[] words = text.toLowerCase().split("\\s+");
+
+        // --- Version A: verbose, with a null check ---
+        Map&lt;String, Integer&gt; countA = new HashMap&lt;&gt;();
+        for (String w : words) {
+            if (w.isBlank()) continue;
+            Integer current = countA.get(w);
+            countA.put(w, current == null ? 1 : current + 1);
+        }
+
+        // --- Version B: getOrDefault ---
+        Map&lt;String, Integer&gt; countB = new HashMap&lt;&gt;();
+        for (String w : words) {
+            if (w.isBlank()) continue;
+            countB.put(w, countB.getOrDefault(w, 0) + 1);
+        }
+
+        // --- Version C: merge - the idiomatic one-liner ---
+        Map&lt;String, Integer&gt; countC = new HashMap&lt;&gt;();
+        for (String w : words) {
+            if (w.isBlank()) continue;
+            countC.merge(w, 1, Integer::sum);
+        }
+
+        System.out.println("All three agree: " + (countA.equals(countB) &amp;&amp; countB.equals(countC)));
+        System.out.println("distinct words : " + countC.size());
+
+        // --- Sort by count descending, then alphabetically ---
+        System.out.println("\n=== Top 5 words ===");
+        countC.entrySet().stream()
+              .sorted(Map.Entry.&lt;String, Integer&gt;comparingByValue().reversed()
+                          .thenComparing(Map.Entry.comparingByKey()))
+              .limit(5)
+              .forEach(e -&gt; System.out.printf("  %-8s %d%n", e.getKey(), e.getValue()));
+
+        // --- Words appearing only once ---
+        System.out.println("\n=== Words appearing exactly once ===");
+        List&lt;String&gt; unique = new ArrayList&lt;&gt;();
+        countC.forEach((word, count) -&gt; { if (count == 1) unique.add(word); });
+        Collections.sort(unique);
+        System.out.println("  " + unique);
+
+        // --- A sorted view, for free ---
+        System.out.println("\n=== Alphabetical (TreeMap) ===");
+        System.out.println("  " + new TreeMap&lt;&gt;(countC));
+
+        // ================= GROUPING: accounts by type =================
+        System.out.println("\n\n=== Grouping accounts by type ===");
+        List&lt;Account&gt; accounts = List.of(
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200),
+            new SavingsAccount     ("AC1005", "Deepa Iyer",    30000),
+            new SavingsAccount     ("AC1006", "Arjun Mehta",   80000),
+            new CurrentAccount     ("AC1007", "Neha Kapoor",   45000, 10000)
+        );
+
+        // computeIfAbsent: create the inner list ONLY when first needed
+        Map&lt;String, List&lt;Account&gt;&gt; byType = new TreeMap&lt;&gt;();
+        for (Account a : accounts) {
+            byType.computeIfAbsent(a.accountType(), k -&gt; new ArrayList&lt;&gt;()).add(a);
+        }
+
+        for (Map.Entry&lt;String, List&lt;Account&gt;&gt; e : byType.entrySet()) {
+            double subtotal = 0;
+            for (Account a : e.getValue()) subtotal += a.getBalance();
+            System.out.printf("%n%s  (%d account(s), subtotal %.2f)%n",
+                              e.getKey(), e.getValue().size(), subtotal);
+            for (Account a : e.getValue()) {
+                System.out.printf("    %-8s %-14s %12.2f%n",
+                                  a.getAccountNumber(), a.getHolder(), a.getBalance());
+            }
+        }
+
+        // ================= Grouping by a computed key =================
+        System.out.println("\n=== Grouped by balance band ===");
+        Map&lt;String, List&lt;String&gt;&gt; byBand = new TreeMap&lt;&gt;();
+        for (Account a : accounts) {
+            String band = a.getBalance() &gt;= 100000 ? "3. high (100k+)"
+                        : a.getBalance() &gt;=  40000 ? "2. medium (40k-100k)"
+                        :                             "1. low (under 40k)";
+            byBand.computeIfAbsent(band, k -&gt; new ArrayList&lt;&gt;()).add(a.getHolder());
+        }
+        byBand.forEach((band, holders) -&gt; System.out.println("  " + band + " : " + holders));
+
+        // ================= A Map of Sets: unique holders per type =================
+        System.out.println("\n=== Unique holders per account type (Map of Sets) ===");
+        Map&lt;String, Set&lt;String&gt;&gt; holdersByType = new TreeMap&lt;&gt;();
+        for (Account a : accounts) {
+            holdersByType.computeIfAbsent(a.accountType(), k -&gt; new TreeSet&lt;&gt;())
+                         .add(a.getHolder());
+        }
+        holdersByType.forEach((type, holders) -&gt;
+            System.out.println("  " + type + " : " + holders));
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output (key parts)</span>
+              <div class="term-out" style="margin:8px 0 0;">All three agree: <span class="ok">true</span>
+distinct words : 19
+
+=== Top 5 words ===
+  the      6
+  dog      3
+  fox      2
+  quick    2
+  and      1
+
+=== Words appearing exactly once ===
+  [and, barks, brown, jumps, lazy, over, race, runs, wins]
+
+=== Grouping accounts by type ===
+
+Current  (2 account(s), subtotal 125000.00)
+    AC1002   Rahul Verma       80000.00
+    AC1007   Neha Kapoor       45000.00
+
+Fixed Deposit  (1 account(s), subtotal 200000.00)
+    AC1003   Anita Desai      200000.00
+
+Salary  (1 account(s), subtotal 1200.00)
+    AC1004   Vikram Rao         1200.00
+
+Savings  (3 account(s), subtotal 160000.00)
+    AC1001   Priya Sharma      50000.00
+    AC1005   Deepa Iyer        30000.00
+    AC1006   Arjun Mehta       80000.00
+
+=== Grouped by balance band ===
+  1. low (under 40k) : [Vikram Rao, Deepa Iyer]
+  2. medium (40k-100k) : [Priya Sharma, Rahul Verma, Arjun Mehta, Neha Kapoor]
+  3. high (100k+) : [Anita Desai]</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">The two patterns to memorise</span>
+              <strong>Counting:</strong> <code>map.merge(key, 1, Integer::sum)</code> — "add 1, or start at 1".<br>
+              <strong>Grouping:</strong> <code>map.computeIfAbsent(key, k -&gt; new ArrayList&lt;&gt;()).add(item)</code> —
+              "get the list for this key, creating it if needed, then add".
+              <br><br>
+              Note the return of <code>computeIfAbsent</code> is the <em>value</em>, which is why you can chain
+              <code>.add(item)</code> straight onto it. Also note using <code>TreeMap</code> instead of
+              <code>HashMap</code> gave sorted output for free — no sorting code at all.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All three counting versions produced <strong>identical</strong> results.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I grouped accounts into a <code>Map&lt;String, List&lt;Account&gt;&gt;</code> with <code>computeIfAbsent</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I built a <code>Map&lt;String, Set&lt;String&gt;&gt;</code> — a nested collection — and grouped by a <strong>computed</strong> key.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I got sorted output <strong>free</strong> by choosing <code>TreeMap</code> over <code>HashMap</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== TASK 6 ===== -->
+      <div class="section-band">Part 2 — File I/O</div>
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> Writing &amp; Reading Files — and the Empty-File Bug<span class="sync">Theory slides 16–19</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Write your first file, read it back, and then <strong>deliberately cause the "my file is empty!" bug</strong>
+              by forgetting to close a writer. This is the single most common file-handling mistake, and Session 1's
+              try-with-resources is the cure.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">FileBasics.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+public class FileBasics {
+
+    public static void main(String[] args) {
+
+        // ===== 1. WRITE (overwrites any existing file) =====
+        System.out.println("1. Writing accounts.txt ...");
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter("accounts.txt", StandardCharsets.UTF_8))) {
+            writer.write("AC1001,Priya Sharma,52000.00");
+            writer.newLine();
+            writer.write("AC1002,Rahul Verma,80000.00");
+            writer.newLine();
+            writer.write("AC1003,Anita Desai,214000.00");
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("   write failed: " + e.getMessage());
+        }
+        System.out.println("   done.");
+
+        // ===== 2. APPEND (note the 'true') =====
+        System.out.println("2. Appending one more line ...");
+        try (BufferedWriter writer = new BufferedWriter(
+                new FileWriter("accounts.txt", StandardCharsets.UTF_8, true))) {
+            writer.write("AC1004,Vikram Rao,1242.00");
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("   append failed: " + e.getMessage());
+        }
+
+        // ===== 3. READ line by line and parse =====
+        System.out.println("3. Reading it back:");
+        double total = 0;
+        int lineNo = 0;
+        try (BufferedReader reader = new BufferedReader(
+                new FileReader("accounts.txt", StandardCharsets.UTF_8))) {
+            String line;
+            while ((line = reader.readLine()) != null) {      // null == end of file
+                lineNo++;
+                String[] parts = line.split(",");
+                if (parts.length != 3) {
+                    System.out.println("   line " + lineNo + " malformed, skipping");
+                    continue;
+                }
+                double balance = Double.parseDouble(parts[2]);
+                total += balance;
+                System.out.printf("   %-8s %-14s %12.2f%n", parts[0], parts[1], balance);
+            }
+        } catch (FileNotFoundException e) {                  // SUBCLASS FIRST (Session 1!)
+            System.out.println("   no file yet - nothing to read");
+        } catch (IOException e) {
+            System.out.println("   read failed: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("   bad number on line " + lineNo + ": " + e.getMessage());
+        }
+        System.out.printf("   TOTAL: %.2f across %d lines%n", total, lineNo);
+
+        // ===== 4. THE BUG: a writer that is never closed =====
+        System.out.println("\n4. The empty-file bug (no try-with-resources):");
+        try {
+            BufferedWriter leaky = new BufferedWriter(
+                    new FileWriter("leaked.txt", StandardCharsets.UTF_8));
+            leaky.write("this text is sitting in the buffer");
+            leaky.newLine();
+            // NO close(). NO flush(). Deliberately.
+        } catch (IOException e) {
+            System.out.println("   " + e.getMessage());
+        }
+        System.out.println("   leaked.txt size = " + new File("leaked.txt").length()
+                           + " bytes   &lt;-- your text never reached the disk");
+
+        // ===== 5. The same thing done properly =====
+        System.out.println("5. With try-with-resources:");
+        try (BufferedWriter proper = new BufferedWriter(
+                new FileWriter("proper.txt", StandardCharsets.UTF_8))) {
+            proper.write("this text is safely written");
+            proper.newLine();
+        } catch (IOException e) {
+            System.out.println("   " + e.getMessage());
+        }
+        System.out.println("   proper.txt size = " + new File("proper.txt").length()
+                           + " bytes   &lt;-- closed, therefore flushed");
+
+        // ===== 6. Reading a file that isn't there =====
+        System.out.println("\n6. Reading a non-existent file:");
+        try (BufferedReader r = new BufferedReader(
+                new FileReader("does-not-exist.txt", StandardCharsets.UTF_8))) {
+            r.readLine();
+        } catch (FileNotFoundException e) {
+            System.out.println("   FileNotFoundException handled - treat as 'empty', not a crash");
+        } catch (IOException e) {
+            System.out.println("   " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it — and then look at the files</span>
+              <ol>
+                <li><code>javac FileBasics.java</code></li>
+                <li><code>java FileBasics</code></li>
+                <li>Now inspect the files it created: <code>cat accounts.txt</code> and <code>cat leaked.txt</code>
+                    (on Windows: <code>type accounts.txt</code>). <strong>Actually look at them</strong> — that's the point.</li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">1. Writing accounts.txt ...
+   done.
+2. Appending one more line ...
+3. Reading it back:
+   AC1001   Priya Sharma       52000.00
+   AC1002   Rahul Verma        80000.00
+   AC1003   Anita Desai       214000.00
+   AC1004   Vikram Rao          1242.00
+   TOTAL: 347242.00 across 4 lines
+
+4. The empty-file bug (no try-with-resources):
+   leaked.txt size = <span class="bad">0</span> bytes   &lt;-- your text never reached the disk
+5. With try-with-resources:
+   proper.txt size = <span class="ok">28</span> bytes   &lt;-- closed, therefore flushed
+
+6. Reading a non-existent file:
+   <span class="ok">FileNotFoundException handled - treat as 'empty', not a crash</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Step 4 is the whole lesson</span>
+              <code>leaked.txt</code> is <strong>0 bytes</strong>. The program reported no error whatsoever. Your text
+              went into an 8KB in-memory buffer and was thrown away when the JVM exited. <strong>Closing a writer
+              flushes it — and try-with-resources always closes.</strong> Every "why is my file empty?" question on
+              Stack Overflow is this.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Two more things worth trying</span>
+              <strong>(a)</strong> Remove the <code>true</code> from step 2's <code>FileWriter</code> and re-run — the
+              file now contains <em>only</em> AC1004, because you overwrote everything. That's how easy it is to destroy
+              data. <strong>(b)</strong> Write a name containing a non-ASCII character (say <code>Priyā</code> or
+              <code>₹5000</code>), then remove <code>StandardCharsets.UTF_8</code> from both the writer and reader and
+              see whether it survives the round-trip.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I wrote, appended to, and read back a real file on disk.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>leaked.txt</code> was <strong>0 bytes</strong> and I understand exactly why.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I handled <code>FileNotFoundException</code> as a <strong>normal</strong> case, not a crash.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I proved that omitting <code>true</code> from <code>FileWriter</code> <strong>destroys</strong> the existing content.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> Modern NIO.2 — <code>Path</code> &amp; <code>Files</code><span class="sync">Theory slide 20</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Do the whole of Task 6 again in a fraction of the code, using <code>java.nio.file</code>. This is what you
+              should reach for in new projects.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">NioLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class NioLab {
+
+    public static void main(String[] args) throws IOException {
+
+        // Path.of joins with the correct separator for THIS operating system
+        Path dir  = Path.of("data");
+        Path file = dir.resolve("accounts.csv");
+
+        System.out.println("path         : " + file);
+        System.out.println("absolute     : " + file.toAbsolutePath());
+        System.out.println("file name    : " + file.getFileName());
+        System.out.println("parent       : " + file.getParent());
+
+        // ===== 1. Create the directory tree if needed =====
+        Files.createDirectories(dir);
+        System.out.println("\ndirectory ready: " + Files.exists(dir));
+
+        // ===== 2. Write a whole List in ONE line =====
+        List&lt;String&gt; lines = new ArrayList&lt;&gt;(List.of(
+            "number,holder,balance",
+            "AC1001,Priya Sharma,52000.00",
+            "AC1002,Rahul Verma,80000.00",
+            "AC1003,Anita Desai,214000.00"
+        ));
+        Files.write(file, lines, StandardCharsets.UTF_8);
+        System.out.println("written, size = " + Files.size(file) + " bytes");
+
+        // ===== 3. Append =====
+        Files.write(file, List.of("AC1004,Vikram Rao,1242.00"),
+                    StandardCharsets.UTF_8, StandardOpenOption.APPEND);
+
+        // ===== 4. Read the whole thing in ONE line =====
+        List&lt;String&gt; readBack = Files.readAllLines(file, StandardCharsets.UTF_8);
+        System.out.println("\nread " + readBack.size() + " lines:");
+        readBack.forEach(l -&gt; System.out.println("   " + l));
+
+        // ===== 5. Read as a single String =====
+        String whole = Files.readString(file, StandardCharsets.UTF_8);
+        System.out.println("\nas one String: " + whole.length() + " characters");
+
+        // ===== 6. Files.lines() - streamed, for large files. NOTE the try-with-resources =====
+        System.out.println("\nstreamed - holders only (skipping the header):");
+        try (var stream = Files.lines(file, StandardCharsets.UTF_8)) {
+            stream.skip(1)
+                  .filter(l -&gt; !l.isBlank())
+                  .map(l -&gt; l.split(",")[1])
+                  .sorted()
+                  .forEach(h -&gt; System.out.println("   " + h));
+        }
+
+        // ===== 7. Sum the balances =====
+        double total = 0;
+        for (int i = 1; i &lt; readBack.size(); i++) {
+            String[] p = readBack.get(i).split(",");
+            if (p.length == 3) total += Double.parseDouble(p[2]);
+        }
+        System.out.printf("%ntotal balance: %.2f%n", total);
+
+        // ===== 8. Copy, then delete =====
+        Path backup = dir.resolve("accounts-backup.csv");
+        Files.copy(file, backup, StandardCopyOption.REPLACE_EXISTING);
+        System.out.println("\nbackup created : " + Files.exists(backup));
+        System.out.println("backup deleted : " + Files.deleteIfExists(backup));
+
+        // ===== 9. Old API vs new: how failure is reported =====
+        System.out.println("\n--- error reporting ---");
+        System.out.println("old File.delete() on a missing file returns: "
+                           + new java.io.File("nope.txt").delete() + "   (no reason given)");
+        try {
+            Files.delete(Path.of("nope.txt"));
+        } catch (NoSuchFileException e) {
+            System.out.println("new Files.delete() THROWS and names the file: " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">path         : data/accounts.csv
+absolute     : /home/you/session4-setmap-io/data/accounts.csv
+file name    : accounts.csv
+parent       : data
+
+directory ready: true
+written, size = 104 bytes
+
+read 5 lines:
+   number,holder,balance
+   AC1001,Priya Sharma,52000.00
+   AC1002,Rahul Verma,80000.00
+   AC1003,Anita Desai,214000.00
+   AC1004,Vikram Rao,1242.00
+
+as one String: 133 characters
+
+streamed - holders only (skipping the header):
+   Anita Desai
+   Priya Sharma
+   Rahul Verma
+   Vikram Rao
+
+total balance: 347242.00
+
+backup created : true
+backup deleted : true
+
+--- error reporting ---
+old File.delete() on a missing file returns: <span class="bad">false</span>   (no reason given)
+new Files.delete() THROWS and names the file: <span class="ok">nope.txt</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Compare the two tasks honestly</span>
+              Task 6 needed a nested <code>BufferedWriter(new FileWriter(...))</code>, a manual
+              <code>while ((line = readLine()) != null)</code> loop and explicit <code>newLine()</code> calls.
+              Task 7 did the same work with <code>Files.write(...)</code> and <code>Files.readAllLines(...)</code>.
+              <br><br>
+              <strong>But note step 6:</strong> <code>Files.lines()</code> returns a stream holding an open file handle,
+              so it <em>still</em> needs try-with-resources. <code>readAllLines</code> and <code>write</code> close
+              internally; <code>lines()</code> does not. That distinction matters.
+            </div>
+            <div class="observe">
+              <span class="lbl">Which to use when</span>
+              <strong>Small/medium files:</strong> <code>Files.readAllLines</code> / <code>Files.write</code>.
+              <strong>Very large files:</strong> <code>Files.lines()</code> or a <code>BufferedReader</code> loop — never
+              load a 2GB file into a <code>List</code>, you'll get <code>OutOfMemoryError</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I wrote and read a file using <code>Files.write</code> / <code>Files.readAllLines</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Files.createDirectories</code> created the <code>data/</code> folder and I can see the file on disk.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used <code>Files.lines()</code> inside try-with-resources and know <strong>why it needs it</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw the difference between <code>File.delete()</code> returning false and <code>Files.delete()</code> throwing.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== TASK 8 — CAPSTONE ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">CAPSTONE</span><span class="chevron">▶</span> The Bank That Survives a Restart<span class="sync">Theory slides 21, 25 — all four sessions</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal — the finale of the whole series</span>
+              Build a bank application that uses <strong>every single thing</strong> you've learned:
+              <strong>exceptions</strong> (Session 1) for files and validation, <strong>polymorphism</strong>
+              (Session 2) to recreate the right subclass on load, <strong>collections</strong> (Session 3) to hold the
+              model, and <strong>Set + Map + File I/O</strong> (today) for uniqueness, instant lookup and persistence.
+              <br><br>
+              <strong>The test of success: add accounts, quit, restart — and your data is still there.</strong>
+            </div>
+
+            <div class="tree">session4-setmap-io/
+├── Account.java + 4 subclasses      <span class="c">Sessions 2-3, with equals/hashCode</span>
+├── InvalidAmountException.java      <span class="c">Session 1</span>
+├── InsufficientFundsException.java  <span class="c">Session 1</span>
+├── DuplicateAccountException.java   <span class="c">NEW - thrown by the Set check</span>
+├── AccountNotFoundException.java    <span class="c">NEW - thrown by the Map lookup</span>
+├── Bank.java                        <span class="c">NEW - Map + Set, the domain logic</span>
+├── BankStorage.java                 <span class="c">NEW - CSV save/load</span>
+└── BankConsole.java                 <span class="c">NEW - the menu</span>
+     └── data/accounts.csv           <span class="c">created at runtime</span></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">DuplicateAccountException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class DuplicateAccountException extends Exception {     // CHECKED - recoverable
+    public DuplicateAccountException(String accountNumber) {
+        super("Account " + accountNumber + " already exists");
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">AccountNotFoundException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class AccountNotFoundException extends Exception {      // CHECKED - recoverable
+    public AccountNotFoundException(String accountNumber) {
+        super("No account found with number " + accountNumber);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Bank.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.*;
+
+public class Bank {
+
+    private final String name;
+
+    // MAP: account number -> Account. O(1) lookup.
+    // LinkedHashMap so listing and saving keep a predictable order.
+    private final Map&lt;String, Account&gt; accounts = new LinkedHashMap&lt;&gt;();
+
+    // SET: every holder name, automatically deduplicated.
+    // TreeSet so it is always sorted, for free.
+    private final Set&lt;String&gt; holders = new TreeSet&lt;&gt;();
+
+    public Bank(String name) {
+        this.name = name;
+    }
+
+    // ===== The Set/Map uniqueness guarantee =====
+    public void addAccount(Account account) throws DuplicateAccountException {
+        Objects.requireNonNull(account, "account must not be null");
+        if (accounts.containsKey(account.getAccountNumber())) {      // O(1) check
+            throw new DuplicateAccountException(account.getAccountNumber());
+        }
+        accounts.put(account.getAccountNumber(), account);
+        holders.add(account.getHolder());
+    }
+
+    // ===== O(1) lookup instead of scanning a list =====
+    public Account find(String accountNumber) throws AccountNotFoundException {
+        Account account = accounts.get(accountNumber);
+        if (account == null) {
+            throw new AccountNotFoundException(accountNumber);
+        }
+        return account;
+    }
+
+    public boolean removeAccount(String accountNumber) {
+        Account removed = accounts.remove(accountNumber);
+        if (removed == null) return false;
+        // The holder may still own other accounts, so only drop the name if not
+        boolean stillHasAccounts = accounts.values().stream()
+                .anyMatch(a -&gt; a.getHolder().equals(removed.getHolder()));
+        if (!stillHasAccounts) holders.remove(removed.getHolder());
+        return true;
+    }
+
+    // ===== Grouping, with computeIfAbsent =====
+    public Map&lt;String, List&lt;Account&gt;&gt; groupByType() {
+        Map&lt;String, List&lt;Account&gt;&gt; byType = new TreeMap&lt;&gt;();
+        for (Account a : accounts.values()) {
+            byType.computeIfAbsent(a.accountType(), k -&gt; new ArrayList&lt;&gt;()).add(a);
+        }
+        return byType;
+    }
+
+    public double totalDeposits() {
+        double total = 0;
+        for (Account a : accounts.values()) total += a.getBalance();
+        return total;
+    }
+
+    public void applyInterestToAll() {
+        for (Account a : accounts.values()) a.applyInterest();     // POLYMORPHIC
+    }
+
+    // Sorted views, using Comparator chains from Session 3
+    public List&lt;Account&gt; sortedByBalance() {
+        List&lt;Account&gt; list = new ArrayList&lt;&gt;(accounts.values());
+        list.sort(Comparator.comparingDouble(Account::getBalance).reversed());
+        return list;
+    }
+
+    // DEFENSIVE COPIES (Session 3)
+    public Collection&lt;Account&gt; getAccounts() { return List.copyOf(accounts.values()); }
+
+    // NOTE: return a NEW TreeSet, not Set.copyOf(holders).
+    // Set.copyOf() gives an immutable set with UNSPECIFIED iteration order, which
+    // would silently throw away our sorting. A TreeSet copy stays sorted.
+    public Set&lt;String&gt; getHolders()          { return new TreeSet&lt;&gt;(holders); }
+
+    public int size()                        { return accounts.size(); }
+    public String getName()                  { return name; }
+}</code></pre></div>
+
+            <div class="observe">
+              <span class="lbl">Note on <code>applyInterest()</code></span>
+              If your Session 2 <code>Account.applyInterest()</code> returns <code>double</code>, that's fine — just
+              ignore the return value here, or change the loop to collect the totals. If you never wrote it, add
+              <code>public void applyInterest() { balance += balance * interestRate(); }</code> to <code>Account</code>.
+            </div>
+            <div class="observe">
+              <span class="lbl">A subtle trap in <code>getHolders()</code> — worth pausing on</span>
+              Notice the comment in <code>getHolders()</code>. The obvious defensive copy would be
+              <code>Set.copyOf(holders)</code> — and it <strong>compiles, runs, and silently breaks your sorting</strong>,
+              because <code>Set.copyOf()</code> returns an immutable set whose iteration order is
+              <em>unspecified</em>. Your carefully chosen <code>TreeSet</code> ordering is thrown away at the door.
+              <br><br>
+              <code>List.copyOf()</code> is safe (lists are ordered by definition), but for a sorted set you must copy
+              into a <strong>new <code>TreeSet</code></strong>. If option 6 prints your holders out of alphabetical
+              order, this is why — a genuinely easy mistake to make, and a good example of why you should always check
+              output rather than assume.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankStorage.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class BankStorage {
+
+    private static final String HEADER = "type,number,holder,balance";
+    private final Path file;
+
+    public BankStorage(Path file) {
+        this.file = file;
+    }
+
+    // ===================== SAVE: objects -> CSV =====================
+    public void save(Bank bank) throws IOException {
+        List&lt;String&gt; lines = new ArrayList&lt;&gt;();
+        lines.add(HEADER);
+        for (Account a : bank.getAccounts()) {
+            lines.add(String.join(",",
+                a.accountType(),
+                a.getAccountNumber(),
+                a.getHolder(),
+                String.format("%.2f", a.getBalance())));
+        }
+        if (file.getParent() != null) Files.createDirectories(file.getParent());
+        Files.write(file, lines, StandardCharsets.UTF_8);       // closes internally
+    }
+
+    // ===================== LOAD: CSV -> objects =====================
+    public Bank load(String bankName) throws IOException {
+        Bank bank = new Bank(bankName);
+
+        if (!Files.exists(file)) {
+            System.out.println("  (no save file yet - starting fresh)");
+            return bank;                       // first run is NOT an error
+        }
+
+        List&lt;String&gt; lines = Files.readAllLines(file, StandardCharsets.UTF_8);
+        int loaded = 0, skipped = 0;
+
+        for (int i = 1; i &lt; lines.size(); i++) {           // skip the header row
+            String line = lines.get(i);
+            if (line.isBlank()) continue;
+
+            String[] p = line.split(",", -1);
+            if (p.length != 4) {
+                System.err.println("  line " + (i + 1) + " malformed, skipped: " + line);
+                skipped++;
+                continue;
+            }
+            try {
+                double balance = Double.parseDouble(p[3].trim());
+
+                // POLYMORPHISM: recreate the correct SUBCLASS from the type column
+                Account account = switch (p[0].trim()) {
+                    case "Savings"       -&gt; new SavingsAccount(p[1].trim(), p[2].trim(), balance);
+                    case "Current"       -&gt; new CurrentAccount(p[1].trim(), p[2].trim(), balance, 25000);
+                    case "Fixed Deposit" -&gt; new FixedDepositAccount(p[1].trim(), p[2].trim(), balance, 12);
+                    case "Salary"        -&gt; new SalaryAccount(p[1].trim(), p[2].trim(), balance);
+                    default -&gt; throw new IllegalArgumentException("unknown type '" + p[0] + "'");
+                };
+                bank.addAccount(account);
+                loaded++;
+
+            } catch (NumberFormatException e) {
+                System.err.println("  line " + (i + 1) + " bad balance, skipped");
+                skipped++;
+            } catch (IllegalArgumentException e) {
+                System.err.println("  line " + (i + 1) + " " + e.getMessage() + ", skipped");
+                skipped++;
+            } catch (DuplicateAccountException e) {
+                System.err.println("  line " + (i + 1) + " " + e.getMessage() + ", skipped");
+                skipped++;
+            }
+        }
+        System.out.println("  loaded " + loaded + " account(s), skipped " + skipped);
+        return bank;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankConsole.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.io.IOException;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+
+public class BankConsole {
+
+    private static final Path SAVE_FILE = Path.of("data", "accounts.csv");
+
+    public static void main(String[] args) {
+        BankStorage storage = new BankStorage(SAVE_FILE);
+
+        // ===== LOAD ON STARTUP =====
+        System.out.println("Loading from " + SAVE_FILE + " ...");
+        Bank bank;
+        try {
+            bank = storage.load("TCS Bank");
+        } catch (IOException e) {
+            System.out.println("  could not read the save file: " + e.getMessage());
+            System.out.println("  starting with an empty bank");
+            bank = new Bank("TCS Bank");
+        }
+
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean running = true;
+            while (running) {
+                menu(bank);
+                switch (scanner.nextLine().trim()) {
+                    case "1" -&gt; listAccounts(bank);
+                    case "2" -&gt; addAccount(bank, scanner);
+                    case "3" -&gt; findAccount(bank, scanner);
+                    case "4" -&gt; deposit(bank, scanner);
+                    case "5" -&gt; groupByType(bank);
+                    case "6" -&gt; showHolders(bank);
+                    case "7" -&gt; applyInterest(bank);
+                    case "8" -&gt; save(bank, storage);
+                    case "9" -&gt; { save(bank, storage); running = false;
+                                  System.out.println("Goodbye."); }
+                    default  -&gt; System.out.println("!! Please choose 1-9.");
+                }
+            }
+        }
+    }
+
+    static void menu(Bank bank) {
+        System.out.printf("%n===== %s | %d account(s) | total %.2f =====%n",
+                          bank.getName(), bank.size(), bank.totalDeposits());
+        System.out.println("1. List all (sorted by balance)   5. Group by type");
+        System.out.println("2. Add account                    6. Unique holders");
+        System.out.println("3. Find by number                 7. Apply interest to all");
+        System.out.println("4. Deposit                        8. Save now");
+        System.out.println("9. Save and exit");
+        System.out.print("Choice: ");
+    }
+
+    static void listAccounts(Bank bank) {
+        if (bank.size() == 0) { System.out.println("  (no accounts yet)"); return; }
+        for (Account a : bank.sortedByBalance()) System.out.println("  " + a);
+    }
+
+    static void addAccount(Bank bank, Scanner scanner) {
+        try {
+            System.out.print("  Type (Savings/Current/Fixed Deposit/Salary): ");
+            String type = scanner.nextLine().trim();
+            System.out.print("  Account number: ");
+            String number = scanner.nextLine().trim();
+            System.out.print("  Holder name (no commas): ");
+            String holder = scanner.nextLine().trim();
+            System.out.print("  Opening balance: ");
+            double balance = Double.parseDouble(scanner.nextLine().trim());
+
+            if (number.isEmpty() || holder.isEmpty()) {
+                System.out.println("  !! Number and holder are required.");
+                return;
+            }
+            if (holder.contains(",")) {
+                System.out.println("  !! Commas would corrupt the CSV. Please omit them.");
+                return;
+            }
+
+            Account account = switch (type) {
+                case "Savings"       -&gt; new SavingsAccount(number, holder, balance);
+                case "Current"       -&gt; new CurrentAccount(number, holder, balance, 25000);
+                case "Fixed Deposit" -&gt; new FixedDepositAccount(number, holder, balance, 12);
+                case "Salary"        -&gt; new SalaryAccount(number, holder, balance);
+                default -&gt; throw new IllegalArgumentException("Unknown type: " + type);
+            };
+            bank.addAccount(account);
+            System.out.println("  Added: " + account);
+
+        } catch (NumberFormatException e) {
+            System.out.println("  !! That is not a valid number.");
+        } catch (DuplicateAccountException e) {
+            System.out.println("  !! " + e.getMessage());          // the Map/Set guarantee
+        } catch (IllegalArgumentException e) {
+            System.out.println("  !! " + e.getMessage());
+        }
+    }
+
+    static void findAccount(Bank bank, Scanner scanner) {
+        System.out.print("  Account number: ");
+        try {
+            Account found = bank.find(scanner.nextLine().trim());   // O(1)
+            System.out.println("  Found: " + found);
+        } catch (AccountNotFoundException e) {
+            System.out.println("  !! " + e.getMessage());
+        }
+    }
+
+    static void deposit(Bank bank, Scanner scanner) {
+        System.out.print("  Account number: ");
+        String number = scanner.nextLine().trim();
+        System.out.print("  Amount: ");
+        try {
+            double amount = Double.parseDouble(scanner.nextLine().trim());
+            Account account = bank.find(number);
+            account.deposit(amount);
+            System.out.printf("  New balance: %.2f%n", account.getBalance());
+        } catch (NumberFormatException e) {
+            System.out.println("  !! That is not a valid number.");
+        } catch (AccountNotFoundException | InvalidAmountException e) {
+            System.out.println("  !! " + e.getMessage());
+        }
+    }
+
+    static void groupByType(Bank bank) {
+        for (Map.Entry&lt;String, List&lt;Account&gt;&gt; e : bank.groupByType().entrySet()) {
+            double subtotal = 0;
+            for (Account a : e.getValue()) subtotal += a.getBalance();
+            System.out.printf("  %-14s %d account(s), subtotal %.2f%n",
+                              e.getKey(), e.getValue().size(), subtotal);
+        }
+    }
+
+    static void showHolders(Bank bank) {
+        System.out.println("  Unique holders (sorted, deduplicated by the Set):");
+        for (String h : bank.getHolders()) System.out.println("    " + h);
+    }
+
+    static void applyInterest(Bank bank) {
+        double before = bank.totalDeposits();
+        bank.applyInterestToAll();                      // one polymorphic loop
+        System.out.printf("  Interest applied. Total %.2f -&gt; %.2f%n",
+                          before, bank.totalDeposits());
+    }
+
+    static void save(Bank bank, BankStorage storage) {
+        try {
+            storage.save(bank);
+            System.out.println("  Saved " + bank.size() + " account(s) to " + SAVE_FILE);
+        } catch (IOException e) {
+            System.out.println("  !! Save FAILED: " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it — and prove persistence works</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java BankConsole</code> — first run says "no save file yet"</li>
+                <li>Add two or three accounts with option <strong>2</strong></li>
+                <li>Try adding the <strong>same account number twice</strong> — the Set/Map guarantee rejects it</li>
+                <li>Choose <strong>9</strong> to save and exit</li>
+                <li>Look at the file: <code>cat data/accounts.csv</code></li>
+                <li><strong>Run <code>java BankConsole</code> again — your accounts are back.</strong></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">A full session — first run</span>
+              <div class="term-out" style="margin:8px 0 0;">Loading from data/accounts.csv ...
+  (no save file yet - starting fresh)
+
+===== TCS Bank | 0 account(s) | total 0.00 =====
+Choice: 2
+  Type: Savings
+  Account number: AC1001
+  Holder name (no commas): Priya Sharma
+  Opening balance: 50000
+  <span class="ok">Added: AC1001   Priya Sharma   Savings   50000.00</span>
+
+Choice: 2
+  Type: Savings
+  Account number: AC1001
+  Holder name (no commas): Someone Else
+  Opening balance: 999
+  <span class="bad">!! Account AC1001 already exists</span>
+
+Choice: 3
+  Account number: AC1001
+  Found: AC1001   Priya Sharma   Savings   50000.00
+
+Choice: 9
+  <span class="ok">Saved 3 account(s) to data/accounts.csv</span>
+Goodbye.</div>
+            </div>
+            <div class="expected">
+              <span class="lbl">The file on disk</span>
+              <div class="term-out" style="margin:8px 0 0;">$ cat data/accounts.csv
+type,number,holder,balance
+Savings,AC1001,Priya Sharma,50000.00
+Current,AC1002,Rahul Verma,80000.00
+Fixed Deposit,AC1003,Anita Desai,200000.00</div>
+            </div>
+            <div class="expected">
+              <span class="lbl">The second run — the moment it all pays off</span>
+              <div class="term-out" style="margin:8px 0 0;">$ java BankConsole
+Loading from data/accounts.csv ...
+  <span class="ok">loaded 3 account(s), skipped 0</span>
+
+===== TCS Bank | 3 account(s) | total 330000.00 =====
+Choice: 1
+  AC1003   Anita Desai    Fixed Deposit    200000.00
+  AC1002   Rahul Verma    Current           80000.00
+  AC1001   Priya Sharma   Savings           50000.00
+
+Choice: 5
+  Current        1 account(s), subtotal 80000.00
+  Fixed Deposit  1 account(s), subtotal 200000.00
+  Savings        1 account(s), subtotal 50000.00
+
+Choice: 7
+  Interest applied. Total 330000.00 -&gt; 346000.00
+
+Choice: 6
+  Unique holders (sorted, deduplicated by the Set):
+    Anita Desai
+    Priya Sharma
+    Rahul Verma</div>
+              <strong>Your data survived the program exiting.</strong> And notice the loaded accounts are genuine
+              <code>SavingsAccount</code>, <code>CurrentAccount</code> and <code>FixedDepositAccount</code> objects —
+              option 7 applied 4%, 0% and 7% correctly, which only works because the CSV round-trip recreated the right
+              subclasses.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Now attack it — resilience test</span>
+              Open <code>data/accounts.csv</code> in your editor and deliberately corrupt it, then restart the app:
+              <ol style="margin:6px 0 0;">
+                <li>Add a line with only two fields: <code>Savings,AC9999</code></li>
+                <li>Add a line with a non-numeric balance: <code>Savings,AC8888,Test User,abc</code></li>
+                <li>Add a line with an unknown type: <code>Crypto,AC7777,Test User,500</code></li>
+                <li>Duplicate an existing account number on a new line</li>
+                <li>Add a completely blank line in the middle</li>
+              </ol>
+              <strong>All five bad rows must be skipped with a clear message, and every good row must still load.</strong>
+              One malformed line must never take down the whole application.
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected resilience</span>
+              <div class="term-out" style="margin:8px 0 0;">Loading from data/accounts.csv ...
+  <span class="warn">line 5 malformed, skipped: Savings,AC9999</span>
+  <span class="warn">line 6 bad balance, skipped</span>
+  <span class="warn">line 7 unknown type 'Crypto', skipped</span>
+  <span class="warn">line 8 Account AC1001 already exists, skipped</span>
+  <span class="ok">loaded 3 account(s), skipped 4</span>
+
+===== TCS Bank | 3 account(s) | total 330000.00 =====</div>
+            </div>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>My accounts survived a restart.</strong> This is the capstone — the data came back from the file.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">A duplicate account number was <strong>rejected</strong> by the Map/Set check.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Find by number uses <code>map.get()</code> — <strong>no list scanning anywhere</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Interest applied <strong>different rates per type</strong> after loading — proving polymorphic reconstruction worked.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I corrupted the CSV five ways and <strong>every bad row was skipped</strong> while good rows still loaded.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can point to where <strong>each of the four sessions</strong> shows up in this application.</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Take a moment — look at what you've built</span>
+              <strong>Session 1:</strong> <code>DuplicateAccountException</code>, <code>AccountNotFoundException</code>,
+              <code>IOException</code> handling, try-with-resources on <code>Scanner</code>, and a load routine that
+              survives corrupt data. <strong>Session 2:</strong> the abstract <code>Account</code> hierarchy, the
+              polymorphic interest loop, <code>equals</code>/<code>hashCode</code>, and the <code>switch</code> that
+              rebuilds the right subclass. <strong>Session 3:</strong> <code>List</code>, <code>Comparator</code>
+              sorting, defensive copies, and <code>BankStorage</code> injected into the console.
+              <strong>Session 4:</strong> <code>Map</code> for O(1) lookup, <code>TreeSet</code> for sorted unique
+              holders, <code>computeIfAbsent</code> grouping, and NIO.2 file persistence.
+              <br><br>
+              <strong>Four sessions, one working application. That's the course.</strong>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> For Anyone Who Finished Early<span class="sync">Optional</span></summary>
+          <div class="exp-body">
+            <p>Entirely optional — extensions to the capstone.</p>
+            <ol class="steps">
+              <li><strong>Atomic save.</strong> Write to <code>accounts.csv.tmp</code> then
+                  <code>Files.move(tmp, real, StandardCopyOption.REPLACE_EXISTING)</code>. Now a crash mid-write can
+                  never corrupt your real save file. This is what production systems do.</li>
+              <li><strong>Transaction log.</strong> Append every deposit to <code>data/audit.log</code> with a
+                  <code>LocalDateTime</code> stamp, using <code>StandardOpenOption.APPEND</code>. Never overwrite it.</li>
+              <li><strong>Properties config.</strong> Move the bank name, save-file path, overdraft limit and FD term
+                  into <code>app.properties</code> and load them with <code>Properties</code>. Use
+                  <code>getProperty(key, default)</code> so a missing file still works.</li>
+              <li><strong>Serialization comparison.</strong> Make <code>Account</code> implement
+                  <code>Serializable</code> and save the whole <code>Map</code> with
+                  <code>ObjectOutputStream</code>. Compare the file sizes and try opening both in a text editor —
+                  then write one sentence on why CSV is usually the better choice.</li>
+              <li><strong>Multiple indexes.</strong> Add a second Map <code>Map&lt;String, List&lt;Account&gt;&gt; byHolder</code>
+                  so you can look up all accounts for a person in O(1). Keep both maps in sync on add and remove —
+                  and notice how easy it is to introduce a bug here.</li>
+              <li><strong>LRU cache.</strong> Use the <code>LinkedHashMap</code> with
+                  <code>removeEldestEntry</code> from theory slide 13 to cache the last 5 accounts viewed.</li>
+              <li><strong>Report export.</strong> Write the <code>groupByType</code> output to
+                  <code>data/report.txt</code>, reusing the <code>Formatter</code> interface idea from Session 3.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — I implemented the atomic temp-file save.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End-of-series checkpoint — all seven must be true</span>
+          <ol style="margin:6px 0 0;">
+            <li>I can explain the bucket mechanism and why a wrong <code>hashCode</code> fails silently.</li>
+            <li>I chose between <code>HashSet</code>, <code>LinkedHashSet</code> and <code>TreeSet</code> with reasons.</li>
+            <li>I replaced list-scanning with <code>Map.get()</code> and measured the difference.</li>
+            <li>I can write <code>merge</code> and <code>computeIfAbsent</code> from memory.</li>
+            <li>I understand why an unclosed writer produces an empty file.</li>
+            <li>My bank saves to CSV and reloads correctly, recreating the right subclasses.</li>
+            <li>My loader survives a corrupt file without crashing.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have reached the end-of-series checkpoint.</strong>
+            <span class="verify">If any of the seven isn't true, ask now — this is the last session.</span>
+          </span>
+        </label>
+      </section>
+
+
+      <!-- ===== TAKE-HOME TASKS ===== -->
+      <div class="section-band">Take-home tasks — the final submission</div>
+      <section class="section">
+        <div class="concept" style="margin-top:14px;">
+          <span class="lbl">Read this first</span>
+          Four tasks. <strong>Tasks 1–3 are compulsory; Task 4 is the capstone project for distinction.</strong>
+          Every task must compile and run with <code>javac *.java</code>. This is the last submission of the series,
+          so Task 4 deliberately asks you to combine <em>everything</em> — treat it as a portfolio piece you'd be happy
+          to show someone.
+        </div>
+
+        <!-- Assignment 1 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 1</span> Text File Analyser <span class="diff easy">Easy</span></h3>
+          <p class="brief">Read a text file and report on it using <code>Set</code>, <code>Map</code> and File I/O together.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Create a sample <code>article.txt</code> with at least 15 lines of prose (any text will do).</li>
+            <li>Read it with <code>Files.readAllLines</code> or a <code>BufferedReader</code>, always specifying UTF-8.</li>
+            <li>Report: total lines, total words, total characters, and <strong>distinct</strong> words (use a <code>Set</code>).</li>
+            <li>Word frequency with <code>merge</code>. Print the <strong>top 10</strong> words by count, ties broken alphabetically.</li>
+            <li>Print all words appearing exactly once, sorted (use a <code>TreeSet</code>).</li>
+            <li>Group words by their <strong>first letter</strong> into a <code>Map&lt;Character, Set&lt;String&gt;&gt;</code> using <code>computeIfAbsent</code>, and print it in alphabetical order.</li>
+            <li>Ignore case and strip punctuation before counting.</li>
+            <li>Write the full report to <code>report.txt</code> — and handle a missing input file gracefully rather than crashing.</li>
+          </ol>
+          <div class="out">=== Analysis of article.txt ===
+Lines: 15   Words: 248   Characters: 1394
+Distinct words: 137
+
+Top 10 words:
+  the        18
+  and        11
+  of          9
+  ...
+
+Words appearing once (42): [absolutely, activity, adapt, ...]
+
+Grouped by first letter:
+  a : [absolutely, activity, adapt, and]
+  b : [because, before]
+  ...
+
+<span class="ok">Report written to report.txt (2114 bytes)</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Use <code>line.toLowerCase().split("[^a-z']+")</code> to split and strip punctuation in one step, then skip
+            any blank results. Watch out for the empty first element that a leading delimiter produces.
+          </div>
+        </div>
+
+        <!-- Assignment 2 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 2</span> Student Records with Persistence <span class="diff easy">Easy</span></h3>
+          <p class="brief">A CRUD console app on a <code>Map</code>, persisted to CSV — the core skill from this session.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>A <code>Student</code> class: <code>rollNo</code>, <code>name</code>, <code>course</code>, <code>marks</code>. Correct <code>equals</code>/<code>hashCode</code> on <code>rollNo</code> only, and make that field <code>final</code>.</li>
+            <li>Store students in a <code>Map&lt;String, Student&gt;</code> keyed by roll number. Adding a duplicate roll number must throw a custom checked <code>DuplicateRollNoException</code>.</li>
+            <li>Maintain a <code>TreeSet&lt;String&gt;</code> of distinct course names, kept in sync automatically.</li>
+            <li>Menu: add, find by roll number (O(1)), update marks, delete, list all sorted by marks descending, group by course, show distinct courses, save, exit.</li>
+            <li>Save to <code>students.csv</code> with a header row; load automatically on startup. Missing file = empty app, not an error.</li>
+            <li>The loader must skip malformed rows with a message and continue. <strong>Demonstrate this</strong> by including a deliberately corrupt <code>students-broken.csv</code> in your submission along with a screenshot or pasted output of it loading.</li>
+            <li>Use try-with-resources everywhere. No stack trace may ever reach the user.</li>
+            <li>Group by course into <code>Map&lt;String, List&lt;Student&gt;&gt;</code> with <code>computeIfAbsent</code>, printing a per-course average.</li>
+          </ol>
+          <div class="out">Loading students.csv ... loaded 5, skipped 0
+
+===== 5 students | 3 courses =====
+Choice: 6
+  B.Tech CSE   2 students, average 84.50
+  B.Tech ECE   2 students, average 71.00
+  MCA          1 student,  average 91.00
+
+Choice: 2
+  Roll number: R003
+  <span class="bad">!! Roll number R003 already exists</span>
+
+Choice: 3
+  Roll number: R002
+  Found: R002  Rahul Verma  B.Tech ECE  68</div>
+        </div>
+
+        <!-- Assignment 3 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 3</span> Inventory System with Set Operations <span class="diff med">Medium</span></h3>
+          <p class="brief">Two warehouses, real set algebra, and a reorder report — exercising every Set operation for a purpose.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>A <code>Product</code> class: <code>sku</code> (final), <code>name</code>, <code>category</code>, <code>price</code>, <code>quantity</code>. <code>equals</code>/<code>hashCode</code> on <code>sku</code>.</li>
+            <li>An <code>Inventory</code> class holding <code>Map&lt;String, Product&gt;</code> by SKU, loaded from a per-warehouse CSV file.</li>
+            <li>Two inventories loaded from <code>warehouse-a.csv</code> and <code>warehouse-b.csv</code> (create both, with deliberate overlap).</li>
+            <li>Using <strong>set operations</strong>, report:
+                <ul>
+                  <li>SKUs stocked in <strong>both</strong> warehouses (<code>retainAll</code>)</li>
+                  <li>SKUs <strong>only</strong> in A, and only in B (<code>removeAll</code>)</li>
+                  <li>The <strong>combined</strong> catalogue (<code>addAll</code>)</li>
+                  <li>Whether A's catalogue is a <strong>subset</strong> of the combined one (<code>containsAll</code>)</li>
+                </ul>
+                <strong>None of these may modify the original sets</strong> — copy first, and prove it by printing the originals afterwards.</li>
+            <li>A <code>TreeMap&lt;String, List&lt;Product&gt;&gt;</code> grouping the combined catalogue by category, printing per-category stock value.</li>
+            <li>A reorder report: every product with <code>quantity &lt; 10</code>, sorted by quantity ascending, written to <code>reorder.txt</code>.</li>
+            <li>A merge operation producing a combined inventory where a shared SKU has its quantities <strong>summed</strong> — use <code>merge</code> with a remapping function.</li>
+            <li>Handle a missing warehouse file as an empty inventory with a warning, not a crash.</li>
+            <li>In a comment, explain why <code>Set&lt;String&gt;</code> of SKUs is used for the algebra rather than <code>Set&lt;Product&gt;</code> — and what would have to be true of <code>Product</code> for the latter to work.</li>
+          </ol>
+          <div class="out">Warehouse A: 8 products   Warehouse B: 7 products
+
+In BOTH warehouses (3)   : [SKU-101, SKU-104, SKU-109]
+Only in A (5)            : [SKU-102, SKU-103, SKU-105, SKU-106, SKU-107]
+Only in B (4)            : [SKU-201, SKU-202, SKU-203, SKU-204]
+Combined catalogue (12)  : 12 distinct SKUs
+A is a subset of combined: true
+<span class="ok">Originals unchanged: A still 8, B still 7</span>
+
+Combined stock by category:
+  Electronics   5 products, value 284500.00
+  Furniture     3 products, value  47200.00
+  Stationery    4 products, value   3120.00
+
+Merged quantities for shared SKUs:
+  SKU-101  A:12 + B:8  = 20
+  SKU-104  A: 3 + B:15 = 18
+
+<span class="warn">Reorder report: 4 products below 10 units -> reorder.txt</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            For requirement 7: <code>combined.merge(sku, qty, Integer::sum)</code> is the whole thing. For requirement 9,
+            think about what <code>equals</code> on <code>Product</code> would mean if the same SKU had different
+            quantities in each warehouse — that's exactly why the SKU string is the safer key for set algebra.
+          </div>
+        </div>
+
+        <!-- Assignment 4 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 4</span> Capstone — Library Management System <span class="diff hard">Distinction</span></h3>
+          <p class="brief">The final project of the series. One application using every concept from all four sessions, with persistence.</p>
+          <span class="rq">Requirements — Session 1: exceptions</span>
+          <ol class="req">
+            <li>A custom exception hierarchy rooted at <code>LibraryException</code>, with at least four children: <code>ItemNotFoundException</code>, <code>ItemNotAvailableException</code>, <code>BorrowLimitExceededException</code>, <code>DuplicateItemException</code>. Justify checked vs unchecked for each in a comment.</li>
+            <li>Exception <strong>chaining</strong> across layers: the storage layer wraps <code>IOException</code> in a <code>StorageException</code> with the cause attached. Log the full chain once, at the boundary.</li>
+            <li>try-with-resources for every file and the <code>Scanner</code>. No stack trace may reach the user.</li>
+          </ol>
+          <span class="rq">Requirements — Session 2: inheritance &amp; polymorphism</span>
+          <ol class="req">
+            <li>Abstract <code>LibraryItem</code> with abstract <code>loanPeriodDays()</code> and <code>finePerDay()</code>, plus a <code>final</code> template method <code>calculateFine(int daysLate)</code>.</li>
+            <li>At least four concrete types: <code>Book</code>, <code>DVD</code>, <code>Magazine</code>, <code>AudioBook</code>. A <code>ReferenceBook</code> that cannot be issued at all.</li>
+            <li>An interface <code>Reservable</code> with a <code>default</code> method, implemented by only some types. Use pattern-matching <code>instanceof</code> to apply it — nowhere else.</li>
+            <li>Correct <code>equals</code>/<code>hashCode</code>/<code>toString</code>, keyed on an immutable <code>id</code>.</li>
+          </ol>
+          <span class="rq">Requirements — Session 3: collections &amp; relationships</span>
+          <ol class="req">
+            <li><code>Member</code> HAS-A borrowed-items list (<strong>aggregation</strong>); <code>LibraryItem</code> OWNS a <code>LoanHistory</code> (<strong>composition</strong>); <code>Library</code> is <strong>injected</strong> with a <code>FineCalculator</code> and a <code>LibraryStorage</code> (<strong>dependency</strong>). Label all of them in a comment block.</li>
+            <li>Defensive copies from every collection-returning getter, with a demo proving an external <code>clear()</code> cannot damage your data.</li>
+            <li>At least three <code>Comparator</code> chains: items by title; items by fine descending then title; members by items-borrowed descending then name.</li>
+            <li><code>removeIf</code> for returns — a <code>ConcurrentModificationException</code> anywhere loses marks.</li>
+          </ol>
+          <span class="rq">Requirements — Session 4: Set, Map &amp; File I/O</span>
+          <ol class="req">
+            <li><code>Map&lt;String, LibraryItem&gt;</code> by id and <code>Map&lt;String, Member&gt;</code> by member id, both O(1). No list scanning for lookups anywhere.</li>
+            <li>A <code>Set</code> guaranteeing unique ids, and a <code>TreeSet</code> of distinct authors or categories, always sorted.</li>
+            <li><code>Map&lt;String, List&lt;LibraryItem&gt;&gt;</code> grouping by category via <code>computeIfAbsent</code>, and a <code>Map&lt;String, Integer&gt;</code> of issue counts per item via <code>merge</code> — used for a "most borrowed" report.</li>
+            <li>Persist <strong>two</strong> files: <code>items.csv</code> and <code>members.csv</code> (with borrowed ids as a semicolon-separated field). Load both on startup; save on exit. <strong>Data must survive a restart, including who has borrowed what.</strong></li>
+            <li>The loader must tolerate malformed rows, unknown types, duplicate ids and blank lines — skipping each with a clear message. <strong>Submit a deliberately corrupted CSV plus the output showing it loading successfully anyway.</strong></li>
+            <li>An <strong>atomic save</strong>: write to a <code>.tmp</code> file then <code>Files.move</code> with <code>REPLACE_EXISTING</code>.</li>
+            <li>An append-only <code>audit.log</code> recording every issue and return with a timestamp, using <code>StandardOpenOption.APPEND</code>.</li>
+          </ol>
+          <div class="out">Loading library ... items.csv: 12 loaded, 2 skipped | members.csv: 4 loaded
+<span class="warn">  items.csv line 7 unknown type 'Podcast', skipped</span>
+<span class="warn">  items.csv line 11 duplicate id 'B003', skipped</span>
+
+===== Central Library | 12 items | 4 members | 5 on loan =====
+Choice: 3
+  Member id: M001   Item id: B004
+  <span class="ok">ISSUED B004 'Effective Java' to Priya Sharma, due in 14 days</span>
+  <span class="dim">[AUDIT] 2026-08-21T14:32:07 ISSUE B004 -> M001</span>
+
+Choice: 3
+  Member id: M001   Item id: R001
+  <span class="bad">!! ItemNotAvailableException: reference items cannot be issued</span>
+
+Choice: 3
+  Member id: M002   Item id: D002
+  <span class="bad">!! BorrowLimitExceededException: Rahul Verma already has 3 items</span>
+
+Choice: 7   (most borrowed)
+  B001  Clean Code           issued 9 times
+  D001  Inception            issued 6 times
+
+Choice: 9
+  <span class="ok">Saved atomically: items.csv (12), members.csv (4). Goodbye.</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Requirement 17 is the hardest part: to restore <em>who borrowed what</em>, load all items into the Map
+            <strong>first</strong>, then load members and resolve their borrowed-id lists against that Map. Trying to do
+            it in one pass will not work — and noticing that is part of the exercise.
+          </div>
+        </div>
+
+        <div class="submit-panel">
+          <h3>📦 How to submit</h3>
+          <ol>
+            <li>Create a folder named <code>&lt;your-name&gt;-session4-tasks</code>.</li>
+            <li>One sub-folder per task: <code>task1/</code> … <code>task4/</code>.</li>
+            <li><code>.java</code> source files only, <strong>plus</strong> your sample data files (<code>article.txt</code>, the CSVs, and the deliberately corrupted ones).</li>
+            <li>No <code>.class</code> files, no <code>data/</code> output folders, no IDE folders.</li>
+            <li>A <code>NOTES.md</code> covering: which tasks you finished, anything broken, your checked/unchecked justifications, your relationship comment block, and <strong>pasted console output showing a corrupt file loading gracefully</strong>.</li>
+            <li>Zip and submit. <strong>This is the final submission of the series.</strong></li>
+          </ol>
+          <p style="margin-top:14px;"><strong>How it will be assessed</strong></p>
+          <table>
+            <thead><tr><th>Criterion</th><th>Weight</th><th>What earns full marks</th></tr></thead>
+            <tbody>
+              <tr><td>Compiles and runs</td><td>10%</td><td><code>javac *.java</code> is clean</td></tr>
+              <tr><td>Correct Set/Map choices</td><td>15%</td><td>The right implementation for the job, justified; no list-scanning for lookups</td></tr>
+              <tr><td>equals/hashCode correctness</td><td>15%</td><td>Same immutable fields in both; keys can't go stale</td></tr>
+              <tr><td>merge / computeIfAbsent used</td><td>10%</td><td>Idiomatic counting and grouping, not manual null checks</td></tr>
+              <tr><td>Resource safety</td><td>15%</td><td>try-with-resources everywhere; charset always specified</td></tr>
+              <tr><td>Round-trip persistence</td><td>20%</td><td>Data genuinely survives a restart, with correct subclasses restored</td></tr>
+              <tr><td>Resilient loading</td><td>15%</td><td>Corrupt rows skipped with clear messages; good rows still load</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;"><strong>Instant mark loss:</strong> a writer that isn't closed, a missing charset, <code>equals</code> without <code>hashCode</code>, a mutable field inside <code>hashCode</code>, an empty <code>catch</code> block, or a loader that dies on the first bad line.</p>
+        </div>
+
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have read all four take-home tasks</strong> and know what's expected.</span>
+        </label>
+      </section>
+
+
+      <!-- ===== COMMON ISSUES ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Common Issues &amp; Fixes</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:40%">Symptom</th><th>Cause &amp; fix</th></tr></thead>
+              <tbody>
+                <tr><td><strong>My file is empty / truncated</strong></td><td>The writer was never closed, so the buffer was never flushed. Use try-with-resources.</td></tr>
+                <tr><td><code>HashSet</code> contains duplicates</td><td>Missing or wrong <code>hashCode()</code>. It must use the same fields as <code>equals()</code>.</td></tr>
+                <tr><td><code>contains()</code> false for an object that's in there</td><td>Either no <code>hashCode()</code>, or you mutated a field used by it after insertion.</td></tr>
+                <tr><td><code>NullPointerException</code> adding to a <code>TreeSet</code></td><td><code>TreeSet</code> rejects <code>null</code> — it can't compare it. Use <code>HashSet</code>, or filter nulls out.</td></tr>
+                <tr><td><code>ClassCastException</code> in a <code>TreeSet</code>/<code>TreeMap</code></td><td>Your class doesn't implement <code>Comparable</code>. Implement it, or pass a <code>Comparator</code> to the constructor.</td></tr>
+                <tr><td><code>map.get(key)</code> returns null unexpectedly</td><td>The key's <code>equals</code>/<code>hashCode</code> don't match, or there's whitespace. <code>trim()</code> keys parsed from files.</td></tr>
+                <tr><td><code>ConcurrentModificationException</code> on a Map</td><td>You modified the map while iterating a view. Use <code>entrySet().removeIf(...)</code>.</td></tr>
+                <tr><td><code>FileNotFoundException</code> and you're sure it exists</td><td>Relative paths resolve from the <em>working directory</em>, not the source folder. Print <code>Path.of("x").toAbsolutePath()</code> to see where it's actually looking.</td></tr>
+                <tr><td><code>NoSuchFileException</code> from <code>Files.write</code></td><td>The parent directory doesn't exist. Call <code>Files.createDirectories(path.getParent())</code> first.</td></tr>
+                <tr><td><code>AccessDeniedException</code></td><td>No write permission there. Choose a folder you own.</td></tr>
+                <tr><td>Accented/Hindi/₹ characters are mangled</td><td>Charset mismatch. Specify <code>StandardCharsets.UTF_8</code> on <strong>both</strong> the writer and the reader.</td></tr>
+                <tr><td><code>ArrayIndexOutOfBoundsException</code> when parsing CSV</td><td>A short or blank row. Check <code>parts.length</code> before indexing, and use <code>split(",", -1)</code>.</td></tr>
+                <tr><td>CSV row splits into too many fields</td><td>A comma inside a data value (e.g. a name). Reject commas on input, or use a proper CSV library.</td></tr>
+                <tr><td>Loading dies on the first bad line</td><td>Your parse is outside the try, or you re-throw. Catch <em>inside</em> the loop and <code>continue</code>.</td></tr>
+                <tr><td><code>unreported exception IOException</code></td><td>Checked exception (Session 1). Catch it, or add <code>throws IOException</code>.</td></tr>
+                <tr><td><code>OutOfMemoryError</code> reading a file</td><td><code>readAllLines</code> on a huge file. Use <code>Files.lines()</code> in try-with-resources.</td></tr>
+                <tr><td>Save works but load gets 0 accounts</td><td>You're probably skipping the header when there isn't one, or writing without one. Keep both sides consistent.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong><code>Set</code></strong></td><td>A collection with no duplicates</td></tr>
+                <tr><td><strong><code>Map</code></strong></td><td>Key → value pairs. <em>Not</em> a <code>Collection</code></td></tr>
+                <tr><td><strong>Bucket</strong></td><td>A slot in the hash table's internal array</td></tr>
+                <tr><td><strong>Hashing</strong></td><td>Turning an object into a number used to pick a bucket</td></tr>
+                <tr><td><strong>Collision</strong></td><td>Two different objects landing in the same bucket — normal and handled</td></tr>
+                <tr><td><strong>Chaining</strong></td><td>Storing colliding entries as a linked list in one bucket</td></tr>
+                <tr><td><strong>Treeification</strong></td><td>Java 8+ converting an over-full bucket into a balanced tree</td></tr>
+                <tr><td><strong>Load factor</strong></td><td>How full the table gets (0.75) before it doubles and rehashes</td></tr>
+                <tr><td><strong>Rehashing</strong></td><td>Recomputing every bucket index after a resize</td></tr>
+                <tr><td><strong><code>entrySet()</code></strong></td><td>A view of key–value pairs — the efficient way to iterate both</td></tr>
+                <tr><td><strong><code>merge</code></strong></td><td>Combine a new value with any existing one — the counting idiom</td></tr>
+                <tr><td><strong><code>computeIfAbsent</code></strong></td><td>Get the value, creating it if missing — the grouping idiom</td></tr>
+                <tr><td><strong>Byte stream</strong></td><td><code>InputStream</code>/<code>OutputStream</code> — for binary data</td></tr>
+                <tr><td><strong>Character stream</strong></td><td><code>Reader</code>/<code>Writer</code> — for text, with an encoding</td></tr>
+                <tr><td><strong>Buffering</strong></td><td>Batching reads/writes in memory to avoid per-character OS calls</td></tr>
+                <tr><td><strong>Flush</strong></td><td>Forcing buffered data out to the destination. <code>close()</code> flushes</td></tr>
+                <tr><td><strong>Charset / encoding</strong></td><td>The rules mapping characters to bytes — always state UTF-8</td></tr>
+                <tr><td><strong>NIO.2</strong></td><td>The modern <code>java.nio.file</code> API: <code>Path</code> and <code>Files</code></td></tr>
+                <tr><td><strong><code>Path</code></strong></td><td>An OS-independent file location</td></tr>
+                <tr><td><strong>Serialization</strong></td><td>Writing a Java object graph to bytes directly</td></tr>
+                <tr><td><strong><code>transient</code></strong></td><td>Marks a field to be excluded from serialization</td></tr>
+                <tr><td><strong>Round-trip</strong></td><td>Objects → file → objects, arriving back intact</td></tr>
+                <tr><td><strong>Atomic save</strong></td><td>Write to a temp file then rename, so a crash can't corrupt the original</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — the final one</summary>
+          <div class="exp-body">
+            <p>Twelve questions covering today. If you can answer them all, you've finished the series properly.</p>
+            <ol class="steps">
+              <li>How does a <code>Set</code> know an element is a duplicate?</li>
+              <li>State the <code>equals</code>/<code>hashCode</code> contract, and say which direction is mandatory.</li>
+              <li>Walk through what <code>HashSet.contains(x)</code> actually does, step by step.</li>
+              <li>Why does a broken <code>hashCode()</code> fail <em>silently</em> rather than throwing?</li>
+              <li>What happens if you mutate a field used by <code>hashCode()</code> after insertion?</li>
+              <li>When would you choose <code>LinkedHashSet</code> over <code>HashSet</code>, and <code>TreeSet</code> over both?</li>
+              <li>Why isn't <code>Map</code> a <code>Collection</code>?</li>
+              <li>Write the one-line idiom for counting occurrences, and the one for grouping into lists.</li>
+              <li>Why is <code>keySet()</code> + <code>get()</code> worse than <code>entrySet()</code>?</li>
+              <li>Why is <code>containsKey()</code> O(1) but <code>containsValue()</code> O(n)?</li>
+              <li>Explain precisely why an unclosed <code>BufferedWriter</code> produces an empty file.</li>
+              <li>When loading a CSV, why must a malformed row not abort the whole load — and how do you arrange that?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all twelve self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3><code>Set</code> &amp; <code>Map</code></h3>
+              <table>
+                <thead><tr><th>Call</th><th>Does</th></tr></thead>
+                <tbody>
+                  <tr><td><code>set.add(e)</code></td><td>Adds; <strong>false</strong> if duplicate</td></tr>
+                  <tr><td><code>set.contains(e)</code></td><td>O(1) membership test</td></tr>
+                  <tr><td><code>a.addAll(b)</code></td><td>Union (mutates <code>a</code>)</td></tr>
+                  <tr><td><code>a.retainAll(b)</code></td><td>Intersection</td></tr>
+                  <tr><td><code>a.removeAll(b)</code></td><td>Difference</td></tr>
+                  <tr><td><code>map.put(k, v)</code></td><td>Insert/overwrite; returns old</td></tr>
+                  <tr><td><code>map.get(k)</code></td><td>Value or <code>null</code></td></tr>
+                  <tr><td><code>getOrDefault(k, d)</code></td><td>Fallback instead of null</td></tr>
+                  <tr><td><code>putIfAbsent(k, v)</code></td><td>Only if not present</td></tr>
+                  <tr><td><code>merge(k, 1, Integer::sum)</code></td><td><strong>Counting</strong></td></tr>
+                  <tr><td><code>computeIfAbsent(k, x -&gt; new ArrayList&lt;&gt;())</code></td><td><strong>Grouping</strong></td></tr>
+                  <tr><td><code>map.entrySet()</code></td><td>Iterate key + value together</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>File I/O</h3>
+              <table>
+                <thead><tr><th>Call</th><th>Does</th></tr></thead>
+                <tbody>
+                  <tr><td><code>Path.of("d", "f.csv")</code></td><td>OS-independent path</td></tr>
+                  <tr><td><code>Files.exists(p)</code></td><td>Is it there?</td></tr>
+                  <tr><td><code>Files.createDirectories(p)</code></td><td>Make the folder tree</td></tr>
+                  <tr><td><code>Files.readAllLines(p, UTF_8)</code></td><td>Whole file → <code>List</code></td></tr>
+                  <tr><td><code>Files.readString(p)</code></td><td>Whole file → <code>String</code></td></tr>
+                  <tr><td><code>Files.write(p, lines, UTF_8)</code></td><td>Write a <code>List</code></td></tr>
+                  <tr><td><code>…, StandardOpenOption.APPEND</code></td><td>Append instead of overwrite</td></tr>
+                  <tr><td><code>Files.lines(p)</code></td><td>Stream — <strong>needs closing</strong></td></tr>
+                  <tr><td><code>Files.copy / move / deleteIfExists</code></td><td>File operations</td></tr>
+                  <tr><td><code>new BufferedReader(new FileReader(f, UTF_8))</code></td><td>Classic line reading</td></tr>
+                  <tr><td><code>new FileWriter(f, UTF_8, true)</code></td><td>Classic append</td></tr>
+                  <tr><td><code>try (…) { }</code></td><td><strong>Always.</strong> Closes and flushes</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Choosing an implementation</h3>
+          <table>
+            <thead><tr><th>Need</th><th>Set</th><th>Map</th><th>Cost</th></tr></thead>
+            <tbody>
+              <tr><td>Just uniqueness / lookup</td><td><code>HashSet</code></td><td><code>HashMap</code></td><td>O(1)</td></tr>
+              <tr><td>Insertion order preserved</td><td><code>LinkedHashSet</code></td><td><code>LinkedHashMap</code></td><td>O(1)</td></tr>
+              <tr><td>Sorted, or range queries</td><td><code>TreeSet</code></td><td><code>TreeMap</code></td><td>O(log n)</td></tr>
+              <tr><td>Shared across threads</td><td><code>ConcurrentHashMap.newKeySet()</code></td><td><code>ConcurrentHashMap</code></td><td>O(1)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== SERIES WRAP-UP ===== -->
+      <section class="section">
+        <div class="section-band">End of the series</div>
+        <div class="concept" style="margin-top:14px;">
+          <span class="lbl">What you've built across four sessions</span>
+          You started by making a program crash on purpose. You finish with an application that guarantees data
+          integrity, refuses invalid input, models its domain with a proper class hierarchy, stores everything in the
+          right collection for the job, and <strong>persists to disk</strong>.
+          <br><br>
+          <strong>Session 1</strong> — exceptions, custom types, chaining, try-with-resources.
+          <strong>Session 2</strong> — inheritance, overriding, polymorphism, abstract classes and interfaces.
+          <strong>Session 3</strong> — Lists, generics, sorting, and the HAS-A relationships.
+          <strong>Session 4</strong> — Set, Map, hashing and File I/O.
+          <br><br>
+          Every one of these is load-bearing in real work. When you move on to JDBC, you'll find it's
+          <code>SQLException</code>, try-with-resources and mapping rows into collections. When you move on to Spring
+          Boot, you'll find interfaces, dependency injection and exception handlers. <strong>You now have the
+          vocabulary to read that code rather than copy it.</strong>
+        </div>
+        <div class="observe">
+          <span class="lbl">The one habit to keep</span>
+          Across all four sessions we broke things deliberately — a stack trace, a compiler error, a set holding
+          duplicates, a 0-byte file. Every one of those bugs <em>announced itself</em> if you were willing to read it.
+          <strong>The skill isn't avoiding mistakes. It's reading them.</strong> Keep breaking things on purpose;
+          it's the fastest way to learn.
+        </div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">🎓 Where to go next</span>
+          <ol style="margin:6px 0 0;">
+            <li><strong>JDBC</strong> — swap your CSV file for a real database. Same skills, new destination.</li>
+            <li><strong>Spring Boot (4 sessions)</strong> — REST APIs, layered architecture, DTOs, microservices.</li>
+            <li><strong>Streams &amp; lambdas</strong> — a declarative layer over the collections you now understand.</li>
+            <li><strong>JUnit</strong> — test what you've built. Your <code>equals</code>/<code>hashCode</code> and exception behaviour are ideal first subjects.</li>
+            <li><strong>Keep the capstone.</strong> Extend it, refactor it, add a database. It's the best revision you'll get.</li>
+          </ol>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:22px; font-size:14px;">
+          Java Core — Session 4 Hands-on Lab &nbsp;·&nbsp; <strong>End of the Java Core series</strong><br>
+          Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD &nbsp;·&nbsp; Thank you for your attention.
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

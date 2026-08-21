@@ -1,0 +1,2203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 1 — Exception Handling (Lab)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(231,111,0,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e76f00, #5382a1, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff8f0, #fdf1e4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(83,130,161,0.10);
+      border: 1px solid rgba(83,130,161,0.32);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffdcbc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(231,111,0,0.22);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #e76f00; }
+    details.exp.lab2 { border-left-color: #5382a1; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.lab8 { border-left-color: #d81b60; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff8f0,#ffeedb); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f2f7fb,#e6eff6); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf3ff,#f2e8ff); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#fff0f5,#ffe3ec); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5382a1; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.lab8 .lab-tag { background:#d81b60; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit compile & run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin: 12px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Take-home assignment cards === */
+    .assign {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #bf5af2;
+      border-radius: 12px; background: #fff;
+      padding: 16px 20px 18px; margin: 16px 0;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .assign h3 {
+      margin: 0 0 8px; font-size: 19px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .assign .anum {
+      background: #bf5af2; color: #fff; border-radius: 8px;
+      padding: 3px 11px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .assign .diff {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .assign .diff.easy { background: rgba(40,200,64,0.14); color: #1a7f2e; border: 1px solid rgba(40,200,64,0.4); }
+    .assign .diff.med  { background: rgba(254,188,46,0.18); color: #96690a; border: 1px solid rgba(254,188,46,0.5); }
+    .assign .diff.hard { background: rgba(255,95,87,0.13); color: #c0392b; border: 1px solid rgba(255,95,87,0.4); }
+    .assign .brief { font-size: 16.5px; margin: 0 0 4px; }
+    .assign .rq { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mac-text-muted); margin: 12px 0 0; display: block; }
+    .assign ol.req, .assign ul.req { margin: 6px 0 0; padding-left: 24px; }
+    .assign .req li { font-size: 16.5px; margin: 5px 0; line-height: 1.55; }
+    .assign .out {
+      background: #12121c; color: #d7dae0; border-radius: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 12px 16px; margin: 10px 0 0; white-space: pre; overflow-x: auto;
+    }
+    .assign .out .ok { color: #a6e22e; }
+    .assign .out .bad { color: #ff6b6b; }
+    .assign .out .dim { color: #8b8fa3; }
+    .assign .hint {
+      background: #fafafc; border: 1px dashed var(--mac-border);
+      border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; font-size: 15.5px;
+    }
+    .assign .hint .lbl { font-weight: 700; color: var(--mac-accent-2); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+
+    /* Submission / grading panel */
+    .submit-panel {
+      background: linear-gradient(135deg,#1e1e2e,#2a2a40);
+      color: #f8f8f2; border-radius: 12px; padding: 22px 26px; margin: 18px 0 0;
+    }
+    .submit-panel h3 { color: #fff; margin: 0 0 10px; font-size: 20px; }
+    .submit-panel p, .submit-panel li { color: #d7dae0; font-size: 16px; }
+    .submit-panel code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; font-size: 14.5px; }
+    .submit-panel table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .submit-panel th, .submit-panel td {
+      border: 1px solid rgba(255,255,255,0.18); padding: 8px 12px; text-align: left; font-size: 14.5px;
+    }
+    .submit-panel th { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+      .assign .diff { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session1-lab.html — Java Core Session 1</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">⚠️</div>
+        <div>
+          <h1>Java Core — Session 1 Hands-on Lab</h1>
+          <p class="section-intro">Exception handling: break it on purpose, then make it unbreakable. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Java Core Session 1 — the theory stays on the main screen while you
+          work here on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge so you know
+          exactly which part of the talk it belongs to: when that slide is on screen, this is the task you build.
+          Click a heading to expand it, use the <strong>Copy</strong> button on any snippet instead of retyping,
+          and tick each checkbox as you go. The progress bar at the top fills as you complete steps — aim for 100%.
+          Read every "Expected output" box to confirm you're on track, and raise your hand the moment you're stuck.
+        </div>
+        <div class="observe">
+          <span class="lbl">Golden rule for today</span>
+          When you get an exception, <strong>read the stack trace before you touch anything</strong>. Find the type,
+          the message, and the first line number that belongs to <em>your</em> file. Today is specifically about
+          getting comfortable with red text instead of frightened by it — so we're going to cause a lot of it
+          deliberately.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–3</span></summary>
+          <div class="exp-body">
+            <p>Do this while the agenda is being covered. Tick each item once its verification passes — the
+               "Ready to begin" badge at the top lights up when all three are green.</p>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17 or higher</strong> installed
+                <span class="verify">Verify: run <code>java -version</code> → expect <code>17</code> or higher. JDK 14+ also gives you the much friendlier NullPointerException messages we rely on in Task 1.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>java -version
+javac -version</code></pre></div>
+            <div class="term-out">$ java -version
+<span class="ok">openjdk version "17.0.9" 2023-10-17</span>
+$ javac -version
+<span class="ok">javac 17.0.9</span></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong><code>javac</code> works too</strong>, not just <code>java</code>
+                <span class="verify">If <code>java -version</code> works but <code>javac -version</code> doesn't, you have a JRE, not a JDK. Install a full JDK (Temurin or Oracle) and reopen your terminal.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A working folder + an editor</strong>
+                <span class="verify">Create a folder called <code>session1-exceptions</code>. VS Code (with the Extension Pack for Java) or IntelliJ IDEA Community are both excellent and free.</span>
+              </span>
+            </label>
+
+            <div class="dothis">
+              <span class="lbl">Set up your working folder</span>
+              <ol>
+                <li>Create a folder <code>session1-exceptions</code> somewhere you can find again.</li>
+                <li>Open it in your editor.</li>
+                <li>Open a terminal <em>in that folder</em> — in VS Code, <span class="kbd">Ctrl</span>+<span class="kbd">`</span>.</li>
+                <li>Every file today goes straight in this folder, with <strong>no package declaration</strong>, so
+                    <code>javac X.java &amp;&amp; java X</code> always just works.</li>
+              </ol>
+            </div>
+            <div class="observe">
+              <span class="lbl">Single-file shortcut (JDK 11+)</span>
+              You can skip the compile step entirely: <code>java Demo.java</code> compiles and runs in one go. Great
+              for these small experiments. For multi-file tasks (Task 6 onward) use <code>javac *.java</code> first.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">The tasks</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Break It On Purpose<span class="sync">Theory slides 6–11</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Trigger the five most common exceptions <strong>deliberately</strong>, and read each stack trace properly.
+              No <code>try</code>/<code>catch</code> yet — today we want the crash. By the end you should be able to
+              name an exception from its trace without reading the type name.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CrashLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class CrashLab {
+
+    public static void main(String[] args) {
+        // Run ONE at a time: uncomment one line, run, read the trace, re-comment.
+        crashOne();
+        // crashTwo();
+        // crashThree();
+        // crashFour();
+        // crashFive();
+    }
+
+    // 1. NullPointerException
+    static void crashOne() {
+        String name = null;
+        System.out.println("Length is: " + name.length());
+    }
+
+    // 2. ArrayIndexOutOfBoundsException
+    static void crashTwo() {
+        int[] marks = {90, 85, 77};
+        System.out.println("Fourth mark: " + marks[3]);
+    }
+
+    // 3. ArithmeticException
+    static void crashThree() {
+        int students = 0;
+        int total = 250;
+        System.out.println("Average: " + (total / students));
+    }
+
+    // 4. NumberFormatException
+    static void crashFour() {
+        String input = "twenty";
+        System.out.println("Parsed: " + Integer.parseInt(input));
+    }
+
+    // 5. StringIndexOutOfBoundsException
+    static void crashFive() {
+        String code = "TCS";
+        System.out.println("Char 10: " + code.charAt(10));
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>In your terminal: <code>javac CrashLab.java</code></li>
+                <li>Then: <code>java CrashLab</code></li>
+                <li>Read the red text carefully, then uncomment the next call and repeat.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">What you should see — crashOne()</span>
+              <div class="term-out" style="margin:8px 0 0;">Exception in thread "main" <span class="bad">java.lang.NullPointerException</span>: <span class="warn">Cannot invoke "String.length()" because "name" is null</span>
+	at CrashLab.crashOne(<span class="ok">CrashLab.java:17</span>)
+	at CrashLab.main(<span class="ok">CrashLab.java:5</span>)</div>
+              Notice the trace names <strong>the variable</strong> (<code>"name"</code>) and gives you two line numbers:
+              17 is where it broke, 5 is who called it.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Answer these for each crash</span>
+              For all five, write down: (a) the exception <strong>type</strong>, (b) the <strong>message</strong>,
+              (c) the <strong>line number in your file</strong>, and (d) whether it's <strong>checked or unchecked</strong>.
+              All five today are unchecked — make sure you can say <em>why</em>.
+            </div>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five crashes triggered</strong> and I read every stack trace.
+                <span class="verify">You should have seen five different exception type names.</span>
+              </span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can point to <strong>the exact line number</strong> in each trace where the exception was thrown.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain why all five are <strong>unchecked</strong> (they're programming mistakes, not external failures).</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Bonus — see the stack unwind</span>
+              Add this and run it. Watch how one exception thrown three levels deep reports all three frames:
+              <div class="codewrap" style="margin-top:8px;"><pre><code>static void level3() { int x = 1 / 0; }
+static void level2() { level3(); }
+static void level1() { level2(); }
+// call level1() from main — the trace shows level3, level2, level1, main</code></pre></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Your First <code>try</code>/<code>catch</code><span class="sync">Theory slide 12</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Take two of the crashes from Task 1 and make the program <strong>survive</strong> them. Prove to yourself
+              that lines after the failing line inside a <code>try</code> are skipped.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself first</span>
+              Wrap a division in <code>try</code>/<code>catch (ArithmeticException e)</code>. Print a friendly
+              message in the catch. Then add a <code>System.out.println("after the try")</code> <em>outside</em>
+              the whole thing and predict whether it runs. <em>Attempt it before opening the solution.</em>
+            </div>
+
+            <details class="exp lab2" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution</summary>
+              <div class="exp-body">
+                <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SafeOps.java</span><span class="fb-tag">create this file</span></div>
+                <div class="codewrap"><pre><code>public class SafeOps {
+
+    public static void main(String[] args) {
+        System.out.println("--- safe division ---");
+        safeDivide(100, 5);
+        safeDivide(100, 0);
+
+        System.out.println("\n--- safe parsing ---");
+        System.out.println("Parsed: " + safeParse("42"));
+        System.out.println("Parsed: " + safeParse("forty-two"));
+
+        System.out.println("\n--- skip proof ---");
+        skipProof();
+
+        System.out.println("\nProgram finished normally. No crash.");
+    }
+
+    static void safeDivide(int a, int b) {
+        try {
+            int result = a / b;
+            System.out.println(a + " / " + b + " = " + result);
+        } catch (ArithmeticException e) {
+            System.out.println("Cannot divide " + a + " by zero. (" + e.getMessage() + ")");
+        }
+    }
+
+    // Returning a fallback value instead of crashing
+    static int safeParse(String text) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException e) {
+            System.out.println("  '" + text + "' is not a number - using 0");
+            return 0;
+        }
+    }
+
+    // Proves that the rest of the try block is SKIPPED
+    static void skipProof() {
+        try {
+            System.out.println("line 1 - runs");
+            int boom = 10 / 0;
+            System.out.println("line 3 - NEVER runs");
+        } catch (ArithmeticException e) {
+            System.out.println("caught it - jumped straight here");
+        }
+        System.out.println("after the try - always runs");
+    }
+}</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">Expected output</span>
+                  <div class="term-out" style="margin:8px 0 0;">--- safe division ---
+100 / 5 = 20
+Cannot divide 100 by zero. (/ by zero)
+
+--- safe parsing ---
+Parsed: 42
+  'forty-two' is not a number - using 0
+Parsed: 0
+
+--- skip proof ---
+line 1 - runs
+caught it - jumped straight here
+after the try - always runs
+
+<span class="ok">Program finished normally. No crash.</span></div>
+                  The words <strong>"line 3 - NEVER runs"</strong> never appear. That's the whole lesson.
+                </div>
+              </div>
+            </details>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>SafeOps runs to completion</strong> with no stack trace at all.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I confirmed <strong>"line 3 - NEVER runs"</strong> is absent from the output, and I can explain why.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> Multiple Catch, Ordering &amp; Multi-catch<span class="sync">Theory slides 13–14</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Handle three different failures from one <code>try</code>, then <strong>deliberately break the ordering
+              rule</strong> to see the compiler stop you. Finally, collapse two branches into a multi-catch.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">MultiCatchLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class MultiCatchLab {
+
+    public static void main(String[] args) {
+        // Each input triggers a DIFFERENT catch block
+        process("1");      // fine
+        process("9");      // index out of bounds
+        process("abc");    // not a number
+        process("2");      // divide by zero (nums[2] is 0)
+    }
+
+    static void process(String input) {
+        System.out.println("\nInput: " + input);
+        int[] nums = {10, 5, 0};
+        try {
+            int index = Integer.parseInt(input);       // may throw NumberFormatException
+            int value = nums[index];                   // may throw ArrayIndexOutOfBounds
+            System.out.println("  100 / " + value + " = " + (100 / value));  // may throw Arithmetic
+        } catch (NumberFormatException e) {
+            System.out.println("  Not a number: " + input);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("  Index must be 0-2, you gave: " + input);
+        } catch (ArithmeticException e) {
+            System.out.println("  That slot holds zero - cannot divide.");
+        } catch (Exception e) {
+            System.out.println("  Unexpected: " + e.getClass().getSimpleName());
+        }
+    }
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">Input: 1
+  100 / 5 = 20
+
+Input: 9
+  Index must be 0-2, you gave: 9
+
+Input: abc
+  Not a number: abc
+
+Input: 2
+  That slot holds zero - cannot divide.</div>
+              One <code>try</code> block, four completely different outcomes — and the program never crashed.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Break it on purpose — the ordering rule</span>
+              Move the <code>catch (Exception e)</code> block so it is <strong>first</strong>, then recompile.
+              <strong>Do not fix it yet — read the compiler error.</strong>
+            </div>
+            <div class="expected">
+              <span class="lbl">What the compiler says</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="bad">MultiCatchLab.java:20: error:</span> exception java.lang.NumberFormatException has already been caught
+        } catch (NumberFormatException e) {
+          ^
+1 error</div>
+              This is a <strong>compile-time</strong> error, not a runtime one — Java refuses to let you write an
+              unreachable catch block. Now move it back to last.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four branches produced <strong>different</strong> messages.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered the <strong>"has already been caught"</strong> compiler error on purpose, then fixed it.</span>
+            </label>
+
+            <h3>Now collapse two into a multi-catch</h3>
+            <p>The "not a number" and "bad index" cases both mean <em>"your input was unusable"</em>. Combine them:</p>
+            <div class="codewrap"><pre><code>        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            System.out.println("  Unusable input '" + input + "' ("
+                               + e.getClass().getSimpleName() + ")");
+        } catch (ArithmeticException e) {
+            System.out.println("  That slot holds zero - cannot divide.");
+        }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Now try an illegal multi-catch</span>
+              Change it to <code>catch (Exception | ArithmeticException e)</code> and compile. You'll get
+              <em>"Alternatives in a multi-catch statement cannot be related by subclassing"</em> — the two types must
+              be unrelated. Revert afterwards.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Multi-catch version works, and I saw the <strong>"related by subclassing"</strong> error too.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> <code>finally</code> &amp; try-with-resources<span class="sync">Theory slides 15–16</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Prove <code>finally</code> runs in all four scenarios, then write <strong>your own <code>AutoCloseable</code></strong>
+              class and watch Java close it for you. This is the single most practically useful task in the sheet —
+              it's exactly what you'll do with files in Session 4 and with JDBC connections at work.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">FinallyLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class FinallyLab {
+
+    public static void main(String[] args) {
+        System.out.println("1. no exception   -> " + noException());
+        System.out.println("2. caught         -> " + caught());
+        System.out.println("3. returns early  -> " + returnsEarly());
+        System.out.println("\n4. uncaught - finally still runs, then it propagates:");
+        try {
+            uncaught();
+        } catch (ArithmeticException e) {
+            System.out.println("   main caught it after finally ran");
+        }
+    }
+
+    static String noException() {
+        try {
+            return "try";
+        } finally {
+            System.out.println("   finally ran (1)");
+        }
+    }
+
+    static String caught() {
+        try {
+            int x = 1 / 0;
+            return "unreachable";
+        } catch (ArithmeticException e) {
+            return "catch";
+        } finally {
+            System.out.println("   finally ran (2)");
+        }
+    }
+
+    static String returnsEarly() {
+        try {
+            return "returned";      // finally runs BEFORE this value is handed back
+        } finally {
+            System.out.println("   finally ran (3)");
+        }
+    }
+
+    static void uncaught() {
+        try {
+            int x = 1 / 0;
+        } finally {
+            System.out.println("   finally ran (4) - before unwinding continues");
+        }
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">   finally ran (1)
+1. no exception   -> try
+   finally ran (2)
+2. caught         -> catch
+   finally ran (3)
+3. returns early  -> returned
+
+4. uncaught - finally still runs, then it propagates:
+   finally ran (4) - before unwinding continues
+   main caught it after finally ran</div>
+              Look closely at 1–3: <strong>"finally ran" prints before the return value</strong>. That's the proof
+              that <code>finally</code> executes before control actually leaves the method.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>finally</code> ran in <strong>all four</strong> scenarios.</span>
+            </label>
+
+            <h3>Your own <code>AutoCloseable</code></h3>
+            <p>Two files. <code>Resource</code> pretends to be a database connection; the demo shows it being closed for you.</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Resource.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class Resource implements AutoCloseable {
+
+    private final String name;
+
+    public Resource(String name) {
+        this.name = name;
+        System.out.println("  OPEN  " + name);
+    }
+
+    public void use() {
+        System.out.println("  USE   " + name);
+    }
+
+    public void fail() {
+        throw new IllegalStateException(name + " blew up mid-operation");
+    }
+
+    @Override
+    public void close() {                 // called automatically
+        System.out.println("  CLOSE " + name);
+    }
+}</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">TwrLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class TwrLab {
+
+    public static void main(String[] args) {
+        System.out.println("A. happy path, two resources:");
+        try (Resource first = new Resource("first");
+             Resource second = new Resource("second")) {
+            first.use();
+            second.use();
+        }
+
+        System.out.println("\nB. exception thrown - is it still closed?");
+        try (Resource r = new Resource("risky")) {
+            r.use();
+            r.fail();
+        } catch (IllegalStateException e) {
+            System.out.println("  CAUGHT " + e.getMessage());
+        }
+
+        System.out.println("\nDone - nothing leaked.");
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac Resource.java TwrLab.java</code></li>
+                <li><code>java TwrLab</code></li>
+                <li>Watch the <strong>order</strong> of OPEN and CLOSE lines in part A.</li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">A. happy path, two resources:
+  OPEN  first
+  OPEN  second
+  USE   first
+  USE   second
+  <span class="ok">CLOSE second</span>
+  <span class="ok">CLOSE first</span>
+
+B. exception thrown - is it still closed?
+  OPEN  risky
+  USE   risky
+  <span class="ok">CLOSE risky</span>
+  CAUGHT risky blew up mid-operation
+
+Done - nothing leaked.</div>
+              <strong>Two critical observations.</strong> (1) In part A resources close in <em>reverse</em> order —
+              second then first. (2) In part B <code>CLOSE</code> appears <strong>before</strong> <code>CAUGHT</code>:
+              the resource is closed before the catch block even starts. You wrote no <code>finally</code> at all.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Resources closed in <strong>reverse order</strong>, and closed <strong>before</strong> the catch block ran.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I understand that implementing <code>AutoCloseable</code> is all it takes to use a class in try-with-resources.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> <code>throw</code>, <code>throws</code> &amp; Failing Fast<span class="sync">Theory slides 17–19</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Stop being the person who <em>catches</em> and become the person who <em>throws</em>. Build a validator
+              that refuses bad data at the door, and see the difference between <code>throw</code> and <code>throws</code>
+              in one file.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself first</span>
+              Write <code>static void setAge(int age)</code> that throws <code>IllegalArgumentException</code> if the
+              age is negative or above 130. <strong>Include the offending value in the message.</strong>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ValidationLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.Objects;
+
+public class ValidationLab {
+
+    public static void main(String[] args) {
+        // --- unchecked: no throws clause needed, no catch forced ---
+        tryRegister("Priya", 28);
+        tryRegister("Rahul", -5);
+        tryRegister("", 40);
+        tryRegister(null, 30);
+
+        // --- checked: the compiler FORCES us to deal with it ---
+        System.out.println("\n--- checked exception ---");
+        try {
+            loadProfile("missing-user");
+        } catch (ProfileException e) {
+            System.out.println("Handled: " + e.getMessage());
+        }
+    }
+
+    static void tryRegister(String name, int age) {
+        try {
+            register(name, age);
+            System.out.println("Registered " + name + ", age " + age);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            System.out.println("Rejected: " + e.getMessage());
+        }
+    }
+
+    // Validates at the boundary and FAILS FAST. No throws clause: unchecked.
+    static void register(String name, int age) {
+        Objects.requireNonNull(name, "name must not be null");
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("name must not be blank");
+        }
+        if (age &lt; 0 || age &gt; 130) {
+            throw new IllegalArgumentException("age must be 0-130, got: " + age);
+        }
+        // ... only reached with valid data ...
+    }
+
+    // CHECKED: declared with throws, so callers must handle it
+    static void loadProfile(String userId) throws ProfileException {
+        throw new ProfileException("No profile for user: " + userId);
+    }
+}</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProfileException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class ProfileException extends Exception {   // extends Exception = CHECKED
+    public ProfileException(String message) {
+        super(message);
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">Registered Priya, age 28
+Rejected: age must be 0-130, got: -5
+Rejected: name must not be blank
+Rejected: name must not be null
+
+--- checked exception ---
+Handled: No profile for user: missing-user</div>
+              Every rejection message names <strong>what</strong> was wrong <em>and</em> <strong>the actual value</strong>.
+              That's the standard to hold yourself to.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Prove the compiler enforces checked exceptions</span>
+              Delete <code>throws ProfileException</code> from <code>loadProfile</code>'s signature and compile. Then
+              put it back, but remove the <code>try</code>/<code>catch</code> in <code>main</code> and compile again.
+            </div>
+            <div class="expected">
+              <span class="lbl">Both errors you should see</span>
+              <div class="term-out" style="margin:8px 0 0;"><span class="dim"># removing the throws clause:</span>
+<span class="bad">error:</span> unreported exception ProfileException; must be caught or declared to be thrown
+
+<span class="dim"># removing the try/catch in main:</span>
+<span class="bad">error:</span> unreported exception ProfileException; must be caught or declared to be thrown</div>
+              This is exactly what "checked" means: <strong>the compiler will not let you ignore it.</strong> Now change
+              <code>ProfileException</code> to <code>extends RuntimeException</code> and watch both errors disappear.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four validation cases behave correctly, with the value included in each message.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered <strong>"unreported exception"</strong> both ways, and saw it vanish when I switched to <code>RuntimeException</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can state the difference between <code>throw</code> and <code>throws</code> without looking.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 6 ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> Custom Exceptions — the Bank Account<span class="sync">Theory slides 20–21</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build the domain object we'll carry into Session 2. <code>BankAccount</code> protects its own balance
+              with two custom exceptions — one carrying extra data. <strong>The balance must never be able to go negative.</strong>
+            </div>
+
+            <div class="tree">session1-exceptions/
+├── InsufficientFundsException.java   <span class="c">checked, carries shortfall</span>
+├── InvalidAmountException.java       <span class="c">unchecked, a caller bug</span>
+├── BankAccount.java                  <span class="c">the domain object</span>
+└── BankDemo.java                     <span class="c">exercises it</span></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">InsufficientFundsException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class InsufficientFundsException extends Exception {   // CHECKED - recoverable
+
+    private final double shortfall;
+
+    public InsufficientFundsException(String message, double shortfall) {
+        super(message);
+        this.shortfall = shortfall;
+    }
+
+    public double getShortfall() {
+        return shortfall;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">InvalidAmountException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class InvalidAmountException extends RuntimeException {  // UNCHECKED - a bug
+
+    public InvalidAmountException(double amount) {
+        super("Amount must be positive, got: " + amount);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankAccount.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class BankAccount {
+
+    private final String accountNumber;
+    private final String holder;
+    private double balance;
+
+    public BankAccount(String accountNumber, String holder, double openingBalance) {
+        if (openingBalance &lt; 0) {
+            throw new InvalidAmountException(openingBalance);
+        }
+        this.accountNumber = accountNumber;
+        this.holder = holder;
+        this.balance = openingBalance;
+    }
+
+    public void deposit(double amount) {
+        if (amount &lt;= 0) {
+            throw new InvalidAmountException(amount);       // caller's mistake
+        }
+        balance += amount;
+        System.out.printf("  Deposited %.2f  | balance %.2f%n", amount, balance);
+    }
+
+    public void withdraw(double amount) throws InsufficientFundsException {
+        if (amount &lt;= 0) {
+            throw new InvalidAmountException(amount);
+        }
+        if (amount &gt; balance) {
+            double shortfall = amount - balance;
+            throw new InsufficientFundsException(
+                String.format("Cannot withdraw %.2f - balance is only %.2f", amount, balance),
+                shortfall);
+        }
+        balance -= amount;
+        System.out.printf("  Withdrew  %.2f  | balance %.2f%n", amount, balance);
+    }
+
+    public double getBalance()      { return balance; }
+    public String getAccountNumber() { return accountNumber; }
+    public String getHolder()        { return holder; }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s): %.2f", accountNumber, holder, balance);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class BankDemo {
+
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount("AC1001", "Priya Sharma", 5000);
+        System.out.println("Opened: " + acc);
+
+        System.out.println("\n1. Valid operations:");
+        acc.deposit(2000);
+        attemptWithdraw(acc, 3000);
+
+        System.out.println("\n2. Withdraw more than the balance (checked):");
+        attemptWithdraw(acc, 99999);
+
+        System.out.println("\n3. Negative deposit (unchecked):");
+        try {
+            acc.deposit(-100);
+        } catch (InvalidAmountException e) {
+            System.out.println("  Rejected: " + e.getMessage());
+        }
+
+        System.out.println("\n4. Balance is still intact:");
+        System.out.println("  " + acc);
+        System.out.println("  Never negative: " + (acc.getBalance() &gt;= 0));
+    }
+
+    static void attemptWithdraw(BankAccount acc, double amount) {
+        try {
+            acc.withdraw(amount);
+        } catch (InsufficientFundsException e) {
+            System.out.println("  Denied: " + e.getMessage());
+            System.out.printf("  You need %.2f more.%n", e.getShortfall());
+        }
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code> — compiles all four files at once</li>
+                <li><code>java BankDemo</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">Opened: AC1001 (Priya Sharma): 5000.00
+
+1. Valid operations:
+  Deposited 2000.00  | balance 7000.00
+  Withdrew  3000.00  | balance 4000.00
+
+2. Withdraw more than the balance (checked):
+  Denied: Cannot withdraw 99999.00 - balance is only 4000.00
+  You need 95999.00 more.
+
+3. Negative deposit (unchecked):
+  Rejected: Amount must be positive, got: -100.0
+
+4. Balance is still intact:
+  AC1001 (Priya Sharma): 4000.00
+  <span class="ok">Never negative: true</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">The point of the extra field</span>
+              <code>getShortfall()</code> is why a custom exception beats a plain <code>Exception</code> with a string.
+              The catch block can do something <em>useful</em> with structured data — here, telling the customer exactly
+              how much more they need. A message alone can't be used in a calculation.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four scenarios behave as shown, and <strong>the balance never went negative</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain why <code>InsufficientFundsException</code> is <strong>checked</strong> but <code>InvalidAmountException</code> is <strong>unchecked</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I used the exception's <strong>extra data</strong> (<code>getShortfall()</code>), not just its message.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> Chaining &amp; Translating Across Layers<span class="sync">Theory slides 22–23</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              See with your own eyes what <code>Caused by:</code> looks like — and what you destroy when you forget
+              to pass the cause. This is the task that most changes how you write production code.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ChainLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class ChainLab {
+
+    public static void main(String[] args) {
+        System.out.println("=== WITH the cause attached ===");
+        try {
+            service(42);
+        } catch (ServiceException e) {
+            e.printStackTrace(System.out);
+        }
+
+        System.out.println("\n=== WITHOUT the cause (evidence destroyed) ===");
+        try {
+            badService(42);
+        } catch (ServiceException e) {
+            e.printStackTrace(System.out);
+        }
+
+        System.out.println("\n=== Walking the chain programmatically ===");
+        try {
+            service(42);
+        } catch (ServiceException e) {
+            Throwable t = e;
+            int depth = 0;
+            while (t != null) {
+                System.out.println("  ".repeat(depth) + "-> "
+                        + t.getClass().getSimpleName() + ": " + t.getMessage());
+                t = t.getCause();
+                depth++;
+            }
+        }
+    }
+
+    // --- Service layer: business language, cause preserved ---
+    static void service(int id) throws ServiceException {
+        try {
+            repository(id);
+        } catch (RepositoryException e) {
+            throw new ServiceException("Could not load user " + id, e);   // cause!
+        }
+    }
+
+    // --- The WRONG version: cause dropped ---
+    static void badService(int id) throws ServiceException {
+        try {
+            repository(id);
+        } catch (RepositoryException e) {
+            throw new ServiceException("Could not load user " + id);      // no cause
+        }
+    }
+
+    // --- Repository layer: technical language, wraps the raw failure ---
+    static void repository(int id) throws RepositoryException {
+        try {
+            rawDatabaseCall();
+        } catch (IllegalStateException e) {
+            throw new RepositoryException("Query failed for id " + id, e);
+        }
+    }
+
+    // --- Pretend JDBC driver failure ---
+    static void rawDatabaseCall() {
+        throw new IllegalStateException("Connection refused: localhost:5432");
+    }
+}</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">RepositoryException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class RepositoryException extends Exception {
+    public RepositoryException(String message)                  { super(message); }
+    public RepositoryException(String message, Throwable cause) { super(message, cause); }
+}</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ServiceException.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class ServiceException extends Exception {
+    public ServiceException(String message)                  { super(message); }
+    public ServiceException(String message, Throwable cause) { super(message, cause); }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output — compare the two traces</span>
+              <div class="term-out" style="margin:8px 0 0;">=== WITH the cause attached ===
+ServiceException: Could not load user 42
+	at ChainLab.service(ChainLab.java:38)
+	at ChainLab.main(ChainLab.java:6)
+<span class="warn">Caused by:</span> RepositoryException: Query failed for id 42
+	at ChainLab.repository(ChainLab.java:52)
+	... 2 more
+<span class="warn">Caused by:</span> <span class="bad">java.lang.IllegalStateException: Connection refused: localhost:5432</span>
+	at ChainLab.rawDatabaseCall(ChainLab.java:59)
+	... 3 more
+
+=== WITHOUT the cause (evidence destroyed) ===
+ServiceException: Could not load user 42
+	at ChainLab.badService(ChainLab.java:46)
+	at ChainLab.main(ChainLab.java:13)
+<span class="dim">(no Caused by - the connection failure is gone forever)</span>
+
+=== Walking the chain programmatically ===
+  -> ServiceException: Could not load user 42
+    -> RepositoryException: Query failed for id 42
+      -> IllegalStateException: Connection refused: localhost:5432</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">This is the whole lesson of the task</span>
+              In the first trace you learn the database was <strong>refusing connections on port 5432</strong> — you can
+              act on that. In the second you learn only that "something went wrong loading user 42". Same bug, same
+              code path; one is fixable in two minutes and the other costs you an afternoon. <strong>Always pass the cause.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <strong>two</strong> <code>Caused by:</code> sections in the first trace and <strong>none</strong> in the second.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I walked the chain with <code>getCause()</code> and reached the root <code>IllegalStateException</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Each layer threw an exception in <strong>its own vocabulary</strong> (repository → service).</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 8 ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">TASK 8</span><span class="chevron">▶</span> Put It Together — the Interactive Bank<span class="sync">Theory slides 24–26</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              A menu-driven console app that <strong>cannot be crashed by the user</strong>, no matter what they type.
+              Reuse <code>BankAccount</code> and both exception classes from Task 6. This is the file you bring to
+              Session 2.
+            </div>
+            <div class="observe">
+              <span class="lbl">Before you start — the challenge</span>
+              Your target: <strong>however hard your neighbour tries, they cannot make this program print a stack trace.</strong>
+              Letters where numbers go, empty input, negative amounts, pressing Enter on its own — all handled.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankApp.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.InputMismatchException;
+import java.util.Scanner;
+
+public class BankApp {
+
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount("AC1001", "Priya Sharma", 5000);
+
+        // Scanner is AutoCloseable - let try-with-resources close it
+        try (Scanner scanner = new Scanner(System.in)) {
+            boolean running = true;
+
+            while (running) {
+                printMenu(account);
+                String choice = scanner.nextLine().trim();
+
+                switch (choice) {
+                    case "1" -&gt; showBalance(account);
+                    case "2" -&gt; doDeposit(account, scanner);
+                    case "3" -&gt; doWithdraw(account, scanner);
+                    case "4" -&gt; {
+                        System.out.println("Goodbye. Final balance: " + account);
+                        running = false;
+                    }
+                    default  -&gt; System.out.println("!! Please choose 1, 2, 3 or 4.");
+                }
+            }
+        }
+    }
+
+    static void printMenu(BankAccount account) {
+        System.out.println("\n===== " + account.getAccountNumber()
+                           + " | " + account.getHolder() + " =====");
+        System.out.println("1. Check balance");
+        System.out.println("2. Deposit");
+        System.out.println("3. Withdraw");
+        System.out.println("4. Exit");
+        System.out.print("Choice: ");
+    }
+
+    static void showBalance(BankAccount account) {
+        System.out.printf("Balance: %.2f%n", account.getBalance());
+    }
+
+    static void doDeposit(BankAccount account, Scanner scanner) {
+        try {
+            double amount = readAmount(scanner, "Amount to deposit: ");
+            account.deposit(amount);
+        } catch (InvalidAmountException e) {
+            System.out.println("!! " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("!! That is not a valid number.");
+        }
+    }
+
+    static void doWithdraw(BankAccount account, Scanner scanner) {
+        try {
+            double amount = readAmount(scanner, "Amount to withdraw: ");
+            account.withdraw(amount);
+        } catch (InsufficientFundsException e) {
+            System.out.println("!! " + e.getMessage());
+            System.out.printf("!! You need %.2f more.%n", e.getShortfall());
+        } catch (InvalidAmountException e) {
+            System.out.println("!! " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("!! That is not a valid number.");
+        }
+    }
+
+    // Reading with nextLine + parse is far safer than nextDouble()
+    static double readAmount(Scanner scanner, String prompt) {
+        System.out.print(prompt);
+        String raw = scanner.nextLine().trim();
+        if (raw.isEmpty()) {
+            throw new NumberFormatException("empty input");
+        }
+        return Double.parseDouble(raw);      // throws NumberFormatException on junk
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java BankApp</code></li>
+                <li>Then try your hardest to crash it. Suggested attacks are below.</li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">A hostile session — every attack survived</span>
+              <div class="term-out" style="margin:8px 0 0;">Choice: <span class="warn">9</span>
+!! Please choose 1, 2, 3 or 4.
+
+Choice: <span class="warn">abc</span>
+!! Please choose 1, 2, 3 or 4.
+
+Choice: 2
+Amount to deposit: <span class="warn">hello</span>
+!! That is not a valid number.
+
+Choice: 2
+Amount to deposit: <span class="warn">-500</span>
+!! Amount must be positive, got: -500.0
+
+Choice: 2
+Amount to deposit: <span class="dim">(pressed Enter)</span>
+!! That is not a valid number.
+
+Choice: 3
+Amount to withdraw: 999999
+!! Cannot withdraw 999999.00 - balance is only 5000.00
+!! You need 994999.00 more.
+
+Choice: 2
+Amount to deposit: 1500
+  Deposited 1500.00  | balance 6500.00
+
+Choice: 4
+Goodbye. Final balance: AC1001 (Priya Sharma): 6500.00
+
+<span class="ok">-- no stack trace anywhere --</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Why <code>nextLine()</code> + <code>parseDouble</code> beats <code>nextDouble()</code></span>
+              <code>scanner.nextDouble()</code> throws <code>InputMismatchException</code> and — the nasty part —
+              <strong>leaves the bad token in the buffer</strong>. Your next read grabs the same junk and you get an
+              infinite loop of errors. Reading the whole line and parsing it yourself avoids that trap completely.
+              Try swapping to <code>nextDouble()</code> if you want to see the infinite loop for yourself.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>BankApp survived every attack</strong> — letters, empty input, negatives, huge withdrawals.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">My neighbour tried to crash it and <strong>failed</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Scanner</code> is managed by try-with-resources, and I know why that matters.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> For Anyone Who Finished Early<span class="sync">Optional</span></summary>
+          <div class="exp-body">
+            <p>Entirely optional. Nothing here is required for Session 2.</p>
+            <ol class="steps">
+              <li><strong>Suppressed exceptions.</strong> Make <code>Resource.close()</code> throw as well as
+                  <code>fail()</code>. Only one exception can propagate — the other is <em>suppressed</em>. Retrieve it
+                  with <code>e.getSuppressed()</code> and print it. This is a real trap in file handling.</li>
+              <li><strong>Custom exception hierarchy.</strong> Create <code>BankException</code> as a parent, then make
+                  <code>InsufficientFundsException</code> and <code>AccountFrozenException</code> extend it. Now
+                  <code>catch (BankException e)</code> handles all bank failures in one block. Notice how a hierarchy
+                  gives callers a <em>choice</em> of granularity.</li>
+              <li><strong><code>StackOverflowError</code>.</strong> Write <code>static void loop() { loop(); }</code> and
+                  call it. Note it's an <code>Error</code>, not an <code>Exception</code> — and that catching it is
+                  pointless.</li>
+              <li><strong>Optional instead of an exception.</strong> Rewrite a lookup that currently throws
+                  "not found" to return <code>Optional&lt;BankAccount&gt;</code> instead. Which reads better?</li>
+              <li><strong>Rethrow after logging.</strong> Add a <code>logger</code> that prints a timestamp, then
+                  practise "log at the boundary, propagate below it" from theory slide 23.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — I explored suppressed exceptions and an exception hierarchy.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End-of-lab checkpoint — all six must be true</span>
+          <ol style="margin:6px 0 0;">
+            <li>I can read any stack trace and name the type, message, line and root cause.</li>
+            <li>I can order multiple <code>catch</code> blocks correctly and explain the compiler error when I don't.</li>
+            <li>I have written a class implementing <code>AutoCloseable</code> and used it in try-with-resources.</li>
+            <li>I can explain <code>throw</code> vs <code>throws</code>, and checked vs unchecked, without notes.</li>
+            <li>My <code>BankAccount</code> balance is impossible to make negative.</li>
+            <li><code>BankApp</code> cannot be crashed by any input.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have reached the Session 1 checkpoint.</strong>
+            <span class="verify">If any of the six isn't true, flag it now — Session 2 builds directly on these files.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== TAKE-HOME TASKS ===== -->
+      <div class="section-band">Take-home tasks — submit before Session 2</div>
+      <section class="section">
+        <div class="concept" style="margin-top:14px;">
+          <span class="lbl">Read this first</span>
+          Four tasks, increasing in difficulty. <strong>Tasks 1–3 are compulsory; Task 4 is for distinction.</strong>
+          Work on your own — you may discuss the approach with others, but the code must be yours. Every task must
+          <strong>compile and run</strong> with <code>javac *.java</code>. If something doesn't work, submit it anyway
+          with a comment explaining where you got stuck: a well-described partial attempt scores far better than nothing.
+        </div>
+
+        <!-- Assignment 1 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 1</span> Safe Calculator <span class="diff easy">Easy</span></h3>
+          <p class="brief">Build <code>SafeCalculator.java</code> — a console calculator that <strong>cannot be crashed</strong>.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Ask the user for two numbers and an operator (<code>+ - * / %</code>).</li>
+            <li>Handle non-numeric input with <code>NumberFormatException</code> and re-prompt.</li>
+            <li>Handle division and modulo by zero with <code>ArithmeticException</code>.</li>
+            <li>Reject an unknown operator by <strong>throwing</strong> <code>IllegalArgumentException</code> with a message naming the bad operator.</li>
+            <li>Loop until the user types <code>exit</code>. Close the <code>Scanner</code> with try-with-resources.</li>
+            <li>No stack trace may ever reach the screen.</li>
+          </ol>
+          <div class="out">Enter expression (or 'exit'): 10 / 0
+<span class="bad">!! Cannot divide by zero. Try a different divisor.</span>
+Enter expression (or 'exit'): 10 ^ 2
+<span class="bad">!! Unsupported operator: '^'. Use + - * / %</span>
+Enter expression (or 'exit'): ten + 2
+<span class="bad">!! 'ten' is not a number.</span>
+Enter expression (or 'exit'): 10 + 2
+<span class="ok">10.0 + 2.0 = 12.0</span>
+Enter expression (or 'exit'): exit
+Goodbye.</div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Read the whole line, then <code>split("\\s+")</code>. Check <code>parts.length == 3</code> before you index
+            into it — otherwise you'll be debugging an <code>ArrayIndexOutOfBoundsException</code> instead of writing the task.
+          </div>
+        </div>
+
+        <!-- Assignment 2 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 2</span> Student Marks Validator <span class="diff easy">Easy</span></h3>
+          <p class="brief">Write <code>MarksValidator.java</code> plus a custom exception <code>InvalidMarksException</code>.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li><code>InvalidMarksException</code> must be <strong>checked</strong>, and must carry two extra fields: the <code>subject</code> and the <code>offendingMark</code>, each with a getter.</li>
+            <li>Method <code>void validate(String subject, int mark)</code> throws it when the mark is outside 0–100.</li>
+            <li>In <code>main</code>, validate an array of at least 6 subject/mark pairs including <strong>at least two invalid ones</strong> (one negative, one above 100).</li>
+            <li>Catch each failure, print subject + offending mark <em>using the getters</em>, and keep going — one bad mark must not stop the rest.</li>
+            <li>At the end print a summary: how many passed validation, how many failed, and the average of the <strong>valid</strong> marks only.</li>
+          </ol>
+          <div class="out"><span class="ok">OK      Maths        : 87</span>
+<span class="bad">REJECT  Physics      : 105  (mark must be 0-100)</span>
+<span class="ok">OK      Chemistry    : 76</span>
+<span class="bad">REJECT  English      : -3   (mark must be 0-100)</span>
+<span class="ok">OK      Computer Sci : 91</span>
+<span class="ok">OK      Hindi        : 68</span>
+
+Summary: 4 valid, 2 rejected, average of valid marks = 80.50</div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            This task is really about <em>why</em> custom exceptions carry data. Your catch block should never need to
+            parse the message string to find the mark — call <code>e.getOffendingMark()</code>.
+          </div>
+        </div>
+
+        <!-- Assignment 3 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 3</span> ATM Simulator with an Exception Hierarchy <span class="diff med">Medium</span></h3>
+          <p class="brief">Extend your Task 6 <code>BankAccount</code> into a small ATM with a proper family of exceptions.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Create a parent exception <code>AtmException extends Exception</code>, and three children:
+                <code>InsufficientFundsException</code>, <code>InvalidPinException</code>, <code>DailyLimitExceededException</code>.</li>
+            <li>An account has a 4-digit PIN. Three wrong attempts must throw <code>AccountLockedException</code> (your choice: checked or unchecked — <strong>justify it in a comment</strong>).</li>
+            <li>Enforce a daily withdrawal limit of 20,000. Cumulative withdrawals beyond that throw <code>DailyLimitExceededException</code> carrying <code>getRemainingLimit()</code>.</li>
+            <li>Withdrawals must be multiples of 100 — otherwise <code>IllegalArgumentException</code>.</li>
+            <li>Demonstrate in <code>main</code> that <strong>one</strong> <code>catch (AtmException e)</code> block can handle all three subtypes — then show a version with separate catch blocks and comment on when each style is better.</li>
+            <li>Use try-with-resources for the <code>Scanner</code>, and <code>finally</code> to print an "audit line" after every transaction attempt, successful or not.</li>
+          </ol>
+          <div class="out">Enter PIN: 9999
+<span class="bad">!! Incorrect PIN. 2 attempt(s) remaining.</span>
+<span class="dim">[AUDIT] PIN attempt failed at 14:32:07</span>
+Enter PIN: 1234
+<span class="ok">Welcome, Priya Sharma</span>
+
+Withdraw: 1550
+<span class="bad">!! Amount must be a multiple of 100.</span>
+Withdraw: 18000
+<span class="ok">Dispensed 18000. Balance: 32000</span>
+<span class="dim">[AUDIT] Withdrawal 18000 OK at 14:32:41</span>
+Withdraw: 5000
+<span class="bad">!! Daily limit exceeded. You may withdraw 2000 more today.</span>
+<span class="dim">[AUDIT] Withdrawal 5000 DENIED at 14:33:02</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Use <code>java.time.LocalTime.now()</code> for the audit timestamp. The exception hierarchy is the real
+            deliverable here — a caller who cares about the difference uses three catch blocks; a caller who just
+            wants "any ATM problem" uses one. Both must work with your design.
+          </div>
+        </div>
+
+        <!-- Assignment 4 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 4</span> Layered Order Processor <span class="diff hard">Distinction</span></h3>
+          <p class="brief">Model three layers and demonstrate correct exception <strong>translation and chaining</strong> between them.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Three classes: <code>OrderRepository</code> (data), <code>OrderService</code> (business), <code>OrderController</code> (presentation).</li>
+            <li><code>OrderRepository.findById(int)</code> simulates a raw failure by throwing <code>IllegalStateException("Connection refused")</code> for id <code>13</code>, and returns an order otherwise.</li>
+            <li>The repository catches that and throws <code>DataAccessException</code> <strong>with the cause attached</strong>.</li>
+            <li>The service catches <code>DataAccessException</code> and throws <code>OrderNotFoundException</code>, again preserving the cause.</li>
+            <li>The controller catches <code>OrderNotFoundException</code>, prints a user-friendly one-line message, and <strong>logs the full chain</strong> — this is the only place logging happens.</li>
+            <li>Write a method <code>printRootCause(Throwable t)</code> that walks <code>getCause()</code> to the deepest exception and prints only that. Prove it returns <code>IllegalStateException: Connection refused</code>.</li>
+            <li>Add a <code>ResourceGuard implements AutoCloseable</code> representing the DB connection. Use try-with-resources in the repository and prove via console output that it closes <strong>even when the exception is thrown</strong>.</li>
+            <li>In a comment block at the bottom, answer in your own words: <em>why should the controller log, and not the repository?</em></li>
+          </ol>
+          <div class="out"><span class="dim">[REPO ] connection opened</span>
+<span class="dim">[REPO ] connection closed</span>
+<span class="bad">User message: Sorry, we could not find order 13.</span>
+
+<span class="dim">--- full chain (logged once, at the boundary) ---</span>
+OrderNotFoundException: Order 13 unavailable
+Caused by: DataAccessException: Query failed for order 13
+Caused by: java.lang.IllegalStateException: Connection refused
+
+<span class="ok">Root cause: IllegalStateException: Connection refused</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Note the ordering in the expected output: <code>connection closed</code> appears <em>before</em> the user
+            message, proving try-with-resources ran during unwinding. If your output shows them the other way round,
+            your <code>close()</code> isn't where you think it is.
+          </div>
+        </div>
+
+        <div class="submit-panel">
+          <h3>📦 How to submit</h3>
+          <ol>
+            <li>Create a folder named <code>&lt;your-name&gt;-session1-tasks</code>.</li>
+            <li>Inside it, one sub-folder per task: <code>task1/</code>, <code>task2/</code>, <code>task3/</code>, <code>task4/</code>.</li>
+            <li>Put your <code>.java</code> source files in each — <strong>source only, no <code>.class</code> files</strong>.</li>
+            <li>Add a <code>NOTES.md</code> at the top level covering: which tasks you completed, anything that doesn't work, and your written answers to the justification questions in Tasks 3 and 4.</li>
+            <li>Zip the folder and submit before Session 2 begins.</li>
+          </ol>
+          <p style="margin-top:14px;"><strong>How it will be assessed</strong></p>
+          <table>
+            <thead><tr><th>Criterion</th><th>Weight</th><th>What earns full marks</th></tr></thead>
+            <tbody>
+              <tr><td>It compiles and runs</td><td>20%</td><td><code>javac *.java</code> is clean — no errors, no warnings you can't explain</td></tr>
+              <tr><td>Correct checked/unchecked choices</td><td>20%</td><td>Each exception type is justified, not arbitrary</td></tr>
+              <tr><td>Message quality</td><td>15%</td><td>Every message names the problem <em>and</em> the offending value</td></tr>
+              <tr><td>Cause chaining</td><td>15%</td><td>Nothing is re-thrown without its cause</td></tr>
+              <tr><td>Resource safety</td><td>15%</td><td>try-with-resources or <code>finally</code> — nothing leaks</td></tr>
+              <tr><td>No anti-patterns</td><td>15%</td><td>No empty catch, no <code>catch (Exception)</code> as a first resort, no <code>printStackTrace</code> as error handling</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;"><strong>Instant mark loss:</strong> an empty <code>catch</code> block, <code>catch (Throwable t)</code>, or a <code>return</code> inside <code>finally</code>. We covered all three as anti-patterns — see theory slide 25.</p>
+        </div>
+
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have read all four take-home tasks</strong> and know what's expected.
+            <span class="verify">Ask now if anything is unclear — not the night before.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== COMMON ISSUES ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Common Issues &amp; Fixes</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:38%">Symptom</th><th>Cause &amp; fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>error: class X is public, should be declared in a file named X.java</code></td><td>Filename must match the public class name <strong>exactly</strong>, including capitals.</td></tr>
+                <tr><td><code>error: unreported exception … must be caught or declared</code></td><td>You're calling something that throws a <strong>checked</strong> exception. Either wrap it in try/catch or add <code>throws</code> to your method.</td></tr>
+                <tr><td><code>error: exception X has already been caught</code></td><td>A broader catch appears before a narrower one. Reorder: subclasses first.</td></tr>
+                <tr><td><code>error: Alternatives in a multi-catch … cannot be related by subclassing</code></td><td>Two types in the same multi-catch are parent/child. Keep only the parent.</td></tr>
+                <tr><td>Infinite loop of "invalid input"</td><td>You used <code>scanner.nextInt()</code>, which leaves bad tokens in the buffer. Use <code>nextLine()</code> + <code>parseInt</code>.</td></tr>
+                <tr><td>Input is skipped after reading a number</td><td>Classic <code>nextInt()</code>-then-<code>nextLine()</code> problem — the newline is left behind. Use <code>nextLine()</code> throughout.</td></tr>
+                <tr><td><code>NoClassDefFoundError</code> when running</td><td>You typed <code>java BankApp.class</code>. Drop the extension: <code>java BankApp</code>.</td></tr>
+                <tr><td>Custom exception "doesn't need catching"</td><td>It extends <code>RuntimeException</code>. Extend <code>Exception</code> for checked behaviour.</td></tr>
+                <tr><td>No <code>Caused by:</code> in the trace</td><td>You didn't pass the cause: use the <code>(String, Throwable)</code> constructor.</td></tr>
+                <tr><td><code>switch</code> with <code>-&gt;</code> won't compile</td><td>Arrow switch needs Java 14+. Check <code>javac -version</code>, or use classic <code>case "1": … break;</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Exception</strong></td><td>An object describing something that went wrong at runtime</td></tr>
+                <tr><td><strong>Throwable</strong></td><td>The root class of everything you can <code>throw</code></td></tr>
+                <tr><td><strong>Error</strong></td><td>A JVM-level failure (out of memory, stack overflow) — don't catch it</td></tr>
+                <tr><td><strong>Checked exception</strong></td><td>The compiler forces you to catch it or declare it</td></tr>
+                <tr><td><strong>Unchecked exception</strong></td><td>Extends <code>RuntimeException</code>; the compiler ignores it. Usually your bug</td></tr>
+                <tr><td><strong>Call stack</strong></td><td>The list of methods currently running, innermost first</td></tr>
+                <tr><td><strong>Stack unwinding</strong></td><td>Popping frames off the stack while hunting for a matching <code>catch</code></td></tr>
+                <tr><td><strong>Stack trace</strong></td><td>The printed snapshot of that stack at the moment of the throw</td></tr>
+                <tr><td><strong>throw</strong></td><td>A statement that raises an exception right now</td></tr>
+                <tr><td><strong>throws</strong></td><td>A signature clause warning callers this method may fail</td></tr>
+                <tr><td><strong>finally</strong></td><td>A block that runs whatever happens — for cleanup</td></tr>
+                <tr><td><strong>try-with-resources</strong></td><td><code>try (…)</code> syntax that closes resources automatically</td></tr>
+                <tr><td><strong>AutoCloseable</strong></td><td>The interface (one method, <code>close()</code>) that makes that possible</td></tr>
+                <tr><td><strong>Chaining / cause</strong></td><td>Attaching the original exception to a new one so the trace survives</td></tr>
+                <tr><td><strong>Suppressed exception</strong></td><td>An exception from <code>close()</code> that was set aside so the primary one could propagate</td></tr>
+                <tr><td><strong>Fail fast</strong></td><td>Detecting and reporting bad data immediately, at the boundary</td></tr>
+                <tr><td><strong>Swallowing</strong></td><td>Catching an exception and doing nothing — the worst anti-pattern here</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>If you can answer all ten, you're ready for Session 2. Try them with a neighbour rather than alone.</p>
+            <ol class="steps">
+              <li>In one sentence: what <em>is</em> an exception in Java?</li>
+              <li>What does the JVM do if nobody catches an exception?</li>
+              <li>Name the two direct subclasses of <code>Throwable</code> and say which one you should never catch.</li>
+              <li>Give the test you'd use to decide whether your own exception should be checked or unchecked.</li>
+              <li>Why won't <code>catch (Exception e)</code> before <code>catch (ArithmeticException e)</code> compile?</li>
+              <li>Name the two situations where <code>finally</code> does <strong>not</strong> run.</li>
+              <li>What single interface must a class implement to work in try-with-resources?</li>
+              <li>In what order are multiple try-with-resources resources closed — and does that happen before or after the <code>catch</code> block?</li>
+              <li>What exactly do you lose by writing <code>throw new ServiceException("failed")</code> instead of <code>throw new ServiceException("failed", e)</code>?</li>
+              <li>Give one situation where returning <code>Optional</code> is better than throwing an exception.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all ten self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Syntax</h3>
+              <table>
+                <thead><tr><th>Form</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  <tr><td><code>try { } catch (E e) { }</code></td><td>Attempt, then handle</td></tr>
+                  <tr><td><code>catch (A | B e)</code></td><td>Multi-catch, unrelated types</td></tr>
+                  <tr><td><code>finally { }</code></td><td>Always runs — cleanup</td></tr>
+                  <tr><td><code>try (R r = new R())</code></td><td>Auto-closes <code>r</code></td></tr>
+                  <tr><td><code>throw new E("msg")</code></td><td>Raise it now</td></tr>
+                  <tr><td><code>void m() throws E</code></td><td>Declare it may fail</td></tr>
+                  <tr><td><code>extends Exception</code></td><td>Custom <strong>checked</strong></td></tr>
+                  <tr><td><code>extends RuntimeException</code></td><td>Custom <strong>unchecked</strong></td></tr>
+                  <tr><td><code>super(msg, cause)</code></td><td>Chain the cause</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Useful methods on any exception</h3>
+              <table>
+                <thead><tr><th>Method</th><th>Returns</th></tr></thead>
+                <tbody>
+                  <tr><td><code>getMessage()</code></td><td>The detail message</td></tr>
+                  <tr><td><code>getCause()</code></td><td>The underlying exception, or null</td></tr>
+                  <tr><td><code>printStackTrace()</code></td><td>Dumps the trace to stderr</td></tr>
+                  <tr><td><code>getStackTrace()</code></td><td>The frames as an array</td></tr>
+                  <tr><td><code>getSuppressed()</code></td><td>Exceptions set aside by try-with-resources</td></tr>
+                  <tr><td><code>getClass().getSimpleName()</code></td><td>Just the type name</td></tr>
+                  <tr><td><code>addSuppressed(t)</code></td><td>Attach a secondary failure</td></tr>
+                  <tr><td><code>initCause(t)</code></td><td>Set the cause after construction</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Checked vs unchecked — at a glance</h3>
+          <table>
+            <thead><tr><th>Checked (must handle)</th><th>Unchecked (fix your code)</th></tr></thead>
+            <tbody>
+              <tr><td><code>IOException</code>, <code>FileNotFoundException</code></td><td><code>NullPointerException</code></td></tr>
+              <tr><td><code>SQLException</code></td><td><code>ArithmeticException</code></td></tr>
+              <tr><td><code>ClassNotFoundException</code></td><td><code>ArrayIndexOutOfBoundsException</code></td></tr>
+              <tr><td><code>InterruptedException</code></td><td><code>NumberFormatException</code>, <code>ClassCastException</code></td></tr>
+              <tr><td><code>ParseException</code></td><td><code>IllegalArgumentException</code>, <code>IllegalStateException</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 2</span>
+          We take your <code>BankAccount</code> and turn it into a <strong>family</strong> of account types —
+          <code>SavingsAccount</code>, <code>CurrentAccount</code>, <code>FixedDepositAccount</code> — using
+          <code>extends</code>, method overriding and polymorphism. One loop will calculate interest for every account
+          type without a single <code>if</code> about which type it is. Your exceptions from today keep guarding it,
+          and you'll learn the rule about which exceptions an <em>overriding</em> method is allowed to throw.
+          <strong>Bring your <code>BankAccount.java</code> and both exception classes — we build straight on top of them.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Core — Session 1 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
