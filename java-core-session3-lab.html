@@ -1,0 +1,2397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 3 — Collections: List Classes &amp; Relationships (Lab)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(231,111,0,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #e76f00, #5382a1, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff8f0, #fdf1e4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(83,130,161,0.10);
+      border: 1px solid rgba(83,130,161,0.32);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffdcbc;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(231,111,0,0.22);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #e76f00; }
+    details.exp.lab2 { border-left-color: #5382a1; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.lab8 { border-left-color: #d81b60; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff8f0,#ffeedb); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f2f7fb,#e6eff6); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf3ff,#f2e8ff); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#fff0f5,#ffe3ec); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5382a1; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.lab8 .lab-tag { background:#d81b60; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit compile & run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin: 12px 0;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Take-home assignment cards === */
+    .assign {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #bf5af2;
+      border-radius: 12px; background: #fff;
+      padding: 16px 20px 18px; margin: 16px 0;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .assign h3 {
+      margin: 0 0 8px; font-size: 19px;
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .assign .anum {
+      background: #bf5af2; color: #fff; border-radius: 8px;
+      padding: 3px 11px; font-size: 13px; font-weight: 800; letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .assign .diff {
+      margin-left: auto; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .assign .diff.easy { background: rgba(40,200,64,0.14); color: #1a7f2e; border: 1px solid rgba(40,200,64,0.4); }
+    .assign .diff.med  { background: rgba(254,188,46,0.18); color: #96690a; border: 1px solid rgba(254,188,46,0.5); }
+    .assign .diff.hard { background: rgba(255,95,87,0.13); color: #c0392b; border: 1px solid rgba(255,95,87,0.4); }
+    .assign .brief { font-size: 16.5px; margin: 0 0 4px; }
+    .assign .rq { font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--mac-text-muted); margin: 12px 0 0; display: block; }
+    .assign ol.req, .assign ul.req { margin: 6px 0 0; padding-left: 24px; }
+    .assign .req li { font-size: 16.5px; margin: 5px 0; line-height: 1.55; }
+    .assign .out {
+      background: #12121c; color: #d7dae0; border-radius: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 12px 16px; margin: 10px 0 0; white-space: pre; overflow-x: auto;
+    }
+    .assign .out .ok { color: #a6e22e; }
+    .assign .out .bad { color: #ff6b6b; }
+    .assign .out .dim { color: #8b8fa3; }
+    .assign .hint {
+      background: #fafafc; border: 1px dashed var(--mac-border);
+      border-radius: 8px; padding: 10px 14px; margin: 10px 0 0; font-size: 15.5px;
+    }
+    .assign .hint .lbl { font-weight: 700; color: var(--mac-accent-2); font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 3px; }
+
+    /* Submission / grading panel */
+    .submit-panel {
+      background: linear-gradient(135deg,#1e1e2e,#2a2a40);
+      color: #f8f8f2; border-radius: 12px; padding: 22px 26px; margin: 18px 0 0;
+    }
+    .submit-panel h3 { color: #fff; margin: 0 0 10px; font-size: 20px; }
+    .submit-panel p, .submit-panel li { color: #d7dae0; font-size: 16px; }
+    .submit-panel code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; font-size: 14.5px; }
+    .submit-panel table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .submit-panel th, .submit-panel td {
+      border: 1px solid rgba(255,255,255,0.18); padding: 8px 12px; text-align: left; font-size: 14.5px;
+    }
+    .submit-panel th { background: rgba(255,255,255,0.08); color: #fff; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ffc48c; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+      .assign .diff { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session3-lab.html — Java Core Session 3</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">📚</div>
+        <div>
+          <h1>Java Core — Session 3 Hands-on Lab</h1>
+          <p class="section-intro">Lists you can grow, search and sort — plus modelling HAS-A relationships properly. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for Java Core Session 3 — the theory stays on the main screen while you
+          work here on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge so you know
+          exactly which part of the talk it belongs to. Click a heading to expand it, use the <strong>Copy</strong>
+          button on any snippet instead of retyping, and tick each checkbox as you go. Aim for 100%.
+        </div>
+        <div class="observe">
+          <span class="lbl">Golden rule for today</span>
+          This lab is in <strong>two halves</strong>, matching the theory. Tasks 1–6 are about <code>List</code>;
+          Tasks 7–8 are about class relationships. Don't skip the second half — the relationship modelling is what
+          separates code that works from code that can be maintained, and it's heavily weighted in the take-home tasks.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–3</span></summary>
+          <div class="exp-body">
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 17+ working</strong>
+                <span class="verify">Verify with <code>javac -version</code>. We use <code>List.of()</code> (Java 9+) and <code>toList()</code> (Java 16+).</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>javac -version
+java -version</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Your Session 2 <code>Account</code> hierarchy</strong>
+                <span class="verify">You need <code>Account.java</code>, <code>SavingsAccount</code>, <code>CurrentAccount</code>, <code>FixedDepositAccount</code>, <code>SalaryAccount</code> and the two exception classes. Missing them? Task 1 tells you exactly what minimum set to create.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A fresh working folder</strong>
+                <span class="verify">Create <code>session3-collections</code> and copy your Session 2 <code>.java</code> files into it. No packages — <code>javac *.java</code> throughout.</span>
+              </span>
+            </label>
+
+            <div class="dothis">
+              <span class="lbl">Set up</span>
+              <ol>
+                <li>Create <code>session3-collections</code> and open it in your editor.</li>
+                <li>Copy in your Session 2 <code>.java</code> files (source only, not <code>.class</code>).</li>
+                <li>Run <code>javac *.java</code> to confirm everything still compiles before you change anything.</li>
+              </ol>
+            </div>
+            <div class="observe">
+              <span class="lbl">Don't have Session 2's files?</span>
+              You can complete every task with this minimal stand-in. Save it as <code>Account.java</code> and you're ready:
+              <div class="codewrap" style="margin-top:8px;"><pre><code>public abstract class Account {
+    private final String accountNumber;
+    private final String holder;
+    protected double balance;
+
+    protected Account(String accountNumber, String holder, double balance) {
+        this.accountNumber = accountNumber;
+        this.holder = holder;
+        this.balance = balance;
+    }
+    public abstract double interestRate();
+    public abstract String accountType();
+
+    public void deposit(double amt)   { balance += amt; }
+    public double getBalance()         { return balance; }
+    public String getAccountNumber()   { return accountNumber; }
+    public String getHolder()          { return holder; }
+
+    @Override public String toString() {
+        return String.format("%-8s %-14s %-14s %12.2f",
+            accountNumber, holder, accountType(), balance);
+    }
+}
+// Then four tiny subclasses, e.g.:
+// public class SavingsAccount extends Account {
+//     public SavingsAccount(String n, String h, double b) { super(n, h, b); }
+//     @Override public double interestRate() { return 0.04; }
+//     @Override public String accountType()  { return "Savings"; }
+// }</code></pre></div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 1 ===== -->
+      <div class="section-band">Part 1 — Lists</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Array → <code>ArrayList</code><span class="sync">Theory slides 4–6</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Feel the pain of the fixed-size array, then delete it. You'll add a fifth account <em>at runtime</em> —
+              something the array version simply cannot do.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ArrayPain.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class ArrayPain {
+
+    public static void main(String[] args) {
+        // The array from Session 2 - size locked forever at 4
+        Account[] portfolio = new Account[4];
+        portfolio[0] = new SavingsAccount     ("AC1001", "Priya Sharma",  50000);
+        portfolio[1] = new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000);
+        portfolio[2] = new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12);
+        portfolio[3] = new SalaryAccount      ("AC1004", "Vikram Rao",     1200);
+
+        System.out.println("Length: " + portfolio.length);
+
+        // 1. Add a fifth?
+        // portfolio[4] = new SavingsAccount("AC1005", "Deepa Iyer", 30000);
+        //    -> ArrayIndexOutOfBoundsException. UNCOMMENT to see it.
+
+        // 2. Remove the second one? Here is what that actually costs:
+        Account[] smaller = new Account[portfolio.length - 1];
+        for (int i = 0, j = 0; i &lt; portfolio.length; i++) {
+            if (i != 1) smaller[j++] = portfolio[i];
+        }
+        portfolio = smaller;
+        System.out.println("After manual removal, length: " + portfolio.length);
+
+        // 3. Does it contain a given account? Write your own loop.
+        String target = "AC1003";
+        boolean found = false;
+        for (Account a : portfolio) {
+            if (a != null &amp;&amp; a.getAccountNumber().equals(target)) { found = true; break; }
+        }
+        System.out.println("Contains " + target + "? " + found);
+    }
+}</code></pre></div>
+            <div class="tryit">
+              <span class="lbl">Do it</span>
+              Uncomment the <code>portfolio[4] = ...</code> line, run it, and read the exception. Then re-comment it.
+              Count how many lines the removal and the search took: <strong>ten lines to do two things.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered <code>ArrayIndexOutOfBoundsException</code> by trying to add a fifth account.</span>
+            </label>
+
+            <h3>Now the same thing with a <code>List</code></h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ListBasics.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class ListBasics {
+
+    public static void main(String[] args) {
+
+        // Declare the INTERFACE, instantiate the CLASS  (theory slide 6)
+        List&lt;Account&gt; portfolio = new ArrayList&lt;&gt;();
+
+        portfolio.add(new SavingsAccount     ("AC1001", "Priya Sharma",  50000));
+        portfolio.add(new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000));
+        portfolio.add(new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12));
+        portfolio.add(new SalaryAccount      ("AC1004", "Vikram Rao",     1200));
+
+        System.out.println("size() = " + portfolio.size());
+
+        // 1. Add a fifth - no ceremony at all
+        portfolio.add(new SavingsAccount("AC1005", "Deepa Iyer", 30000));
+        System.out.println("after add, size() = " + portfolio.size());
+
+        // 2. Insert at a position (everything after shifts right)
+        portfolio.add(0, new SalaryAccount("AC1000", "Meera Nair", 5000));
+        System.out.println("after insert at 0, size() = " + portfolio.size());
+
+        // 3. Remove by index
+        portfolio.remove(1);
+        System.out.println("after remove(1), size() = " + portfolio.size());
+
+        // 4. Read and replace by index
+        System.out.println("get(0) = " + portfolio.get(0).getAccountNumber());
+
+        System.out.println("\n--- the whole portfolio ---");
+        for (Account a : portfolio) {
+            System.out.println(a);
+        }
+
+        // 5. Total balance - polymorphic call inside a List loop
+        double total = 0;
+        for (Account a : portfolio) total += a.getBalance();
+        System.out.printf("%nTotal across %d accounts: %.2f%n", portfolio.size(), total);
+
+        // 6. Swap the implementation - ONE word changes, nothing else
+        List&lt;Account&gt; asLinked = new java.util.LinkedList&lt;&gt;(portfolio);
+        System.out.println("Same code, LinkedList: size " + asLinked.size());
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java ListBasics</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">size() = 4
+after add, size() = 5
+after insert at 0, size() = 6
+after remove(1), size() = 5
+get(0) = AC1000
+
+--- the whole portfolio ---
+AC1000   Meera Nair     Salary                 5000.00
+AC1002   Rahul Verma    Current               80000.00
+AC1003   Anita Desai    Fixed Deposit        200000.00
+AC1004   Vikram Rao     Salary                 1200.00
+AC1005   Deepa Iyer     Savings               30000.00
+
+Total across 5 accounts: 316200.00
+<span class="ok">Same code, LinkedList: size 5</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Two things to notice</span>
+              <strong>1.</strong> Every operation that took ten lines with an array is now one method call.
+              <strong>2.</strong> The last line swapped <code>ArrayList</code> for <code>LinkedList</code> and
+              <em>nothing else changed</em> — because the variable is declared as <code>List</code>. That's
+              "program to the interface" earning its keep.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The list grew from 4 to 6 and shrank to 5 <strong>at runtime</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I declared the variable as <code>List</code>, not <code>ArrayList</code>, and swapped implementations with one word.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Generics &amp; the <code>remove()</code> Trap<span class="sync">Theory slides 7–8</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              See raw types fail at runtime versus generics failing at compile time, then hit the single most
+              notorious overload trap in the entire Java library.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">GenericsLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class GenericsLab {
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static void main(String[] args) {
+
+        // ===== 1. RAW type - no type safety =====
+        System.out.println("--- raw list ---");
+        List raw = new ArrayList();
+        raw.add("Priya");
+        raw.add(42);                    // compiler allows a mixed bag
+        raw.add(true);
+        System.out.println("raw = " + raw);
+
+        try {
+            String s = (String) raw.get(1);      // cast an Integer to String
+            System.out.println(s);
+        } catch (ClassCastException e) {
+            System.out.println("ClassCastException at RUNTIME: " + e.getMessage());
+        }
+
+        // ===== 2. GENERIC - impossible to get wrong =====
+        System.out.println("\n--- generic list ---");
+        List&lt;String&gt; names = new ArrayList&lt;&gt;();
+        names.add("Priya");
+        // names.add(42);               // UNCOMMENT: compile error, not runtime
+        String safe = names.get(0);     // no cast needed
+        System.out.println("safe = " + safe);
+
+        // ===== 3. THE remove() TRAP =====
+        System.out.println("\n--- the remove() trap ---");
+        List&lt;Integer&gt; nums = new ArrayList&lt;&gt;(List.of(10, 20, 30, 40, 50));
+        System.out.println("start          : " + nums);
+
+        nums.remove(2);                          // remove(int index) -> removes 30
+        System.out.println("remove(2)      : " + nums);
+
+        nums.remove(Integer.valueOf(20));        // remove(Object) -> removes VALUE 20
+        System.out.println("remove(val 20) : " + nums);
+
+        // ===== 4. Autoboxing =====
+        System.out.println("\n--- autoboxing ---");
+        List&lt;Integer&gt; boxed = new ArrayList&lt;&gt;();
+        boxed.add(5);                   // int 5 -> Integer.valueOf(5), silently
+        int back = boxed.get(0);        // Integer -> int, silently
+        System.out.println("boxed = " + boxed + ", unboxed back = " + back);
+
+        // The classic gotcha: == on boxed values above 127
+        Integer a = 1000, b = 1000;
+        System.out.println("a == b      -> " + (a == b) + "   (reference compare!)");
+        System.out.println("a.equals(b) -> " + a.equals(b) + "   (value compare)");
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">--- raw list ---
+raw = [Priya, 42, true]
+<span class="bad">ClassCastException at RUNTIME:</span> class java.lang.Integer cannot be cast to class java.lang.String
+
+--- generic list ---
+safe = Priya
+
+--- the remove() trap ---
+start          : [10, 20, 30, 40, 50]
+remove(2)      : [10, 20, 40, 50]        <span class="dim">← removed INDEX 2 (the value 30)</span>
+remove(val 20) : [10, 40, 50]            <span class="dim">← removed the VALUE 20</span>
+
+--- autoboxing ---
+boxed = [5], unboxed back = 5
+a == b      -> <span class="bad">false</span>   (reference compare!)
+a.equals(b) -> <span class="ok">true</span>    (value compare)</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Why <code>a == b</code> is false for 1000 but true for 100</span>
+              Java caches <code>Integer</code> objects from −128 to 127, so small values are literally the same object.
+              Above that range you get distinct objects and <code>==</code> compares references. <strong>Never use
+              <code>==</code> on boxed types — always <code>equals()</code>.</strong> Try changing 1000 to 100 and watch
+              the answer flip; it's a favourite interview question.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Prove generics work</span>
+              Uncomment <code>names.add(42);</code> and compile. You should get
+              <code>incompatible types: int cannot be converted to String</code> — caught at <strong>compile</strong>
+              time, exactly where you want it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Raw list threw <code>ClassCastException</code> at runtime; the generic list refused to <strong>compile</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain the difference between <code>remove(2)</code> and <code>remove(Integer.valueOf(2))</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <code>a == b</code> be <strong>false</strong> for 1000 and understand the Integer cache.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> ArrayList vs LinkedList — Measure It<span class="sync">Theory slides 9–12</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Stop taking Big-O on trust. <strong>Time it yourself</strong> and see the O(n²) disaster with your own eyes —
+              then see where <code>LinkedList</code> genuinely wins.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">PerfLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class PerfLab {
+
+    static final int N = 50_000;
+
+    public static void main(String[] args) {
+        List&lt;Integer&gt; arrayList  = new ArrayList&lt;&gt;();
+        List&lt;Integer&gt; linkedList = new LinkedList&lt;&gt;();
+        for (int i = 0; i &lt; N; i++) { arrayList.add(i); linkedList.add(i); }
+
+        System.out.println("N = " + N + "\n");
+
+        // ===== TEST 1: indexed get(i) - the O(n^2) trap =====
+        System.out.println("TEST 1: loop with get(i)");
+        System.out.printf("  ArrayList  : %6d ms%n", time(() -&gt; {
+            long sum = 0;
+            for (int i = 0; i &lt; arrayList.size(); i++) sum += arrayList.get(i);
+        }));
+        System.out.printf("  LinkedList : %6d ms   &lt;-- walks the chain every time%n", time(() -&gt; {
+            long sum = 0;
+            for (int i = 0; i &lt; linkedList.size(); i++) sum += linkedList.get(i);
+        }));
+
+        // ===== TEST 2: the SAME data, but for-each =====
+        System.out.println("\nTEST 2: for-each (uses the iterator)");
+        System.out.printf("  ArrayList  : %6d ms%n", time(() -&gt; {
+            long sum = 0;
+            for (int v : arrayList) sum += v;
+        }));
+        System.out.printf("  LinkedList : %6d ms   &lt;-- now competitive!%n", time(() -&gt; {
+            long sum = 0;
+            for (int v : linkedList) sum += v;
+        }));
+
+        // ===== TEST 3: inserting at the FRONT - LinkedList's home turf =====
+        System.out.println("\nTEST 3: 50,000 inserts at index 0");
+        System.out.printf("  ArrayList  : %6d ms   &lt;-- shifts everything, every time%n", time(() -&gt; {
+            List&lt;Integer&gt; l = new ArrayList&lt;&gt;();
+            for (int i = 0; i &lt; N; i++) l.add(0, i);
+        }));
+        System.out.printf("  LinkedList : %6d ms%n", time(() -&gt; {
+            List&lt;Integer&gt; l = new LinkedList&lt;&gt;();
+            for (int i = 0; i &lt; N; i++) l.add(0, i);
+        }));
+
+        // ===== TEST 4: pre-sizing an ArrayList =====
+        System.out.println("\nTEST 4: 1,000,000 appends");
+        System.out.printf("  default capacity  : %6d ms%n", time(() -&gt; {
+            List&lt;Integer&gt; l = new ArrayList&lt;&gt;();
+            for (int i = 0; i &lt; 1_000_000; i++) l.add(i);
+        }));
+        System.out.printf("  pre-sized         : %6d ms%n", time(() -&gt; {
+            List&lt;Integer&gt; l = new ArrayList&lt;&gt;(1_000_000);
+            for (int i = 0; i &lt; 1_000_000; i++) l.add(i);
+        }));
+    }
+
+    static long time(Runnable task) {
+        long start = System.currentTimeMillis();
+        task.run();
+        return System.currentTimeMillis() - start;
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac PerfLab.java</code></li>
+                <li><code>java PerfLab</code> — <strong>test 1 on the LinkedList will take a few seconds. Be patient; that's the lesson.</strong></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Typical output — your exact numbers will differ</span>
+              <div class="term-out" style="margin:8px 0 0;">N = 50000
+
+TEST 1: loop with get(i)
+  ArrayList  :      2 ms
+  LinkedList :   <span class="bad">3841 ms</span>   &lt;-- walks the chain every time
+
+TEST 2: for-each (uses the iterator)
+  ArrayList  :      3 ms
+  LinkedList :      <span class="ok">4 ms</span>   &lt;-- now competitive!
+
+TEST 3: 50,000 inserts at index 0
+  ArrayList  :    <span class="bad">412 ms</span>   &lt;-- shifts everything, every time
+  LinkedList :      <span class="ok">3 ms</span>
+
+TEST 4: 1,000,000 appends
+  default capacity  :     31 ms
+  pre-sized         :     <span class="ok">12 ms</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Read these four results carefully — this is the whole task</span>
+              <strong>Test 1:</strong> the same logical loop is <strong>~1,000× slower</strong> on a LinkedList. That's O(n²)
+              versus O(n), and it's a real bug people ship.<br>
+              <strong>Test 2:</strong> identical data, identical work — but for-each uses the iterator, so LinkedList is
+              fine. <strong>How you loop matters more than what you loop over.</strong><br>
+              <strong>Test 3:</strong> LinkedList's genuine win — front insertion, ~100× faster.<br>
+              <strong>Test 4:</strong> pre-sizing an ArrayList is free performance when you know the size.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Test 1 showed <code>LinkedList.get(i)</code> being <strong>hundreds of times slower</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Test 2 showed for-each makes that difference <strong>vanish</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Test 3 showed <code>LinkedList</code> winning decisively at front insertion.</span>
+            </label>
+            <div class="observe">
+              <span class="lbl">Bonus — the legacy classes</span>
+              Add a <code>Stack&lt;String&gt;</code> and prove you can call <code>get(0)</code> on it — a stack that lets you
+              peek at the bottom. Then rewrite it with <code>ArrayDeque</code> and confirm no such method exists.
+              That's theory slide 12's point about <code>Stack extends Vector</code> being a broken IS-A claim.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Iteration &amp; <code>ConcurrentModificationException</code><span class="sync">Theory slides 13–14</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Trigger <code>ConcurrentModificationException</code> deliberately, then fix it three different ways.
+              Everyone hits this exception once — better here than in production.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">IterationLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Iterator;
+import java.util.List;
+
+public class IterationLab {
+
+    public static void main(String[] args) {
+
+        // ===== The four ways to iterate =====
+        List&lt;String&gt; names = new ArrayList&lt;&gt;(List.of("Priya", "Rahul", "Anita", "Ravi"));
+
+        System.out.println("1. classic for (index available):");
+        for (int i = 0; i &lt; names.size(); i++) System.out.println("   " + i + ": " + names.get(i));
+
+        System.out.println("2. for-each (the default):");
+        for (String n : names) System.out.println("   " + n);
+
+        System.out.println("3. Iterator (can remove):");
+        Iterator&lt;String&gt; it = names.iterator();
+        while (it.hasNext()) System.out.println("   " + it.next());
+
+        System.out.println("4. forEach + method reference:");
+        names.forEach(n -&gt; System.out.println("   " + n));
+
+        // ===== BREAK IT: remove inside a for-each =====
+        System.out.println("\n=== The bug ===");
+        List&lt;String&gt; bad = new ArrayList&lt;&gt;(List.of("Priya", "Rahul", "Anita", "Ravi"));
+        try {
+            for (String n : bad) {
+                if (n.startsWith("R")) {
+                    bad.remove(n);              // structural change during iteration
+                }
+            }
+            System.out.println("  no exception?! " + bad);
+        } catch (ConcurrentModificationException e) {
+            System.out.println("  ConcurrentModificationException - as expected");
+        }
+
+        // ===== FIX A: removeIf - one line, always correct =====
+        System.out.println("\n=== Fix A: removeIf ===");
+        List&lt;String&gt; fixA = new ArrayList&lt;&gt;(List.of("Priya", "Rahul", "Anita", "Ravi"));
+        fixA.removeIf(n -&gt; n.startsWith("R"));
+        System.out.println("  " + fixA);
+
+        // ===== FIX B: Iterator.remove() =====
+        System.out.println("=== Fix B: Iterator.remove() ===");
+        List&lt;String&gt; fixB = new ArrayList&lt;&gt;(List.of("Priya", "Rahul", "Anita", "Ravi"));
+        Iterator&lt;String&gt; iter = fixB.iterator();
+        while (iter.hasNext()) {
+            if (iter.next().startsWith("R")) iter.remove();
+        }
+        System.out.println("  " + fixB);
+
+        // ===== FIX C: collect, then removeAll =====
+        System.out.println("=== Fix C: collect then removeAll ===");
+        List&lt;String&gt; fixC = new ArrayList&lt;&gt;(List.of("Priya", "Rahul", "Anita", "Ravi"));
+        List&lt;String&gt; doomed = new ArrayList&lt;&gt;();
+        for (String n : fixC) if (n.startsWith("R")) doomed.add(n);
+        fixC.removeAll(doomed);
+        System.out.println("  " + fixC);
+
+        // ===== set() is NOT structural - this is safe =====
+        System.out.println("\n=== set() during a classic for is fine ===");
+        List&lt;String&gt; upper = new ArrayList&lt;&gt;(List.of("priya", "rahul", "anita"));
+        for (int i = 0; i &lt; upper.size(); i++) upper.set(i, upper.get(i).toUpperCase());
+        System.out.println("  " + upper);
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output (abridged)</span>
+              <div class="term-out" style="margin:8px 0 0;">=== The bug ===
+  <span class="bad">ConcurrentModificationException - as expected</span>
+
+=== Fix A: removeIf ===
+  [Priya, Anita]
+=== Fix B: Iterator.remove() ===
+  [Priya, Anita]
+=== Fix C: collect then removeAll ===
+  [Priya, Anita]
+
+=== set() during a classic for is fine ===
+  [PRIYA, RAHUL, ANITA]</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">A subtlety worth knowing</span>
+              Try removing the <strong>second-to-last</strong> element in a for-each. Sometimes it doesn't throw at all —
+              it silently skips an element instead, because the iterator's <code>hasNext()</code> happens to return
+              <code>false</code> early. <strong>That's worse than the exception</strong>, and it's precisely why you should
+              never rely on getting an error. Use <code>removeIf</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I triggered <code>ConcurrentModificationException</code> on purpose.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All three fixes produced <code>[Priya, Anita]</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I understand why <code>set()</code> is safe but <code>add</code>/<code>remove</code> are not.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Sorting with <code>Comparable</code> &amp; <code>Comparator</code><span class="sync">Theory slides 15–16</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Give <code>Account</code> a natural order, then sort the same list six different ways <em>without touching
+              the class again</em>. This is where interfaces from Session 2 become genuinely powerful.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Step 1 — make <code>Account</code> comparable</span>
+              <ol>
+                <li>Open <code>Account.java</code>.</li>
+                <li>Change the class declaration to <code>implements Comparable&lt;Account&gt;</code>.</li>
+                <li>Add the <code>compareTo</code> method below.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>public abstract class Account implements Comparable&lt;Account&gt; {
+
+    // ... everything you already have ...
+
+    // NATURAL ORDER: by balance, ascending
+    @Override
+    public int compareTo(Account other) {
+        return Double.compare(this.balance, other.balance);
+        //     ^^^^^^^^^^^^^^ NOT (int)(this.balance - other.balance) - see slide 15
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">SortLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+public class SortLab {
+
+    public static void main(String[] args) {
+        List&lt;Account&gt; accounts = new ArrayList&lt;&gt;(List.of(
+            new SavingsAccount     ("AC1001", "Priya Sharma",  50000),
+            new CurrentAccount     ("AC1002", "Rahul Verma",   80000, 25000),
+            new FixedDepositAccount("AC1003", "Anita Desai",  200000, 12),
+            new SalaryAccount      ("AC1004", "Vikram Rao",     1200),
+            new SavingsAccount     ("AC1005", "Deepa Iyer",    30000),
+            new SavingsAccount     ("AC1006", "Arjun Mehta",   80000)
+        ));
+
+        print("1. Insertion order", accounts);
+
+        // ===== COMPARABLE: the natural order, built into the class =====
+        Collections.sort(accounts);
+        print("2. Natural order (balance ascending) - Comparable", accounts);
+
+        // ===== COMPARATOR: any order, without editing Account =====
+        accounts.sort(Comparator.comparingDouble(Account::getBalance).reversed());
+        print("3. Balance DESCENDING - Comparator.reversed()", accounts);
+
+        accounts.sort(Comparator.comparing(Account::getHolder));
+        print("4. Holder name A-Z", accounts);
+
+        accounts.sort(Comparator.comparing(Account::accountType)
+                                .thenComparing(Comparator.comparingDouble(Account::getBalance)
+                                                         .reversed()));
+        print("5. Type, then balance descending - thenComparing()", accounts);
+
+        accounts.sort(Comparator.comparing((Account a) -&gt; a.getHolder().length())
+                                .thenComparing(Account::getHolder));
+        print("6. Name LENGTH, then alphabetical", accounts);
+
+        // A lambda, for when the factory methods aren't enough
+        accounts.sort((a, b) -&gt; b.getAccountNumber().compareTo(a.getAccountNumber()));
+        print("7. Account number descending - raw lambda", accounts);
+
+        // ===== Collections utility methods =====
+        System.out.println("\n--- Collections utilities ---");
+        System.out.println("max by balance : " + Collections.max(accounts).getHolder());
+        System.out.println("min by balance : " + Collections.min(accounts).getHolder());
+        Collections.reverse(accounts);
+        System.out.println("after reverse, first: " + accounts.get(0).getAccountNumber());
+        Collections.shuffle(accounts);
+        System.out.println("after shuffle, first: " + accounts.get(0).getAccountNumber());
+
+        // binarySearch REQUIRES a sorted list
+        Collections.sort(accounts);
+        Account target = accounts.get(3);
+        System.out.println("binarySearch found index: " + Collections.binarySearch(accounts, target));
+    }
+
+    static void print(String title, List&lt;Account&gt; accounts) {
+        System.out.println("\n=== " + title + " ===");
+        for (Account a : accounts) System.out.println("  " + a);
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output (key sections)</span>
+              <div class="term-out" style="margin:8px 0 0;">=== 2. Natural order (balance ascending) - Comparable ===
+  AC1004   Vikram Rao     Salary                 1200.00
+  AC1005   Deepa Iyer     Savings               30000.00
+  AC1001   Priya Sharma   Savings               50000.00
+  AC1002   Rahul Verma    Current               80000.00
+  AC1006   Arjun Mehta    Savings               80000.00
+  AC1003   Anita Desai    Fixed Deposit        200000.00
+
+=== 4. Holder name A-Z ===
+  AC1006   Arjun Mehta    Savings               80000.00
+  AC1003   Anita Desai    Fixed Deposit        200000.00
+  ...
+
+=== 5. Type, then balance descending - thenComparing() ===
+  AC1002   Rahul Verma    Current               80000.00
+  AC1003   Anita Desai    Fixed Deposit        200000.00
+  AC1004   Vikram Rao     Salary                 1200.00
+  AC1006   Arjun Mehta    Savings               80000.00
+  AC1001   Priya Sharma   Savings               50000.00
+  AC1005   Deepa Iyer     Savings               30000.00
+
+--- Collections utilities ---
+max by balance : Anita Desai
+min by balance : Vikram Rao</div>
+              In section 5, look at the three Savings accounts: grouped together by type, and <em>within</em> that group
+              ordered 80000 → 50000 → 30000. That's <code>thenComparing</code> working.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Break it on purpose — the subtraction bug</span>
+              Temporarily change <code>compareTo</code> to <code>return (int)(this.balance - other.balance);</code>
+              then create two accounts differing by <strong>0.50</strong> (e.g. 1000.00 and 1000.50) and sort.
+              The cast to <code>int</code> makes the difference <code>0</code>, so Java thinks they're equal and the
+              order is wrong. Restore <code>Double.compare</code>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Collections.sort()</code> works using my <code>compareTo</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I sorted the same list <strong>six different ways</strong> without editing <code>Account</code> again.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I built a <strong>two-level</strong> sort with <code>thenComparing</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I reproduced the <strong>subtraction bug</strong> and understand why <code>Double.compare</code> is required.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 6 ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> The Immutability Traps<span class="sync">Theory slide 17</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Hit all three immutability traps in one file so you recognise
+              <code>UnsupportedOperationException</code> instantly when it appears in real code.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ImmutableTraps.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+public class ImmutableTraps {
+
+    public static void main(String[] args) {
+
+        // ===== TRAP 1: List.of() is fully IMMUTABLE =====
+        System.out.println("TRAP 1: List.of()");
+        List&lt;String&gt; fixed = List.of("a", "b", "c");
+        attempt("add",  () -&gt; fixed.add("d"));
+        attempt("set",  () -&gt; fixed.set(0, "z"));
+
+        // ===== TRAP 2: Arrays.asList() is FIXED-SIZE but mutable =====
+        System.out.println("\nTRAP 2: Arrays.asList()");
+        String[] array = {"a", "b", "c"};
+        List&lt;String&gt; view = Arrays.asList(array);
+        attempt("add",  () -&gt; view.add("d"));
+        attempt("set",  () -&gt; view.set(0, "z"));      // this one WORKS
+        System.out.println("  after set: " + view);
+        System.out.println("  the BACKING ARRAY changed too: " + Arrays.toString(array));
+
+        // ===== TRAP 3: unmodifiableList is a VIEW, not a copy =====
+        System.out.println("\nTRAP 3: unmodifiableList is a live view");
+        List&lt;String&gt; backing  = new ArrayList&lt;&gt;(List.of("a", "b"));
+        List&lt;String&gt; readOnly = Collections.unmodifiableList(backing);
+        attempt("add via readOnly", () -&gt; readOnly.add("c"));
+        backing.add("c");                            // but the ORIGINAL still can
+        System.out.println("  readOnly now shows: " + readOnly + "  &lt;-- it changed!");
+
+        // ===== THE FIX: copyOf makes a real, independent snapshot =====
+        System.out.println("\nTHE FIX: List.copyOf() is a true snapshot");
+        List&lt;String&gt; snapshot = List.copyOf(backing);
+        backing.add("d");
+        System.out.println("  backing  : " + backing);
+        System.out.println("  snapshot : " + snapshot + "  &lt;-- unaffected");
+
+        // ===== And how to get a genuinely mutable copy =====
+        System.out.println("\nMutable copy of an immutable list:");
+        List&lt;String&gt; mutable = new ArrayList&lt;&gt;(List.of("a", "b", "c"));
+        mutable.add("d");
+        System.out.println("  " + mutable);
+    }
+
+    static void attempt(String label, Runnable action) {
+        try {
+            action.run();
+            System.out.println("  " + label + ": OK");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("  " + label + ": UnsupportedOperationException");
+        }
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">TRAP 1: List.of()
+  add: <span class="bad">UnsupportedOperationException</span>
+  set: <span class="bad">UnsupportedOperationException</span>
+
+TRAP 2: Arrays.asList()
+  add: <span class="bad">UnsupportedOperationException</span>
+  set: <span class="ok">OK</span>
+  after set: [z, b, c]
+  the BACKING ARRAY changed too: [z, b, c]
+
+TRAP 3: unmodifiableList is a live view
+  add via readOnly: <span class="bad">UnsupportedOperationException</span>
+  readOnly now shows: [a, b, c]  &lt;-- it changed!
+
+THE FIX: List.copyOf() is a true snapshot
+  backing  : [a, b, c, d]
+  snapshot : [a, b, c]  &lt;-- unaffected
+
+Mutable copy of an immutable list:
+  [a, b, c, d]</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">The one to really remember</span>
+              <strong>Trap 3.</strong> Handing someone an <code>unmodifiableList</code> does <em>not</em> give them a stable
+              snapshot — it gives them a read-only window onto data you can still change underneath them. When you want
+              a true snapshot, use <code>List.copyOf(...)</code>. This matters directly for the defensive-copy work in
+              Task 8.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I hit <code>UnsupportedOperationException</code> from all three sources.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I saw <code>Arrays.asList().set()</code> modify the <strong>original array</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I proved <code>unmodifiableList</code> is a <strong>live view</strong> and <code>List.copyOf</code> is a real snapshot.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 ===== -->
+      <div class="section-band">Part 2 — Class relationships</div>
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> Aggregation, Composition &amp; Dependency<span class="sync">Theory slides 19–23</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build the full bank model with <strong>all four relationships</strong> present and clearly labelled, and
+              prove the lifecycle difference between aggregation and composition <em>in code</em>.
+            </div>
+
+            <div class="tree">session3-collections/
+├── Account.java + 4 subclasses   <span class="c">INHERITANCE (IS-A) - from Session 2</span>
+├── TransactionHistory.java       <span class="c">owned part</span>
+├── Customer.java                 <span class="c">AGGREGATION: has Accounts</span>
+├── Branch.java                   <span class="c">AGGREGATION: has Customers</span>
+├── Formatter.java                <span class="c">interface</span>
+├── PlainFormatter.java           <span class="c">implementation</span>
+├── ReportService.java            <span class="c">DEPENDENCY: uses a Formatter</span>
+└── BankModelDemo.java            <span class="c">runs it all</span></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">TransactionHistory.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class TransactionHistory {
+
+    private final List&lt;String&gt; entries = new ArrayList&lt;&gt;();
+
+    public void record(String entry) {
+        entries.add(entries.size() + 1 + ". " + entry);
+    }
+
+    // DEFENSIVE COPY: callers get a snapshot, not our internal list
+    public List&lt;String&gt; getEntries() {
+        return List.copyOf(entries);
+    }
+
+    public int count() { return entries.size(); }
+}</code></pre></div>
+
+            <div class="dothis">
+              <span class="lbl">Add composition to <code>Account</code></span>
+              <ol>
+                <li>Open <code>Account.java</code>.</li>
+                <li>Add the <code>history</code> field and the two methods below.</li>
+                <li>Note the history is created <strong>inside</strong> Account and never handed out — that's what makes it composition.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>    // ===== COMPOSITION: created here, owned here, dies with this Account =====
+    private final TransactionHistory history = new TransactionHistory();
+
+    public TransactionHistory getHistory() { return history; }
+
+    // Update deposit() so it records to the history:
+    public void deposit(double amount) {
+        balance += amount;
+        history.record(String.format("DEPOSIT %.2f -> balance %.2f", amount, balance));
+    }</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Customer.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+public class Customer {
+
+    private final String customerId;
+    private final String name;
+
+    // AGGREGATION: accounts have their own lifecycle. Note the list is created
+    // here but the Account objects are passed IN from outside.
+    private final List&lt;Account&gt; accounts = new ArrayList&lt;&gt;();
+
+    public Customer(String customerId, String name) {
+        this.customerId = customerId;
+        this.name = name;
+    }
+
+    public void addAccount(Account account) {
+        Objects.requireNonNull(account, "account must not be null");
+        accounts.add(account);
+    }
+
+    // Behaviour, not raw data
+    public double totalWealth() {
+        double total = 0;
+        for (Account a : accounts) total += a.getBalance();   // polymorphic
+        return total;
+    }
+
+    public int accountCount() { return accounts.size(); }
+
+    // DEFENSIVE COPY - callers cannot clear our list
+    public List&lt;Account&gt; getAccounts() { return List.copyOf(accounts); }
+
+    public String getName()       { return name; }
+    public String getCustomerId() { return customerId; }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s): %d account(s), total %.2f",
+                             name, customerId, accounts.size(), totalWealth());
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Branch.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class Branch {
+
+    private final String name;
+
+    // AGGREGATION: customers are passed IN and outlive the branch
+    private final List&lt;Customer&gt; customers;
+
+    public Branch(String name, List&lt;Customer&gt; customers) {
+        this.name = name;
+        this.customers = new ArrayList&lt;&gt;(customers);   // defensive copy of the LIST
+    }
+
+    public double totalDeposits() {
+        double total = 0;
+        for (Customer c : customers) total += c.totalWealth();
+        return total;
+    }
+
+    public List&lt;Customer&gt; getCustomers() { return List.copyOf(customers); }
+    public String getName()              { return name; }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Formatter.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public interface Formatter {
+    String format(Branch branch);
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">PlainFormatter.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class PlainFormatter implements Formatter {
+
+    @Override
+    public String format(Branch branch) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("=== Branch: ").append(branch.getName()).append(" ===\n");
+        for (Customer c : branch.getCustomers()) {
+            sb.append("  ").append(c).append("\n");
+            for (Account a : c.getAccounts()) {
+                sb.append("      ").append(a).append("\n");
+            }
+        }
+        sb.append(String.format("  TOTAL DEPOSITS: %.2f", branch.totalDeposits()));
+        return sb.toString();
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ReportService.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>public class ReportService {
+
+    // DEPENDENCY (injected): we depend on the INTERFACE, never a concrete class.
+    // This is constructor injection - the core idea of Spring.
+    private final Formatter formatter;
+
+    public ReportService(Formatter formatter) {
+        this.formatter = formatter;
+    }
+
+    public void printReport(Branch branch) {
+        System.out.println(formatter.format(branch));    // dynamic dispatch
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">BankModelDemo.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.List;
+
+public class BankModelDemo {
+
+    public static void main(String[] args) {
+
+        // ===== Accounts exist independently (that's what makes it aggregation) =====
+        Account a1 = new SavingsAccount     ("AC1001", "Priya Sharma",  50000);
+        Account a2 = new FixedDepositAccount("AC1002", "Priya Sharma", 200000, 12);
+        Account a3 = new CurrentAccount     ("AC1003", "Rahul Verma",   80000, 25000);
+
+        Customer priya = new Customer("C001", "Priya Sharma");
+        priya.addAccount(a1);
+        priya.addAccount(a2);
+
+        Customer rahul = new Customer("C002", "Rahul Verma");
+        rahul.addAccount(a3);
+
+        Branch branch = new Branch("Andheri West",
+                                   new ArrayList&lt;&gt;(List.of(priya, rahul)));
+
+        // ===== DEPENDENCY: swap the formatter, no other change =====
+        ReportService service = new ReportService(new PlainFormatter());
+        service.printReport(branch);
+
+        // ===== COMPOSITION in action: history lives inside the Account =====
+        System.out.println("\n--- composition: the account owns its history ---");
+        a1.deposit(5000);
+        a1.deposit(2500);
+        System.out.println("History for AC1001 (" + a1.getHistory().count() + " entries):");
+        for (String entry : a1.getHistory().getEntries()) {
+            System.out.println("   " + entry);
+        }
+
+        // ===== AGGREGATION proof: the account survives its customer =====
+        System.out.println("\n--- aggregation: parts outlive the whole ---");
+        System.out.println("Before: " + priya);
+        priya = null;                          // the Customer is gone
+        System.out.println("Customer reference cleared, but the account still exists:");
+        System.out.println("   " + a1);
+        System.out.println("   balance still readable: " + a1.getBalance());
+
+        // ===== DEFENSIVE COPY proof =====
+        System.out.println("\n--- defensive copy: outsiders cannot break us ---");
+        System.out.println("Rahul's account count: " + rahul.accountCount());
+        try {
+            rahul.getAccounts().clear();       // attacking the returned list
+            System.out.println("clear() did not throw");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("clear() rejected - UnsupportedOperationException");
+        }
+        System.out.println("Rahul's account count AFTER the attack: " + rahul.accountCount());
+    }
+}</code></pre></div>
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><code>javac *.java</code></li>
+                <li><code>java BankModelDemo</code></li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Branch: Andheri West ===
+  Priya Sharma (C001): 2 account(s), total 250000.00
+      AC1001   Priya Sharma   Savings               50000.00
+      AC1002   Priya Sharma   Fixed Deposit        200000.00
+  Rahul Verma (C002): 1 account(s), total 80000.00
+      AC1003   Rahul Verma    Current               80000.00
+  TOTAL DEPOSITS: 330000.00
+
+--- composition: the account owns its history ---
+History for AC1001 (2 entries):
+   1. DEPOSIT 5000.00 -&gt; balance 55000.00
+   2. DEPOSIT 2500.00 -&gt; balance 57500.00
+
+--- aggregation: parts outlive the whole ---
+Before: Priya Sharma (C001): 2 account(s), total 257500.00
+Customer reference cleared, but the account still exists:
+   AC1001   Priya Sharma   Savings               57500.00
+   balance still readable: 57500.0
+
+--- defensive copy: outsiders cannot break us ---
+Rahul's account count: 1
+<span class="ok">clear() rejected - UnsupportedOperationException</span>
+Rahul's account count AFTER the attack: <span class="ok">1</span></div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Read your own code and name each relationship</span>
+              <strong>IS-A:</strong> <code>SavingsAccount extends Account</code>.
+              <strong>Composition:</strong> <code>Account</code> creates its own <code>TransactionHistory</code> — nobody
+              else can reach it, and it dies with the account.
+              <strong>Aggregation:</strong> <code>Customer</code> holds <code>Account</code>s that were passed in and
+              survive it. <strong>Dependency:</strong> <code>ReportService</code> is <em>given</em> a
+              <code>Formatter</code> — swap in a JSON one and nothing else changes.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four relationships are present in my model and I can point to each in the code.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I proved the account <strong>outlives</strong> its customer (aggregation).</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The defensive copy <strong>blocked</strong> the <code>clear()</code> attack.</span>
+            </label>
+            <div class="tryit">
+              <span class="lbl">Prove dependency injection pays off</span>
+              Write a <code>CsvFormatter implements Formatter</code> that outputs comma-separated rows. Then change
+              <strong>exactly one line</strong> in <code>BankModelDemo</code> —
+              <code>new ReportService(new CsvFormatter())</code> — and get a totally different report.
+              <strong>You should not need to touch <code>ReportService</code>, <code>Branch</code>, <code>Customer</code>
+              or <code>Account</code>.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I added a second <code>Formatter</code> and swapped it in by changing <strong>one line</strong>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 8 ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">TASK 8</span><span class="chevron">▶</span> The Double-Counting Bug<span class="sync">Theory slides 21, 24</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Reproduce the famous <code>extends ArrayList</code> bug with your own hands, then fix it with composition.
+              This is the most persuasive argument for "favour composition over inheritance" — because you'll see it
+              give a wrong answer.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">CountingLab.java</span><span class="fb-tag">create this file</span></div>
+            <div class="codewrap"><pre><code>import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+// ===== THE BROKEN VERSION: inheritance used for reuse =====
+class InheritedCounter&lt;E&gt; extends ArrayList&lt;E&gt; {
+    private int addCount = 0;
+
+    @Override
+    public boolean add(E e) {
+        addCount++;
+        return super.add(e);
+    }
+
+    @Override
+    public boolean addAll(Collection&lt;? extends E&gt; c) {
+        addCount += c.size();
+        return super.addAll(c);      // internally calls add() for EACH element!
+    }
+
+    public int getAddCount() { return addCount; }
+}
+
+// ===== THE FIXED VERSION: composition =====
+class ComposedCounter&lt;E&gt; {
+    private final List&lt;E&gt; inner = new ArrayList&lt;&gt;();
+    private int addCount = 0;
+
+    public boolean add(E e) {
+        addCount++;
+        return inner.add(e);
+    }
+
+    public boolean addAll(Collection&lt;? extends E&gt; c) {
+        addCount += c.size();
+        return inner.addAll(c);      // inner's internals cannot reach OUR add()
+    }
+
+    public int getAddCount() { return addCount; }
+    public int size()        { return inner.size(); }
+    public List&lt;E&gt; asList()  { return List.copyOf(inner); }
+}
+
+public class CountingLab {
+
+    public static void main(String[] args) {
+
+        System.out.println("=== Inheritance version ===");
+        InheritedCounter&lt;String&gt; bad = new InheritedCounter&lt;&gt;();
+        bad.addAll(List.of("a", "b", "c"));
+        System.out.println("  added 3 items");
+        System.out.println("  size()        = " + bad.size());
+        System.out.println("  getAddCount() = " + bad.getAddCount() + "   &lt;-- WRONG");
+
+        System.out.println("\n=== Composition version ===");
+        ComposedCounter&lt;String&gt; good = new ComposedCounter&lt;&gt;();
+        good.addAll(List.of("a", "b", "c"));
+        System.out.println("  added 3 items");
+        System.out.println("  size()        = " + good.size());
+        System.out.println("  getAddCount() = " + good.getAddCount() + "   &lt;-- CORRECT");
+
+        // And the OTHER problem with inheritance: the whole ArrayList API leaks out
+        System.out.println("\n=== The leaked API problem ===");
+        bad.add("d");
+        bad.set(0, "OVERWRITTEN");          // nobody counted this
+        bad.removeIf(s -&gt; s.equals("b"));   // nor this
+        System.out.println("  after set() and removeIf(): " + bad);
+        System.out.println("  getAddCount() = " + bad.getAddCount()
+                           + " but size() = " + bad.size() + "  &lt;-- inconsistent");
+        System.out.println("\n  The composed version only exposes what we chose to expose,");
+        System.out.println("  so its count can never drift out of sync.");
+    }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <div class="term-out" style="margin:8px 0 0;">=== Inheritance version ===
+  added 3 items
+  size()        = 3
+  getAddCount() = <span class="bad">6</span>   &lt;-- WRONG
+
+=== Composition version ===
+  added 3 items
+  size()        = 3
+  getAddCount() = <span class="ok">3</span>   &lt;-- CORRECT
+
+=== The leaked API problem ===
+  after set() and removeIf(): [OVERWRITTEN, c, d]
+  getAddCount() = 7 but size() = 3  &lt;-- inconsistent
+
+  The composed version only exposes what we chose to expose,
+  so its count can never drift out of sync.</div>
+            </div>
+            <div class="observe">
+              <span class="lbl">Why the inherited version says 6</span>
+              <code>addAll</code> added 3 to the count, then called <code>super.addAll(c)</code> — and
+              <code>ArrayList.addAll</code> internally calls <code>add()</code> for each element, which is <em>your
+              overridden</em> <code>add</code>. So each item was counted twice. <strong>You depended on an internal
+              implementation detail that ArrayList never promised</strong>, and which a future JDK could change.
+              Composition has no such exposure: <code>inner</code>'s internals can never call your methods.
+            </div>
+            <div class="observe">
+              <span class="lbl">The second, subtler problem</span>
+              Because <code>InheritedCounter</code> IS-A <code>ArrayList</code>, callers get <code>set</code>,
+              <code>removeIf</code>, <code>clear</code>, <code>sort</code> — every method — and you cannot count or
+              validate any of them. <strong>Inheritance forces you to inherit the entire public API, including the parts
+              that break your invariants.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">The inheritance version reported <strong>6</strong>; the composition version reported <strong>3</strong>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can explain <em>why</em> it double-counted, in terms of <code>super.addAll</code> calling my <code>add</code>.</span>
+            </label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I understand the "leaked API" problem — that inheritance exposes methods I can't control.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> For Anyone Who Finished Early<span class="sync">Optional</span></summary>
+          <div class="exp-body">
+            <p>Entirely optional. Nothing here is required for Session 4.</p>
+            <ol class="steps">
+              <li><strong><code>ListIterator</code>.</strong> Use it to walk a list <em>backwards</em> with
+                  <code>hasPrevious()</code>, and to <code>add</code> an element mid-iteration — something a plain
+                  <code>Iterator</code> cannot do.</li>
+              <li><strong><code>subList</code> is a view.</strong> Take <code>list.subList(1, 3)</code>, modify the
+                  sublist, and watch the original change. Then <code>clear()</code> the sublist and see elements vanish
+                  from the parent. Genuinely surprising.</li>
+              <li><strong>Your own <code>Iterable</code>.</strong> Make <code>Customer</code> implement
+                  <code>Iterable&lt;Account&gt;</code> so you can write <code>for (Account a : priya)</code>. You'll need
+                  to return <code>accounts.iterator()</code>.</li>
+              <li><strong>Streams.</strong> Rewrite Task 5's sorting and Task 7's totals using
+                  <code>stream().filter(...).sorted(...).mapToDouble(...).sum()</code>. Compare readability.</li>
+              <li><strong><code>ArrayDeque</code> as a stack and a queue.</strong> Implement undo/redo for account
+                  transactions with two deques.</li>
+              <li><strong>Generic method.</strong> Write <code>static &lt;T&gt; List&lt;T&gt; firstN(List&lt;T&gt; src, int n)</code>
+                  and use it with both <code>List&lt;String&gt;</code> and <code>List&lt;Account&gt;</code>.</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Stretch done — I proved <code>subList</code> is a live view.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== CHECKPOINT ===== -->
+      <section class="section">
+        <div class="section-band">Checkpoint</div>
+        <div class="expected" style="font-size:17px;">
+          <span class="lbl">✅ End-of-lab checkpoint — all seven must be true</span>
+          <ol style="margin:6px 0 0;">
+            <li>My accounts live in a <code>List</code> declared as <code>List</code>, not <code>ArrayList</code>.</li>
+            <li>I can explain <code>remove(2)</code> vs <code>remove(Integer.valueOf(2))</code>.</li>
+            <li>I measured <code>LinkedList.get(i)</code> being hundreds of times slower than <code>ArrayList</code>'s.</li>
+            <li>I can fix a <code>ConcurrentModificationException</code> three ways.</li>
+            <li>I sorted one list six ways using <code>Comparable</code> and <code>Comparator</code>.</li>
+            <li>My model contains inheritance, aggregation, composition <em>and</em> dependency — and I can name each.</li>
+            <li>I reproduced the double-counting bug and fixed it with composition.</li>
+          </ol>
+        </div>
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have reached the Session 3 checkpoint.</strong>
+            <span class="verify">If any of the seven isn't true, flag it now — Session 4 builds on this model.</span>
+          </span>
+        </label>
+      </section>
+
+      <!-- ===== TAKE-HOME TASKS ===== -->
+      <div class="section-band">Take-home tasks — submit before Session 4</div>
+      <section class="section">
+        <div class="concept" style="margin-top:14px;">
+          <span class="lbl">Read this first</span>
+          Four tasks. <strong>Tasks 1–3 are compulsory; Task 4 is for distinction.</strong> Every task must compile
+          and run with <code>javac *.java</code>. Where a task asks you to <em>name</em> or <em>justify</em> a
+          relationship, write it as a comment above the field — the relationship modelling carries as many marks as the
+          working code.
+        </div>
+
+        <!-- Assignment 1 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 1</span> Student Result Manager <span class="diff easy">Easy</span></h3>
+          <p class="brief">A <code>List</code>-driven console app — the bread and butter of collections work.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>A <code>Student</code> class: <code>rollNo</code>, <code>name</code>, <code>marks</code> (a <code>List&lt;Integer&gt;</code> of 5 subjects). Add methods <code>total()</code>, <code>average()</code> and <code>grade()</code> (A ≥ 80, B ≥ 60, C ≥ 40, else F).</li>
+            <li><code>Student</code> must implement <code>Comparable&lt;Student&gt;</code> with natural order = <strong>total descending</strong> (rank order). Use <code>Integer.compare</code>, never subtraction.</li>
+            <li>Override <code>toString</code>, <code>equals</code> and <code>hashCode</code> (on <code>rollNo</code>).</li>
+            <li>A <code>ResultManager</code> holding a <code>List&lt;Student&gt;</code> with: <code>add</code>, <code>removeByRollNo</code>, <code>findByRollNo</code>, <code>topN(int n)</code>, <code>failList()</code> and <code>classAverage()</code>.</li>
+            <li><code>removeByRollNo</code> must use <code>removeIf</code> — <strong>a <code>ConcurrentModificationException</code> anywhere loses marks</strong>.</li>
+            <li>Getters returning the internal list must return a <strong>defensive copy</strong>.</li>
+            <li>Print: the full list in rank order, the top 3, everyone who failed, and the class average.</li>
+          </ol>
+          <div class="out">=== Rank order ===
+1.  R003  Anita Desai     total 445  avg 89.0  grade A
+2.  R001  Priya Sharma    total 421  avg 84.2  grade A
+3.  R005  Deepa Iyer      total 388  avg 77.6  grade B
+4.  R002  Rahul Verma     total 310  avg 62.0  grade B
+5.  R004  Vikram Rao      total 165  avg 33.0  grade F
+
+Top 3: Anita Desai, Priya Sharma, Deepa Iyer
+<span class="bad">Failing: Vikram Rao (33.0)</span>
+Class average: 69.16</div>
+        </div>
+
+        <!-- Assignment 2 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 2</span> Playlist Manager — Sorting Every Which Way <span class="diff easy">Easy</span></h3>
+          <p class="brief">Focused practice on <code>Comparator</code> chains and the <code>Collections</code> utilities.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>A <code>Song</code> class: <code>title</code>, <code>artist</code>, <code>album</code>, <code>durationSeconds</code>, <code>playCount</code>, <code>rating</code> (1–5).</li>
+            <li>Natural order (<code>Comparable</code>) = by <code>title</code>, case-insensitive.</li>
+            <li>Provide <strong>at least six named <code>Comparator</code> constants</strong> as <code>public static final</code> fields on <code>Song</code>: <code>BY_ARTIST</code>, <code>BY_DURATION</code>, <code>BY_PLAYCOUNT_DESC</code>, <code>BY_RATING_DESC</code>, <code>BY_ARTIST_THEN_ALBUM_THEN_TITLE</code>, <code>BY_RATING_DESC_THEN_PLAYCOUNT_DESC</code>.</li>
+            <li>All must be built with <code>Comparator.comparing</code> / <code>thenComparing</code> / <code>reversed</code> — <strong>no hand-written <code>compare</code> methods</strong>.</li>
+            <li>A <code>Playlist</code> class (a <code>List&lt;Song&gt;</code> — decide and <strong>comment</strong> whether this is aggregation or composition, and why) with <code>shuffle()</code>, <code>totalDuration()</code> formatted as <code>h:mm:ss</code>, <code>longestSong()</code>, <code>search(String keyword)</code> across title and artist, and <code>removeUnrated()</code>.</li>
+            <li>Demonstrate every comparator in <code>main</code>, printing a titled table for each.</li>
+            <li>Handle at least one <code>null</code> album gracefully using <code>Comparator.nullsLast</code>.</li>
+          </ol>
+          <div class="out">=== BY_RATING_DESC_THEN_PLAYCOUNT_DESC ===
+  5★  1402 plays  Kesariya                  Arijit Singh
+  5★   980 plays  Tum Hi Ho                 Arijit Singh
+  4★  2100 plays  Jai Ho                    A R Rahman
+  4★   455 plays  Ilahi                     Pritam
+  3★   120 plays  Malhari                   Vishal-Shekhar
+
+Total duration: 0:24:37   Longest: Jai Ho (5:42)
+Search 'arijit' -> 2 matches</div>
+        </div>
+
+        <!-- Assignment 3 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 3</span> Library System — Model the Relationships <span class="diff med">Medium</span></h3>
+          <p class="brief">The relationship-modelling task. Build a library where every relationship is a deliberate, documented choice.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>Reuse or rebuild your Session 2 <code>LibraryItem</code> hierarchy (<code>Book</code>, <code>DVD</code>, <code>Magazine</code>) — that's the <strong>IS-A</strong> relationship.</li>
+            <li><code>Member</code> HAS-A <code>List&lt;LibraryItem&gt;</code> of borrowed items. <strong>Aggregation</strong> — items outlive members. Enforce a maximum of 3 borrowed items by throwing a custom <code>BorrowLimitExceededException</code>.</li>
+            <li><code>LibraryItem</code> OWNS a <code>LoanHistory</code> object recording every issue and return with a timestamp. <strong>Composition</strong> — created inside, never handed out raw.</li>
+            <li><code>Library</code> HAS-A <code>List&lt;Member&gt;</code> and a <code>List&lt;LibraryItem&gt;</code>. Decide aggregation vs composition for each and <strong>justify both in comments</strong>.</li>
+            <li>A <code>FineCalculator</code> <strong>interface</strong> with two implementations (<code>StandardFineCalculator</code>, <code>StudentFineCalculator</code> at half rate). <code>Library</code> receives one by <strong>constructor injection</strong> — that's <strong>dependency</strong>. Prove you can swap it with one line.</li>
+            <li>Every getter that returns a collection must return a <strong>defensive copy</strong>. Include a demo in <code>main</code> proving an outside <code>clear()</code> cannot damage your data.</li>
+            <li>Sorting: list all items by title; all members by number of items borrowed (descending), then name. Use <code>Comparator</code> chains.</li>
+            <li>Use <code>removeIf</code> for returns. A <code>ConcurrentModificationException</code> loses marks.</li>
+            <li>At the top of <code>Library.java</code>, add a comment block listing all five relationships in your design in the form <code>ClassA --[relationship]--&gt; ClassB</code>.</li>
+          </ol>
+          <div class="out">=== Library: Central Branch (StandardFineCalculator) ===
+Members by items borrowed:
+  Priya Sharma      3 items
+  Rahul Verma       2 items
+  Anita Desai       0 items
+
+<span class="bad">Priya cannot borrow a 4th item: BorrowLimitExceededException - limit is 3</span>
+
+Fines for 5 days late (Standard):  Book 10.00  DVD 50.00
+Fines for 5 days late (Student) :  Book  5.00  DVD 25.00
+
+Loan history for B001 (owned by the item):
+   1. ISSUED  to Priya Sharma  at 14:32:07
+   2. RETURNED from Priya Sharma at 14:35:12
+
+<span class="ok">Defensive copy held: outside clear() had no effect (3 items still borrowed)</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            The comment block in requirement 9 is the single highest-value thing you'll write. If you can't name a
+            relationship confidently, that's a sign the design needs rethinking — not that the comment should be vague.
+          </div>
+        </div>
+
+        <!-- Assignment 4 -->
+        <div class="assign">
+          <h3><span class="anum">TASK 4</span> Generic Repository + Refactor <span class="diff hard">Distinction</span></h3>
+          <p class="brief">Write a reusable generic container, then use it to remove duplication from Task 3.</p>
+          <span class="rq">Requirements</span>
+          <ol class="req">
+            <li>An interface <code>Identifiable</code> with <code>String getId()</code>. Make <code>LibraryItem</code>, <code>Member</code> and <code>Student</code> implement it.</li>
+            <li>A generic class <code>Repository&lt;T extends Identifiable&gt;</code> built by <strong>composition</strong> around a <code>List&lt;T&gt;</code> — <strong>it must NOT extend <code>ArrayList</code></strong>. In a comment, explain what would go wrong if it did, referencing the double-counting bug from Task 8.</li>
+            <li>Methods: <code>save(T)</code> (reject duplicate ids with a custom exception), <code>findById(String)</code> returning <code>Optional&lt;T&gt;</code>, <code>deleteById(String)</code> returning <code>boolean</code>, <code>findAll()</code> returning a defensive copy, <code>count()</code>, and <code>findAllSorted(Comparator&lt;T&gt;)</code>.</li>
+            <li>A generic method <code>&lt;R&gt; List&lt;R&gt; mapAll(Function&lt;T, R&gt; mapper)</code> — e.g. turn a repository of Members into a <code>List&lt;String&gt;</code> of names.</li>
+            <li>A method <code>List&lt;T&gt; findWhere(Predicate&lt;T&gt; condition)</code>.</li>
+            <li>Refactor Task 3's <code>Library</code> to hold <code>Repository&lt;LibraryItem&gt;</code> and <code>Repository&lt;Member&gt;</code> instead of raw lists. <strong>The public behaviour of <code>Library</code> must not change.</strong></li>
+            <li>Prove genericity: use the <em>same</em> <code>Repository</code> class with <code>Student</code> from Task 1 and show it works unchanged.</li>
+            <li>Add a <code>Repository&lt;T&gt;</code> method <code>void addAll(Collection&lt;? extends T&gt;)</code> and explain in a comment why the wildcard <code>? extends T</code> is needed rather than plain <code>Collection&lt;T&gt;</code>.</li>
+            <li>Write a short <code>DESIGN.md</code> (or a comment block) covering: why composition over inheritance here, why <code>Optional</code> over returning <code>null</code>, and why the repository returns defensive copies.</li>
+          </ol>
+          <div class="out">=== Repository&lt;LibraryItem&gt; ===
+saved B001, D001, M001  (count = 3)
+<span class="bad">save duplicate B001 -> DuplicateIdException: id 'B001' already exists</span>
+findById("D001")  -> Optional[DVD: Inception]
+findById("XXX")   -> Optional.empty
+deleteById("M001")-> true   (count = 2)
+
+mapAll(LibraryItem::getTitle) -> [Clean Code, Inception]
+findWhere(i -&gt; i.finePerDay() &gt; 5) -> [Inception]
+
+=== SAME class, different type ===
+Repository&lt;Student&gt; count = 5
+findAllSorted(by total desc) -> Anita, Priya, Deepa, Rahul, Vikram
+
+<span class="ok">Library refactored: public API unchanged, all Task 3 output identical</span></div>
+          <div class="hint">
+            <span class="lbl">Hint</span>
+            Requirement 6 is the real test. If refactoring <code>Library</code>'s internals forces you to change
+            <code>main</code>, your original encapsulation was leaky — which is itself a useful thing to discover.
+            Note it honestly in <code>DESIGN.md</code>.
+          </div>
+        </div>
+
+        <div class="submit-panel">
+          <h3>📦 How to submit</h3>
+          <ol>
+            <li>Create a folder named <code>&lt;your-name&gt;-session3-tasks</code>.</li>
+            <li>One sub-folder per task: <code>task1/</code> … <code>task4/</code>.</li>
+            <li><code>.java</code> source files only — no <code>.class</code> files, no IDE folders.</li>
+            <li>A <code>NOTES.md</code> at the top level with: which tasks you finished, anything broken, your relationship comment block from Task 3, and the <code>DESIGN.md</code> content if you attempted Task 4.</li>
+            <li>Zip and submit before Session 4 begins.</li>
+          </ol>
+          <p style="margin-top:14px;"><strong>How it will be assessed</strong></p>
+          <table>
+            <thead><tr><th>Criterion</th><th>Weight</th><th>What earns full marks</th></tr></thead>
+            <tbody>
+              <tr><td>Compiles and runs</td><td>15%</td><td><code>javac *.java</code> is clean</td></tr>
+              <tr><td>Correct collection choices</td><td>15%</td><td><code>ArrayList</code> by default; interface-typed declarations everywhere</td></tr>
+              <tr><td>Generics used properly</td><td>10%</td><td>No raw types, no unnecessary casts</td></tr>
+              <tr><td>Comparator quality</td><td>15%</td><td>Factory methods and chains, <code>Double</code>/<code>Integer.compare</code>, no subtraction</td></tr>
+              <tr><td>Relationships modelled &amp; named</td><td>20%</td><td>Aggregation vs composition chosen deliberately and justified in comments</td></tr>
+              <tr><td>Encapsulation</td><td>15%</td><td>Private fields, defensive copies, behaviour exposed rather than data</td></tr>
+              <tr><td>Safe iteration</td><td>10%</td><td><code>removeIf</code> / <code>Iterator.remove</code>; no CME anywhere</td></tr>
+            </tbody>
+          </table>
+          <p style="margin-top:12px;"><strong>Instant mark loss:</strong> a raw <code>List</code>, a getter returning the internal collection directly, <code>(int)(a - b)</code> in a comparator, modifying a collection inside a for-each, or <code>extends ArrayList</code>.</p>
+        </div>
+
+        <label class="check"><input type="checkbox" class="labstep" />
+          <span class="ctext"><strong>I have read all four take-home tasks</strong> and know what's expected.</span>
+        </label>
+      </section>
+
+      <!-- ===== COMMON ISSUES ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Common Issues &amp; Fixes</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:40%">Symptom</th><th>Cause &amp; fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>ConcurrentModificationException</code></td><td>You added/removed inside a for-each. Use <code>removeIf</code> or <code>Iterator.remove()</code>.</td></tr>
+                <tr><td><code>UnsupportedOperationException</code> on <code>add</code></td><td>The list came from <code>List.of()</code> or <code>Arrays.asList()</code>. Wrap it: <code>new ArrayList&lt;&gt;(theList)</code>.</td></tr>
+                <tr><td><code>IndexOutOfBoundsException: Index 5 out of bounds for length 5</code></td><td>Valid indices are 0 to <code>size()-1</code>. Your loop condition should be <code>i &lt; size()</code>.</td></tr>
+                <tr><td><code>remove()</code> removed the wrong thing</td><td>Overload trap on <code>List&lt;Integer&gt;</code>. Use <code>remove(Integer.valueOf(x))</code> to remove by value.</td></tr>
+                <tr><td><code>contains()</code> returns false for an object that's in there</td><td>You didn't override <code>equals()</code>. <code>contains</code>/<code>indexOf</code>/<code>remove(Object)</code> all rely on it.</td></tr>
+                <tr><td>Program hangs / takes forever</td><td>Probably <code>get(i)</code> in a loop over a <code>LinkedList</code> — that's O(n²). Use for-each.</td></tr>
+                <tr><td><code>ClassCastException</code> in <code>Collections.sort</code></td><td>Your class doesn't implement <code>Comparable</code>. Implement it, or pass a <code>Comparator</code>.</td></tr>
+                <tr><td>Sort order is subtly wrong</td><td><code>(int)(a - b)</code> truncation or overflow. Use <code>Double.compare</code>/<code>Integer.compare</code>.</td></tr>
+                <tr><td><code>binarySearch</code> returns a negative number</td><td>Either not found, or <strong>the list wasn't sorted first</strong>. Sort with the same ordering you search with.</td></tr>
+                <tr><td><code>incompatible types: int cannot be converted to String</code></td><td>Generics doing their job. Check the element type of your list.</td></tr>
+                <tr><td><code>NullPointerException</code> during a sort</td><td>A null field in your comparator key. Use <code>Comparator.nullsLast(...)</code>.</td></tr>
+                <tr><td>Caller changed my object's internal list</td><td>Your getter leaked it. Return <code>List.copyOf(...)</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== GLOSSARY ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Collection</strong></td><td>An object that holds a group of other objects</td></tr>
+                <tr><td><strong><code>List</code></strong></td><td>Ordered, indexed, duplicates allowed</td></tr>
+                <tr><td><strong><code>ArrayList</code></strong></td><td>A List backed by a resizable array. Your default</td></tr>
+                <tr><td><strong><code>LinkedList</code></strong></td><td>A List of doubly linked nodes; also a <code>Deque</code></td></tr>
+                <tr><td><strong>Generics</strong></td><td>The <code>&lt;Type&gt;</code> syntax giving compile-time type safety</td></tr>
+                <tr><td><strong>Diamond operator</strong></td><td>The empty <code>&lt;&gt;</code> — type inferred from the left</td></tr>
+                <tr><td><strong>Raw type</strong></td><td>A collection with no type parameter. Unsafe; never use</td></tr>
+                <tr><td><strong>Autoboxing</strong></td><td>Automatic <code>int</code> ↔ <code>Integer</code> conversion</td></tr>
+                <tr><td><strong>Capacity vs size</strong></td><td>Capacity = slots allocated; size = elements actually present</td></tr>
+                <tr><td><strong>Amortised O(1)</strong></td><td>Cheap on average, occasionally expensive (the resize)</td></tr>
+                <tr><td><strong><code>Iterator</code></strong></td><td>The cursor object that walks a collection; can remove safely</td></tr>
+                <tr><td><strong><code>Iterable</code></strong></td><td>The interface that makes for-each possible</td></tr>
+                <tr><td><strong>Fail-fast</strong></td><td>Throwing immediately on concurrent modification rather than corrupting</td></tr>
+                <tr><td><strong><code>Comparable</code></strong></td><td>One natural order, defined inside the class</td></tr>
+                <tr><td><strong><code>Comparator</code></strong></td><td>An external ordering strategy; have as many as you like</td></tr>
+                <tr><td><strong>View</strong></td><td>A window onto another collection — changes show through both ways</td></tr>
+                <tr><td><strong>Defensive copy</strong></td><td>Returning a copy so callers can't mutate your internals</td></tr>
+                <tr><td><strong>Association</strong></td><td>Any structural link between two classes</td></tr>
+                <tr><td><strong>Aggregation</strong></td><td>HAS-A where the part has its own lifecycle and may be shared</td></tr>
+                <tr><td><strong>Composition</strong></td><td>HAS-A where the whole owns the part exclusively</td></tr>
+                <tr><td><strong>Dependency</strong></td><td>USES-A — needed only for the duration of a method</td></tr>
+                <tr><td><strong>Dependency injection</strong></td><td>Being handed your collaborators instead of creating them</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF-CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>If you can answer all ten, you're ready for Session 4. Try them with a neighbour rather than alone.</p>
+            <ol class="steps">
+              <li>Give two things a <code>List</code> can do that an array cannot.</li>
+              <li>Why is <code>List&lt;String&gt; l = new ArrayList&lt;&gt;()</code> better than <code>ArrayList&lt;String&gt; l = new ArrayList&lt;&gt;()</code>?</li>
+              <li>Why won't <code>List&lt;int&gt;</code> compile, and what do you write instead?</li>
+              <li>What happens inside an <code>ArrayList</code> when it runs out of capacity?</li>
+              <li>Why is looping with <code>get(i)</code> over a <code>LinkedList</code> O(n²)?</li>
+              <li>For <code>List&lt;Integer&gt; l</code>, what's the difference between <code>l.remove(2)</code> and <code>l.remove(Integer.valueOf(2))</code>?</li>
+              <li>Name three ways to remove elements from a list while iterating, safely.</li>
+              <li>When would you use <code>Comparator</code> rather than <code>Comparable</code>?</li>
+              <li>Explain the difference between aggregation and composition, with an example of each.</li>
+              <li>Your teammate writes <code>class MyList extends ArrayList&lt;String&gt;</code> to add a counter. What do you tell them, and why?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all ten self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick Reference Card</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3><code>List</code> methods</h3>
+              <table>
+                <thead><tr><th>Method</th><th>Does</th></tr></thead>
+                <tbody>
+                  <tr><td><code>add(e)</code></td><td>Append</td></tr>
+                  <tr><td><code>add(i, e)</code></td><td>Insert at index</td></tr>
+                  <tr><td><code>get(i)</code> / <code>set(i, e)</code></td><td>Read / replace</td></tr>
+                  <tr><td><code>remove(int)</code></td><td>By <strong>index</strong></td></tr>
+                  <tr><td><code>remove(Object)</code></td><td>By <strong>value</strong> (uses equals)</td></tr>
+                  <tr><td><code>removeIf(pred)</code></td><td>Safe conditional removal</td></tr>
+                  <tr><td><code>contains(o)</code> / <code>indexOf(o)</code></td><td>Search — O(n)</td></tr>
+                  <tr><td><code>size()</code> / <code>isEmpty()</code></td><td>Count</td></tr>
+                  <tr><td><code>sort(cmp)</code></td><td>In-place sort</td></tr>
+                  <tr><td><code>subList(a, b)</code></td><td>A live <strong>view</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Sorting</h3>
+              <table>
+                <thead><tr><th>Form</th><th>Meaning</th></tr></thead>
+                <tbody>
+                  <tr><td><code>implements Comparable&lt;T&gt;</code></td><td>Natural order</td></tr>
+                  <tr><td><code>Double.compare(a, b)</code></td><td>Safe numeric compare</td></tr>
+                  <tr><td><code>Comparator.comparing(X::get)</code></td><td>Order by a key</td></tr>
+                  <tr><td><code>.thenComparing(...)</code></td><td>Tie-breaker</td></tr>
+                  <tr><td><code>.reversed()</code></td><td>Flip the order</td></tr>
+                  <tr><td><code>Comparator.nullsLast(...)</code></td><td>Nulls at the end</td></tr>
+                  <tr><td><code>Collections.sort(list)</code></td><td>Uses <code>compareTo</code></td></tr>
+                  <tr><td><code>Collections.max/min</code></td><td>Extremes</td></tr>
+                  <tr><td><code>Collections.reverse/shuffle</code></td><td>Reorder in place</td></tr>
+                  <tr><td><code>Collections.binarySearch</code></td><td>O(log n) — sort first!</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Complexity &amp; relationships at a glance</h3>
+          <div class="grid">
+            <div>
+              <table>
+                <thead><tr><th>Operation</th><th>ArrayList</th><th>LinkedList</th></tr></thead>
+                <tbody>
+                  <tr><td><code>get(i)</code></td><td>O(1)</td><td>O(n)</td></tr>
+                  <tr><td><code>add(e)</code> end</td><td>O(1)*</td><td>O(1)</td></tr>
+                  <tr><td><code>add(0, e)</code></td><td>O(n)</td><td>O(1)</td></tr>
+                  <tr><td><code>contains(o)</code></td><td>O(n)</td><td>O(n)</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <table>
+                <thead><tr><th>Relationship</th><th>Reads as</th><th>Field?</th></tr></thead>
+                <tbody>
+                  <tr><td>Inheritance</td><td>IS-A</td><td><code>extends</code></td></tr>
+                  <tr><td>Composition</td><td>OWNS-A</td><td>created inside</td></tr>
+                  <tr><td>Aggregation</td><td>HAS-A</td><td>passed in</td></tr>
+                  <tr><td>Dependency</td><td>USES-A</td><td>no field</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== WHAT'S NEXT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">Coming up in Session 4</span>
+          Your bank model works, but two problems remain. <strong>First:</strong> nothing stops two accounts sharing an
+          account number, and finding an account means scanning the whole list — a <code>Set</code> and a
+          <code>Map</code> fix both, and you'll finally see the hash buckets that made Session 2's broken
+          <code>HashSet</code> misbehave. <strong>Second:</strong> close the program and everything is gone. We'll add
+          <strong>File I/O</strong> to save your bank to a CSV file and load it back — which means Session 1's
+          try-with-resources becomes essential, because every file operation throws a checked <code>IOException</code>.
+          <strong>Bring your whole <code>Bank</code>/<code>Customer</code>/<code>Account</code> model.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Core — Session 3 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

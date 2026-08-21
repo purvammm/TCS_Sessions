@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Core Session 2 — Inheritance &amp; Polymorphism (Theory)</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Java Core series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every java-core-session*-theory.html and java-core-session*-lab.html
+      file. Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot and Angular series:
+      Java brand orange (#e76f00) is the primary, with Java blue (#5382a1) as
+      the secondary. Everything else — spacing, radii, shadows, type scale — is
+      identical across all three series.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #e76f00;
+      --mac-accent-2: #5382a1;
+      --mac-accent-soft: #fff6ed;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(231,111,0,0.09);
+      color: #a34e00;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(231,111,0,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(83,130,161,0.09);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #3c6480; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #e76f00 0%, #c85c00 42%, #5382a1 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.sm, table.cmp.sm td, table.cmp.sm th { font-size: 14.5px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #eef4f9; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Class hierarchy / tree visual */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .node.checked { border-color: #0a84ff; background: #f0f7ff; }
+    .node.checked .bn { color: #0a6dd8; }
+    .node.unchecked { border-color: #ff9f0a; background: #fff8ec; }
+    .node.unchecked .bn { color: #b3700a; }
+    .node.err { border-color: var(--tl-red); background: #fff0ef; }
+    .node.err .bn { color: #c0392b; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #e76f00; }
+    .stack-row.l2 { border-left-color: #5382a1; }
+    .stack-row.l3 { border-left-color: #28c840; }
+    .stack-row.l4 { border-left-color: #bf5af2; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* === Java-specific visuals === */
+
+    /* Call stack frames — used for exception propagation and unwinding */
+    .callstack {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 16px;
+      max-width: 620px;
+    }
+    .csf {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--mac-border);
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      background: #fafafc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .csf:last-child { border-bottom: none; }
+    .csf .tagx {
+      margin-left: auto;
+      font-family: var(--mac-font);
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--mac-text-muted);
+      white-space: nowrap;
+    }
+    .csf.throwing { background: #fff0ea; color: #b3430b; }
+    .csf.throwing .tagx { color: #b3430b; }
+    .csf.catching { background: #eefcf1; color: #1a7f2e; }
+    .csf.catching .tagx { color: #1a7f2e; }
+    .csf.dead { background: #f4f4f6; color: var(--mac-text-muted); text-decoration: line-through; }
+
+    /* Array / list cells — memory layout visuals */
+    .cells { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; align-items: flex-start; }
+    .cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      min-width: 58px;
+      padding: 10px 8px;
+      text-align: center;
+      background: #fff;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+    .cell .idx { display: block; font-size: 11px; color: var(--mac-text-muted); margin-top: 4px; font-family: var(--mac-font); }
+    .cell.filled { background: var(--mac-accent-soft); border-color: var(--mac-accent); }
+    .cell.empty { color: var(--mac-text-muted); border-style: dashed; }
+    .cell.hit { background: #eefcf1; border-color: #28c840; }
+    .cell.gone { background: #fff0ef; border-color: var(--tl-red); color: #c0392b; }
+    .cells-label { font-size: 14px; color: var(--mac-text-muted); margin-top: 12px; font-weight: 600; }
+
+    /* Hash bucket table — HashSet / HashMap internals */
+    .buckets { display: grid; gap: 8px; margin-top: 16px; }
+    .bkt { display: flex; align-items: center; gap: 10px; }
+    .bkt .bi {
+      flex: 0 0 auto; width: 92px;
+      font-family: var(--mac-mono); font-size: 13px;
+      color: var(--mac-text-muted); text-align: right;
+    }
+    .bkt .chain { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .bkt .ent {
+      border: 1px solid var(--mac-accent);
+      background: var(--mac-accent-soft);
+      border-radius: 7px; padding: 5px 10px;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .bkt .ent.clash { border-color: var(--tl-red); background: #fff0ef; }
+    .bkt .lnk { color: var(--mac-text-muted); font-size: 13px; }
+    .bkt .nil { color: var(--mac-text-muted); font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Linked-node chain — LinkedList internals */
+    .chainviz { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin-top: 16px; }
+    .lnode {
+      border: 1px solid var(--mac-accent); border-radius: 9px;
+      background: #fff; display: flex; overflow: hidden;
+      font-family: var(--mac-mono); font-size: 13px;
+    }
+    .lnode span { padding: 8px 10px; }
+    .lnode .pv, .lnode .nx { background: #f4f4f6; color: var(--mac-text-muted); font-size: 11.5px; }
+    .lnode .val { background: var(--mac-accent-soft); font-weight: 700; border-left: 1px solid var(--mac-border); border-right: 1px solid var(--mac-border); }
+    .chainviz .dbl { color: var(--mac-accent); font-size: 18px; font-weight: 700; }
+
+    /* Decision flowchart for "which collection?" */
+    .decide { margin-top: 16px; }
+    .dq {
+      border: 1px solid var(--mac-border); border-left: 5px solid var(--mac-accent-2);
+      border-radius: 10px; background: #fafafc;
+      padding: 12px 18px; margin: 9px 0; font-size: 16.5px;
+    }
+    .dq .q { font-weight: 700; }
+    .dq .a { color: var(--mac-text-muted); font-size: 15.5px; margin-top: 4px; display: block; }
+    .dq .a code { font-weight: 700; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .slide pre.sm code { font-size: 13px; }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    /* Console output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+    .term-out .dim { color: #8b8fa3; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(231,111,0,0.10);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #e76f00, #5382a1);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">java-core-session2-theory.html — Java Core Session 2</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 2 of 4 — Java Core Series</span>
+            <h1>Inheritance &amp; Polymorphism</h1>
+            <div class="sub">How one line of code can behave differently depending on the object behind it — and why that single idea is the foundation of every framework you will ever use.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. WHERE WE ARE -->
+        <section class="slide">
+          <p class="eyebrow">Recap &amp; today's place in the journey</p>
+          <h2>Session 1 → Session 2</h2>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1 ✓ Done</span>
+              <span class="desc">Exception handling. You built a <code>BankAccount</code> whose balance can never go negative, guarded by custom exceptions.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2 · Today</span>
+              <span class="desc">We turn that <em>one</em> account class into a <strong>family</strong> — savings, current, fixed deposit — and calculate interest for all of them with a single loop and no <code>if</code> statements.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3</span>
+              <span class="desc">Collections — storing many of those accounts in a <code>List</code>, sorting them, and the HAS-A relationships between classes.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4</span>
+              <span class="desc">Set, Map &amp; File I/O — unique account numbers, fast lookup by key, and saving to disk.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Today's promise</span>
+            By the end of this session you will write a loop like <code>for (Account a : accounts) a.applyInterest();</code> where <strong>each object does something different</strong> — and you will be able to explain exactly how Java decides which code runs.
+          </div>
+        </section>
+
+        <!-- 3. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">Session 2</p>
+          <h2>Agenda</h2>
+          <ol class="agenda">
+            <li><span class="num">1</span><span>The duplication problem — and IS-A with <code>extends</code></span></li>
+            <li><span class="num">2</span><span>What is inherited, what isn't, and the <code>Object</code> root class</span></li>
+            <li><span class="num">3</span><span><code>super</code>, constructor chaining and access modifiers</span></li>
+            <li><span class="num">4</span><span>Types of inheritance — and why Java forbids multiple inheritance of classes</span></li>
+            <li><span class="num">5</span><span>Method overriding: the rules, and <code>@Override</code></span></li>
+            <li><span class="num">6</span><span>Overloading vs overriding — compile-time vs runtime</span></li>
+            <li><span class="num">7</span><span>Polymorphism &amp; dynamic method dispatch</span></li>
+            <li><span class="num">8</span><span>Upcasting, downcasting, <code>instanceof</code> and pattern matching</span></li>
+            <li><span class="num">9</span><span>Abstract classes vs interfaces — and which to choose</span></li>
+            <li><span class="num">10</span><span><code>final</code>, <code>equals</code>/<code>hashCode</code>/<code>toString</code>, and "favour composition"</span></li>
+          </ol>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "Who can name the four pillars of OOP?" — Encapsulation, Inheritance, Polymorphism, Abstraction. <strong>Today is two and a half of the four.</strong>
+          </div>
+        </section>
+
+        <!-- 4. THE PROBLEM -->
+        <section class="slide">
+          <p class="eyebrow">The problem inheritance solves</p>
+          <h2>Copy-paste is not a design</h2>
+          <p class="deep">Suppose we need three kinds of employee. Without inheritance, here's what happens:</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Three classes, one shared mess</h3>
+              <pre class="sm"><code>class Developer {
+    String name; int id;
+    double salary;
+    void printDetails() { ... }
+    double annualPay() { ... }
+    // + writeCode()
+}
+class Manager {
+    String name; int id;      // same
+    double salary;            // same
+    void printDetails() { ... }  // same
+    double annualPay() { ... }   // same
+    // + approveLeave()
+}
+class Intern {
+    String name; int id;      // AGAIN
+    ...
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Say it once</h3>
+              <pre class="sm"><code>class Employee {
+    String name; int id;
+    double salary;
+    void printDetails() { ... }
+    double annualPay() { ... }
+}
+
+class Developer extends Employee {
+    void writeCode() { ... }
+}
+class Manager extends Employee {
+    void approveLeave() { ... }
+}
+class Intern extends Employee { }</code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The real cost of duplication</span>
+            It isn't the typing. It's that when the pay calculation changes, you must remember to change it in <strong>three</strong> places — and one day you'll change two. That bug is subtle, silent, and expensive.
+          </div>
+        </section>
+
+        <!-- 5. IS-A -->
+        <section class="slide">
+          <p class="eyebrow">The mechanism</p>
+          <h2>IS-A: <code>extends</code></h2>
+          <p class="deep"><code>extends</code> creates an <span class="term">IS-A</span> relationship. A <code>Developer</code> <strong>is a</strong> <code>Employee</code>. Everything an Employee can do, a Developer can do — plus more.</p>
+          <pre><code>class Employee {                 // SUPERCLASS  (parent / base)
+    protected String name;
+    protected double salary;
+
+    public void printDetails() {
+        System.out.println(name + " earns " + salary);
+    }
+}
+
+class Developer extends Employee {    // SUBCLASS  (child / derived)
+    private String language;
+
+    public void writeCode() {
+        System.out.println(name + " writes " + language);   // inherited 'name'
+    }
+}</code></pre>
+          <div class="tree-vis" data-label="IS-A hierarchy">
+            <div class="tv-row"><div class="node root"><div class="bn">Employee</div><div class="bd">name, salary, printDetails()</div></div></div>
+            <div class="tv-tick">╱ &nbsp;&nbsp;&nbsp; │ &nbsp;&nbsp;&nbsp; ╲</div>
+            <div class="tv-row">
+              <div class="node"><div class="bn">Developer</div><div class="bd">+ writeCode()</div></div>
+              <div class="node"><div class="bn">Manager</div><div class="bd">+ approveLeave()</div></div>
+              <div class="node"><div class="bn">Intern</div><div class="bd">+ stipend</div></div>
+            </div>
+            <div class="tv-note">All three inherit name, salary and printDetails() — written once</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The IS-A test — apply it before you type <code>extends</code></span>
+            Say it out loud: <em>"A Developer is an Employee."</em> True → inheritance is appropriate. <br>
+            Now try: <em>"A Car is an Engine."</em> False! A car <strong>HAS</strong> an engine. That's composition, which we cover in Session 3. <strong>Getting this test wrong is the most common OOP design error.</strong>
+          </div>
+        </section>
+
+        <!-- 6. WHAT IS INHERITED -->
+        <section class="slide">
+          <p class="eyebrow">Precision matters here</p>
+          <h2>What gets inherited — and what doesn't</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:34%">Member</th><th>Inherited?</th></tr></thead>
+            <tbody>
+              <tr><td><code>public</code> fields &amp; methods</td><td class="good">Yes — fully accessible</td></tr>
+              <tr><td><code>protected</code> fields &amp; methods</td><td class="good">Yes — accessible in subclasses</td></tr>
+              <tr><td>Package-private (no modifier)</td><td>Only if the subclass is in the <strong>same package</strong></td></tr>
+              <tr><td><code>private</code> fields &amp; methods</td><td class="bad">No — not accessible. They still <em>exist</em> in the object, but only the superclass's own methods can touch them</td></tr>
+              <tr><td><strong>Constructors</strong></td><td class="bad">No — never inherited. But a subclass constructor must <em>call</em> one</td></tr>
+              <tr><td><code>static</code> members</td><td>Accessible, but shared — not "inherited" per instance</td></tr>
+              <tr><td><code>final</code> methods</td><td>Inherited, but <strong>cannot be overridden</strong></td></tr>
+            </tbody>
+          </table>
+          <pre><code>class Parent {
+    private   int secret = 42;      // exists in every Child object, but invisible to Child
+    protected int shared = 7;
+    public    int open   = 1;
+
+    public int revealSecret() { return secret; }   // the approved way in
+}
+
+class Child extends Parent {
+    void test() {
+        System.out.println(open);            // OK
+        System.out.println(shared);          // OK
+        // System.out.println(secret);       // COMPILE ERROR - private
+        System.out.println(revealSecret());  // OK - 42, via the public method
+    }
+}</code></pre>
+          <div class="note">
+            <span class="lbl">The subtle point students miss</span>
+            A <code>private</code> field is <em>not absent</em> from the child object — memory is still allocated for it. It's simply <strong>not accessible by name</strong>. That's encapsulation doing its job: the parent keeps control of its own internals, even from its own children.
+          </div>
+        </section>
+
+        <!-- 7. OBJECT -->
+        <section class="slide">
+          <p class="eyebrow">You've been inheriting all along</p>
+          <h2><code>Object</code> — the root of everything</h2>
+          <p class="deep">Every class in Java extends <code>java.lang.Object</code>, whether you write it or not. <code>class Employee { }</code> is silently <code>class Employee extends Object { }</code>.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:30%">Inherited from <code>Object</code></th><th>Default behaviour — and why you usually override it</th></tr></thead>
+            <tbody>
+              <tr><td><code>toString()</code></td><td>Returns <code>Employee@1b6d3586</code> — the class name and a hash. Useless in logs. <strong>Always override.</strong></td></tr>
+              <tr><td><code>equals(Object)</code></td><td>Compares <em>references</em> — true only for the same object. Override for value equality.</td></tr>
+              <tr><td><code>hashCode()</code></td><td>An identity-based number. <strong>Must</strong> be overridden together with <code>equals</code> — critical for Session 4's HashMap/HashSet.</td></tr>
+              <tr><td><code>getClass()</code></td><td>The runtime type. <code>final</code> — can't be overridden.</td></tr>
+              <tr><td><code>clone()</code>, <code>finalize()</code></td><td>Legacy and problematic. Avoid both in new code.</td></tr>
+              <tr><td><code>wait()</code>, <code>notify()</code></td><td>Thread coordination — beyond today's scope.</td></tr>
+            </tbody>
+          </table>
+          <pre><code>Employee e = new Employee("Priya", 90000);
+
+System.out.println(e);              // Employee@1b6d3586   ← default, unhelpful
+// after overriding toString():
+System.out.println(e);              // Employee{name='Priya', salary=90000.0}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why this matters today</span>
+            <code>System.out.println(anyObject)</code> calls <code>toString()</code> on it — and which version runs is decided <strong>at runtime by the object's actual type</strong>. You have been using polymorphism since your very first Java program without realising it.
+          </div>
+        </section>
+
+        <!-- 8. SUPER -->
+        <section class="slide">
+          <p class="eyebrow">Reaching upwards</p>
+          <h2>The <code>super</code> keyword — three uses</h2>
+          <pre><code>class Employee {
+    protected String name;
+    protected double salary;
+
+    public Employee(String name, double salary) {          // parent constructor
+        this.name = name;
+        this.salary = salary;
+    }
+    public double annualPay() { return salary * 12; }
+}
+
+class Manager extends Employee {
+    private double bonus;
+
+    public Manager(String name, double salary, double bonus) {
+        super(name, salary);          // 1. call the PARENT CONSTRUCTOR - must be first line
+        this.bonus = bonus;
+    }
+
+    @Override
+    public double annualPay() {
+        return super.annualPay() + bonus;   // 2. call the PARENT'S VERSION of a method
+    }                                       //    (reuse, then extend - no duplication)
+
+    void show() {
+        System.out.println(super.name);     // 3. access a parent FIELD (rarely needed)
+    }
+}</code></pre>
+          <table class="cmp">
+            <thead><tr><th style="width:32%">Use</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>super(args)</code></td><td>Invoke a parent constructor. <strong>Must be the very first statement</strong> in the child constructor.</td></tr>
+              <tr><td><code>super.method()</code></td><td>Call the parent's implementation — essential when overriding to <em>extend</em> rather than replace.</td></tr>
+              <tr><td><code>super.field</code></td><td>Reach a parent field that a child field is shadowing.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The pattern to internalise</span>
+            <code>return super.annualPay() + bonus;</code> — <strong>reuse the parent's logic, then add your own.</strong> If the parent's pay formula ever changes, Manager automatically gets the fix. Copy-pasting the formula instead would break that.
+          </div>
+        </section>
+
+        <!-- 9. CONSTRUCTOR CHAINING -->
+        <section class="slide">
+          <p class="eyebrow">Order of operations</p>
+          <h2>Constructor chaining — parents build first</h2>
+          <p class="deep">Creating a subclass object runs a <strong>chain</strong> of constructors, from the top of the hierarchy downwards. The logic is simple: a child cannot initialise itself before the parent part of the object exists.</p>
+          <pre><code>class A            { A() { System.out.println("A constructor"); } }
+class B extends A  { B() { System.out.println("B constructor"); } }
+class C extends B  { C() { System.out.println("C constructor"); } }
+
+new C();</code></pre>
+          <div class="term-out">A constructor      <span class="dim">← Object's constructor ran before this, invisibly</span>
+B constructor
+C constructor      <span class="dim">← the one you actually called finishes LAST</span></div>
+          <div class="flow vert">
+            <div class="flow-box">You call <code>new C()</code></div>
+            <div class="flow-arrow">↓ implicit <code>super()</code></div>
+            <div class="flow-box alt">B's constructor entered</div>
+            <div class="flow-arrow">↓ implicit <code>super()</code></div>
+            <div class="flow-box alt">A's constructor entered</div>
+            <div class="flow-arrow">↓ then bodies run, bottom-up</div>
+            <div class="flow-box green">A body → B body → C body</div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The error you will definitely hit</span>
+            If the parent has <strong>no no-argument constructor</strong>, Java's implicit <code>super()</code> fails and you get <code>constructor Employee in class Employee cannot be applied to given types</code>. <strong>The fix:</strong> call <code>super(...)</code> explicitly with the right arguments as the first line of your child constructor.
+          </div>
+        </section>
+
+        <!-- 10. ACCESS MODIFIERS -->
+        <section class="slide">
+          <p class="eyebrow">Controlling the boundary</p>
+          <h2>Access modifiers</h2>
+          <table class="cmp">
+            <thead><tr><th>Modifier</th><th>Same class</th><th>Same package</th><th>Subclass<br>(other package)</th><th>Everywhere</th></tr></thead>
+            <tbody>
+              <tr><td><code>private</code></td><td class="good">✓</td><td class="bad">✗</td><td class="bad">✗</td><td class="bad">✗</td></tr>
+              <tr><td><em>(no modifier)</em><br>package-private</td><td class="good">✓</td><td class="good">✓</td><td class="bad">✗</td><td class="bad">✗</td></tr>
+              <tr><td><code>protected</code></td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="bad">✗</td></tr>
+              <tr><td><code>public</code></td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td><td class="good">✓</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">What <code>protected</code> really means</span>
+            It's often described as "package + subclasses", and that's accurate — but there's a catch that trips people up. A subclass in a <em>different</em> package can access <code>protected</code> members <strong>only through a reference of its own type</strong> (or a subtype), not through an arbitrary parent reference. It's narrower than most people assume.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Practical guidance</span>
+            <strong>Default to <code>private</code>.</strong> Make fields <code>private</code> and expose behaviour through methods. Use <code>protected</code> deliberately, when you are <em>designing for extension</em> — because every <code>protected</code> member becomes part of the contract you owe your subclasses forever.
+          </div>
+        </section>
+
+        <!-- 11. TYPES OF INHERITANCE -->
+        <section class="slide">
+          <p class="eyebrow">Shapes of hierarchies</p>
+          <h2>Types of inheritance in Java</h2>
+          <div class="cards">
+            <div class="card"><h3>1. Single</h3><p><code>B extends A</code>. One parent, one child. The common case.</p></div>
+            <div class="card"><h3>2. Multilevel</h3><p><code>C extends B extends A</code>. A chain. <code>FixedDepositAccount → SavingsAccount → Account</code>.</p></div>
+            <div class="card"><h3>3. Hierarchical</h3><p>One parent, several children. <code>Developer</code>, <code>Manager</code>, <code>Intern</code> all extend <code>Employee</code>.</p></div>
+            <div class="card" style="border-color:var(--tl-red);background:#fff0ef;"><h3>4. Multiple ✗</h3><p><strong>Not allowed for classes.</strong> <code>class C extends A, B</code> won't compile. Achieved with <em>interfaces</em> instead.</p></div>
+          </div>
+          <h3>Why multiple inheritance of classes is banned — the diamond problem</h3>
+          <div class="tree-vis" data-label="The diamond">
+            <div class="tv-row"><div class="node root"><div class="bn">A</div><div class="bd">greet()</div></div></div>
+            <div class="tv-tick">╱ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ╲</div>
+            <div class="tv-row">
+              <div class="node"><div class="bn">B extends A</div><div class="bd">overrides greet()</div></div>
+              <div class="node"><div class="bn">C extends A</div><div class="bd">overrides greet()</div></div>
+            </div>
+            <div class="tv-tick">╲ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ╱</div>
+            <div class="tv-row"><div class="node err"><div class="bn">D extends B, C</div><div class="bd">whose greet() does D inherit?!</div></div></div>
+            <div class="tv-note">Ambiguous — so Java simply forbids it for classes</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Java's answer</span>
+            <strong>Single inheritance of implementation, multiple inheritance of type.</strong> One <code>extends</code>, but as many <code>implements</code> as you like. Interfaces carry no state, so there's nothing to conflict — and when two interfaces provide clashing <code>default</code> methods, the compiler forces <em>you</em> to resolve it explicitly.
+          </div>
+        </section>
+
+        <!-- 12. OVERRIDING -->
+        <section class="slide">
+          <p class="eyebrow">The heart of polymorphism</p>
+          <h2>Method overriding</h2>
+          <p class="deep"><span class="term">Overriding</span> means a subclass provides its own version of a method it inherited. Same signature, different body.</p>
+          <pre><code>class Account {
+    protected double balance = 10000;
+    public double interestRate() { return 0.0; }
+    public void applyInterest() {
+        double interest = balance * interestRate();
+        balance += interest;
+        System.out.printf("%s: +%.2f%n", getClass().getSimpleName(), interest);
+    }
+}
+
+class SavingsAccount extends Account {
+    @Override
+    public double interestRate() { return 0.04; }     // 4%
+}
+
+class FixedDepositAccount extends Account {
+    @Override
+    public double interestRate() { return 0.07; }     // 7%
+}</code></pre>
+          <h3>The rules of overriding</h3>
+          <table class="cmp sm">
+            <thead><tr><th style="width:38%">Rule</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td>Same method name</td><td>Exactly — Java is case-sensitive</td></tr>
+              <tr><td>Same parameter list</td><td>Types <em>and</em> order. Change it and you've <strong>overloaded</strong>, not overridden</td></tr>
+              <tr><td>Return type: same or <em>covariant</em></td><td>A subclass of the original return type is allowed</td></tr>
+              <tr><td>Access: same or <strong>wider</strong></td><td><code>protected</code> → <code>public</code> ✓. <code>public</code> → <code>private</code> ✗</td></tr>
+              <tr><td>Checked exceptions: same or <strong>narrower</strong></td><td>Cannot add <em>new</em> or broader checked exceptions — <strong>ties directly back to Session 1</strong></td></tr>
+              <tr><td>Cannot override</td><td><code>final</code>, <code>static</code> or <code>private</code> methods</td></tr>
+            </tbody>
+          </table>
+          <div class="askbox">
+            <span class="lbl">Ask the batch — connecting to Session 1</span>
+            "Why can't an overriding method throw <em>broader</em> checked exceptions?" Because a caller holding an <code>Account</code> reference compiled against <code>Account</code>'s <code>throws</code> clause. If the subclass could throw something extra, the caller's <code>catch</code> blocks would be incomplete — <strong>and the compiler could no longer guarantee checked exceptions are handled.</strong>
+          </div>
+        </section>
+
+        <!-- 13. @OVERRIDE -->
+        <section class="slide">
+          <p class="eyebrow">Four characters that save hours</p>
+          <h2>Always write <code>@Override</code></h2>
+          <p class="deep">It's optional. Use it anyway, every single time. It asks the compiler to verify you really are overriding something — and it catches the single most frustrating bug in Java OOP.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Silent failure — no annotation</h3>
+              <pre class="sm"><code>class Account {
+    public void applyInterest() { }
+}
+class Savings extends Account {
+    public void applyinterest() { }
+    //            ^ lowercase 'i'
+}
+// Compiles fine!
+// You've created a NEW method.
+// applyInterest() does nothing.
+// Hours of confused debugging.</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Caught instantly</h3>
+              <pre class="sm"><code>class Savings extends Account {
+    @Override
+    public void applyinterest() { }
+}
+// error: method does not override
+// or implement a method from a
+// supertype
+
+// Found in 1 second, at compile
+// time, with the exact line.</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Rule</span>
+            <strong>If you intend to override, write <code>@Override</code>.</strong> It costs nothing at runtime — it's purely a compile-time assertion — and it turns a class of silent, expensive bugs into instant compiler errors. It also documents your intent for the next reader.
+          </div>
+          <div class="note">
+            <span class="lbl">It works for interfaces too</span>
+            Since Java 6, <code>@Override</code> is valid on methods implementing an <em>interface</em> method as well, not just overriding a class method. Use it there too.
+          </div>
+        </section>
+
+        <!-- 14. OVERLOADING VS OVERRIDING -->
+        <section class="slide">
+          <p class="eyebrow">The classic confusion</p>
+          <h2>Overloading vs overriding</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:20%"></th><th>Overloading</th><th>Overriding</th></tr></thead>
+            <tbody>
+              <tr><td><strong>What</strong></td><td>Same name, <strong>different</strong> parameters</td><td>Same name, <strong>same</strong> parameters</td></tr>
+              <tr><td><strong>Where</strong></td><td>Usually in one class</td><td>Across a parent–child pair</td></tr>
+              <tr><td><strong>Inheritance</strong></td><td>Not required</td><td>Required</td></tr>
+              <tr><td><strong>Resolved</strong></td><td class="good"><strong>Compile time</strong> — by the reference type</td><td class="good"><strong>Runtime</strong> — by the object type</td></tr>
+              <tr><td><strong>Also called</strong></td><td>Static / early binding<br><em>Compile-time polymorphism</em></td><td>Dynamic / late binding<br><em>Runtime polymorphism</em></td></tr>
+              <tr><td><strong>Return type</strong></td><td>Can differ freely</td><td>Must be same or covariant</td></tr>
+              <tr><td><strong>Purpose</strong></td><td>Convenience — several ways to call one idea</td><td>Specialisation — different behaviour per type</td></tr>
+            </tbody>
+          </table>
+          <pre><code>class Printer {
+    void print(String s)          { }     // OVERLOADED - 3 different signatures
+    void print(int i)             { }
+    void print(String s, int cnt) { }
+}
+
+class ColourPrinter extends Printer {
+    @Override
+    void print(String s)          { }     // OVERRIDDEN - same signature as parent
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The one-line distinction</span>
+            <strong>Overloading = same name, different arguments, chosen by the compiler.<br>
+            Overriding = same name, same arguments, chosen by the JVM at runtime.</strong>
+          </div>
+        </section>
+
+        <!-- 15. POLYMORPHISM -->
+        <section class="slide">
+          <p class="eyebrow">The payoff</p>
+          <h2>Polymorphism — one reference, many forms</h2>
+          <p class="deep">From Greek: <em>poly</em> = many, <em>morph</em> = form. In practice: <strong>a parent-type reference can point to any subclass object, and calling a method runs the subclass's version.</strong></p>
+          <pre><code>// The reference type is Account. The OBJECT type is different each time.
+Account[] accounts = {
+    new SavingsAccount(),
+    new CurrentAccount(),
+    new FixedDepositAccount()
+};
+
+for (Account acc : accounts) {
+    acc.applyInterest();      // SAME line of code, THREE different behaviours
+}</code></pre>
+          <div class="term-out">SavingsAccount: +400.00      <span class="dim">← 4%</span>
+CurrentAccount: +0.00        <span class="dim">← 0%</span>
+FixedDepositAccount: +700.00 <span class="dim">← 7%</span></div>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Without polymorphism</h3>
+              <pre class="sm"><code>for (Account a : accounts) {
+  if (a instanceof SavingsAccount)
+      rate = 0.04;
+  else if (a instanceof CurrentAccount)
+      rate = 0.0;
+  else if (a instanceof FixedDeposit...)
+      rate = 0.07;
+  // add a new type?
+  // EDIT THIS METHOD. Again.
+}</code></pre>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✓ With polymorphism</h3>
+              <pre class="sm"><code>for (Account a : accounts) {
+    a.applyInterest();
+}
+// Add RecurringDepositAccount
+// tomorrow? This loop needs
+// NO changes at all.</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why this is the most important idea in OOP</span>
+            <strong>You can add new types without modifying existing code.</strong> That's the Open/Closed Principle — open for extension, closed for modification. A long <code>if-else</code> chain checking types is almost always a missed polymorphism opportunity.
+          </div>
+        </section>
+
+        <!-- 16. DYNAMIC DISPATCH -->
+        <section class="slide">
+          <p class="eyebrow">How it actually works</p>
+          <h2>Dynamic method dispatch</h2>
+          <p class="deep">Two different types are in play for every variable, and knowing which one governs what is the key insight of this whole session.</p>
+          <pre><code>Account acc = new SavingsAccount();
+//      ^^^^^^^ REFERENCE type      ^^^^^^^^^^^^^^ OBJECT type</code></pre>
+          <table class="cmp">
+            <thead><tr><th style="width:46%">Decided by the <strong>reference</strong> type<br><span class="muted">(compile time)</span></th><th>Decided by the <strong>object</strong> type<br><span class="muted">(runtime)</span></th></tr></thead>
+            <tbody>
+              <tr><td><strong>Which methods you're allowed to call.</strong> <code>acc.interestRate()</code> ✓ — but a Savings-only method ✗</td><td><strong>Which implementation actually runs.</strong> <code>SavingsAccount</code>'s override</td></tr>
+              <tr><td>Field access (fields are <em>not</em> polymorphic)</td><td>Overridden instance methods</td></tr>
+              <tr><td><code>static</code> method calls</td><td><code>getClass()</code>, <code>toString()</code>, <code>equals()</code></td></tr>
+            </tbody>
+          </table>
+          <div class="flow">
+            <div class="flow-box">Compiler sees<br><code>Account acc</code><span class="sm">checks the method EXISTS</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box alt">Bytecode:<br><code>invokevirtual</code><span class="sm">"look it up later"</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">Runtime: JVM checks<br>the real object<span class="sm">finds SavingsAccount</span></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">Runs the<br>override<span class="sm">returns 0.04</span></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The exception to the rule: fields are NOT polymorphic</span>
+            If both parent and child declare a field <code>rate</code>, then <code>acc.rate</code> gives you the <strong>parent's</strong> value, because field access is resolved at compile time from the reference type. This is called <em>field hiding</em>, it is confusing, and the practical advice is simple: <strong>never shadow a field. Keep fields <code>private</code> and access them through methods.</strong>
+          </div>
+        </section>
+
+        <!-- 17. UP AND DOWNCASTING -->
+        <section class="slide">
+          <p class="eyebrow">Moving between types</p>
+          <h2>Upcasting, downcasting &amp; <code>instanceof</code></h2>
+          <div class="cards">
+            <div class="card" style="border-color:#28c840;background:#eefcf1;">
+              <h3>⬆ Upcasting — always safe</h3>
+              <pre class="sm"><code>Account a = new SavingsAccount();</code></pre>
+              <p>Implicit, no cast needed. A Savings <em>is</em> an Account, so it can never fail.</p>
+            </div>
+            <div class="card" style="border-color:var(--tl-yellow);background:#fffdf3;">
+              <h3>⬇ Downcasting — risky</h3>
+              <pre class="sm"><code>SavingsAccount s =
+    (SavingsAccount) a;</code></pre>
+              <p>Explicit cast required. Compiles fine, but throws <code>ClassCastException</code> at runtime if the object isn't really that type.</p>
+            </div>
+          </div>
+          <pre><code>Account acc = new CurrentAccount();
+
+// The compiler allows this. The JVM does not.
+SavingsAccount s = (SavingsAccount) acc;
+// Exception in thread "main" java.lang.ClassCastException:
+//   class CurrentAccount cannot be cast to class SavingsAccount
+
+// ALWAYS guard a downcast:
+if (acc instanceof SavingsAccount) {
+    SavingsAccount safe = (SavingsAccount) acc;
+    safe.addBonusInterest();
+}
+
+// Java 16+ — pattern matching for instanceof: test and bind in one step
+if (acc instanceof SavingsAccount safe) {      // 'safe' only exists if true
+    safe.addBonusInterest();
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Design smell alert</span>
+            If your code is full of <code>instanceof</code> checks followed by downcasts, that's usually a sign the behaviour belongs <strong>in the classes themselves as an overridden method</strong>. Reach for polymorphism first; downcast only when you genuinely need a capability that exists on just one subtype.
+          </div>
+        </section>
+
+        <!-- 18. ABSTRACT CLASSES -->
+        <section class="slide">
+          <p class="eyebrow">Incomplete on purpose</p>
+          <h2>Abstract classes</h2>
+          <p class="deep">Sometimes a parent should <strong>never be instantiated</strong>. What <em>is</em> a plain "Account", with no type? <code>abstract</code> says: this class exists to be extended, and children <strong>must</strong> fill in the blanks.</p>
+          <pre><code>abstract class Account {                 // cannot do: new Account()
+
+    protected double balance;
+    protected String accountNumber;
+
+    public Account(String accountNumber, double balance) {   // abstract classes
+        this.accountNumber = accountNumber;                  // CAN have constructors
+        this.balance = balance;
+    }
+
+    // ABSTRACT: no body. Every concrete subclass MUST implement this.
+    public abstract double interestRate();
+    public abstract String accountType();
+
+    // CONCRETE: shared logic, written once, inherited by all
+    public final void applyInterest() {         // final: subclasses can't break the flow
+        double interest = balance * interestRate();
+        balance += interest;
+        System.out.printf("%-14s %8.2f interest -> balance %10.2f%n",
+                          accountType(), interest, balance);
+    }
+
+    public double getBalance() { return balance; }
+}</code></pre>
+          <div class="term-out"><span class="bad">error:</span> Account is abstract; cannot be instantiated
+        Account a = new Account("AC1", 5000);
+                    ^</div>
+          <div class="keybox">
+            <span class="lbl">The Template Method pattern — you just wrote one</span>
+            <code>applyInterest()</code> defines the <em>algorithm</em> (get rate → add → report) while leaving one step (<code>interestRate()</code>) for subclasses to supply. The skeleton is fixed and reliable; the varying detail is delegated. This is one of the most widely used patterns in real Java frameworks.
+          </div>
+        </section>
+
+        <!-- 19. INTERFACES -->
+        <section class="slide">
+          <p class="eyebrow">Pure contract</p>
+          <h2>Interfaces</h2>
+          <p class="deep">An interface says <strong>what</strong> a type can do, with no opinion about how. It's a promise, and a class can promise many things at once.</p>
+          <pre><code>public interface Taxable {
+    double TAX_RATE = 0.30;              // implicitly public static final
+
+    double taxableIncome();              // implicitly public abstract
+
+    default double taxDue() {            // Java 8+: a DEFAULT method with a body
+        return taxableIncome() * TAX_RATE;
+    }
+
+    static boolean isExempt(double income) {   // Java 8+: a STATIC helper
+        return income &lt; 250000;
+    }
+}
+
+// Multiple inheritance of TYPE — one extends, many implements
+class SavingsAccount extends Account implements Taxable, Comparable&lt;SavingsAccount&gt; {
+
+    @Override public double interestRate()   { return 0.04; }
+    @Override public String accountType()    { return "Savings"; }
+    @Override public double taxableIncome()  { return balance * interestRate(); }
+    @Override public int compareTo(SavingsAccount other) {
+        return Double.compare(this.balance, other.balance);
+    }
+}</code></pre>
+          <div class="note">
+            <span class="lbl">Why <code>default</code> methods were added in Java 8</span>
+            Before them, adding a method to a published interface <strong>broke every existing implementation</strong>. <code>default</code> methods let interfaces evolve: existing classes inherit the new method for free. This is exactly how <code>forEach</code> was added to <code>Iterable</code> — you'll use it in Session 3.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            "So do interfaces bring back the diamond problem?" — If two interfaces give clashing <code>default</code> methods, the compiler <strong>refuses to guess</strong> and makes you write <code>InterfaceName.super.method()</code> to state which one you mean. The ambiguity is resolved by you, explicitly.
+          </div>
+        </section>
+
+        <!-- 20. ABSTRACT VS INTERFACE -->
+        <section class="slide">
+          <p class="eyebrow">The design decision</p>
+          <h2>Abstract class vs interface</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:20%"></th><th>Abstract class</th><th>Interface</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Relationship</strong></td><td>IS-A — a kind of thing</td><td>CAN-DO — a capability</td></tr>
+              <tr><td><strong>How many</strong></td><td>Only <strong>one</strong> per class</td><td><strong>Many</strong> per class</td></tr>
+              <tr><td><strong>Instance fields</strong></td><td class="good">Yes — real state</td><td class="bad">No — only <code>public static final</code> constants</td></tr>
+              <tr><td><strong>Constructors</strong></td><td class="good">Yes</td><td class="bad">No</td></tr>
+              <tr><td><strong>Method bodies</strong></td><td>Concrete, abstract, <code>final</code>, <code>static</code></td><td><code>default</code>, <code>static</code>, <code>private</code> (Java 9+), otherwise abstract</td></tr>
+              <tr><td><strong>Access modifiers</strong></td><td>Any</td><td>Members are implicitly <code>public</code></td></tr>
+              <tr><td><strong>Use when</strong></td><td>Subclasses share <strong>state and code</strong>, and are genuinely the same kind of thing</td><td>Unrelated classes share a <strong>capability</strong>, or you want loose coupling</td></tr>
+              <tr><td><strong>Example</strong></td><td><code>abstract class Account</code></td><td><code>Comparable</code>, <code>Runnable</code>, <code>Taxable</code>, <code>AutoCloseable</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">How to decide, quickly</span>
+            Is there <strong>shared state or shared implementation</strong> the children all need? → <strong>abstract class</strong>.<br>
+            Are you describing something <strong>unrelated classes can also be</strong>? → <strong>interface</strong>.<br>
+            Genuinely unsure? → <strong>interface</strong>. It couples you less, and a class can add more of them later.
+          </div>
+          <div class="note">
+            <span class="lbl">They work together</span>
+            Look at the JDK: <code>AbstractList</code> is an abstract class that <em>implements</em> the <code>List</code> interface, providing the boilerplate so <code>ArrayList</code> only writes what's genuinely different. Interface for the contract, abstract class for the convenience. You'll meet exactly this in Session 3.
+          </div>
+        </section>
+
+        <!-- 21. FINAL -->
+        <section class="slide">
+          <p class="eyebrow">Shutting the door</p>
+          <h2>The <code>final</code> keyword — three meanings</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:24%">Applied to</th><th>Effect</th><th style="width:30%">Why</th></tr></thead>
+            <tbody>
+              <tr><td><code>final</code> variable</td><td>Can be assigned once only</td><td>Constants; safety in lambdas</td></tr>
+              <tr><td><code>final</code> method</td><td>Cannot be overridden</td><td>Protect logic subclasses must not change</td></tr>
+              <tr><td><code>final</code> class</td><td>Cannot be extended</td><td>Guarantee immutability &amp; behaviour</td></tr>
+            </tbody>
+          </table>
+          <pre><code>public final class String { ... }        // that's why you can't extend String
+
+class Account {
+    private final String accountNumber;   // set in the constructor, never changes
+
+    public final void applyInterest() {   // the ALGORITHM is fixed...
+        balance += balance * interestRate();
+    }
+    public abstract double interestRate();  // ...but the RATE is open
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">A <code>final</code> reference is not an immutable object</span>
+            <code>final List&lt;String&gt; list = new ArrayList&lt;&gt;();</code> — you cannot point <code>list</code> at a different list, but <code>list.add("x")</code> works perfectly. <strong><code>final</code> freezes the reference, not the contents.</strong> Guaranteed exam question, and a real source of bugs.
+          </div>
+          <div class="note">
+            <span class="lbl">Immutable class recipe</span>
+            <code>final</code> class + all fields <code>private final</code> + no setters + defensive copies of any mutable field in the constructor and getters. Immutable objects are automatically thread-safe and make excellent HashMap keys — which matters a great deal in Session 4.
+          </div>
+        </section>
+
+        <!-- 22. EQUALS HASHCODE -->
+        <section class="slide">
+          <p class="eyebrow">Overriding done properly</p>
+          <h2><code>equals</code>, <code>hashCode</code> &amp; <code>toString</code></h2>
+          <p class="deep">These three are the overrides you'll write most often. Getting <code>equals</code>/<code>hashCode</code> right is <strong>essential</strong> for Session 4 — a broken pair silently corrupts every <code>HashSet</code> and <code>HashMap</code> you put the object into.</p>
+          <pre><code>public class Employee {
+    private final int id;
+    private final String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;                       // same object - fast path
+        if (o == null || getClass() != o.getClass()) return false;
+        Employee other = (Employee) o;
+        return id == other.id &amp;&amp; Objects.equals(name, other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);        // MUST use the same fields as equals
+    }
+
+    @Override
+    public String toString() {
+        return "Employee{id=" + id + ", name='" + name + "'}";
+    }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The contract — memorise this</span>
+            <strong>If <code>a.equals(b)</code> is true, then <code>a.hashCode() == b.hashCode()</code> must also be true.</strong> The reverse need not hold (different objects may share a hash — that's a collision, and it's fine). Break this contract and a <code>HashSet</code> will happily store two "equal" objects, or fail to find one you just added.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Override <code>equals</code>, always override <code>hashCode</code></span>
+            Never one without the other. Your IDE generates both together for exactly this reason — and both must use <strong>the same fields</strong>.
+          </div>
+        </section>
+
+        <!-- 23. COMPOSITION -->
+        <section class="slide">
+          <p class="eyebrow">A word of caution</p>
+          <h2>Favour composition over inheritance</h2>
+          <p class="deep">Inheritance is powerful and <strong>over-used</strong>. It is the tightest coupling in object-oriented programming: a subclass depends on its parent's internal behaviour, so a change upstream can silently break it. Session 3 covers HAS-A in depth; here's the essential warning.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Inheriting for reuse</h3>
+              <pre class="sm"><code>class CountingList
+        extends ArrayList&lt;String&gt; {
+    int added = 0;
+
+    @Override
+    public boolean add(String s) {
+        added++;
+        return super.add(s);
+    }
+    @Override
+    public boolean addAll(
+            Collection&lt;? extends String&gt; c) {
+        added += c.size();
+        return super.addAll(c);
+    }
+}
+// addAll() internally calls add()
+// so every item is COUNTED TWICE.
+// Adding 3 items reports 6.</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Composition — wrap it</h3>
+              <pre class="sm"><code>class CountingList {
+    private final List&lt;String&gt; inner
+        = new ArrayList&lt;&gt;();
+    private int added = 0;
+
+    public boolean add(String s) {
+        added++;
+        return inner.add(s);
+    }
+    public int getAdded() { return added; }
+}
+// You control the whole surface.
+// ArrayList's internals cannot
+// surprise you.</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule of thumb</span>
+            Use <strong>inheritance</strong> when the child genuinely <em>is a</em> kind of the parent <em>and</em> you want polymorphic substitution. Use <strong>composition</strong> when you merely want to <em>reuse</em> functionality. If you find yourself inheriting just to avoid retyping code, that's the wrong reason.
+          </div>
+        </section>
+
+        <!-- 24. LISKOV -->
+        <section class="slide">
+          <p class="eyebrow">The design principle behind it all</p>
+          <h2>Substitutability — don't surprise the caller</h2>
+          <p class="deep">Polymorphism only works if a subclass can be used <em>anywhere</em> the parent is expected <strong>without breaking the caller's assumptions</strong>. This is the Liskov Substitution Principle, and it's less abstract than it sounds.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ The classic violation</h3>
+              <pre class="sm"><code>class Rectangle {
+    void setWidth(int w)  { ... }
+    void setHeight(int h) { ... }
+    int area() { return w * h; }
+}
+class Square extends Rectangle {
+    // a square must stay square,
+    // so setWidth ALSO sets height
+}
+
+// Caller's reasonable assumption:
+r.setWidth(5);
+r.setHeight(4);
+assert r.area() == 20;   // FAILS
+                         // for Square: 16</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Honest modelling</h3>
+              <pre class="sm"><code>interface Shape {
+    double area();
+}
+class Rectangle implements Shape {
+    Rectangle(int w, int h) { ... }
+    public double area() { ... }
+}
+class Square implements Shape {
+    Square(int side) { ... }
+    public double area() { ... }
+}
+// Both ARE shapes. Neither
+// pretends to be the other.</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Practical warning signs you're violating it</span>
+            An override that <strong>throws</strong> where the parent didn't · an override that does <strong>nothing</strong> ("not supported for this type") · an override that <strong>tightens</strong> what inputs it accepts · callers needing <code>instanceof</code> to use your class safely. Any of these means the IS-A claim was wrong.
+          </div>
+        </section>
+
+        <!-- 25. PUTTING IT TOGETHER -->
+        <section class="slide">
+          <p class="eyebrow">The whole picture</p>
+          <h2>Everything in one example</h2>
+          <pre class="sm"><code>abstract class Account {                                   // ABSTRACTION
+    private final String number;                          // ENCAPSULATION
+    protected double balance;
+
+    protected Account(String number, double balance) {    // CONSTRUCTOR CHAINING
+        this.number = number;
+        this.balance = balance;
+    }
+    public abstract double interestRate();                // must be implemented
+    public abstract String type();
+
+    public final void applyInterest() {                   // TEMPLATE METHOD
+        double interest = balance * interestRate();
+        balance += interest;
+    }
+    @Override public String toString() {                  // OVERRIDES Object
+        return String.format("%-8s %-10s %10.2f", number, type(), balance);
+    }
+    public double getBalance() { return balance; }
+}
+
+class SavingsAccount extends Account {                    // INHERITANCE
+    SavingsAccount(String n, double b) { super(n, b); }
+    @Override public double interestRate() { return 0.04; }   // OVERRIDING
+    @Override public String type()         { return "Savings"; }
+}
+
+class CurrentAccount extends Account {
+    CurrentAccount(String n, double b) { super(n, b); }
+    @Override public double interestRate() { return 0.0; }
+    @Override public String type()         { return "Current"; }
+}
+
+class FixedDepositAccount extends Account implements Taxable {   // + CAPABILITY
+    FixedDepositAccount(String n, double b) { super(n, b); }
+    @Override public double interestRate()  { return 0.07; }
+    @Override public String type()          { return "FD"; }
+    @Override public double taxableIncome() { return getBalance() * interestRate(); }
+}
+
+// --- and the payoff: ONE loop, no type checks anywhere ---
+Account[] portfolio = {
+    new SavingsAccount("AC1001", 50000),
+    new CurrentAccount("AC1002", 80000),
+    new FixedDepositAccount("AC1003", 200000)
+};
+for (Account a : portfolio) {         // POLYMORPHISM
+    a.applyInterest();
+    System.out.println(a);
+    if (a instanceof Taxable t) {     // pattern matching, only where needed
+        System.out.printf("   tax due: %.2f%n", t.taxDue());
+    }
+}</code></pre>
+        </section>
+
+        <!-- 26. WHERE THIS GOES NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Why this pays off</p>
+          <h2>Where you'll meet this again</h2>
+          <div class="cards">
+            <div class="card"><h3>📚 Session 3 — Collections</h3><p><code>List</code> is an interface; <code>ArrayList</code> and <code>LinkedList</code> implement it. <code>List&lt;String&gt; list = new ArrayList&lt;&gt;();</code> is upcasting — you'll finally see <em>why</em> everyone writes it that way.</p></div>
+            <div class="card"><h3>🔢 Session 3 — Sorting</h3><p><code>Comparable</code> and <code>Comparator</code> are interfaces you implement so <code>Collections.sort()</code> can call <em>your</em> logic polymorphically.</p></div>
+            <div class="card"><h3>🗺️ Session 4 — HashMap</h3><p><code>equals</code>/<code>hashCode</code> from slide 22 is precisely what makes hash-based collections work — or silently fail.</p></div>
+            <div class="card"><h3>🌱 Spring Boot</h3><p>Every <code>@Service</code> behind an interface, every <code>JpaRepository</code> — the whole framework is dynamic dispatch and programming to interfaces.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">One idea, everywhere</span>
+            <code>List&lt;String&gt; names = new ArrayList&lt;&gt;();</code> — after today you can explain every part of that line: <code>List</code> is the reference type (an interface, so you're programming to the contract), <code>ArrayList</code> is the object type, and every method call on <code>names</code> is dispatched dynamically to <code>ArrayList</code>'s implementation.
+          </div>
+        </section>
+
+        <!-- 27. BEST PRACTICES -->
+        <section class="slide">
+          <p class="eyebrow">Do this</p>
+          <h2>Best practices</h2>
+          <ul class="checklist">
+            <li><strong>Apply the IS-A test out loud</strong> before typing <code>extends</code></li>
+            <li><strong>Always write <code>@Override</code></strong> — it costs nothing and catches typos instantly</li>
+            <li><strong>Program to the interface:</strong> <code>List&lt;X&gt; l = new ArrayList&lt;&gt;()</code>, not <code>ArrayList&lt;X&gt; l = …</code></li>
+            <li><strong>Keep fields <code>private</code></strong> and never shadow a parent field</li>
+            <li><strong>Override <code>equals</code> and <code>hashCode</code> together</strong>, using the same fields</li>
+            <li><strong>Always override <code>toString()</code></strong> — your future self debugging at 2am will thank you</li>
+            <li><strong>Prefer <code>super.method()</code> + additions</strong> over copy-pasting the parent's logic</li>
+            <li><strong>Replace <code>instanceof</code> chains</strong> with an overridden method wherever you can</li>
+            <li><strong>Favour composition</strong> when you only want to reuse code, not to be substitutable</li>
+            <li><strong>Keep hierarchies shallow</strong> — two or three levels. Deep trees are hard to reason about</li>
+          </ul>
+        </section>
+
+        <!-- 28. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Session 2</p>
+          <h2>Recap — what you can now do</h2>
+          <ul class="checklist">
+            <li>Use <code>extends</code> correctly, and apply the <strong>IS-A test</strong> to decide when not to</li>
+            <li>State exactly what is inherited — and why <code>private</code> members and constructors are not</li>
+            <li>Use all three forms of <code>super</code>, and trace <strong>constructor chaining</strong> order</li>
+            <li>Explain why Java forbids multiple inheritance of classes, and how interfaces solve it</li>
+            <li>Override methods within all six rules, and know why <code>@Override</code> is non-negotiable</li>
+            <li>Distinguish <strong>overloading (compile time)</strong> from <strong>overriding (runtime)</strong></li>
+            <li>Explain <strong>dynamic method dispatch</strong> — and that fields are not polymorphic</li>
+            <li>Upcast safely, downcast defensively with <code>instanceof</code> pattern matching</li>
+            <li>Choose between an <strong>abstract class and an interface</strong> and justify it</li>
+            <li>Write a correct <code>equals</code>/<code>hashCode</code>/<code>toString</code> trio</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">Bring this with you</span>
+            Keep your <code>Account</code> hierarchy from the lab. Session 3 puts many accounts into a <code>List</code>, sorts them by balance with <code>Comparable</code> and <code>Comparator</code>, and models the HAS-A relationships between <code>Customer</code>, <code>Account</code> and <code>Branch</code>.
+          </div>
+        </section>
+
+        <!-- 29. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 2</span>
+            <h1>Questions?</h1>
+            <div class="sub">Then open the lab sheet — let's build a hierarchy where one loop does five different things.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — Collections: List classes &amp; relationships.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java Core · Session 2 — Inheritance &amp; Polymorphism</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
