@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Servlets — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into servlets-lab.html. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation. Reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .dangerbox {
+      border-left: 4px solid var(--tl-red);
+      background: rgba(255,95,87,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .dangerbox .lbl { font-weight: 700; color: var(--tl-red); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+    .card code { font-family: var(--mac-mono); font-size: 13.5px; color: var(--mac-accent); }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 7px 0;
+      background: #fafafc;
+      font-size: 16.5px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
+    table.cmp td.hl { background: rgba(10,132,255,0.07); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.sm { font-size: 15px; }
+    table.cmp.sm th, table.cmp.sm td { padding: 8px 12px; }
+
+    /* Status badges in tables */
+    .sbadge { display:inline-block; padding: 3px 10px; border-radius: 20px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .sbadge.dead { background: rgba(255,95,87,0.15); color: var(--tl-red); }
+    .sbadge.rare { background: rgba(254,188,46,0.18); color: #b8860b; }
+    .sbadge.legacy { background: rgba(142,142,147,0.18); color: #6e6e73; }
+    .sbadge.current { background: rgba(40,200,64,0.16); color: #1a9e34; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: #f3f8ff;
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+    .flow-arrow.bi::before { content: "\2195"; }
+
+    /* Two-column comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Step chips (numbered horizontal steps) */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Numbered vertical step list with code */
+    .vsteps { display: grid; gap: 10px; margin-top: 14px; }
+    .vstep { display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: start; }
+    .vstep .vn {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-top: 8px;
+    }
+    .vstep .vbody { min-width: 0; }
+    .vstep .vlabel { font-weight: 700; font-size: 15.5px; margin: 6px 0 2px; }
+    .vstep pre { margin: 4px 0; }
+
+    /* Annotation grid (recap) */
+    .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .anno-cell {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .anno-cell .ac-tag { font-family: var(--mac-mono); font-size: 15px; font-weight: 700; color: var(--mac-accent); }
+    .anno-cell .ac-def { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* SQL / log color coding */
+    .sql-kw { color: #ff6188; }
+    .sql-str { color: #a6e22e; }
+    .sql-num { color: #fd9353; }
+    .sql-punc { color: #f8f8f2; }
+    .attack { color: #ff6188; font-weight: 700; }
+    .comment-out { color: #6b7089; text-decoration: line-through; }
+
+    /* HTTP message color coding */
+    .h-line { color: #78dce8; font-weight: 700; }
+    .h-hdr { color: #ffd866; }
+    .h-val { color: #f8f8f2; }
+    .h-body { color: #a6e22e; }
+    .h-blank { color: #6b7089; font-style: italic; }
+
+    /* URL anatomy strip */
+    .urlstrip {
+      display: flex; flex-wrap: wrap; align-items: stretch;
+      margin: 18px 0 6px; border-radius: 10px; overflow: hidden;
+      border: 1px solid var(--mac-border); font-family: var(--mac-mono);
+    }
+    .urlpart { padding: 10px 12px; font-size: 14.5px; text-align: center; flex: 0 1 auto; }
+    .urlpart .plabel {
+      display: block; font-family: var(--mac-font); font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; opacity: 0.85;
+    }
+    .urlpart.p1 { background: #e6f1ff; color: #0a4a8f; }
+    .urlpart.p2 { background: #ebe8ff; color: #3f3ba8; }
+    .urlpart.p3 { background: #fff6ea; color: #a35d00; }
+    .urlpart.p4 { background: #eefcf1; color: #157a2b; }
+    .urlpart.p5 { background: #e9fbfa; color: #00726c; }
+    .urlpart.p6 { background: #f7ecff; color: #7d1fb5; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* Mistake list — red crosses instead of green ticks */
+    .xlist { list-style: none; padding: 0; margin-top: 12px; }
+    .xlist li { font-size: 16.5px; padding: 9px 0 9px 38px; position: relative; }
+    .xlist li::before {
+      content: "\2715";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: var(--tl-red); color: #fff;
+      border-radius: 50%;
+      font-size: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: var(--mac-accent);
+      transition: width var(--slide-anim) ease;
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">servlets-theory.html — Java Servlets, HTTP, MVC &amp; CRUD</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Java EE · Web Layer</span>
+            <h1>Java Servlets</h1>
+            <div class="sub">Fundamentals, HTTP, MVC &amp; CRUD with JDBC — how a Java program starts answering requests from a browser instead of a <code>main</code> method.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+          </div>
+        </section>
+
+        <!-- 2. AGENDA -->
+        <section class="slide">
+          <p class="eyebrow">What we'll cover today</p>
+          <h2>Agenda</h2>
+          <p class="lead">Until now every Java program you wrote started at <code>main()</code> and talked to <strong>you</strong> through the console. Today that changes: your code will start being called by a <strong>browser</strong>, over a network, and it will answer in HTML. That's the entire job of a servlet — and it's the layer Spring Boot's <code>@RestController</code> is quietly built on.</p>
+          <ul class="agenda">
+            <li><span class="num">A</span> Web &amp; HTTP foundations — servers, URLs, requests, responses, GET vs POST</li>
+            <li><span class="num">B</span> Servlets — what they are, their lifecycle, and your first <code>doGet</code></li>
+            <li><span class="num">C</span> MVC architecture — the five packages and why we split code up</li>
+            <li><span class="num">D</span> Database setup — Derby, the <code>product</code> table, and the two-JAR trap</li>
+            <li><span class="num">E</span> The CRUD design pattern — one servlet, four actions</li>
+          </ul>
+          <div class="note">
+            <span class="lbl">How to use these slides</span>
+            This deck is written to be <strong>read on its own afterwards</strong>, not just watched — each slide carries the full explanation of its topic, so nothing depends on remembering what was said out loud. Nothing here assumes you've built a web app before. Keep <strong>slide 18 (the servlet lifecycle)</strong> and <strong>slide 29 (the five packages)</strong> in mind during the lab: every file you create belongs to one of those packages, and every request follows that lifecycle.
+          </div>
+        </section>
+
+        <!-- 3. WHAT IS A WEB APPLICATION -->
+        <section class="slide">
+          <p class="eyebrow">Part A · Web &amp; HTTP foundations</p>
+          <h2>What is a web application?</h2>
+          <p class="deep">A <span class="term">web application</span> is a program you use through a browser instead of installing it. Gmail, Amazon, your bank's site, the college portal — all web applications. They all follow one arrangement, the <strong>client–server model</strong>:</p>
+          <div class="flow" style="justify-content:center; margin-top:22px;">
+            <div class="flow-box" style="min-width:180px;">Client <span class="sm">the browser — Chrome, Firefox, Edge</span></div>
+            <span class="flow-arrow">&#8596;</span>
+            <div class="flow-box amber" style="min-width:180px;">Network <span class="sm">the internet / your LAN</span></div>
+            <span class="flow-arrow">&#8596;</span>
+            <div class="flow-box green" style="min-width:180px;">Server <span class="sm">the machine running your Java code</span></div>
+          </div>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>The client's job</h3>
+              <ul style="padding-left:18px;">
+                <li><strong>Asks</strong> for something — "give me the product list"</li>
+                <li><strong>Renders</strong> whatever HTML comes back</li>
+                <li>Knows <strong>nothing</strong> about your database or your Java classes</li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>The server's job</h3>
+              <ul style="padding-left:18px;">
+                <li><strong>Listens</strong> for requests, all day, forever</li>
+                <li><strong>Runs logic</strong> — validate, calculate, query the DB</li>
+                <li><strong>Replies</strong> with HTML (or JSON) the client can display</li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The mental shift to make today</span>
+            A console program is <strong>in charge</strong>: it decides when to read input and when to print. A web application is <strong>reactive</strong> — it sits still and waits, then wakes up when a request arrives, answers it, and goes back to sleep. <strong>You no longer write <code>main()</code>. You write methods that the server calls for you.</strong>
+          </div>
+        </section>
+
+        <!-- 4. STATIC vs DYNAMIC -->
+        <section class="slide">
+          <p class="eyebrow">Why we need Java on the server at all</p>
+          <h2>Static vs dynamic web pages</h2>
+          <p class="deep">Before servlets make sense, you need to see the problem they solve. There are two kinds of thing a server can send back:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th style="width:22%;">&nbsp;</th><th>Static page</th><th class="hl">Dynamic page</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td>A <code>.html</code> file sitting on disk</td><td class="hl">HTML <strong>generated at request time</strong> by a program</td></tr>
+              <tr><td><strong>Who builds it</strong></td><td>A developer, once, by hand</td><td class="hl">Your Java code, freshly, on every request</td></tr>
+              <tr><td><strong>Content</strong></td><td>Identical for every visitor, every time</td><td class="hl">Different per user, per query, per moment</td></tr>
+              <tr><td><strong>Example</strong></td><td>An "About Us" page</td><td class="hl">"Your cart (3 items)", a search result, a bank balance</td></tr>
+              <tr><td><strong>Needs a database?</strong></td><td>No</td><td class="hl">Usually yes</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">This is precisely why servlets exist</span>
+            A static file can't say <em>"Welcome back, Priya — you have 3 items in your cart."</em> It has no idea who Priya is. To produce that sentence you need <strong>code that runs on the server, at the moment of the request</strong>, that can look things up and build the HTML on the spot. In the Java world, that code is a <strong>servlet</strong>.
+          </div>
+          <div class="note">
+            <span class="lbl">A useful analogy</span>
+            A static page is a <strong>printed poster</strong> — everyone who walks past sees the same thing. A dynamic page is a <strong>waiter</strong> — they ask who you are, go to the kitchen, and come back with <em>your</em> order. Today you're building the waiter.
+          </div>
+        </section>
+
+        <!-- 5. WEB SERVER + TYPES -->
+        <section class="slide">
+          <p class="eyebrow">The software that receives the request</p>
+          <h2>What is a web server?</h2>
+          <p class="deep">A <span class="term">web server</span> is software that listens on a network port, accepts incoming HTTP requests, and sends back HTTP responses. It's the permanent receptionist of your application: always on, always listening.</p>
+          <table class="cmp">
+            <thead>
+              <tr><th>Server</th><th>Made by / ecosystem</th><th>Typically used for</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="hl"><strong>Apache Tomcat</strong></td><td class="hl">Apache, Java</td><td class="hl">Running Java servlets &amp; JSP — <strong>this is ours today</strong> <span class="sbadge current">our server</span></td></tr>
+              <tr><td><strong>Nginx</strong></td><td>Open source, C</td><td>Very fast static files, reverse proxy, load balancing</td></tr>
+              <tr><td><strong>IIS</strong></td><td>Microsoft</td><td>ASP.NET applications on Windows Server</td></tr>
+              <tr><td><strong>Lighttpd</strong></td><td>Open source, C</td><td>Lightweight, low-memory environments</td></tr>
+              <tr><td><strong>Apache HTTP Server</strong></td><td>Apache, C</td><td>The classic general-purpose web server ("httpd")</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why Tomcat, specifically?</span>
+            Nginx and IIS can serve files and forward requests, but they <strong>cannot run a Java class</strong>. Tomcat can — it contains a <strong>servlet container</strong>, the piece that knows how to load your compiled servlet, call its methods, and hand it the request. <strong>Tomcat is a web server that speaks Java.</strong> That's why every lab today runs on it.
+          </div>
+          <div class="note">
+            <span class="lbl">Don't confuse the two "Apaches"</span>
+            <strong>Apache HTTP Server</strong> and <strong>Apache Tomcat</strong> are different products that happen to share a foundation's name. Tomcat is the Java one. When a job description says "experience with Tomcat," it means the Java servlet container.
+          </div>
+        </section>
+
+        <!-- 6. WEB SERVER vs APPLICATION SERVER -->
+        <section class="slide">
+          <p class="eyebrow">A distinction interviewers love</p>
+          <h2>Web server vs application server</h2>
+          <p class="deep">These two terms get used loosely, and the boundary genuinely has blurred over the years. Here's the honest version:</p>
+          <table class="cmp">
+            <thead>
+              <tr><th style="width:20%;">&nbsp;</th><th>Web server</th><th>Application server</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Core job</strong></td><td>Serve content over HTTP</td><td>Host and run full business applications</td></tr>
+              <tr><td><strong>Handles</strong></td><td>HTML, CSS, images, and (with a container) servlets</td><td>Servlets <em>plus</em> EJB, transactions, messaging, connection pooling</td></tr>
+              <tr><td><strong>Weight</strong></td><td>Light</td><td>Heavy — many more moving parts</td></tr>
+              <tr><td><strong>Examples</strong></td><td>Nginx, Apache HTTP Server, <strong>Tomcat</strong></td><td>WildFly (JBoss), WebLogic, WebSphere, GlassFish</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Where Tomcat sits — the nuance worth knowing</span>
+            Tomcat is usually called a <strong>web server with a servlet container</strong> (sometimes "web container"). It does servlets and JSP beautifully, but it doesn't implement the full Java EE stack — no EJB container, for instance. In practice that's fine: <strong>the overwhelming majority of modern Java web apps only ever need what Tomcat provides.</strong> Spring Boot ships an embedded Tomcat inside your JAR for exactly this reason.
+          </div>
+          <div class="note">
+            <span class="lbl">Answer this crisply if asked</span>
+            "A web server handles HTTP and serves content. An application server adds enterprise services — transactions, EJB, messaging — on top. Tomcat is a web server plus a servlet container, which is all most applications need."
+          </div>
+        </section>
+
+        <!-- 7. URL ANATOMY -->
+        <section class="slide">
+          <p class="eyebrow">Reading an address properly</p>
+          <h2>Anatomy of a URL</h2>
+          <p class="deep">Every request starts with a URL. It looks like one blob of text, but it's really <strong>six labelled parts</strong> — and you'll be constructing these by hand all through the lab, so learn to see the seams:</p>
+          <div class="urlstrip">
+            <div class="urlpart p1"><span class="plabel">1 · Protocol</span>http://</div>
+            <div class="urlpart p2"><span class="plabel">2 · Server location</span>localhost</div>
+            <div class="urlpart p3"><span class="plabel">3 · Port (optional)</span>:8080</div>
+            <div class="urlpart p4"><span class="plabel">4 · Resource path</span>/ServletBasics/product</div>
+            <div class="urlpart p5"><span class="plabel">5 · Query parameters</span>?action=delete&amp;p=3</div>
+            <div class="urlpart p6"><span class="plabel">6 · Fragment (optional)</span>#results</div>
+          </div>
+          <table class="cmp sm">
+            <thead><tr><th style="width:20%;">Part</th><th style="width:34%;">What it means</th><th>The detail that matters</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Protocol</strong></td><td>The language to speak — <code>http</code> or <code>https</code></td><td><code>https</code> is the same protocol wrapped in encryption. Always <code>https</code> in production.</td></tr>
+              <tr><td><strong>Server location</strong></td><td>A domain name or an IP address</td><td><code>localhost</code> means <em>this machine</em> — it resolves to <code>127.0.0.1</code>. That's what you'll use all lab.</td></tr>
+              <tr><td><strong>Port</strong></td><td>Which program on that machine</td><td>Optional because there are defaults: <strong>80</strong> for http, <strong>443</strong> for https. Tomcat defaults to <strong>8080</strong>, so we must write it.</td></tr>
+              <tr><td><strong>Resource path</strong></td><td>What you're asking for</td><td>For us: <code>/&lt;project-name&gt;/&lt;url-pattern&gt;</code>. The first segment is the app, the second picks the servlet.</td></tr>
+              <tr><td><strong>Query parameters</strong></td><td>Extra data, as <code>key=value</code> pairs</td><td>Starts with <code>?</code>, pairs joined by <code>&amp;</code>. This is what <code>request.getParameter()</code> reads.</td></tr>
+              <tr><td><strong>Fragment</strong></td><td>A spot <em>within</em> the page</td><td><strong>Never sent to the server</strong> — the browser alone uses it to scroll. Worth knowing.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The one you'll type a hundred times today</span>
+            <code>http://localhost:8080/ServletBasics/product?action=view</code> — protocol, this machine, Tomcat's port, the project, the servlet, and one parameter telling the servlet what to do. <strong>If a page 404s in the lab, re-read this line part by part; the mistake is almost always in the path.</strong>
+          </div>
+        </section>
+
+        <!-- 8. FULL REQUEST FLOW -->
+        <section class="slide">
+          <p class="eyebrow">The whole journey, end to end</p>
+          <h2>What happens when you press Enter</h2>
+          <p class="deep">This is the single most important diagram of the session. Every lab you build today is one lap around this loop:</p>
+          <div class="flow vert" style="max-width:660px; margin:12px auto;">
+            <div class="flow-box" style="min-width:380px;">1 · Browser <span class="sm">you type a URL / click a link / submit a form</span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box" style="min-width:380px;">2 · Web server (Tomcat) <span class="sm">receives the HTTP request on port 8080</span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box alt" style="min-width:380px;">3 · Servlet container <span class="sm">matches the URL to your servlet, calls <code>doGet</code> / <code>doPost</code></span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box alt" style="min-width:380px;">4 · Your Java code <span class="sm">servlet &rarr; service &rarr; DAO</span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box amber" style="min-width:380px;">5 · JDBC driver <span class="sm">translates your Java calls into database protocol</span></div>
+            <span class="flow-arrow">&#8595;</span>
+            <div class="flow-box green" style="min-width:380px;">6 · Database <span class="sm">runs the SQL, returns a <strong>record set</strong></span></div>
+            <span class="flow-arrow">&#8593;</span>
+            <div class="flow-box" style="min-width:380px;">7 · Servlet builds HTML <span class="sm">loops the rows, writes tags with <code>PrintWriter</code></span></div>
+            <span class="flow-arrow">&#8593;</span>
+            <div class="flow-box" style="min-width:380px;">8 · Browser renders it <span class="sm">HTML text becomes a visible table</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The insight that makes servlets click</span>
+            Notice step 7. <strong>Your servlet never sends a table — it sends a string of text that happens to be HTML.</strong> The browser is what turns <code>&lt;table&gt;&lt;tr&gt;&lt;td&gt;</code> into lines and boxes on screen. Your job is only to produce the right characters in the right order.
+          </div>
+        </section>
+
+        <!-- 9. HTTP INTRO -->
+        <section class="slide">
+          <p class="eyebrow">The rules of the conversation</p>
+          <h2>HTTP — request in, response out</h2>
+          <p class="deep"><span class="term">HTTP</span> (HyperText Transfer Protocol) is the agreed format for those messages. Two properties define how it feels to program against:</p>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🔁</div>
+              <h3>1 · Strictly request–response</h3>
+              <p>The client asks; the server answers; the exchange is over. The server <strong>cannot</strong> spontaneously push something to a browser — it can only reply to a request that arrived.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧠</div>
+              <h3>2 · Stateless</h3>
+              <p>Each request is independent. The server remembers <strong>nothing</strong> from the previous one. Two requests from the same person look, by default, like two strangers.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Why "stateless" is a problem worth naming now</span>
+            You log in on one request. On the very next request — clicking a link — HTTP has already forgotten who you are. So how does any site keep you logged in? With extra machinery layered on top: <strong>cookies</strong> and <strong>sessions</strong>, where the server hands the browser an ID and the browser sends it back with every subsequent request. You'll see <code>Set-Cookie: JSESSIONID=...</code> two slides from now — that's Tomcat doing exactly this.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Scope note for today</span>
+            Our login servlet checks a hardcoded id and password and prints the result. It does <strong>not</strong> keep you logged in afterwards, because we haven't added sessions yet — and that's deliberate. <strong>Today: one request, one answer.</strong> Sessions come next.
+          </div>
+        </section>
+
+        <!-- 10. HTTP REQUEST STRUCTURE -->
+        <section class="slide">
+          <p class="eyebrow">Anatomy, part 1</p>
+          <h2>Structure of an HTTP request</h2>
+          <p class="deep">A request is just <strong>plain text</strong> in a fixed shape — four parts, always in this order. This is literally what travels down the wire when you submit the lab's login form:</p>
+          <pre><code><span class="h-line">GET /ServletBasics/login?action=login&amp;id=123&amp;pwd=Christi HTTP/1.1</span>   <span class="code-comment">&lt;- 1. REQUEST LINE</span>
+<span class="h-hdr">Host</span>: <span class="h-val">localhost:8080</span>                            <span class="code-comment">&lt;- 2. HEADERS start</span>
+<span class="h-hdr">Accept</span>: <span class="h-val">text/html,application/xhtml+xml,*/*</span>
+<span class="h-hdr">Accept-Encoding</span>: <span class="h-val">gzip, deflate</span>
+<span class="h-hdr">Accept-Language</span>: <span class="h-val">en-US,en;q=0.9</span>
+<span class="h-hdr">User-Agent</span>: <span class="h-val">Mozilla/5.0 (Windows NT 10.0) Chrome/120.0</span>
+<span class="h-hdr">Content-Length</span>: <span class="h-val">0</span>
+                                                <span class="h-blank">&lt;- 3. ONE BLANK LINE (mandatory)</span>
+<span class="h-body">(body — empty for this GET request)</span>            <span class="code-comment">&lt;- 4. BODY</span></code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:22%;">Part</th><th>What it carries</th></tr></thead>
+            <tbody>
+              <tr><td class="hl"><strong>1 · Request line</strong></td><td>Three things: the <strong>method</strong> (<code>GET</code>), the <strong>path + query string</strong>, and the <strong>HTTP version</strong>. Notice the parameters are sitting right here in the URL — that fact drives the whole GET-vs-POST discussion.</td></tr>
+              <tr><td class="hl"><strong>2 · Headers</strong></td><td><code>key: value</code> metadata. <code>Host</code> — which site (required in HTTP/1.1). <code>Accept</code> — formats I can read. <code>Accept-Encoding</code> — compressions I understand. <code>Content-Length</code> — how many bytes of body follow. <code>User-Agent</code> — which browser.</td></tr>
+              <tr><td class="hl"><strong>3 · Blank line</strong></td><td>A single empty line marking "headers are finished, body begins." Not decoration — it's how the server knows where to stop parsing headers.</td></tr>
+              <tr><td class="hl"><strong>4 · Body</strong></td><td>The payload. <strong>Empty for GET.</strong> For POST, this is where the form data lives.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The takeaway</span>
+            There's nothing magical in a request — it's text you could type by hand. When you call <code>request.getParameter("id")</code> in the lab, you're asking Tomcat to pull <code>id=123</code> out of the request line above and hand you the <code>"123"</code>.
+          </div>
+        </section>
+
+        <!-- 11. HTTP RESPONSE STRUCTURE -->
+        <section class="slide">
+          <p class="eyebrow">Anatomy, part 2</p>
+          <h2>Structure of an HTTP response</h2>
+          <p class="deep">The reply has the same four-part shape, with a status line instead of a request line. This is what your servlet produces:</p>
+          <pre><code><span class="h-line">HTTP/1.1 200 OK</span>                                <span class="code-comment">&lt;- 1. STATUS LINE (version + code)</span>
+<span class="h-hdr">Content-Type</span>: <span class="h-val">text/html;charset=UTF-8</span>          <span class="code-comment">&lt;- 2. HEADERS start</span>
+<span class="h-hdr">Set-Cookie</span>: <span class="h-val">JSESSIONID=8A1F3C9D; Path=/ServletBasics</span>
+<span class="h-hdr">Pragma</span>: <span class="h-val">no-cache</span>
+<span class="h-hdr">Cache-Control</span>: <span class="h-val">no-store, must-revalidate</span>
+<span class="h-hdr">Expires</span>: <span class="h-val">Thu, 01 Jan 1970 00:00:00 GMT</span>
+<span class="h-hdr">Content-Length</span>: <span class="h-val">64</span>
+                                                <span class="h-blank">&lt;- 3. ONE BLANK LINE</span>
+<span class="h-body">&lt;h3&gt;&lt;font color="green"&gt;Login successful&lt;/font&gt;&lt;/h3&gt;</span>  <span class="code-comment">&lt;- 4. BODY</span></code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:24%;">Header</th><th>Its role</th></tr></thead>
+            <tbody>
+              <tr><td class="hl"><code>Content-Type</code></td><td><strong>The most important one for us.</strong> It tells the browser <em>how to interpret the body</em>. <code>text/html</code> &rarr; parse the tags and render. <code>text/plain</code> &rarr; show the characters literally. This is exactly what <code>response.setContentType("text/html")</code> sets — and forgetting it is the bug on slide 25.</td></tr>
+              <tr><td><code>Set-Cookie</code></td><td>Asks the browser to store a small value and send it back on later requests. <code>JSESSIONID</code> is how Tomcat recognises a returning visitor.</td></tr>
+              <tr><td><code>Pragma</code> / <code>Cache-Control</code></td><td>Caching instructions. <code>no-cache</code> / <code>no-store</code> mean "don't keep a copy" — important for pages showing live data or private information.</td></tr>
+              <tr><td><code>Expires</code></td><td>Content expiry. A date in the <strong>past</strong> (like the 1970 one above) is the classic trick for "this is already stale, always re-fetch."</td></tr>
+              <tr><td><code>Content-Length</code></td><td>Body size in bytes, so the browser knows when it has received everything.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Where the body comes from in your code</span>
+            Everything you write with <code>out.println(...)</code> lands in part 4. Tomcat writes parts 1–3 for you automatically — which is a mercy, but also why a missing <code>setContentType</code> is invisible until the browser renders the wrong thing.
+          </div>
+        </section>
+
+        <!-- 12. STATUS CODES -->
+        <section class="slide">
+          <p class="eyebrow">Reading the server's mood</p>
+          <h2>HTTP status codes</h2>
+          <p class="deep">The number in the status line is the server's one-word verdict. They're grouped by first digit, and knowing the groups means you can diagnose a problem before reading a single log line:</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:12%;">Range</th><th style="width:22%;">Meaning</th><th>Ones you will actually meet</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1xx</strong></td><td>Informational</td><td>Rare in day-to-day work. <code>100 Continue</code>.</td></tr>
+              <tr><td class="hl"><strong>2xx</strong></td><td class="hl"><strong>Success</strong></td><td class="hl"><code>200 OK</code> — it worked. <code>201 Created</code> — a new resource was made (you'll use this in REST).</td></tr>
+              <tr><td><strong>3xx</strong></td><td>Redirection</td><td><code>301</code> moved permanently · <code>302 Found</code> — "look over there instead," what <code>sendRedirect()</code> sends.</td></tr>
+              <tr><td class="hl"><strong>4xx</strong></td><td class="hl"><strong>You (the client) erred</strong></td><td class="hl"><code>400</code> bad request · <code>401</code> not authenticated · <code>403</code> forbidden · <code><strong>404 Not Found</strong></code> — wrong URL · <code>405</code> method not allowed.</td></tr>
+              <tr><td class="hl"><strong>5xx</strong></td><td class="hl"><strong>The server erred</strong></td><td class="hl"><code><strong>500 Internal Server Error</strong></code> — your code threw an exception · <code>503</code> service unavailable.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The two you'll debug all lab — and how to tell them apart instantly</span>
+            <strong>404</strong> means Tomcat looked for your URL and found nothing — <em>your address is wrong</em>. Check the project name and the <code>&lt;url-pattern&gt;</code>. <strong>500</strong> means Tomcat found your servlet, ran it, and <em>your code threw an exception</em> — scroll the Eclipse console for the stack trace; the real error is there.
+          </div>
+          <div class="note">
+            <span class="lbl">Remember the two groups by who's at fault</span>
+            <strong>4xx = your fault (the client's).</strong> You asked for something wrong. <strong>5xx = my fault (the server's).</strong> You asked correctly and I broke. Also worth knowing: <code>405 Method Not Allowed</code> is what you get when a form POSTs to a servlet that only implements <code>doGet</code> — a very common beginner surprise, and slide 23 shows the fix.
+          </div>
+        </section>
+
+        <!-- 13. GET vs POST TABLE -->
+        <section class="slide">
+          <p class="eyebrow">The comparison that gets asked in every interview</p>
+          <h2>GET vs POST — the full comparison</h2>
+          <p class="deep">Both send data to the server. The difference is <strong>where the data rides</strong>, and everything else follows from that one fact:</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:18%;">Aspect</th><th>GET</th><th>POST</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Data goes in</strong></td><td>The <strong>URL</strong> — the query string of the request line</td><td>The <strong>body</strong> of the request</td></tr>
+              <tr><td><strong>Visible?</strong></td><td class="bad">Yes — in the address bar, browser history, server logs, and over anyone's shoulder</td><td class="good">No — not shown in the address bar</td></tr>
+              <tr><td><strong>Data volume</strong></td><td class="bad">Limited — URLs are capped in practice (~2000 chars in older browsers)</td><td class="good">Effectively unlimited — fine for large forms and file uploads</td></tr>
+              <tr><td><strong>Idempotent?</strong></td><td class="good">Yes — repeating it changes nothing</td><td class="bad">No — repeating it may create a duplicate</td></tr>
+              <tr><td><strong>Bookmarkable / shareable?</strong></td><td class="good">Yes — the whole request is one URL you can save or send</td><td class="bad">No — the body isn't part of the URL</td></tr>
+              <tr><td><strong>Cached by browsers?</strong></td><td>Yes — which makes repeat views fast</td><td>No — every submit hits the server</td></tr>
+              <tr><td><strong>Safe for passwords?</strong></td><td class="bad">Never</td><td class="good">Yes — <em>with HTTPS</em>; see the warning below</td></tr>
+              <tr><td><strong>Servlet method called</strong></td><td><code>doGet(...)</code></td><td><code>doPost(...)</code></td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Be precise about "POST is secure" — it's the most-repeated half-truth in web development</span>
+            POST only <strong>hides data from the address bar</strong>. The body still travels as <strong>plain text</strong> and anyone watching the network can read it. <strong>Only HTTPS makes data secure</strong>, by encrypting the whole exchange. Correct phrasing: <em>"POST keeps data out of the URL; HTTPS keeps it out of an attacker's hands."</em>
+          </div>
+        </section>
+
+        <!-- 14. GET vs POST — IDEMPOTENCY + USE CASES -->
+        <section class="slide">
+          <p class="eyebrow">The tradeoff, in real terms</p>
+          <h2>Idempotency, efficiency &amp; when to use which</h2>
+          <p class="deep"><span class="term">Idempotent</span> is a fancy word for a simple test: <strong>if I do this twice, is the result the same as doing it once?</strong> Reading a product page twice = same result, so GET is idempotent. Submitting a payment twice = two charges, so POST is not.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Refresh a POST result</h3>
+              <ul>
+                <li>Browser asks: <em>"Confirm form resubmission?"</em></li>
+                <li>Say yes &rarr; the registration/payment runs <strong>again</strong></li>
+                <li>Duplicate rows, double charges</li>
+                <li><strong>This is why that dialog exists</strong> — the browser knows POST isn't safe to repeat</li>
+              </ul>
+            </div>
+            <div class="ba-mid">vs</div>
+            <div class="ba-col after">
+              <h3>Refresh a GET result</h3>
+              <ul>
+                <li>Silently re-fetches — no prompt</li>
+                <li>Same page, no side effects</li>
+                <li>Can be cached, bookmarked, shared, pre-fetched</li>
+                <li><strong>Safe to repeat any number of times</strong></li>
+              </ul>
+            </div>
+          </div>
+          <div class="cards" style="margin-top:16px;">
+            <div class="card">
+              <div class="ic">🔍</div>
+              <h3>Use GET when you're <em>reading</em></h3>
+              <p>Browsing a catalogue, viewing a product, searching, filtering, paginating, our <strong>view-all-products</strong> link. You <em>want</em> these bookmarkable and cacheable — <code>?q=laptop&amp;page=2</code> in the URL is a feature, not a leak.</p>
+            </div>
+            <div class="card">
+              <div class="ic">✍️</div>
+              <h3>Use POST when you're <em>changing</em></h3>
+              <p>Registration, login, placing an order, uploading a file, our <strong>insert-product</strong> form. Data is sensitive or large, and re-running it must not happen by accident.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The one-line rule to carry forward</span>
+            <strong>GET to read, POST to write.</strong> Efficiency-wise GET wins on repeat reads (cacheable, one tidy URL); POST wins on size and privacy. In today's lab we deliberately use <strong>both</strong> — links carry a GET for view and delete, forms POST for insert and update — so you feel the difference rather than just memorising the table.
+          </div>
+        </section>
+
+
+        <!-- 15. WHAT IS A SERVLET -->
+        <section class="slide">
+          <p class="eyebrow">Part B · Servlets</p>
+          <h2>What is a servlet?</h2>
+          <p class="deep">A <span class="term">servlet</span> is an ordinary Java class that <strong>extends the capability of a web server</strong> — it lets the server answer a request with content your code generated, rather than a file from disk.</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">☕</div>
+              <h3>It's just a Java class</h3>
+              <p>No new language, no magic. You <code>extends HttpServlet</code> and override a method. Everything you know about Java still applies.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🚫</div>
+              <h3>But it has no <code>main()</code></h3>
+              <p>You never run a servlet yourself. <strong>The server runs it</strong>, calling your methods when a matching request arrives.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📤</div>
+              <h3>Its output is a response</h3>
+              <p>Instead of <code>System.out</code>, you write to the response. The characters you write become the page the user sees.</p>
+            </div>
+          </div>
+          <pre><code><span class="code-comment">// The smallest useful servlet — this is the whole shape of it</span>
+public class HelloServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("&lt;h1&gt;Hello from a servlet!&lt;/h1&gt;");
+    }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Read those two parameters carefully — they're the whole API</span>
+            <code>HttpServletRequest request</code> is <strong>everything the browser sent you</strong> — parameters, headers, the method used. <code>HttpServletResponse response</code> is <strong>the reply you're filling in</strong> — its content type, and the writer you print the body to. <strong>Request = incoming, response = outgoing.</strong> Master those two objects and you've mastered servlets.
+          </div>
+        </section>
+
+        <!-- 16. SERVLET CONTAINER -->
+        <section class="slide">
+          <p class="eyebrow">The invisible partner doing half your work</p>
+          <h2>The servlet container</h2>
+          <p class="deep">The <span class="term">servlet container</span> (also called the web container — inside Tomcat, it's the component named Catalina) is the part of the server that manages your servlets. Understanding what it does for you is what turns servlets from "magic" into "obvious":</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:34%;">The container handles…</th><th>…so you never write code for</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Socket &amp; port management</strong></td><td>Opening port 8080, accepting TCP connections, reading bytes off the wire</td></tr>
+              <tr><td><strong>Parsing HTTP</strong></td><td>Splitting that raw text into a request line, headers, and body</td></tr>
+              <tr><td><strong>URL mapping</strong></td><td>Deciding <em>which</em> of your servlets should handle <code>/product</code></td></tr>
+              <tr><td><strong>Object creation (lifecycle)</strong></td><td>Loading your class, instantiating it, calling <code>init()</code>, and eventually <code>destroy()</code></td></tr>
+              <tr><td><strong>Threading</strong></td><td>Serving 500 simultaneous users without you touching <code>Thread</code></td></tr>
+              <tr><td><strong>Building the response</strong></td><td>Writing the status line, headers, and <code>Content-Length</code> around your body</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">This is a genuinely huge deal</span>
+            Without a container, "serve a web page in Java" means writing socket code, parsing HTTP by hand, and managing a thread pool — hundreds of lines before you display anything. The container does all of it. <strong>You write only the part that's unique to your application: the business logic.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">Inversion of control — you've now met it twice</span>
+            You don't call the container; <strong>the container calls you.</strong> This "don't call us, we'll call you" arrangement is the same principle behind Spring's dependency injection. Servlets are where most Java developers meet it for the first time.
+          </div>
+        </section>
+
+        <!-- 17. SERVLET API FAMILY -->
+        <section class="slide">
+          <p class="eyebrow">Where <code>HttpServlet</code> comes from</p>
+          <h2>The Servlet API family tree</h2>
+          <p class="deep">You'll write <code>extends HttpServlet</code> without thinking. Here's what's above it, because it explains why <code>service()</code> exists and where <code>doGet</code> gets called from:</p>
+          <div class="flow vert" style="max-width:560px; margin:14px auto;">
+            <div class="flow-box alt" style="min-width:340px;"><code>interface Servlet</code> <span class="sm">the contract: <code>init</code>, <code>service</code>, <code>destroy</code> — protocol-neutral</span></div>
+            <span class="flow-arrow">&#8593;</span>
+            <div class="flow-box alt" style="min-width:340px;"><code>abstract class GenericServlet</code> <span class="sm">implements the boring parts; still protocol-neutral</span></div>
+            <span class="flow-arrow">&#8593;</span>
+            <div class="flow-box" style="min-width:340px;"><code>abstract class HttpServlet</code> <span class="sm">adds HTTP: <code>service()</code> inspects the method and dispatches to <code>doGet</code>/<code>doPost</code>/…</span></div>
+            <span class="flow-arrow">&#8593;</span>
+            <div class="flow-box green" style="min-width:340px;"><code>class LoginServlet extends HttpServlet</code> <span class="sm"><strong>your class</strong> — override just the methods you need</span></div>
+          </div>
+          <div class="note">
+            <span class="lbl">So why do we override <code>doGet</code> and not <code>service</code>?</span>
+            Because <code>HttpServlet.service()</code> already contains the <code>if</code>-ladder: <em>"was the request method GET? then call <code>doGet</code>. POST? call <code>doPost</code>."</em> By overriding <code>doGet</code> you plug into that ladder at exactly the right rung. Override <code>service()</code> yourself and you'd break the dispatching. <strong>Rule: override <code>doGet</code>/<code>doPost</code>, leave <code>service</code> alone.</strong>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">⚠ Read this before you write a single import — <code>javax</code> vs <code>jakarta</code></span>
+            The package name changed when Java EE became Jakarta EE, and mismatching it is the <strong>#1 reason a servlet won't compile or 404s</strong> for people following older tutorials:
+            <ul style="margin:8px 0 0; font-size:16px;">
+              <li><strong>Tomcat 9 and earlier</strong> &rarr; <code>import javax.servlet.*;</code> — this is what our lab code uses.</li>
+              <li><strong>Tomcat 10 and later</strong> &rarr; <code>import jakarta.servlet.*;</code> — identical class names, different package.</li>
+            </ul>
+            <div style="margin-top:8px;">Check your Tomcat version first. If you're on 10+, change every <code>javax.servlet</code> to <code>jakarta.servlet</code> — <strong>nothing else in the code changes.</strong></div>
+          </div>
+        </section>
+
+        <!-- 18. SERVLET LIFECYCLE -->
+        <section class="slide">
+          <p class="eyebrow">Keep this slide in mind for the whole lab</p>
+          <h2>The servlet lifecycle</h2>
+          <p class="deep">A servlet passes through three phases, and the container drives every one. The middle phase is the one that repeats:</p>
+          <div class="vsteps">
+            <div class="vstep">
+              <div class="vn">1</div>
+              <div class="vbody">
+                <div class="vlabel"><code>init()</code> — <strong>once</strong>, on the first request ever</div>
+                <p class="deep" style="margin:2px 0 0;">The container loads the class, creates <strong>one single instance</strong>, and calls <code>init()</code>. Used for one-time setup — reading config, opening a connection pool. You usually don't override it. Called <strong>once in the servlet's entire life</strong>, not once per request.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">2</div>
+              <div class="vbody">
+                <div class="vlabel"><code>service()</code> &rarr; <code>doGet()</code> / <code>doPost()</code> — <strong>once per request</strong></div>
+                <p class="deep" style="margin:2px 0 0;">For <em>every</em> request, the container calls <code>service()</code>, which checks the HTTP method and dispatches to your <code>doGet</code> or <code>doPost</code>. <strong>This is where all your code lives.</strong> A thousand requests = a thousand <code>doGet</code> calls — on the same object.</p>
+              </div>
+            </div>
+            <div class="vstep">
+              <div class="vn">3</div>
+              <div class="vbody">
+                <div class="vlabel"><code>destroy()</code> — <strong>once</strong>, at shutdown</div>
+                <p class="deep" style="margin:2px 0 0;">Called when Tomcat stops or the app is undeployed/redeployed. Your chance to release resources. Then the object is garbage collected.</p>
+              </div>
+            </div>
+          </div>
+          <div class="flow" style="justify-content:center; margin-top:8px;">
+            <div class="flow-box green">Loaded <span class="sm">class found</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box">init() <span class="sm">once</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box alt" style="border-width:3px;">service() &rarr; doGet/doPost <span class="sm">↻ every request</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box warn">destroy() <span class="sm">once</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The count that matters: 1 – many – 1</span>
+            <strong><code>init()</code> once. <code>doGet()</code> many times. <code>destroy()</code> once.</strong> If you remember one thing about lifecycle, remember those three numbers — the next slide shows why they have real consequences for your code.
+          </div>
+        </section>
+
+        <!-- 19. ONE INSTANCE, MANY THREADS -->
+        <section class="slide">
+          <p class="eyebrow">The consequence beginners get bitten by</p>
+          <h2>One instance, many threads</h2>
+          <p class="deep">Here's the part that surprises people: the container creates <strong>exactly one object</strong> of your servlet class, no matter how many users arrive. Concurrency is handled by giving each request its own <strong>thread</strong> — all running through the same object.</p>
+          <div class="flow" style="justify-content:center;">
+            <div class="flow-box">User A <span class="sm">thread 1</span></div>
+            <div class="flow-box">User B <span class="sm">thread 2</span></div>
+            <div class="flow-box">User C <span class="sm">thread 3</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box alt" style="min-width:190px; border-width:3px;">ONE ProductServlet object <span class="sm">shared by all three</span></div>
+          </div>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ Dangerous — shared mutable field</h3>
+              <pre><code>public class BadServlet extends HttpServlet {
+
+    <span class="code-comment">// ONE copy shared by every user!</span>
+    private String userName;
+
+    protected void doGet(...) {
+        userName = request.getParameter("name");
+        <span class="code-comment">// User B can overwrite this</span>
+        <span class="code-comment">// between these two lines...</span>
+        out.println("Hello " + userName);
+        <span class="code-comment">// ...so A may greet B's name.</span>
+    }
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✓ Safe — local variable</h3>
+              <pre><code>public class GoodServlet extends HttpServlet {
+
+    <span class="code-comment">// no request state as a field</span>
+
+    protected void doGet(...) {
+        <span class="code-comment">// local = one per thread,</span>
+        <span class="code-comment">// living on that thread's stack</span>
+        String userName =
+            request.getParameter("name");
+
+        out.println("Hello " + userName);
+        <span class="code-comment">// always the right name</span>
+    }
+}</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule that keeps you safe</span>
+            <strong>Never store per-request data in an instance field.</strong> Keep it in <strong>local variables</strong> inside <code>doGet</code>/<code>doPost</code> — locals are per-thread and therefore automatically safe. Fields are acceptable only for things that are <em>the same for everybody and never change</em>, like our <code>private ProductService service = new ProductService();</code> — that's a stateless helper, shared safely.
+          </div>
+        </section>
+
+        <!-- 20. URL MAPPING -->
+        <section class="slide">
+          <p class="eyebrow">How the browser reaches <em>your</em> class</p>
+          <h2>Browser-to-servlet: the contact model</h2>
+          <p class="deep">The browser knows nothing about Java class names. It only sends a URL. Something must connect <code>/login</code> to <code>com.tcs.web.LoginServlet</code> — that connection is called a <strong>URL mapping</strong>, and there are two ways to declare it:</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>Option 1 · web.xml (what we use today)</h3>
+              <pre style="margin:0;"><code>&lt;servlet&gt;
+  &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+  &lt;servlet-class&gt;
+      com.tcs.web.LoginServlet
+  &lt;/servlet-class&gt;
+&lt;/servlet&gt;
+
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;/login&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;</code></pre>
+              <p style="font-size:14.5px; margin:8px 0 0;">Two blocks joined by the <strong>same <code>&lt;servlet-name&gt;</code></strong>: the first names the class, the second names the URL. <strong>All mappings visible in one file</strong> — which is exactly why we start here.</p>
+            </div>
+            <div class="colbox b">
+              <h3>Option 2 · Annotation (the modern way)</h3>
+              <pre style="margin:0;"><code>@WebServlet("/login")
+public class LoginServlet
+        extends HttpServlet {
+
+    protected void doGet(...) {
+        ...
+    }
+}</code></pre>
+              <p style="font-size:14.5px; margin:8px 0 0;">One line, right above the class — no XML at all. Servlet 3.0+ (Tomcat 7+). Shorter and harder to get out of sync, but the mapping is <strong>scattered across your source files</strong> instead of listed in one place.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Putting the URL together</span>
+            <code>http://localhost:8080</code><strong>/ServletBasics</strong><strong style="color:#1a9e34;">/login</strong> = server &nbsp;+&nbsp; <strong>context path</strong> (your project name) &nbsp;+&nbsp; <strong style="color:#1a9e34;">url-pattern</strong>. Get either of the last two wrong and you get a <strong>404</strong>. <strong>The <code>url-pattern</code> must start with a <code>/</code>.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">Why we teach <code>web.xml</code> first</span>
+            Because it makes the wiring <strong>visible</strong>. You can see, in one file, that a URL is deliberately bound to a class — nothing is hidden. Once that clicks, <code>@WebServlet</code> stops looking like magic and starts looking like a shortcut. It's the same reason we taught JDBC before Spring Data.
+          </div>
+        </section>
+
+        <!-- 21. DYNAMIC WEB PROJECT vs JAVA PROJECT -->
+        <section class="slide">
+          <p class="eyebrow">Get this wrong and nothing else works</p>
+          <h2>Dynamic Web Project vs Java Project</h2>
+          <p class="deep">In Eclipse these are two different project types, and a servlet <strong>only</strong> works in the web one. Telling them apart is a five-second check that saves an hour of confusion:</p>
+          <table class="cmp">
+            <thead><tr><th style="width:22%;">&nbsp;</th><th>Java Project</th><th class="hl">Dynamic Web Project</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Icon in Explorer</strong></td><td>A plain folder / <strong>J</strong></td><td class="hl">A folder with a small <strong>globe 🌐 + J</strong> badge</td></tr>
+              <tr><td><strong>Runs via</strong></td><td><code>main()</code> — Run As &rarr; Java Application</td><td class="hl">A <strong>server</strong> — Run As &rarr; Run on Server</td></tr>
+              <tr><td><strong>Has <code>WebContent/</code></strong></td><td>No</td><td class="hl">Yes — with <code>WEB-INF/</code> inside it</td></tr>
+              <tr><td><strong>Has <code>web.xml</code></strong></td><td>No</td><td class="hl">Yes (if you tick the box — see below)</td></tr>
+              <tr><td><strong>Servlet API available?</strong></td><td class="bad">No — <code>HttpServlet</code> won't resolve</td><td class="hl">Yes — provided by the linked Tomcat runtime</td></tr>
+              <tr><td><strong>Produces</strong></td><td>A <code>.jar</code></td><td class="hl">A <code>.war</code> — a deployable web archive</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The two symptoms of picking the wrong type</span>
+            <strong>1.</strong> <code>import javax.servlet.http.HttpServlet;</code> shows a red error — "cannot be resolved." <strong>2.</strong> There's no "Run on Server" option in the right-click menu. Both mean: you made a plain Java Project. <strong>Delete it and create a Dynamic Web Project</strong> — trying to retrofit one is more painful than starting over.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Two boxes to tick when you create it</span>
+            <strong>1.</strong> Set the <strong>Target Runtime</strong> to your Tomcat — this is what puts the Servlet API on your build path. <strong>2.</strong> On the last wizard page, tick <strong>"Generate web.xml deployment descriptor"</strong> — otherwise you have to create the file by hand.
+          </div>
+        </section>
+
+        <!-- 22. PROJECT STRUCTURE -->
+        <section class="slide">
+          <p class="eyebrow">Where everything lives</p>
+          <h2>Project structure &amp; the deployment descriptor</h2>
+          <pre><code>ServletBasics/
+├── src/                                <span class="code-comment">&lt;- ALL your .java files</span>
+│   └── com/tcs/web/LoginServlet.java
+├── WebContent/                         <span class="code-comment">&lt;- everything the browser can reach</span>
+│   ├── index.html                      <span class="code-comment">   public — browser CAN request this</span>
+│   ├── product.html                    <span class="code-comment">   public</span>
+│   └── WEB-INF/                        <span class="code-comment">&lt;- PROTECTED — browser can NEVER request these</span>
+│       ├── web.xml                     <span class="code-comment">   the deployment descriptor</span>
+│       ├── lib/                        <span class="code-comment">   JARs your app needs (derby.jar goes here)</span>
+│       └── classes/                     <span class="code-comment">   your compiled .class files (auto-generated)</span>
+└── build/                              <span class="code-comment">&lt;- Eclipse's compiler output</span></code></pre>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">📁</div>
+              <h3><code>WebContent/</code></h3>
+              <p>The web root. A file here at <code>index.html</code> is reachable at <code>/ServletBasics/index.html</code>. <span class="muted">Called <code>src/main/webapp</code> in Maven projects — same idea, different name.</span></p>
+            </div>
+            <div class="card">
+              <div class="ic">🔒</div>
+              <h3><code>WEB-INF/</code></h3>
+              <p><strong>Deliberately unreachable</strong> from the browser — the servlet spec forbids serving anything inside it. That's a <strong>security feature</strong>: config and JARs can't be downloaded by a visitor.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📜</div>
+              <h3><code>web.xml</code></h3>
+              <p>The <strong>deployment descriptor</strong>. Tomcat reads it at startup to learn your servlets, their URLs, and the welcome file.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">The welcome file — what loads when no page is named</span>
+            Request <code>http://localhost:8080/ServletBasics/</code> with no file at the end and Tomcat consults the welcome list:
+            <pre style="margin:8px 0 0;"><code>&lt;welcome-file-list&gt;
+    &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+&lt;/welcome-file-list&gt;</code></pre>
+            <div style="margin-top:6px;">It serves the <strong>first entry it can find</strong>. Change it to <code>home.html</code> and you must actually have a <code>home.html</code> in <code>WebContent/</code> — otherwise you get <strong>404</strong>, and it's a confusing one because the URL looks perfectly correct.</div>
+          </div>
+        </section>
+
+        <!-- 23. doGet BASICS -->
+        <section class="slide">
+          <p class="eyebrow">Your first real method</p>
+          <h2><code>doGet</code>, line by line</h2>
+          <p class="deep">Let's dissect the method you'll write in Lab 2. Every line has a job:</p>
+          <pre><code>protected void doGet(HttpServletRequest request,
+                     HttpServletResponse response)
+        throws ServletException, IOException {          <span class="code-comment">&lt;- 1</span>
+
+    response.setContentType("text/html");               <span class="code-comment">&lt;- 2  BEFORE getWriter()</span>
+    PrintWriter out = response.getWriter();             <span class="code-comment">&lt;- 3</span>
+
+    String action = request.getParameter("action");     <span class="code-comment">&lt;- 4</span>
+
+    if ("login".equals(action)) {                       <span class="code-comment">&lt;- 5  null-safe order</span>
+        out.println("&lt;h3&gt;Logging you in...&lt;/h3&gt;");     <span class="code-comment">&lt;- 6</span>
+    }
+}</code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:6%;">#</th><th>What it does &amp; why</th></tr></thead>
+            <tbody>
+              <tr><td><strong>1</strong></td><td><code>protected</code> because we're overriding <code>HttpServlet.doGet</code>. The two exceptions are declared by the parent — you must keep them (or narrow them), so just leave the signature as the IDE generates it.</td></tr>
+              <tr><td><strong>2</strong></td><td>Tells the browser the body is HTML. <strong>Must come before <code>getWriter()</code></strong> — slide 25 explains what happens if you get this wrong or forget it.</td></tr>
+              <tr><td><strong>3</strong></td><td>Gets the pipe to the browser. <code>PrintWriter</code> is from <code>java.io</code> — Eclipse's <span class="pill">Ctrl+Shift+O</span> will add the import.</td></tr>
+              <tr><td><strong>4</strong></td><td>Reads one parameter out of the request. Returns a <code>String</code>, or <code>null</code> if that parameter wasn't sent at all.</td></tr>
+              <tr><td><strong>5</strong></td><td>Note the order: <code>"login".equals(action)</code>, <strong>not</strong> <code>action.equals("login")</code>. If <code>action</code> is <code>null</code> the second form throws <code>NullPointerException</code> &rarr; a <strong>500</strong> page. Constant-first is a habit worth building today.</td></tr>
+              <tr><td><strong>6</strong></td><td>Writes the response body. This text becomes part 4 of the HTTP response from slide 11.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">GET vs POST must match your form, or you get a 405</span>
+            <code>doGet</code> only answers GET requests. If your form says <code>method="post"</code>, Tomcat looks for <code>doPost</code>, doesn't find it, and returns <strong>405 Method Not Allowed</strong>. Fix it either way: change the form to <code>method="get"</code>, or add a <code>doPost</code> that simply forwards — <code>protected void doPost(req, res) { doGet(req, res); }</code>. That one-liner is a very common, very practical pattern, and we use it in the lab.
+          </div>
+        </section>
+
+        <!-- 24. PrintWriter vs System.out -->
+        <section class="slide">
+          <p class="eyebrow">Two outputs, two audiences</p>
+          <h2><code>PrintWriter</code> vs <code>System.out</code></h2>
+          <p class="deep">Both print. They print to <strong>completely different places</strong>, and mixing them up is the most common "my page is blank" moment for beginners:</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>✗ <code>System.out.println()</code> — goes to the console</h3>
+              <pre><code>System.out.println("&lt;h3&gt;Welcome&lt;/h3&gt;");
+
+<span class="code-comment">// Appears in: the Eclipse console</span>
+<span class="code-comment">// (Tomcat's log)</span>
+<span class="code-comment">// The user sees: NOTHING.</span>
+<span class="code-comment">// The browser page is blank.</span></code></pre>
+              <p style="font-size:15px; margin:8px 0 0;">Not useless — this is your <strong>debugging</strong> channel. Print here to check whether a method was reached or what a parsed value was.</p>
+            </div>
+            <div class="panel good">
+              <h3>✓ <code>out.println()</code> — goes to the browser</h3>
+              <pre><code>PrintWriter out = response.getWriter();
+out.println("&lt;h3&gt;Welcome&lt;/h3&gt;");
+
+<span class="code-comment">// Appears in: the HTTP response body</span>
+<span class="code-comment">// The user sees: Welcome</span>
+<span class="code-comment">// rendered as a heading.</span></code></pre>
+              <p style="font-size:15px; margin:8px 0 0;">This is your <strong>user-facing</strong> channel — the actual page. Everything the visitor should see goes through here.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">One sentence to keep them straight</span>
+            <strong><code>System.out</code> is for you. <code>out</code> (the <code>PrintWriter</code>) is for the user.</strong> If a page renders empty, your first check is whether you printed to the wrong one.
+          </div>
+          <div class="note">
+            <span class="lbl">Where does the console even live in a web app?</span>
+            Tomcat runs inside Eclipse during development, so <code>System.out</code> lands in Eclipse's <strong>Console view</strong>. On a real server it goes to a log file such as <code>catalina.out</code>. Same stream, different destination — which is exactly why production code logs through a logging framework instead of <code>System.out</code>.
+          </div>
+        </section>
+
+        <!-- 25. setContentType -->
+        <section class="slide">
+          <p class="eyebrow">The bug every single person hits once</p>
+          <h2><code>setContentType("text/html")</code></h2>
+          <p class="deep">You wrote perfect HTML. The page shows the tags as <strong>literal text</strong>. Nothing is broken in your Java — you just forgot to tell the browser what kind of content it's receiving.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Without <code>setContentType</code></h3>
+              <pre style="margin:6px 0; background:#1e1e2e; padding:10px 12px; border-radius:8px;"><code style="font-size:13px; color:#f8f8f2;">PrintWriter out = response.getWriter();
+out.println("&lt;h3&gt;Hi&lt;/h3&gt;");</code></pre>
+              <p style="font-size:14.5px; margin:6px 0 0;"><strong>Browser shows, literally:</strong></p>
+              <div style="background:#fff; border:1px solid #ffc9c4; border-radius:6px; padding:8px 10px; font-family:var(--mac-mono); font-size:13.5px;">&lt;h3&gt;Hi&lt;/h3&gt;</div>
+              <p style="font-size:14px; margin:8px 0 0;">Treated as plain text. Tags are characters, not instructions.</p>
+            </div>
+            <div class="ba-mid">&#8594;</div>
+            <div class="ba-col after">
+              <h3>✓ With <code>setContentType</code></h3>
+              <pre style="margin:6px 0; background:#1e1e2e; padding:10px 12px; border-radius:8px;"><code style="font-size:13px; color:#f8f8f2;">response.setContentType("text/html");
+PrintWriter out = response.getWriter();
+out.println("&lt;h3&gt;Hi&lt;/h3&gt;");</code></pre>
+              <p style="font-size:14.5px; margin:6px 0 0;"><strong>Browser shows:</strong></p>
+              <div style="background:#fff; border:1px solid #b9ecc4; border-radius:6px; padding:8px 10px;"><span style="font-size:19px; font-weight:700;">Hi</span></div>
+              <p style="font-size:14px; margin:8px 0 0;">Parsed as HTML. A real heading.</p>
+            </div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">Order matters — and this one fails silently</span>
+            <code>setContentType()</code> must be called <strong>before</strong> <code>getWriter()</code>. Call it after and it is <strong>ignored</strong> — no exception, no warning, just the wrong rendering. Headers are committed when the writer is obtained; you cannot change them retroactively.
+            <pre style="margin:8px 0 0;"><code>response.setContentType("text/html");        <span class="code-comment">// 1. FIRST — always</span>
+PrintWriter out = response.getWriter();     <span class="code-comment">// 2. THEN get the writer</span></code></pre>
+          </div>
+          <div class="note">
+            <span class="lbl">Other content types you'll meet</span>
+            <code>text/html</code> — a web page (today) &nbsp;·&nbsp; <code>text/plain</code> — raw text &nbsp;·&nbsp; <code>application/json</code> — JSON, what a REST API returns &nbsp;·&nbsp; <code>application/pdf</code>, <code>image/png</code> — binary downloads. <strong>When you write <code>@RestController</code> in Spring Boot, it sets <code>application/json</code> for you</strong> — same header, chosen automatically.
+          </div>
+        </section>
+
+        <!-- 26. READING FORM DATA -->
+        <section class="slide">
+          <p class="eyebrow">Getting the user's input into Java</p>
+          <h2>Reading form data — <code>request.getParameter()</code></h2>
+          <p class="deep">The bridge from an HTML form to your Java variables is one method, and it works off the <code>name</code> attribute — not the label, not the id:</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>The HTML you write</h3>
+              <pre style="margin:0;"><code>&lt;form action="login" method="get"&gt;
+
+  &lt;input type="text"
+         name="id" /&gt;
+
+  &lt;input type="password"
+         name="pwd" /&gt;
+
+  &lt;input type="submit"
+         name="action"
+         value="login" /&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+            <div class="colbox b">
+              <h3>The Java that reads it</h3>
+              <pre style="margin:0;"><code>String id =
+    request.getParameter("id");
+
+String pwd =
+    request.getParameter("pwd");
+
+String action =
+    request.getParameter("action");
+
+<span class="code-comment">// The String you pass MUST match</span>
+<span class="code-comment">// the name="" attribute exactly —</span>
+<span class="code-comment">// including capitalisation.</span></code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">It returns <code>null</code>, and <code>null</code> is not an error</span>
+            If the parameter wasn't sent, <code>getParameter</code> returns <strong><code>null</code></strong> — no exception. If the field was submitted but left <strong>empty</strong>, you get an <strong>empty string <code>""</code></strong>, not null. Two different cases, and both will crash you if you call a method on the result blindly. Guard with <code>if (x != null &amp;&amp; !x.trim().isEmpty())</code>.
+          </div>
+          <div class="note">
+            <span class="lbl">The submit-button trick — worth understanding, since we use it in Lab 2</span>
+            A submit button with <code>name="action" value="login"</code> sends <code>action=login</code> along with the form. That's how one servlet can tell <em>which</em> button was pressed. It works, and it's what many tutorials show — but a <strong>hidden field</strong> (<code>&lt;input type="hidden" name="action" value="insert"&gt;</code>) is clearer, because the value the server reads is then independent of the button's visible label. We use the button trick in Part 1 and hidden fields in Part 3, deliberately, so you've seen both.
+          </div>
+          <div class="note">
+            <span class="lbl">Two relatives of <code>getParameter</code></span>
+            <code>request.getParameterValues("hobbies")</code> returns a <code>String[]</code> — use it for checkbox groups and multi-selects, where one name has several values. <code>request.getParameterNames()</code> returns every parameter name that arrived, which is a handy debugging tool when a value is mysteriously null.
+          </div>
+        </section>
+
+        <!-- 27. EVERYTHING IS A STRING -->
+        <section class="slide">
+          <p class="eyebrow">A small fact with big consequences</p>
+          <h2>Form data always arrives as a String</h2>
+          <p class="deep">HTTP is a <strong>text</strong> protocol. There are no ints, doubles, or booleans on the wire — only characters. So <code>getParameter()</code> <em>always</em> returns a <code>String</code>, even for a field you think of as a number. <strong>Converting is your job.</strong></p>
+          <pre><code><span class="code-comment">// The request said:  id=123&amp;price=55000.50&amp;quantity=10</span>
+
+String idText = request.getParameter("id");          <span class="code-comment">// "123"    — a String!</span>
+
+int    id       = Integer.parseInt(idText);                            <span class="code-comment">// 123</span>
+double price    = Double.parseDouble(request.getParameter("price"));    <span class="code-comment">// 55000.50</span>
+int    quantity = Integer.parseInt(request.getParameter("quantity"));   <span class="code-comment">// 10</span></code></pre>
+          <div class="dangerbox">
+            <span class="lbl">Both failure modes produce a 500 page — handle them</span>
+            <ul style="margin:6px 0 0; font-size:16px;">
+              <li><strong>User typed "abc"</strong> in a number box &rarr; <code>NumberFormatException</code></li>
+              <li><strong>Field left blank</strong> &rarr; <code>parseInt("")</code> &rarr; <code>NumberFormatException</code></li>
+              <li><strong>Parameter missing entirely</strong> &rarr; <code>parseInt(null)</code> &rarr; <code>NumberFormatException</code></li>
+            </ul>
+            <div style="margin-top:6px;">Unhandled, each one shows the user a raw <strong>500 Internal Server Error</strong> with a stack trace. Never acceptable in real software.</div>
+          </div>
+          <pre><code><span class="code-comment">// The defensive version — this is what we write in the lab</span>
+try {
+    int id = Integer.parseInt(request.getParameter("id"));
+    double price = Double.parseDouble(request.getParameter("price"));
+    <span class="code-comment">// ... use them ...</span>
+} catch (NumberFormatException e) {
+    out.println("&lt;h3&gt;&lt;font color='red'&gt;Please enter valid numbers.&lt;/font&gt;&lt;/h3&gt;");
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The habit to build</span>
+            <strong>Every single value from a browser is untrusted text.</strong> Parse it, validate it, and be ready for it to be garbage — because sooner or later someone will type letters into your price box. <em>(Later, Spring Boot will do this conversion and validation for you with <code>@RequestParam int id</code> and <code>@Valid</code> — but it's doing exactly what you're about to write by hand.)</em>
+          </div>
+        </section>
+
+
+        <!-- 28. MVC OVERVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Part C · MVC architecture</p>
+          <h2>Model–View–Controller</h2>
+          <p class="deep">Everything so far has been one servlet doing everything. That's fine for a login check and disastrous for a real application. <span class="term">MVC</span> is the standard answer: split the code by <strong>responsibility</strong>, so each class has exactly one reason to change.</p>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🗃️</div>
+              <h3>Model — the data</h3>
+              <p>What the application is <em>about</em>: a <code>Product</code>, an <code>Employee</code>. Plus the code that stores and fetches it. Knows nothing about the web.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🖥️</div>
+              <h3>View — what the user sees</h3>
+              <p>The presentation. Today it's HTML built by <code>PrintWriter</code>; later it'll be JSP or a template. Contains no business rules.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🎛️</div>
+              <h3>Controller — the traffic cop</h3>
+              <p>Receives the request, decides what should happen, calls the model, picks the view. <strong>Coordinates; doesn't do the work itself.</strong></p>
+            </div>
+          </div>
+          <div class="flow" style="justify-content:center; margin-top:18px;">
+            <div class="flow-box">Browser</div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box alt">Controller <span class="sm">servlet</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box green">Model <span class="sm">service + DAO + bean</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box amber">Database</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why bother, in one concrete sentence</span>
+            When the boss says <em>"change the price column to show two decimals,"</em> you want to touch <strong>one</strong> place — not hunt through SQL, validation, and HTML tangled in a single 400-line method. <strong>Separation of concerns isn't neatness; it's the ability to change one thing safely.</strong>
+          </div>
+        </section>
+
+        <!-- 29. THE FIVE PACKAGES -->
+        <section class="slide">
+          <p class="eyebrow">The exact structure we build in the lab — keep this slide handy</p>
+          <h2>The five packages</h2>
+          <p class="deep">MVC in the abstract becomes five concrete packages. <strong>Every file you create today belongs to exactly one of these</strong>, and each layer talks only to the next one down:</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:16%;">Package</th><th style="width:20%;">Role</th><th>What goes in it — and what must never</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="hl"><code>web</code></td><td class="hl"><strong>View / Web layer</strong></td>
+                <td>The <strong>servlets</strong> — where client requests land. Reads parameters, calls the service, writes HTML. <strong>No SQL here, ever.</strong></td>
+              </tr>
+              <tr>
+                <td class="hl"><code>service</code></td><td class="hl"><strong>Controller / Service layer</strong></td>
+                <td><strong>Business logic and validation.</strong> "Is the price negative? Then refuse." Calls the DAO. Knows nothing about HTTP <em>or</em> SQL.</td>
+              </tr>
+              <tr>
+                <td class="hl"><code>dao</code></td><td class="hl"><strong>Data Access Object</strong></td>
+                <td><strong>All SQL lives here — and only here.</strong> <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code> via <code>PreparedStatement</code>. No HTML, no validation.</td>
+              </tr>
+              <tr>
+                <td class="hl"><code>bean</code></td><td class="hl"><strong>The Model objects</strong></td>
+                <td><strong>POJOs</strong> — private fields, getters/setters, constructors. Our <code>Product</code>. Pure data carriers; <strong>no logic at all</strong>.</td>
+              </tr>
+              <tr>
+                <td class="hl"><code>helper</code></td><td class="hl"><strong>Infrastructure</strong></td>
+                <td><strong>Database connection management</strong> — one place that opens and closes connections. The only class that knows the JDBC URL.</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="flow" style="justify-content:center; margin-top:14px;">
+            <div class="flow-box">web <span class="sm">ProductServlet</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box alt">service <span class="sm">ProductService</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box green">dao <span class="sm">ProductDao</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box amber">helper <span class="sm">DBHelper</span></div>
+            <span class="flow-arrow">&#8594;</span>
+            <div class="flow-box warn">Database</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Where does <code>bean</code> sit in that chain?</span>
+            <strong>Everywhere — it's the currency, not a step.</strong> A <code>Product</code> object is what the layers <em>hand to each other</em>: the servlet builds one from form data, the service validates it, the DAO writes it to the database, and a DAO <code>SELECT</code> returns a <code>List&lt;Product&gt;</code> back up the chain. That's why it's in its own package that everyone imports.
+          </div>
+        </section>
+
+        <!-- 30. WHY LAYERS PAY OFF -->
+        <section class="slide">
+          <p class="eyebrow">The payoff, made concrete</p>
+          <h2>Why the layers are worth the extra files</h2>
+          <p class="deep">Five packages for a four-column table feels like overkill — a fair objection. Here's what you actually buy, in situations you will genuinely face:</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:30%;">The change request</th><th style="width:33%;">All-in-one servlet</th><th class="hl">Layered (MVC)</th></tr></thead>
+            <tbody>
+              <tr><td>"Switch from Derby to MySQL"</td><td class="bad">Hunt through every servlet for connection code</td><td class="hl"><strong>Edit <code>DBHelper</code>. One file.</strong></td></tr>
+              <tr><td>"Reject negative prices"</td><td class="bad">Add the same <code>if</code> in every place a price is written — and miss one</td><td class="hl"><strong>Add it once in <code>ProductService</code></strong>; every path is covered</td></tr>
+              <tr><td>"Also expose this as a JSON API"</td><td class="bad">Copy-paste the logic and edit the copy — now two versions to maintain</td><td class="hl"><strong>New servlet, same service.</strong> Zero logic duplicated</td></tr>
+              <tr><td>"Write unit tests"</td><td class="bad">Nearly impossible — logic needs a running server to execute</td><td class="hl">Test <code>ProductService</code> as a <strong>plain Java class</strong></td></tr>
+              <tr><td>"Redesign the page"</td><td class="bad">Risk breaking SQL while editing HTML — they're in the same method</td><td class="hl">Touch only the <code>web</code> layer. <strong>Data code untouched</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">The honest caveat</span>
+            For a genuinely tiny app, layering <em>is</em> extra ceremony — and you should know that rather than treat it as gospel. But applications don't stay tiny, and retrofitting structure into tangled code is far more expensive than starting with it. <strong>The habit is what you're learning today, not the file count.</strong>
+          </div>
+          <div class="keybox">
+            <span class="lbl">You've seen this shape before — and you'll see it again</span>
+            JDBC's <strong>DAO pattern</strong> (Tester &rarr; DAO &rarr; DBConnector) was the same idea with three layers. Spring Boot's <strong><code>@Controller</code> &rarr; <code>@Service</code> &rarr; <code>@Repository</code></strong> is the same idea with annotations. <strong>Learn the shape once and every Java framework afterwards looks familiar.</strong>
+          </div>
+        </section>
+
+        <!-- 31. DATABASE SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Part D · Database setup for the CRUD app</p>
+          <h2>Connecting to Derby in Eclipse</h2>
+          <p class="deep">Before Java touches the database we prove the connection works <strong>visually</strong>, in Eclipse's Data Source Explorer. Debugging a broken connection through a web app is miserable; debugging it in a dedicated tool takes seconds.</p>
+          <div class="vsteps">
+            <div class="vstep">
+              <div class="vn">1</div>
+              <div class="vbody"><div class="vlabel">Open the view</div>
+              <p class="deep" style="margin:0;">Window &rarr; Show View &rarr; Other &rarr; <strong>Data Management</strong> &rarr; Data Source Explorer.</p></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">2</div>
+              <div class="vbody"><div class="vlabel">New connection profile</div>
+              <p class="deep" style="margin:0;">Right-click <strong>Database Connections</strong> &rarr; New &rarr; choose <strong>Derby</strong> &rarr; Next.</p></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">3</div>
+              <div class="vbody"><div class="vlabel">New Driver Definition <span class="muted" style="font-weight:400;">— vs Edit Driver Definition</span></div>
+              <p class="deep" style="margin:0;">Click the <strong>⊕ New Driver Definition</strong> icon the <strong>first time</strong> — Eclipse ships the Derby <em>template</em> but not the JAR, so you must point it at one. On later projects the definition already exists, so you pick it from the dropdown (or use <strong>✎ Edit</strong> to fix a wrong path). <strong>New = first-time setup. Edit = reuse or repair.</strong></p></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">4</div>
+              <div class="vbody"><div class="vlabel">Add the Derby JAR to the driver</div>
+              <p class="deep" style="margin:0;">In the <strong>JAR List</strong> tab, remove any entry showing a red ✗ (a stale path) and <strong>Add JAR/Zip</strong> &rarr; your real <code>derby.jar</code>.</p></div>
+            </div>
+            <div class="vstep">
+              <div class="vn">5</div>
+              <div class="vbody"><div class="vlabel">Set properties &amp; test</div>
+              <p class="deep" style="margin:0;">Database <code>productdb</code>, user <code>sa</code>, password blank, and make sure <strong>Create database if it does not exist</strong> is ticked. Then <strong>Test Connection</strong> &rarr; you want <strong>"Ping succeeded!"</strong>. Copy the generated URL — <code>DBHelper</code> needs it verbatim.</p></div>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">"Ping succeeded!" is your green light</span>
+            Don't write a line of Java until you see it. If ping fails, the problem is the JAR path or the database path — <strong>fix it here</strong>, where the error message is specific, rather than later through a <code>NullPointerException</code> in a servlet.
+          </div>
+        </section>
+
+        <!-- 32. PRODUCT TABLE -->
+        <section class="slide">
+          <p class="eyebrow">The one table behind the whole CRUD app</p>
+          <h2>Creating the <code>product</code> table</h2>
+          <p class="deep">Open a <strong>SQL Scrapbook</strong> (right-click the connection &rarr; Open SQL Scrapbook), pick your connection in the toolbar dropdown, and run these. Execute statements <strong>one at a time</strong> with <span class="pill">Ctrl + Alt + X</span>:</p>
+          <pre><code><span class="sql-kw">CREATE TABLE</span> product (
+    id       <span class="sql-kw">INT</span> <span class="sql-kw">PRIMARY KEY</span>,      <span class="code-comment">-- unique identifier, never duplicated</span>
+    name     <span class="sql-kw">VARCHAR</span>(<span class="sql-num">50</span>),          <span class="code-comment">-- text, max 50 characters</span>
+    price    <span class="sql-kw">DOUBLE</span>,               <span class="code-comment">-- decimal number</span>
+    quantity <span class="sql-kw">INT</span>                   <span class="code-comment">-- whole number in stock</span>
+);
+
+<span class="sql-kw">INSERT INTO</span> product <span class="sql-kw">VALUES</span> (<span class="sql-num">1</span>, <span class="sql-str">'Laptop'</span>,   <span class="sql-num">55000.00</span>, <span class="sql-num">10</span>);
+<span class="sql-kw">INSERT INTO</span> product <span class="sql-kw">VALUES</span> (<span class="sql-num">2</span>, <span class="sql-str">'Mouse'</span>,      <span class="sql-num">750.50</span>, <span class="sql-num">100</span>);
+<span class="sql-kw">INSERT INTO</span> product <span class="sql-kw">VALUES</span> (<span class="sql-num">3</span>, <span class="sql-str">'Keyboard'</span>,  <span class="sql-num">1200.00</span>, <span class="sql-num">45</span>);
+<span class="sql-kw">INSERT INTO</span> product <span class="sql-kw">VALUES</span> (<span class="sql-num">4</span>, <span class="sql-str">'Monitor'</span>,   <span class="sql-num">9500.00</span>, <span class="sql-num">20</span>);
+
+<span class="sql-kw">SELECT</span> * <span class="sql-kw">FROM</span> product;    <span class="code-comment">-- always verify: you should see 4 rows</span></code></pre>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">🔑</div>
+              <h3>Why <code>id</code> is the primary key</h3>
+              <p>It guarantees uniqueness, so <code>WHERE id = 3</code> can only ever match one row. That's what makes update and delete <strong>precise</strong> instead of accidentally hitting many rows.</p>
+            </div>
+            <div class="card">
+              <div class="ic">💾</div>
+              <h3>Why we seed sample rows</h3>
+              <p>So <strong>view</strong> has something to show and <strong>update</strong>/<strong>delete</strong> have something to work on. Otherwise your first test tells you nothing.</p>
+            </div>
+            <div class="card">
+              <div class="ic">📄</div>
+              <h3>Save the scrapbook</h3>
+              <p>Save it as <code>product-setup.sql</code>. When you break your data — and you will while testing delete — you can re-seed in seconds.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Two Derby quirks worth knowing now</span>
+            <strong>1.</strong> Derby folds unquoted identifiers to <strong>UPPERCASE</strong>, so the table appears as <code>PRODUCT</code> in the explorer. Your SQL can still say <code>product</code> — it's the same table. <strong>2.</strong> Strings use <strong>single quotes</strong> (<code>'Laptop'</code>). Double quotes mean <em>identifier</em> in SQL, so <code>"Laptop"</code> would be read as a column name and error out.
+          </div>
+        </section>
+
+        <!-- 33. THE TWO-JAR TRAP -->
+        <section class="slide">
+          <p class="eyebrow">The setup mistake that costs people an hour</p>
+          <h2>The Derby JAR goes in <em>two</em> places</h2>
+          <p class="deep">You already added <code>derby.jar</code> to the driver definition and the connection worked. So why does your servlet still fail? <strong>Because those were two different programs.</strong></p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>1 · The JAR in the driver definition</h3>
+              <ul style="padding-left:18px;">
+                <li>Used by <strong>Eclipse itself</strong> — the Data Source Explorer and SQL Scrapbook</li>
+                <li>Lets <strong>you</strong> browse tables and run queries by hand</li>
+                <li>An <strong>IDE tool</strong> convenience, nothing more</li>
+                <li><strong>Your application cannot see it</strong></li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>2 · The JAR in <code>WEB-INF/lib/</code></h3>
+              <ul style="padding-left:18px;">
+                <li>Used by <strong>your web app running on Tomcat</strong></li>
+                <li>What makes <code>DriverManager.getConnection()</code> work at runtime</li>
+                <li>Gets packaged into the <code>.war</code> and deployed with your code</li>
+                <li><strong>Mandatory for actual JDBC calls</strong></li>
+              </ul>
+            </div>
+          </div>
+          <div class="dangerbox">
+            <span class="lbl">The symptom, so you recognise it instantly</span>
+            The Data Source Explorer works perfectly — you can see your rows — but the servlet throws <code>java.sql.SQLException: No suitable driver found for jdbc:derby:...</code> and the page shows a <strong>500</strong>. Every time you see "No suitable driver," the answer is: <strong>the JAR isn't in <code>WEB-INF/lib/</code>.</strong>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why <code>WEB-INF/lib/</code> specifically?</span>
+            The servlet spec says a web app's classloader automatically picks up every JAR in <code>WEB-INF/lib/</code>. Drop the file in that folder and it's on your classpath — <strong>no build-path configuration needed</strong>. This is also why <code>WEB-INF</code> is unreachable from the browser: nobody should be able to download your dependencies.
+          </div>
+        </section>
+
+        <!-- 34. SINGLE SERVLET, MULTI-ACTION -->
+        <section class="slide">
+          <p class="eyebrow">Part E · The CRUD design pattern</p>
+          <h2>One servlet, four actions</h2>
+          <p class="deep">CRUD is four operations. You could write four servlets with four mappings — or <strong>one servlet that reads an <code>action</code> parameter and branches</strong>. We do the latter, because it keeps all product-related handling in one readable place:</p>
+          <pre><code>String action = request.getParameter("action");
+<span class="code-comment">// treat "no action given" as a sensible default instead of crashing</span>
+if (action == null) {
+    action = "view";
+}
+
+if (action.equals("view")) {
+    displayAllProducts(out);                  <span class="code-comment">// READ</span>
+
+} else if (action.equals("insert")) {
+    <span class="code-comment">// read id, name, price, quantity -&gt; service.addProduct(p)</span>   <span class="code-comment">// CREATE</span>
+
+} else if (action.equals("update")) {
+    <span class="code-comment">// read id, price -&gt; service.updateProduct(id, price)</span>          <span class="code-comment">// UPDATE</span>
+
+} else if (action.equals("delete")) {
+    <span class="code-comment">// read p -&gt; service.deleteProduct(id)</span>                        <span class="code-comment">// DELETE</span>
+
+} else {
+    out.println("&lt;h3&gt;&lt;font color='red'&gt;Unknown action&lt;/font&gt;&lt;/h3&gt;");
+}</code></pre>
+          <table class="cmp sm">
+            <thead><tr><th style="width:26%;">Approach</th><th>Trade-off</th></tr></thead>
+            <tbody>
+              <tr><td class="hl"><strong>One servlet + <code>action</code></strong></td><td><strong>+</strong> One mapping, one file, shared helper methods, easy to see all behaviour at once. &nbsp;<strong>−</strong> Grows long; the <code>if</code>-ladder can sprawl as features are added.</td></tr>
+              <tr><td><strong>Four servlets</strong></td><td><strong>+</strong> Each class is tiny and single-purpose. &nbsp;<strong>−</strong> Four mappings to maintain, and shared code needs a common parent or utility class.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Where this pattern leads</span>
+            That <code>if</code>-ladder is a hand-written <strong>front controller</strong> — and it's exactly what Spring MVC's <code>DispatcherServlet</code> does industrially. When you later write <code>@GetMapping("/products")</code> and <code>@PostMapping("/products")</code>, Spring is running a far more sophisticated version of the ladder you're about to write. <strong>Write it by hand once and annotations stop being mysterious.</strong>
+          </div>
+        </section>
+
+        <!-- 35. LINKS vs FORMS -->
+        <section class="slide">
+          <p class="eyebrow">Two ways to send that <code>action</code></p>
+          <h2>Passing parameters: links vs forms</h2>
+          <p class="deep">Both put parameters in a request. Which one you reach for depends on <strong>whether the user needs to type anything</strong>:</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>🔗 A link — no input needed</h3>
+              <pre style="margin:0;"><code>&lt;a href="product?action=view"&gt;
+    View all products
+&lt;/a&gt;
+
+<span class="code-comment">&lt;!-- delete row 3: two params,</span>
+<span class="code-comment">     joined with &amp;amp; --&gt;</span>
+&lt;a href="product?action=delete&amp;amp;p=3"&gt;
+    Delete
+&lt;/a&gt;</code></pre>
+              <p style="font-size:14.5px; margin:8px 0 0;">Always a <strong>GET</strong>; parameters sit in the query string. Perfect when the values are already known — the row's own id. This is how we build the per-row <strong>Delete</strong> link.</p>
+            </div>
+            <div class="colbox b">
+              <h3>📝 A form — the user types</h3>
+              <pre style="margin:0;"><code>&lt;form action="product" method="post"&gt;
+  &lt;input type="hidden"
+         name="action" value="insert" /&gt;
+
+  &lt;input type="text" name="id" /&gt;
+  &lt;input type="text" name="name" /&gt;
+  &lt;input type="text" name="price" /&gt;
+  &lt;input type="text" name="quantity" /&gt;
+
+  &lt;input type="submit" value="Add" /&gt;
+&lt;/form&gt;</code></pre>
+              <p style="font-size:14.5px; margin:8px 0 0;">GET or POST, your choice. Necessary when values come from the user. The <strong>hidden field</strong> carries the action invisibly. This is our <strong>insert</strong> and <strong>update</strong> path.</p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">In HTML, write <code>&amp;amp;</code> to separate parameters</span>
+            Inside an <code>href</code> the correct separator is the entity <code>&amp;amp;</code>, not a bare <code>&amp;</code>. Browsers forgive the bare version, so it usually works — but <code>&amp;amp;</code> is valid HTML and won't surprise you when a parameter name collides with an entity name (a real bug when a parameter is called something like <code>p</code> followed by <code>amp</code>). Note that <strong>Java string-concatenating a URL is where beginners lose the <code>&amp;</code></strong> entirely — check your quotes carefully.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The choice, summarised</span>
+            <strong>Nothing to type &rarr; link (GET). Something to type &rarr; form (POST for writes).</strong> Which lines up exactly with the GET-to-read / POST-to-write rule from slide 14 — the design isn't arbitrary, it follows from HTTP's own semantics.
+          </div>
+        </section>
+
+        <!-- 36. BOOLEAN RETURN PATTERN -->
+        <section class="slide">
+          <p class="eyebrow">How the layers report success</p>
+          <h2>The boolean-return pattern</h2>
+          <p class="deep">Your DAO ran an <code>UPDATE</code>. Did it change anything? Maybe the id didn't exist. The servlet needs to know so it can show the right message — so <strong>every write method returns a <code>boolean</code></strong>:</p>
+          <pre><code><span class="code-comment">// ===== DAO: turn "rows affected" into a plain yes/no =====</span>
+public boolean updateProduct(int id, double price) {
+    String sql = "UPDATE product SET price = ? WHERE id = ?";
+    <span class="code-comment">// ... prepare and bind ...</span>
+    int rows = ps.executeUpdate();
+    return rows &gt; 0;        <span class="code-comment">// 0 rows matched -&gt; false. 1+ -&gt; true.</span>
+}
+
+<span class="code-comment">// ===== SERVLET: branch on it and tell the user the truth =====</span>
+if (service.updateProduct(id, price)) {
+    out.println("&lt;h3&gt;&lt;font color='green'&gt;Product updated successfully.&lt;/font&gt;&lt;/h3&gt;");
+} else {
+    out.println("&lt;h3&gt;&lt;font color='red'&gt;Updation failed — no product with id " + id + ".&lt;/font&gt;&lt;/h3&gt;");
+}</code></pre>
+          <div class="cards c3">
+            <div class="card">
+              <div class="ic">📊</div>
+              <h3>It comes from <code>executeUpdate()</code></h3>
+              <p>That method returns the <strong>number of rows affected</strong>. <code>rows &gt; 0</code> converts a count into the yes/no the UI actually needs.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🎯</div>
+              <h3>It distinguishes two silent cases</h3>
+              <p>"Ran fine but matched nothing" vs "found it and changed it." <strong>Without this check both look like success</strong> — and you'd lie to the user.</p>
+            </div>
+            <div class="card">
+              <div class="ic">🧱</div>
+              <h3>It keeps layers separate</h3>
+              <p>The DAO reports a fact; the <strong>servlet</strong> decides the wording and the colour. Presentation stays out of the data layer.</p>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">Honest limitation — worth naming</span>
+            A <code>boolean</code> says <em>that</em> it failed, not <em>why</em>. "Id not found," "duplicate key," and "database down" all come back as <code>false</code>. That's an acceptable simplification while learning, and the right next step is <strong>custom exceptions</strong> carrying a reason — exactly what you'll do with <code>@ControllerAdvice</code> in Spring Boot. For today, log the real <code>SQLException</code> in the DAO's catch block so the detail isn't lost.
+          </div>
+        </section>
+
+        <!-- 37. CODE REUSE -->
+        <section class="slide">
+          <p class="eyebrow">A small refactor with a big lesson</p>
+          <h2>Extracting the repeated display code</h2>
+          <p class="deep">After every operation you want to show the updated table. Write that loop four times and you have four copies to fix when the table design changes. <strong>Extract it once.</strong></p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>✗ Before — duplicated four times</h3>
+              <pre style="margin:6px 0; background:#1e1e2e; padding:10px 12px; border-radius:8px;"><code style="font-size:12.5px; color:#f8f8f2; line-height:1.5;">if (action.equals("view")) {
+    <span class="code-comment">// 15 lines of table loop</span>
+} else if (action.equals("insert")) {
+    <span class="code-comment">// ... insert ...</span>
+    <span class="code-comment">// the SAME 15 lines again</span>
+} else if (action.equals("update")) {
+    <span class="code-comment">// ... update ...</span>
+    <span class="code-comment">// the SAME 15 lines again</span>
+} else if (action.equals("delete")) {
+    <span class="code-comment">// ... delete ...</span>
+    <span class="code-comment">// the SAME 15 lines AGAIN</span>
+}</code></pre>
+              <p style="font-size:14px; margin:6px 0 0;"><strong>60 lines. One design change = four edits — and you'll forget one.</strong></p>
+            </div>
+            <div class="ba-mid">&#8594;</div>
+            <div class="ba-col after">
+              <h3>✓ After — one method, called four times</h3>
+              <pre style="margin:6px 0; background:#1e1e2e; padding:10px 12px; border-radius:8px;"><code style="font-size:12.5px; color:#f8f8f2; line-height:1.5;">if (action.equals("view")) {
+    displayAllProducts(out);
+} else if (action.equals("insert")) {
+    <span class="code-comment">// ... insert ...</span>
+    displayAllProducts(out);
+} else if (action.equals("update")) {
+    <span class="code-comment">// ... update ...</span>
+    displayAllProducts(out);
+} else if (action.equals("delete")) {
+    <span class="code-comment">// ... delete ...</span>
+    displayAllProducts(out);
+}</code></pre>
+              <p style="font-size:14px; margin:6px 0 0;"><strong>15 lines, in one place. One design change = one edit.</strong></p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">DRY — Don't Repeat Yourself</span>
+            The trigger to watch for: <strong>the moment you copy-paste code for the second time, extract it into a method instead.</strong> Not before (premature abstraction is its own problem) — but definitely then. In the lab we deliberately write the duplication first and then refactor, because feeling the pain is what makes the lesson stick.
+          </div>
+          <div class="note">
+            <span class="lbl">Signature note</span>
+            <code>private void displayAllProducts(PrintWriter out)</code> — <strong>pass the writer in as a parameter</strong> rather than storing it in a field. Remember slide 19: an instance field would be shared across all users' threads. A parameter is per-call and therefore safe.
+          </div>
+        </section>
+
+        <!-- 38. WHERE THIS LEADS -->
+        <section class="slide">
+          <p class="eyebrow">Honest context — this is not how you'll write web apps in 2026</p>
+          <h2>Servlets &rarr; JSP &rarr; Spring MVC</h2>
+          <p class="deep">Building HTML with <code>out.println()</code> is genuinely unpleasant, and you should know that's not a limitation of your skill — it's why the industry moved on. Here's the honest lineage:</p>
+          <table class="cmp sm">
+            <thead><tr><th style="width:18%;">Technology</th><th style="width:32%;">The idea</th><th>Why the next thing replaced it</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Servlet</strong><br><span class="muted" style="font-size:14px;">today</span></td><td>Java code that writes HTML strings</td><td>HTML inside Java is painful to write, impossible for a designer to edit, and you can't see the page shape.</td></tr>
+              <tr><td><strong>JSP</strong></td><td><strong>Inverts it:</strong> an HTML page with Java sprinkled in</td><td>Much better for layout — but tempting to bury business logic in the page, which recreates the tangle.</td></tr>
+              <tr><td><strong>Servlet + JSP (MVC-2)</strong></td><td>Servlet controls, JSP renders — a clean split</td><td>Correct architecture, but heaps of boilerplate: XML config, manual dispatching, manual binding.</td></tr>
+              <tr><td class="hl"><strong>Spring MVC / Boot</strong><br><span class="muted" style="font-size:14px;">where you're headed</span></td><td class="hl"><code>DispatcherServlet</code> + annotations + auto-configuration</td><td class="hl">The same architecture with the boilerplate deleted. <strong>Still servlets underneath.</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">So why learn servlets at all?</span>
+            Because <strong>every one of those layers is still a servlet underneath</strong>. Spring's <code>DispatcherServlet</code> is a servlet. <code>@GetMapping</code> is a URL mapping. <code>@RequestParam</code> is <code>getParameter()</code> with automatic type conversion. <code>ResponseEntity</code> is <code>HttpServletResponse</code> with a nicer API. <strong>Today you learn the machine; later you get the power tools — and you'll know what they're doing.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">The direct translation table, for when you get to Spring Boot</span>
+            <code>extends HttpServlet</code> &rarr; <code>@Controller</code> &nbsp;·&nbsp; <code>doGet</code> &rarr; <code>@GetMapping</code> &nbsp;·&nbsp; <code>doPost</code> &rarr; <code>@PostMapping</code> &nbsp;·&nbsp; <code>getParameter("id")</code> &rarr; <code>@RequestParam int id</code> &nbsp;·&nbsp; <code>web.xml</code> mapping &rarr; the annotation's path &nbsp;·&nbsp; our <code>ProductService</code> &rarr; <code>@Service</code> &nbsp;·&nbsp; our <code>ProductDao</code> &rarr; <code>@Repository</code> / <code>JpaRepository</code>.
+          </div>
+        </section>
+
+        <!-- 39. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Bookmark this slide before you start the lab</p>
+          <h2>The ten mistakes you're most likely to make</h2>
+          <p class="deep">Every one of these has cost a student an afternoon. Read them now and you'll recognise the symptom instead of guessing:</p>
+          <ul class="xlist">
+            <li><strong>Plain Java Project instead of Dynamic Web Project</strong> &rarr; <code>HttpServlet</code> won't resolve, no "Run on Server". Recreate the project.</li>
+            <li><strong>Wrong servlet package</strong> — <code>javax.servlet</code> on Tomcat 10+, or <code>jakarta.servlet</code> on Tomcat 9. Match your Tomcat version.</li>
+            <li><strong>Forgot <code>setContentType("text/html")</code></strong>, or called it after <code>getWriter()</code> &rarr; tags render as literal text.</li>
+            <li><strong>Printed with <code>System.out</code></strong> instead of <code>out</code> &rarr; blank page, output hiding in the console.</li>
+            <li><strong>Form <code>method="post"</code> but only <code>doGet</code> exists</strong> &rarr; <strong>405 Method Not Allowed</strong>. Add <code>doPost</code> delegating to <code>doGet</code>.</li>
+            <li><strong><code>name</code> attribute doesn't match <code>getParameter("...")</code></strong> &rarr; silent <code>null</code>, then a confusing <code>NumberFormatException</code>.</li>
+            <li><strong><code>action.equals("login")</code> with a null action</strong> &rarr; <code>NullPointerException</code> &rarr; 500. Write <code>"login".equals(action)</code>.</li>
+            <li><strong><code>derby.jar</code> missing from <code>WEB-INF/lib/</code></strong> &rarr; "No suitable driver found," even though the Data Source Explorer works fine.</li>
+            <li><strong>Derby database still open in Eclipse</strong> while Tomcat starts &rarr; "another instance may have already booted." Embedded Derby allows <strong>one JVM at a time</strong> — disconnect in the explorer first.</li>
+            <li><strong>Edited <code>web.xml</code> without restarting Tomcat</strong> &rarr; still a 404. The descriptor is read at startup; <strong>restart the server</strong>.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">The two-question debugging routine</span>
+            <strong>Got a 404?</strong> Your URL is wrong — check project name, then <code>&lt;url-pattern&gt;</code>, then restart Tomcat. <strong>Got a 500?</strong> Your code threw — go to the Eclipse console and read the <em>first</em> line of the stack trace, not the last. Those two questions cover the large majority of what goes wrong.
+          </div>
+        </section>
+
+        <!-- 40. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Your closing checklist</p>
+          <h2>Session recap</h2>
+          <p class="deep">Nine things you should now be able to explain to someone else — the real test of understanding:</p>
+          <ul class="checklist">
+            <li><strong>The client–server model</strong> and why dynamic pages need code running on the server.</li>
+            <li><strong>URL anatomy</strong> — protocol, host, port, path, query parameters, fragment — and that the fragment never reaches the server.</li>
+            <li><strong>HTTP request &amp; response structure</strong> — request/status line, headers, blank line, body — plus the status-code families and that 4xx is the client's fault, 5xx the server's.</li>
+            <li><strong>GET vs POST</strong> — URL vs body, visibility, size, idempotency, bookmarkability — and that only HTTPS provides real security.</li>
+            <li><strong>What a servlet is</strong>, what the <strong>container</strong> does for you, and the <strong>lifecycle</strong>: <code>init</code> once, <code>doGet</code> many times, <code>destroy</code> once.</li>
+            <li><strong>One instance, many threads</strong> — so per-request data belongs in local variables, never instance fields.</li>
+            <li><strong>The mechanics</strong> — <code>web.xml</code> mapping, <code>setContentType</code> before <code>getWriter</code>, <code>PrintWriter</code> vs <code>System.out</code>, <code>getParameter</code> returning Strings you must parse.</li>
+            <li><strong>MVC and the five packages</strong> — web, service, dao, bean, helper — and what must never appear in each.</li>
+            <li><strong>The CRUD patterns</strong> — routing on <code>action</code>, links vs forms, boolean returns, and extracting repeated display code.</li>
+          </ul>
+          <div class="keybox">
+            <span class="lbl">One sentence to carry forward</span>
+            A servlet is just a Java class whose methods are called by a server instead of by <code>main()</code> — <strong>and every Java web framework you will ever use is built on top of exactly that.</strong>
+          </div>
+        </section>
+
+        <!-- 41. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Servlets Theory</span>
+            <h1>Let's build it.</h1>
+            <div class="sub">Open the lab sheet — we'll create a Dynamic Web Project, write a login servlet from scratch, then build a full product CRUD application across all five MVC layers.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: the same architecture, minus the boilerplate — Spring Boot.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Java · Servlets</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1 of 41</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight') { next(); }
+        else if (e.key === 'ArrowLeft') { prev(); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

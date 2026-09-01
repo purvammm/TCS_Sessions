@@ -15,6 +15,7 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 | Java Foundations | `java-foundations-theory.html` | — |
 | Collections, Class Relationships & File I/O | `java-collections-theory.html` | — |
 | JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` |
+| Java Servlets — HTTP, MVC & CRUD | `servlets-theory.html` | `servlets-lab.html` |
 | 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` |
 | 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` |
 | 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` |
@@ -24,6 +25,8 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 - **Lab files** are scrollable companions with a progress checklist and copy-to-clipboard code blocks.
 
 ## The journey
+
+The foundation sessions run in order — **JDBC** (how Java reaches a database) then **Servlets** (how Java answers a browser). Together they build a complete five-layer web application by hand, which is exactly the architecture the Spring Boot sessions then rebuild with far less boilerplate.
 
 The four Spring Boot sessions build on each other — from a Hello World endpoint to a running microservices architecture:
 
