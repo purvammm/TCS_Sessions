@@ -15,7 +15,8 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 | Java Foundations | `java-foundations-theory.html` | — |
 | Collections, Class Relationships & File I/O | `java-collections-theory.html` | — |
 | JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` |
-| Java Servlets — HTTP, MVC & CRUD | `servlets-theory.html` | `servlets-lab.html` |
+| Servlets 1 — Web, HTTP & your first servlet | `servlets-session1-theory.html` | `servlets-session1-lab.html` |
+| Servlets 2 — MVC architecture & CRUD with JDBC | `servlets-session2-theory.html` | `servlets-session2-lab.html` |
 | 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` |
 | 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` |
 | 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` |
@@ -26,7 +27,12 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 
 ## The journey
 
-The foundation sessions run in order — **JDBC** (how Java reaches a database) then **Servlets** (how Java answers a browser). Together they build a complete five-layer web application by hand, which is exactly the architecture the Spring Boot sessions then rebuild with far less boilerplate.
+The foundation sessions run in order — **JDBC** (how Java reaches a database), then the two **Servlets** sessions (how Java answers a browser):
+
+1. **Servlets 1** — the mechanics: HTTP, the servlet lifecycle, and one login servlet built properly.
+2. **Servlets 2** — the architecture: five MVC layers and a full CRUD app on top of JDBC.
+
+Servlets 2 extends the same Eclipse project created in Servlets 1, so the two sessions are best taken in order. Together they build by hand exactly the architecture the Spring Boot sessions then rebuild with far less boilerplate.
 
 The four Spring Boot sessions build on each other — from a Hello World endpoint to a running microservices architecture:
 
