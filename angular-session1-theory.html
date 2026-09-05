@@ -202,8 +202,57 @@
       font-size: 16.5px;
     }
     .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Expected-result box — "this is what success looks like" */
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
     .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    /* Numbered procedure list */
+    .slide ol.steps { padding-left: 24px; }
+    .slide ol.steps > li { margin: 12px 0; }
+    .slide ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .slide kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
     .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Jargon-buster rows — term on the left, plain-English meaning on the right */
+    .jargon { display: grid; gap: 8px; margin-top: 14px; }
+    .jargon .jrow {
+      display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start;
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      background: #fafafc; padding: 10px 15px;
+    }
+    .jargon .jt { font-weight: 700; color: var(--mac-accent); font-size: 16px; }
+    .jargon .jd { font-size: 15.5px; line-height: 1.5; }
 
     /* Cover slide */
     .cover {
@@ -279,6 +328,8 @@
     table.cmp td.good { background: rgba(40,200,64,0.10); }
     table.cmp td.bad { background: rgba(255,95,87,0.08); }
     table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.tight { font-size: 15px; }
+    table.cmp.tight th, table.cmp.tight td { padding: 8px 11px; }
 
     /* Architecture diagram */
     .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
@@ -462,12 +513,14 @@
       display: inline-block; background: var(--mac-accent); color: #fff;
       border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
     }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
     .browser .viewport .navbar {
-      display: flex; gap: 16px; border-bottom: 2px solid var(--mac-accent);
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
       padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
     }
     .browser .viewport .navbar .on { color: var(--mac-accent); }
     .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
 
     /* Data-flow direction map (used for the four binding types) */
     .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
@@ -582,6 +635,7 @@
       .slide { padding: 28px 26px 92px; }
       .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
       .anno-row { grid-template-columns: 1fr; }
+      .jargon .jrow { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
@@ -612,82 +666,158 @@
         <section class="slide">
           <p class="eyebrow">Before we start — where are we going?</p>
           <h2>The four-session journey</h2>
-          <p class="deep">It helps enormously to see the destination on day one. Over four sessions we build <strong>one application</strong>, adding a layer each time. Nothing is thrown away — every session's work becomes the foundation of the next.</p>
+          <p class="deep">It helps enormously to see the destination on day one. Over four sessions we build <strong>one single application</strong>, adding one layer each time. Nothing is thrown away — every session's work becomes the foundation of the next.</p>
           <div class="stack">
             <div class="stack-row l1">
               <span class="layer">Session 1 · Today</span>
-              <span class="desc">TypeScript fundamentals + your first running Angular app. <strong>Output:</strong> a Hello World app you edited yourself.</span>
+              <span class="desc">TypeScript fundamentals + your first running Angular app. <strong>You leave with:</strong> a Hello World app that you edited yourself and understood.</span>
             </div>
             <div class="stack-row l2">
               <span class="layer">Session 2</span>
-              <span class="desc">Components, templates, the four kinds of data binding, directives &amp; pipes. <strong>Output:</strong> a colour-coded employee table + a login form.</span>
+              <span class="desc">Components, templates, the four kinds of data binding, directives &amp; pipes. <strong>You leave with:</strong> a working login form and a colour-coded employee table.</span>
             </div>
             <div class="stack-row l3">
               <span class="layer">Session 3</span>
-              <span class="desc">Forms (both styles), validation, services, HttpClient, Observables. <strong>Output:</strong> data moves from a hardcoded array to a service, then to a live API.</span>
+              <span class="desc">Forms (both styles), validation, services, <code>HttpClient</code>, Observables. <strong>You leave with:</strong> data moving from a hardcoded array, into a service, then in from a live API.</span>
             </div>
             <div class="stack-row l4">
               <span class="layer">Session 4</span>
-              <span class="desc">Routing + a complete Customer Management CRUD app. <strong>Output:</strong> a multi-page, navigable, service-backed application.</span>
+              <span class="desc">Routing + a complete Customer Management CRUD app. <strong>You leave with:</strong> a multi-page, navigable, service-backed application.</span>
             </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">How today is delivered</span>
-            These slides stay on the main screen. The <strong>lab sheet stays open on your machine</strong>, and every lab task is tagged with the slide it belongs to — so we explain, then you build, in lockstep. You are expected to be typing, not just watching.
+          <div class="plainbox">
+            <span class="lbl">In plain English</span>
+            Today we learn the language and get the tools working. Session 2 puts things on the screen. Session 3 makes those things talk to a server. Session 4 turns it into a real, multi-screen application.
           </div>
         </section>
 
-        <!-- 3. AGENDA -->
+        <!-- 3. ROADMAP -->
         <section class="slide">
           <p class="eyebrow">What we'll cover today</p>
           <h2>Session 1 roadmap</h2>
           <ul class="agenda">
-            <li><span class="num">1</span> What Angular is, and what a single-page application means</li>
-            <li><span class="num">2</span> Angular versions — and why "AngularJS" is a different thing</li>
-            <li><span class="num">3</span> Why Angular? A JSP/Servlet app vs the same app in Angular</li>
-            <li><span class="num">4</span> TypeScript: types, interfaces, optionals, unions, loops, arrays, tuples, classes</li>
-            <li><span class="num">5</span> Environment setup — Node.js and the Angular CLI</li>
-            <li><span class="num">6</span> Your first app: <code>ng new</code> → <code>ng serve</code> → the browser</li>
-            <li><span class="num">7</span> Anatomy of a generated project — what all those files do</li>
+            <li><span class="num">1</span> The vocabulary — the words we'll use all day, defined up front</li>
+            <li><span class="num">2</span> What Angular is, and what a <strong>single-page application</strong> means</li>
+            <li><span class="num">3</span> Angular versions — and why "AngularJS" is a completely different thing</li>
+            <li><span class="num">4</span> Why Angular? The same screen built as JSPs vs built in Angular</li>
+            <li><span class="num">5</span> TypeScript, from zero: variables, types, interfaces, optionals, unions, arrays, tuples, loops, functions, classes</li>
+            <li><span class="num">6</span> Setting up your machine — Node.js, npm and the Angular CLI</li>
+            <li><span class="num">7</span> Your first app: <code>ng new</code> → <code>ng serve</code> → the browser</li>
+            <li><span class="num">8</span> A guided tour of a generated project — what every file is for</li>
+            <li><span class="num">9</span> The errors you will hit today, and how to fix each one</li>
           </ul>
-          <div class="note">
-            <span class="lbl">How to use these slides</span>
-            This deck is written to be <strong>read on its own afterwards</strong>, not just watched live. Every slide carries the full explanation of its topic, so you can revise from these slides alone without needing notes. If a slide feels long, that's deliberate — it's your reference copy.
+        </section>
+
+        <!-- 4. HOW TODAY WORKS -->
+        <section class="slide">
+          <p class="eyebrow">Housekeeping — two minutes, then we begin</p>
+          <h2>How today works</h2>
+          <div class="cards">
+            <div class="card"><div class="ic">📊</div><h3>These slides stay on the big screen</h3><p>Use them to follow the explanation. They are also written to be <strong>re-read on your own afterwards</strong> — every slide carries its full explanation, so you can revise from the deck alone.</p></div>
+            <div class="card"><div class="ic">🧪</div><h3>The lab sheet stays on your machine</h3><p>Open <code>angular-session1-lab.html</code> now, in a second window. Every lab task has a <strong>"Theory slides …"</strong> badge telling you which part of the talk it belongs to.</p></div>
+            <div class="card"><div class="ic">⌨️</div><h3>You should be typing</h3><p>Watching someone code feels like learning and isn't. When a slide says "now do Task 2", stop watching and go build it.</p></div>
+            <div class="card"><div class="ic">🙋</div><h3>Interrupt me</h3><p>If a word goes past that you don't know, say so immediately. Front-end has a lot of jargon and it compounds — one missed word can cost you the next twenty minutes.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">If you have never touched front-end code before</span>
+            That is completely fine and it is who this series is written for. We assume you know <strong>Java</strong> and a little <strong>HTML</strong>, and nothing else. Every JavaScript and TypeScript idea is explained from scratch, and where something has a Java equivalent, we point it out.
           </div>
         </section>
 
-        <!-- 4. WHAT IS ANGULAR -->
+        <!-- 5. JARGON BUSTER -->
+        <section class="slide">
+          <p class="eyebrow">Vocabulary first — so nothing is a mystery later</p>
+          <h2>Jargon buster: words you'll hear all day</h2>
+          <p class="deep">Front-end development has a lot of terminology. Here is every term we will use today, in one place, in plain words. You do not need to memorise this — just know the slide is here.</p>
+          <div class="jargon">
+            <div class="jrow"><div class="jt">JavaScript</div><div class="jd">The one programming language that every web browser can run. If you want code to execute inside a browser, it ends up as JavaScript.</div></div>
+            <div class="jrow"><div class="jt">TypeScript</div><div class="jd">JavaScript with types added. You write TypeScript; a tool converts it into JavaScript for the browser.</div></div>
+            <div class="jrow"><div class="jt">Compile / transpile</div><div class="jd">Converting code from one language into another. TypeScript → JavaScript. "Transpile" just means compiling between two similar-level languages.</div></div>
+            <div class="jrow"><div class="jt">Framework</div><div class="jd">A large, opinionated toolkit that gives your application its structure. Angular is a framework. (More on this in two slides.)</div></div>
+            <div class="jrow"><div class="jt">Node.js</div><div class="jd">A program that runs JavaScript <em>outside</em> the browser, on your machine. Angular's tools are written in JavaScript, so you need Node to run them.</div></div>
+            <div class="jrow"><div class="jt">npm</div><div class="jd">Node Package Manager — downloads and manages third-party code libraries. It is the JavaScript world's Maven.</div></div>
+            <div class="jrow"><div class="jt">Package / library</div><div class="jd">A reusable chunk of code published by someone else. Same idea as a JAR file.</div></div>
+            <div class="jrow"><div class="jt">CLI</div><div class="jd">Command Line Interface — a tool you type commands at. The Angular CLI creates projects and files for you.</div></div>
+            <div class="jrow"><div class="jt">Component</div><div class="jd">One reusable piece of screen, with its own logic, markup and styling. Angular apps are built entirely out of these.</div></div>
+            <div class="jrow"><div class="jt">Template</div><div class="jd">The HTML belonging to a component — what the user actually sees.</div></div>
+            <div class="jrow"><div class="jt">SPA</div><div class="jd">Single-Page Application — the browser loads one page once, then JavaScript swaps pieces of it in and out. (Next slide but one.)</div></div>
+            <div class="jrow"><div class="jt">JSON</div><div class="jd">A plain-text format for data — the format your Spring Boot API already returns. Angular's job is to turn JSON into what the user sees.</div></div>
+            <div class="jrow"><div class="jt">Bundle</div><div class="jd">All your many source files squashed into a few big JavaScript files, so the browser downloads fewer things. The CLI does this for you.</div></div>
+            <div class="jrow"><div class="jt">localhost:4200</div><div class="jd">The address of the little web server the Angular CLI runs on your own machine while you develop. Nobody else can see it.</div></div>
+          </div>
+        </section>
+
+        <!-- 6. WHAT IS ANGULAR -->
         <section class="slide">
           <p class="eyebrow">Concept 1</p>
           <h2>What is Angular?</h2>
-          <p class="deep">Angular is an <strong>open-source front-end framework</strong>, written in TypeScript and maintained by <strong>Google</strong>. Its purpose is to build <strong>single-page applications</strong> — rich, app-like websites that run in the browser.</p>
+          <p class="lead">Angular is an <strong>open-source front-end framework</strong>, written in TypeScript and maintained by <strong>Google</strong>, used to build single-page applications — rich, app-like websites that run inside the browser.</p>
           <div class="cards">
-            <div class="card"><div class="ic">🅰️</div><h3>Written in TypeScript</h3><p>You also write your Angular code in TypeScript. The framework and your app speak the same language.</p></div>
-            <div class="card"><div class="ic">🏢</div><h3>Backed by Google</h3><p>Used in Google's own products. Predictable release cadence, long-term support, huge ecosystem.</p></div>
-            <div class="card"><div class="ic">🧩</div><h3>Component-based</h3><p>From Angular 2 onwards, everything is a <strong>component</strong>. Your app is a tree of them — a parent with children, each child with its own children.</p></div>
-            <div class="card"><div class="ic">🔋</div><h3>Batteries included</h3><p>Routing, forms, HTTP, testing and a CLI all ship as part of the framework. You don't assemble them from ten libraries.</p></div>
+            <div class="card"><div class="ic">🅰️</div><h3>Written in TypeScript</h3><p>And you write your app in TypeScript too. The framework and your code speak the same language, so error messages and autocomplete are genuinely helpful.</p></div>
+            <div class="card"><div class="ic">🏢</div><h3>Backed by Google</h3><p>Used inside Google's own products. A predictable release every six months, long-term support, and a very large ecosystem of tutorials and libraries.</p></div>
+            <div class="card"><div class="ic">🧩</div><h3>Component-based</h3><p>From Angular 2 onwards, <strong>everything</strong> is a component. Your app is a tree of them: a parent holding children, each child holding its own children.</p></div>
+            <div class="card"><div class="ic">🔋</div><h3>Batteries included</h3><p>Routing, forms, HTTP, testing and a command-line tool all ship as part of Angular. You don't have to research and glue together ten separate libraries.</p></div>
           </div>
-          <p class="deep" style="margin-top:14px;">That last point is the one to hold on to. In Angular you never build "a page" — you build small, self-contained components and then <strong>nest</strong> them inside each other until they form a page.</p>
+          <div class="plainbox">
+            <span class="lbl">The one sentence to remember</span>
+            In Angular you never build "a page". You build small, self-contained <strong>components</strong>, and then nest them inside one another until they add up to a page.
+          </div>
           <div class="askbox">
             <span class="lbl">Ask the batch</span>
-            Have you used a website built with Angular (or React/Vue) before — Gmail, a banking dashboard, a booking site? What felt <em>different</em> about it compared to an older website?
+            Have you used a website that felt more like an app than a website — Gmail, a banking dashboard, a flight booking site? What felt <em>different</em> about it compared to an older website?
           </div>
         </section>
 
-        <!-- 5. SPA EXPLAINED -->
+        <!-- 7. FRAMEWORK VS LIBRARY -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 continued — a distinction worth 30 seconds</p>
+          <h2>"Framework", not "library" — why the word matters</h2>
+          <p class="deep">People use these two words loosely, but the difference explains why Angular feels the way it does.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>A library</h3>
+              <ul>
+                <li><strong>You</strong> call it, when you choose to</li>
+                <li>You design the structure of your app</li>
+                <li>Small, focused, does one job</li>
+                <li>Examples: a date-formatting library, a charting library</li>
+              </ul>
+            </div>
+            <div class="ba-mid">vs</div>
+            <div class="ba-col after">
+              <h3>A framework</h3>
+              <ul>
+                <li><strong>It</strong> calls your code, at moments it decides</li>
+                <li>It provides the structure; you fill in the blanks</li>
+                <li>Large, covers the whole application</li>
+                <li>Examples: Angular, and — on the Java side — Spring Boot</li>
+              </ul>
+            </div>
+          </div>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            A library is a <strong>power drill</strong>: you pick it up when you need a hole. A framework is a <strong>house being built around you</strong>: the walls, wiring and plumbing are already decided, and you decide what goes in each room. Angular decides the shape of your app; you decide what it does.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why this is good news</span>
+            Because Angular is opinionated, <strong>every Angular project looks the same</strong>. Join a new team, open their repository, and you already know where things are. That is exactly the benefit you already get from Spring Boot's conventions.
+          </div>
+        </section>
+
+        <!-- 8. SPA EXPLAINED -->
         <section class="slide">
           <p class="eyebrow">Concept 2 — the idea Angular is built around</p>
           <h2>What is a single-page application?</h2>
-          <p class="deep">In a <strong>traditional multi-page application</strong> (JSP, Servlets, PHP, ASP.NET Web Forms), every click asks the server for a brand-new HTML page. The browser throws away everything it had and re-paints from scratch — you see the flash, the spinner, the scroll position jumping back to the top.</p>
-          <p class="deep">In a <strong>single-page application</strong>, the browser loads <em>one</em> HTML page — literally one file, <code>index.html</code> — exactly once. After that, JavaScript swaps pieces of the screen in and out. When new data is needed, only the <strong>data</strong> travels over the network (as JSON), not a whole new page.</p>
+          <p class="deep">In a <strong>traditional multi-page application</strong> — JSP, Servlets, PHP, ASP.NET Web Forms — every click asks the server for a brand-new HTML page. The browser throws away everything it had and repaints from scratch. That is the flash you see, the spinner, the scroll position jumping back to the top.</p>
+          <p class="deep">In a <strong>single-page application</strong>, the browser loads <em>one</em> HTML file — literally one, called <code>index.html</code> — exactly once. After that, JavaScript swaps pieces of the screen in and out. When new data is needed, only the <strong>data</strong> travels over the network (as JSON), never a whole new page.</p>
           <div class="ba">
             <div class="ba-col before">
               <h3>Multi-page (the old way)</h3>
               <ul>
                 <li>Every click = a full page reload</li>
-                <li>Server re-renders the entire HTML each time</li>
-                <li>Visible flicker; state is lost between pages</li>
-                <li>Server is responsible for the UI</li>
+                <li>The server re-renders the entire HTML each time</li>
+                <li>Visible flicker; anything the user had typed is lost</li>
+                <li>The server is responsible for how things look</li>
               </ul>
             </div>
             <div class="ba-mid">→</div>
@@ -695,100 +825,120 @@
               <h3>Single-page (Angular)</h3>
               <ul>
                 <li>One page load, then only sections change</li>
-                <li>Browser renders; server just returns JSON</li>
-                <li>Smooth, app-like, state survives navigation</li>
-                <li>Server is a pure API — reusable by mobile too</li>
+                <li>The browser renders; the server just returns JSON</li>
+                <li>Smooth and app-like; state survives navigation</li>
+                <li>The server is a pure API — a mobile app can reuse it</li>
               </ul>
             </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">Why this matters to you as a Java developer</span>
-            This is a <strong>split of responsibility</strong>. Your Spring Boot REST API stops producing HTML and starts producing JSON. Angular consumes that JSON and owns the entire user interface. The same API can then serve a web app, an Android app and an iOS app without change — that's the real payoff.
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            Multi-page is <strong>replacing the whole newspaper</strong> every time one headline changes. Single-page is <strong>a whiteboard</strong> — you wipe one corner and rewrite just that bit.
           </div>
         </section>
 
-        <!-- 6. VERSIONS -->
+        <!-- 9. SPA — WHY IT MATTERS TO YOU -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 continued</p>
+          <h2>What changes for you, the Java developer</h2>
+          <p class="deep">This is not just a cosmetic improvement. It is a <strong>redistribution of responsibility</strong> between server and browser, and it changes what your Spring Boot code does.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:26%">Question</th><th>Multi-page (JSP)</th><th>Single-page (Angular)</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Who builds the HTML?</strong></td><td class="bad">The server, on every request</td><td class="good">The browser, once, then it edits it in place</td></tr>
+              <tr><td><strong>What travels over the network?</strong></td><td class="bad">Whole HTML pages, repeatedly</td><td class="good">Small JSON payloads — just the data</td></tr>
+              <tr><td><strong>What does your controller return?</strong></td><td><code>ModelAndView</code> / a JSP name</td><td class="good">A Java object, serialised to JSON</td></tr>
+              <tr><td><strong>Can a mobile app reuse the backend?</strong></td><td class="bad">No — it returns HTML</td><td class="good">Yes — JSON suits any client</td></tr>
+              <tr><td><strong>Who owns the user interface?</strong></td><td>The backend team, mostly</td><td class="good">The front-end team, entirely</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The real payoff</span>
+            Your Spring Boot application stops producing HTML and starts producing <strong>JSON</strong>. Angular consumes that JSON and owns the whole user interface. The same API then serves a web app, an Android app and an iOS app <strong>without a single change</strong>. That is why the industry moved this way.
+          </div>
+        </section>
+
+        <!-- 10. VERSIONS -->
         <section class="slide">
           <p class="eyebrow">Concept 3</p>
           <h2>Angular versions — a short history</h2>
           <ul class="timeline">
-            <li><span class="yr">2010</span><strong>AngularJS 1.x</strong> — the original. JavaScript-based, MVC architecture, used <code>$scope</code> and controllers. Still alive in legacy projects, but end-of-life.</li>
+            <li><span class="yr">2010</span><strong>AngularJS 1.x</strong> — the original. Written in JavaScript, MVC architecture, used <code>$scope</code> and controllers. Still alive in legacy projects, but officially end-of-life.</li>
             <li><span class="yr">2016</span><strong>Angular 2</strong> — a <em>complete rewrite</em>, not an upgrade. TypeScript, component-based, mobile-friendly, dramatically faster. This is where "modern Angular" begins.</li>
-            <li><span class="yr">2016–17</span><strong>Angular 4 &amp; 5</strong> — smaller bundles, the new HttpClient, faster compilation. (There is no Angular 3 — the router package had already reached v3, so they skipped the number to keep versions aligned.)</li>
-            <li><span class="yr">2018–19</span><strong>Angular 6, 7, 8</strong> — <code>ng update</code>, the CLI matures, differential loading, lazy loading improvements.</li>
-            <li><span class="yr">2020</span><strong>Angular 9 &amp; 10</strong> — the <strong>Ivy</strong> renderer becomes the default: smaller, faster, better error messages.</li>
-            <li><span class="yr">2021–22</span><strong>Angular 11 → 14</strong> — strict typing by default, standalone components introduced, typed reactive forms.</li>
-            <li><span class="yr">2023+</span><strong>Angular 15 → 17+</strong> — standalone APIs become the recommended default, signals, new control-flow syntax. Everything you learn here still applies.</li>
+            <li><span class="yr">2016–17</span><strong>Angular 4 &amp; 5</strong> — smaller downloads, the new <code>HttpClient</code>, faster compilation. <span class="muted">(There is no Angular 3: the router package had already reached v3, so they skipped the number to keep every package aligned.)</span></li>
+            <li><span class="yr">2018–19</span><strong>Angular 6, 7, 8</strong> — <code>ng update</code> arrives, the CLI matures, lazy loading improves.</li>
+            <li><span class="yr">2020</span><strong>Angular 9 &amp; 10</strong> — the <strong>Ivy</strong> renderer becomes the default: smaller bundles, faster rendering, far better error messages.</li>
+            <li><span class="yr">2021–22</span><strong>Angular 11 → 14</strong> — strict typing on by default, standalone components introduced, typed reactive forms.</li>
+            <li><span class="yr">2023+</span><strong>Angular 15 → 17 and beyond</strong> — standalone APIs become the recommended default, signals, new template control-flow syntax. <strong>Everything you learn here still applies.</strong></li>
           </ul>
           <div class="warnbox">
-            <span class="lbl">Beginner note — the naming trap</span>
-            <strong>"AngularJS" means version 1.x only.</strong> <strong>"Angular"</strong> with no "JS" means version 2 and everything after it. They are different frameworks with different architectures — code does not port between them. When you search online, a StackOverflow answer using <code>$scope</code> is AngularJS and will not help you. Add the version number to your searches.
+            <span class="lbl">Beginner trap — the naming</span>
+            <strong>"AngularJS" means version 1.x only.</strong> <strong>"Angular"</strong> with no "JS" means version 2 and everything after. They are different frameworks with different architectures, and code does not port between them. When you search online, an answer using <code>$scope</code> is AngularJS and <strong>will not help you</strong>. Always put a version number in your search.
           </div>
-          <p class="muted">Angular ships a major version roughly every six months. Don't be alarmed by high version numbers — the core concepts in these four sessions (components, binding, directives, services, routing) have been stable since Angular 2.</p>
         </section>
 
-        <!-- 7. ANGULARJS VS ANGULAR -->
+        <!-- 11. ANGULARJS VS ANGULAR -->
         <section class="slide">
           <p class="eyebrow">Concept 3 continued</p>
           <h2>AngularJS (1.x) vs Angular (2+)</h2>
           <table class="cmp">
             <thead><tr><th style="width:22%">Aspect</th><th>AngularJS 1.x</th><th>Angular 2+</th></tr></thead>
             <tbody>
-              <tr><td><strong>Language</strong></td><td class="bad">JavaScript</td><td class="good">TypeScript (compiles to JavaScript)</td></tr>
+              <tr><td><strong>Language</strong></td><td class="bad">JavaScript</td><td class="good">TypeScript (compiled to JavaScript)</td></tr>
               <tr><td><strong>Architecture</strong></td><td class="bad">MVC — controllers, <code>$scope</code>, directives</td><td class="good">Component-based — a tree of components</td></tr>
-              <tr><td><strong>Mobile support</strong></td><td class="bad">Not designed for mobile</td><td class="good">Mobile-first; works with Ionic/Cordova</td></tr>
+              <tr><td><strong>Mobile support</strong></td><td class="bad">Not designed for mobile</td><td class="good">Mobile-first; works with Ionic</td></tr>
               <tr><td><strong>Performance</strong></td><td class="bad">Slower — two-way binding on everything, digest cycles</td><td class="good">Much faster — one-way data flow by default, Ivy renderer</td></tr>
-              <tr><td><strong>Dependency injection</strong></td><td>String-based, error-prone</td><td class="good">Type-based, hierarchical injector</td></tr>
+              <tr><td><strong>Dependency injection</strong></td><td class="bad">String-based, easy to typo</td><td class="good">Type-based, hierarchical injector</td></tr>
               <tr><td><strong>Tooling</strong></td><td class="bad">No official CLI</td><td class="good">Angular CLI — scaffold, serve, build, test</td></tr>
-              <tr><td><strong>Structure</strong></td><td>Loose — you invent your own</td><td class="good">Opinionated — same layout in every project</td></tr>
+              <tr><td><strong>Project structure</strong></td><td>Loose — every team invents its own</td><td class="good">Opinionated — the same layout everywhere</td></tr>
             </tbody>
           </table>
           <div class="note">
-            <span class="lbl">Why the rewrite was worth it</span>
-            AngularJS's two-way-binding-everywhere model was magical for small apps and painful for large ones — it became almost impossible to reason about what changed what. Angular 2's component tree with explicit, directional data flow is the fix: data flows <em>down</em> into children, events flow <em>up</em> to parents. You always know where a change came from.
+            <span class="lbl">Why a full rewrite was worth it</span>
+            AngularJS bound everything to everything, in both directions, automatically. That felt magical in a small app and became almost impossible to reason about in a large one — you genuinely could not tell what had changed what. Angular 2's component tree fixed it with <strong>explicit, directional data flow</strong>: data flows <em>down</em> into children, events flow <em>up</em> to parents. You can always trace where a change came from.
           </div>
         </section>
 
-        <!-- 8. WHY ANGULAR -->
+        <!-- 12. WHY ANGULAR -->
         <section class="slide">
           <p class="eyebrow">Concept 4 — the case for Angular</p>
           <h2>Why Angular? A concrete comparison</h2>
-          <p class="deep">Imagine an <strong>employee management</strong> screen. Here's how the same feature set looks built two ways.</p>
+          <p class="deep">Forget theory for a moment. Imagine an <strong>employee management</strong> screen: list them, search them, add one, edit one, delete one. Here is that same feature set, built two ways.</p>
           <div class="panels">
             <div class="panel bad">
               <h3>❌ The JSP / Servlet version</h3>
               <ul>
                 <li><code>list.jsp</code> — show all employees</li>
-                <li><code>search.jsp</code> — a search form + its results</li>
+                <li><code>search.jsp</code> — a search form and its results</li>
                 <li><code>insert.jsp</code> — add a new employee</li>
                 <li><code>update.jsp</code> — edit an existing one</li>
-                <li><code>delete.jsp</code> — confirm and delete</li>
+                <li><code>delete.jsp</code> — confirm, then delete</li>
               </ul>
-              <p style="font-size:15px;"><strong>Five separate pages.</strong> Each click is a full round-trip and a full page reload. The HTML for the table is duplicated across files. Styling is hand-rolled. To add a column, you edit several JSPs.</p>
+              <p style="font-size:15px;"><strong>Five separate pages.</strong> Every click is a full round-trip and a full reload. The table markup is copy-pasted across files. To add one column you edit several JSPs and hope you found them all.</p>
             </div>
             <div class="panel good">
               <h3>✅ The Angular version</h3>
               <ul>
                 <li>One <code>employee-list</code> component — the table</li>
                 <li>One <code>employee-form</code> component — reused for insert <em>and</em> update</li>
-                <li>Search is a filter on data already in memory — no server hit</li>
-                <li>Delete removes a row in place, no reload</li>
-                <li>Bootstrap/Material gives a polished UI for free</li>
+                <li>Search filters data already in memory — no server hit at all</li>
+                <li>Delete removes the row in place, no reload</li>
+                <li>Bootstrap or Angular Material gives a polished look for free</li>
               </ul>
               <p style="font-size:15px;"><strong>A handful of reusable components.</strong> To add a column you change one template. No page ever reloads.</p>
             </div>
           </div>
           <div class="askbox">
             <span class="lbl">Ask the batch</span>
-            So what's the real advantage of Angular over a JSP/Servlet app? <span class="muted">(Look for: no reloads, reusable components, clean separation of UI and API, one backend serving many clients, and far less duplicated markup.)</span>
+            So what is the real advantage here? <span class="muted">(Looking for: no reloads, reusable components, a clean split between UI and API, one backend serving many clients, and far less duplicated markup to keep in sync.)</span>
           </div>
         </section>
 
-        <!-- 9. WHERE ANGULAR SITS -->
+        <!-- 13. WHERE ANGULAR SITS -->
         <section class="slide">
           <p class="eyebrow">The bigger picture</p>
           <h2>Where Angular sits in your stack</h2>
-          <p class="deep">Angular is a <strong>front-end</strong> framework — it runs in the user's browser, not on your server. Your Spring Boot application becomes a pure JSON API sitting behind it.</p>
+          <p class="deep">Angular is a <strong>front-end</strong> framework: it runs in the user's browser, not on your server. Your Spring Boot application becomes a pure JSON API sitting behind it.</p>
           <div class="arch" id="archContainer">
             <div class="arch-node"><div class="t">Browser</div><div class="d">Chrome / Edge / Safari</div></div>
             <span class="arch-arrow">→</span>
@@ -805,534 +955,929 @@
             <span class="lbl">The handshake</span>
             Angular sends an HTTP request; Spring Boot answers with <strong>JSON</strong>; Angular turns that JSON into what the user sees. Everything you built in the Spring Boot sessions is the right-hand side of this diagram. Today we start building the left-hand side.
           </div>
-          <p class="muted">Note that Angular never talks to the database directly. It has no credentials, no SQL — all of that stays safely on the server. This is a security feature, not a limitation.</p>
+          <div class="warnbox">
+            <span class="lbl">Notice what is missing</span>
+            Angular never talks to the database. It has no database credentials and no SQL — all of that stays safely on the server, where the user cannot read it. Anyone can open the browser's developer tools and read every line of your Angular code, so <strong>never put a secret in it</strong>.
+          </div>
         </section>
 
-        <!-- 10. WHAT IS TYPESCRIPT -->
+
+        <!-- 14. WHAT IS TYPESCRIPT -->
         <section class="slide">
-          <p class="eyebrow">Concept 5 — the language</p>
+          <p class="eyebrow">Part 2 — the language · Concept 5</p>
           <h2>What is TypeScript?</h2>
-          <p class="deep">JavaScript is <strong>loosely typed</strong> (also called dynamically typed): a variable has no fixed type, and can silently change from a number to a string to a boolean. The language allows it and says nothing.</p>
-          <pre><code>// Plain JavaScript — all three lines are legal
+          <p class="deep">Before we can write Angular, we need the language Angular is written in. Start with the problem it solves.</p>
+          <p class="deep">JavaScript is <strong>loosely typed</strong> (also called dynamically typed): a variable has no fixed type and can silently change from a number, to a string, to a boolean. The language permits it and says nothing.</p>
+          <pre><code>// Plain JavaScript — all three of these lines are legal
 let age = 42;        // a number
 age = "Anoop";       // now a string  (?!)
 age = true;          // now a boolean (?!)</code></pre>
-          <p class="deep">That flexibility is convenient in a five-line script and <strong>disastrous</strong> in a fifty-thousand-line application. A variable named <code>age</code> holding <code>true</code> will not crash where the mistake was made — it will crash somewhere far away, at runtime, in front of a user.</p>
-          <p class="deep"><strong>TypeScript</strong>, released by <strong>Microsoft in 2012</strong>, is a <span class="term">superset of JavaScript</span>: all valid JavaScript is valid TypeScript, plus TypeScript adds <strong>static typing</strong> on top. The same code above now fails immediately, in your editor, before you even save:</p>
+          <p class="deep">That flexibility is convenient in a five-line script and <strong>disastrous</strong> in a fifty-thousand-line application. A variable named <code>age</code> holding <code>true</code> will not crash where the mistake was made — it will crash somewhere far away, much later, at runtime, in front of a user.</p>
+          <p class="deep"><strong>TypeScript</strong>, released by <strong>Microsoft in 2012</strong>, is a <span class="term">superset of JavaScript</span>: every valid JavaScript program is also a valid TypeScript program, and TypeScript adds <strong>static typing</strong> on top. The same code now fails immediately, in your editor, before you have even saved the file:</p>
           <pre><code>// TypeScript
 let age = 42;
 age = "Anoop";
 // ✖ Error: Type 'string' is not assignable to type 'number'.</code></pre>
-          <div class="keybox">
-            <span class="lbl">"Superset" — what that means in practice</span>
-            You are not learning a new language from scratch. TypeScript is JavaScript <strong>plus type annotations</strong>. If you know Java, the type-checking part will feel immediately familiar; if you know JavaScript, everything you know still works.
+          <div class="plainbox">
+            <span class="lbl">"Superset" — what that actually means</span>
+            You are not learning a brand-new language. TypeScript is JavaScript <strong>plus type annotations</strong>. If you know Java, the type-checking part will feel instantly familiar. If you know a little JavaScript, everything you already know still works exactly as before.
           </div>
         </section>
 
-        <!-- 11. TS VS JS -->
+        <!-- 15. TS VS JS -->
         <section class="slide">
           <p class="eyebrow">Concept 5 continued</p>
           <h2>TypeScript vs JavaScript</h2>
           <table class="cmp">
             <thead><tr><th style="width:24%">Aspect</th><th>JavaScript</th><th>TypeScript</th></tr></thead>
             <tbody>
-              <tr><td><strong>Typing</strong></td><td class="bad">Dynamic — types decided at runtime</td><td class="good">Static — types checked before the code runs</td></tr>
-              <tr><td><strong>Runs in the browser?</strong></td><td class="good">Directly</td><td>Must be <strong>compiled</strong> (transpiled) to JavaScript first</td></tr>
-              <tr><td><strong>When errors surface</strong></td><td class="bad">At runtime, in front of the user</td><td class="good">At compile time, in your editor</td></tr>
-              <tr><td><strong>IDE support</strong></td><td>Guesswork autocomplete</td><td class="good">Precise autocomplete, safe rename, jump-to-definition</td></tr>
-              <tr><td><strong>OOP features</strong></td><td>Classes only (ES6+)</td><td class="good">Classes, interfaces, generics, enums, access modifiers</td></tr>
-              <tr><td><strong>Best for</strong></td><td>Small scripts</td><td class="good">Large, long-lived, team-owned applications</td></tr>
+              <tr><td><strong>Typing</strong></td><td class="bad">Dynamic — types are decided while running</td><td class="good">Static — types are checked before the code runs</td></tr>
+              <tr><td><strong>Runs in the browser?</strong></td><td class="good">Directly</td><td>Must be <strong>compiled</strong> to JavaScript first</td></tr>
+              <tr><td><strong>When do errors surface?</strong></td><td class="bad">At runtime, in front of the user</td><td class="good">At compile time, in your editor</td></tr>
+              <tr><td><strong>Editor support</strong></td><td class="bad">Guesswork autocomplete</td><td class="good">Precise autocomplete, safe rename, jump-to-definition</td></tr>
+              <tr><td><strong>OOP features</strong></td><td>Classes only</td><td class="good">Classes, interfaces, generics, enums, access modifiers</td></tr>
+              <tr><td><strong>Best suited to</strong></td><td>Small scripts</td><td class="good">Large, long-lived, team-owned applications</td></tr>
             </tbody>
           </table>
           <div class="note">
-            <span class="lbl">The one-sentence summary</span>
-            TypeScript's types exist <strong>only at development time</strong> — they are stripped away during compilation, and the browser runs ordinary JavaScript. Types cost you nothing at runtime and save you enormous amounts of debugging. That is why Angular is written in TypeScript and why your Angular code will be too.
+            <span class="lbl">The detail that surprises everyone</span>
+            TypeScript's types exist <strong>only at development time</strong>. They are stripped away completely during compilation, and the browser runs ordinary JavaScript with no types in it at all. So types cost you <strong>nothing</strong> at runtime — no performance penalty, no extra download — and save you enormous amounts of debugging. That is why Angular is written in TypeScript, and why your Angular code will be too.
           </div>
         </section>
 
-        <!-- 12. TS: INFERENCE & DECLARED -->
+        <!-- 16. THE COMPILE STEP -->
         <section class="slide">
-          <p class="eyebrow">TypeScript basics · 1 of 7</p>
-          <h2>Type inference vs declared types</h2>
-          <p class="deep">There are two ways a TypeScript variable gets its type. Both give you full type safety — the difference is only whether <em>you</em> write the type or the compiler works it out.</p>
-          <h3>Inference — the compiler guesses from the initial value</h3>
-          <pre><code>let str = "Hello World";   // TS infers: string
-str = "Goodbye";           // ✔ fine — still a string
-str = 100;                 // ✖ Error: Type 'number' is not assignable to type 'string'</code></pre>
-          <h3>Declaration — you state the type explicitly with <code>: type</code></h3>
-          <pre><code>let name: string = "Anoop";
-let age: number = 40;
-let isActive: boolean = true;
-let anything: any = "could be anything";   // opts OUT of type checking</code></pre>
-          <table class="cmp">
-            <thead><tr><th>Type</th><th>Holds</th><th>Example</th></tr></thead>
-            <tbody>
-              <tr><td><code>string</code></td><td>Text</td><td><code>"Trivandrum"</code></td></tr>
-              <tr><td><code>number</code></td><td>Integers <em>and</em> decimals (no separate <code>int</code>/<code>float</code>)</td><td><code>25000.50</code></td></tr>
-              <tr><td><code>boolean</code></td><td>true / false</td><td><code>true</code></td></tr>
-              <tr><td><code>any</code></td><td>Anything — disables checking for that variable</td><td><code>let x: any;</code></td></tr>
-              <tr><td><code>void</code></td><td>Used for functions that return nothing</td><td><code>function log(): void</code></td></tr>
-            </tbody>
-          </table>
-          <div class="warnbox">
-            <span class="lbl">Use <code>any</code> sparingly</span>
-            <code>any</code> switches off the very feature you came for. It's an escape hatch for awkward third-party data, not a default. If your file is full of <code>any</code>, you're writing JavaScript with extra steps.
+          <p class="eyebrow">Concept 5 continued — the step people forget</p>
+          <h2>How TypeScript actually becomes JavaScript</h2>
+          <p class="deep">A browser has never heard of TypeScript. Something has to translate your <code>.ts</code> files into <code>.js</code> files first. That something is the <strong>TypeScript compiler</strong>, and in an Angular project the CLI runs it for you, automatically, every time you save.</p>
+          <div class="flow">
+            <div class="flow-box">You write<span class="sm">app.component.ts</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">TypeScript compiler<span class="sm">checks types, strips them out</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Plain JavaScript<span class="sm">bundled into main.js</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">Browser runs it<span class="sm">localhost:4200</span></div>
           </div>
-        </section>
-
-        <!-- 13. TS: INTERFACES -->
-        <section class="slide">
-          <p class="eyebrow">TypeScript basics · 2 of 7</p>
-          <h2>Interfaces — giving an object a shape</h2>
-          <p class="deep">Types like <code>string</code> describe single values. An <span class="term">interface</span> describes the <strong>shape of an object</strong>: which properties it must have, and of what type.</p>
-          <pre><code>interface Person {
-  name: string;
-  city: string;
-  age: number;
-}
-
-let myData: Person = {
-  name: "Anoop",
-  city: "Trivandrum",
-  age: 40
-};
-
-console.log(myData.name);   // Anoop  — and the editor autocompletes '.name'</code></pre>
-          <p class="deep">Now the compiler protects you in three ways:</p>
-          <pre><code>let bad1: Person = { name: "Anoop", city: "Trivandrum" };
-// ✖ Property 'age' is missing
-
-let bad2: Person = { name: "Anoop", city: "Trivandrum", age: "forty" };
-// ✖ Type 'string' is not assignable to type 'number'
-
-let bad3: Person = { name: "Anoop", city: "Trivandrum", age: 40, pin: 695001 };
-// ✖ Object literal may only specify known properties — 'pin' does not exist on 'Person'</code></pre>
-          <div class="keybox">
-            <span class="lbl">Why this matters for Angular</span>
-            When your API returns a list of employees, you'll declare <code>interface Employee { ... }</code> and type the response as <code>Employee[]</code>. From that moment on, the editor autocompletes every field, and a typo like <code>emp.nmae</code> is caught instantly instead of rendering as <code>undefined</code> in the browser. You'll do exactly this in Session 2.
-          </div>
-        </section>
-
-        <!-- 14. TS: OPTIONAL -->
-        <section class="slide">
-          <p class="eyebrow">TypeScript basics · 3 of 7</p>
-          <h2>Optional properties — the <code>?</code> marker</h2>
-          <p class="deep">Real data is often incomplete: a user hasn't filled in their age, a middle name doesn't exist. Adding <code>?</code> after a property name makes it <strong>optional</strong> — present or absent, both valid.</p>
-          <pre><code>interface Person {
-  name: string;
-  city: string;
-  age?: number;      // ← optional
-}
-
-let p1: Person = { name: "Anoop", city: "Trivandrum", age: 40 };  // ✔ with age
-let p2: Person = { name: "Ajay",  city: "Chennai" };              // ✔ without age
-
-console.log(p2.age);   // undefined — not an error, just absent</code></pre>
-          <div class="note">
-            <span class="lbl">Required vs optional — the mental rule</span>
-            Ask: "could a valid object of this type genuinely be missing this field?" If yes, mark it <code>?</code>. If no, leave it required so the compiler forces you to supply it. Don't mark things optional just to silence an error — that only moves the bug to runtime.
-          </div>
-          <div class="warnbox">
-            <span class="lbl">The catch</span>
-            An optional property may be <code>undefined</code>, so guard before using it: <code>if (p2.age) { ... }</code>. This is exactly the discipline that prevents "cannot read property of undefined" — the single most common error in front-end development.
-          </div>
-        </section>
-
-        <!-- 15. TS: UNIONS -->
-        <section class="slide">
-          <p class="eyebrow">TypeScript basics · 4 of 7</p>
-          <h2>Union types — "one of these"</h2>
-          <p class="deep">Sometimes a value legitimately has more than one possible type. A <span class="term">union type</span>, written with the pipe <code>|</code>, says "any one of these types is acceptable — and nothing else."</p>
-          <pre><code>interface Person {
-  name: string;
-  city: string;
-  age: number | string;      // ← a number OR a string
-}
-
-let p1: Person = { name: "Anoop", city: "Trivandrum", age: 40 };        // ✔
-let p2: Person = { name: "Ajay",  city: "Chennai",    age: "Forty" };   // ✔
-let p3: Person = { name: "Rekha", city: "Kochi",      age: true };      // ✖ boolean not allowed</code></pre>
-          <h3>The genuinely useful form: literal unions</h3>
-          <pre><code>let status: "Active" | "Inactive";
-status = "Active";     // ✔
-status = "active";     // ✖ wrong case — caught at compile time!
-status = "Pending";    // ✖ not one of the allowed values</code></pre>
-          <div class="keybox">
-            <span class="lbl">This is better than an enum for simple cases</span>
-            A literal union gives you a fixed set of allowed strings with full autocomplete and zero runtime code. You'll use exactly this in Session 2 for the employee <code>status</code> field that drives the green/red row colouring.
-          </div>
-        </section>
-
-        <!-- 16. TS: LOOPS -->
-        <section class="slide">
-          <p class="eyebrow">TypeScript basics · 5 of 7</p>
-          <h2>Three ways to loop</h2>
-          <pre><code>let arr = [10, 20, 30, 40];</code></pre>
-          <h3>1 · Classic <code>for</code> — you control the index</h3>
-          <pre><code>for (let i = 0; i &lt; arr.length; i++) {
-  console.log(i + " → " + arr[i]);
-}
-// 0 → 10 · 1 → 20 · 2 → 30 · 3 → 40</code></pre>
-          <h3>2 · <code>for...of</code> — gives you the VALUES</h3>
-          <pre><code>for (let value of arr) {
-  console.log(value);
-}
-// 10 · 20 · 30 · 40</code></pre>
-          <h3>3 · <code>for...in</code> — gives you the KEYS / INDICES</h3>
-          <pre><code>for (let index in arr) {
-  console.log(index);        // "0" · "1" · "2" · "3"  ← strings, not numbers!
-  console.log(arr[index]);   // 10 · 20 · 30 · 40
+          <p class="deep" style="margin-top:18px;">Here is the same code before and after. Notice the types simply <em>vanish</em> — they were only ever instructions to the compiler:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>What you write — <code>greet.ts</code></h3>
+              <pre><code>function greet(name: string): string {
+  return "Hello, " + name;
 }</code></pre>
-          <div class="warnbox">
-            <span class="lbl">The mistake almost everyone makes once</span>
-            <code>for...of</code> = values. <code>for...in</code> = keys. Writing <code>for (let x in arr) console.log(x)</code> when you wanted the values prints <code>0 1 2 3</code> and leaves people staring at the screen. Memorise it as: "<strong>in</strong>dex" for <code>for...in</code>. For arrays, prefer <code>for...of</code>.
+            </div>
+            <div class="panel">
+              <h3>What the browser gets — <code>greet.js</code></h3>
+              <pre><code>function greet(name) {
+  return "Hello, " + name;
+}</code></pre>
+            </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">Where you'll see this again</span>
-            Angular's <code>*ngFor="let emp of employees"</code> is deliberately <code>of</code>, not <code>in</code> — it iterates the values. Knowing the difference here means that syntax will make immediate sense in Session 2.
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            Types are like the <strong>scaffolding</strong> on a building. Essential while you are constructing it, checked carefully by an inspector, and then taken away completely before anyone moves in.
           </div>
         </section>
 
-        <!-- 17. TS: ARRAYS & TUPLES -->
+        <!-- 17. TS 1 — VARIABLES -->
         <section class="slide">
-          <p class="eyebrow">TypeScript basics · 6 of 7</p>
-          <h2>Typed arrays &amp; tuples</h2>
-          <h3>Arrays — many values, all the same type</h3>
-          <pre><code>let numbersArray: number[] = [1, 2, 3];
-numbersArray.push(4);         // ✔
-numbersArray.push("five");    // ✖ Argument of type 'string' is not assignable
+          <p class="eyebrow">TypeScript step 1 of 12</p>
+          <h2>Variables: <code>let</code>, <code>const</code>, and inference</h2>
+          <p class="deep">There are two ways to give a variable a type, and you will use both constantly.</p>
+          <h3>Option A — declare the type yourself</h3>
+          <pre><code>let empName: string = "Anoop";
+let empAge: number = 40;
+let isActive: boolean = true;</code></pre>
+          <p class="deep">The pattern is <code>name<strong>:</strong> type = value</code>. Note the order is the opposite of Java — the name comes first, then a colon, then the type.</p>
+          <h3>Option B — let TypeScript work it out (this is called <span class="term">inference</span>)</h3>
+          <pre><code>let empName = "Anoop";     // TypeScript infers: string
+let empAge = 40;           // infers: number
+let isActive = true;       // infers: boolean
 
-let names: string[] = ["Anoop", "Ajay", "Rekha"];
-let mixed: (number | string)[] = [1, "two", 3, "four"];   // union array
-let people: Person[] = [];    // an array of objects — the Angular workhorse</code></pre>
-          <h3>Tuples — a fixed length, with a fixed type per position</h3>
-          <pre><code>let employee: [number, string, string, number];
-employee = [1001, 'Anoop', 'Software Engineer', 25000.00];   // ✔ exact match
-
-employee = ['Anoop', 1001, 'Software Engineer', 25000.00];   // ✖ wrong order
-employee = [1001, 'Anoop', 'Software Engineer'];             // ✖ wrong length
-
-console.log(employee[1]);   // 'Anoop' — TS knows position 1 is a string</code></pre>
-          <table class="cmp">
-            <thead><tr><th>&nbsp;</th><th>Array</th><th>Tuple</th></tr></thead>
+empAge = 41;               // ✔ fine, still a number
+empAge = "forty-one";      // ✖ Error: Type 'string' is not assignable to type 'number'</code></pre>
+          <div class="keybox">
+            <span class="lbl">You get type safety even when you don't ask for it</span>
+            Because you gave it an initial value, TypeScript already knows the type. <strong>Inference means safety for free</strong> — and it is why real Angular code often looks untyped when it is fully type-checked. Hover over any variable in VS Code and it will tell you the type it inferred.
+          </div>
+          <h3><code>let</code> vs <code>const</code></h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:16%">Keyword</th><th>Meaning</th><th>Java equivalent</th></tr></thead>
             <tbody>
-              <tr><td><strong>Length</strong></td><td>Grows and shrinks freely</td><td>Fixed at declaration</td></tr>
-              <tr><td><strong>Types</strong></td><td>One type (or a union) throughout</td><td>A specific type per position</td></tr>
-              <tr><td><strong>Use it for</strong></td><td>Lists — employees, products, results</td><td>A fixed record — a coordinate pair, a CSV row</td></tr>
+              <tr><td><code>let</code></td><td>A variable whose value can be reassigned later</td><td><code>String x = ...;</code></td></tr>
+              <tr><td><code>const</code></td><td>A variable that can <strong>never</strong> be reassigned. Prefer this by default.</td><td><code>final String x = ...;</code></td></tr>
+              <tr><td><code>var</code></td><td class="bad">Old, badly-behaved JavaScript keyword. <strong>Never use it.</strong></td><td>—</td></tr>
             </tbody>
           </table>
-          <p class="muted">In practice you'll use arrays constantly and tuples rarely. Know tuples exist so you recognise them; reach for an <code>interface</code> whenever the data has meaningful field names.</p>
         </section>
 
-        <!-- 18. TS: CLASSES -->
+        <!-- 18. TS 2 — THE TYPES -->
         <section class="slide">
-          <p class="eyebrow">TypeScript basics · 7 of 7</p>
-          <h2>Classes — because every Angular component is one</h2>
-          <p class="deep">This is the piece that connects TypeScript to Angular. Every component, every service you write is a TypeScript <strong>class</strong>. The syntax will look very familiar coming from Java.</p>
-          <pre><code>class Employee {
-  // properties, with types
+          <p class="eyebrow">TypeScript step 2 of 12</p>
+          <h2>The built-in types you will actually use</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:16%">Type</th><th>Holds</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><code>string</code></td><td>Text. Single or double quotes both work.</td><td><code>let a: string = 'hi';</code></td></tr>
+              <tr><td><code>number</code></td><td>Any number — whole or decimal. There is no separate <code>int</code>/<code>float</code>/<code>double</code>.</td><td><code>let b: number = 3.5;</code></td></tr>
+              <tr><td><code>boolean</code></td><td><code>true</code> or <code>false</code>.</td><td><code>let c: boolean = true;</code></td></tr>
+              <tr><td><code>null</code></td><td>"Deliberately empty."</td><td><code>let d: string | null = null;</code></td></tr>
+              <tr><td><code>undefined</code></td><td>"Never given a value." Different from <code>null</code>.</td><td><code>let e;  // undefined</code></td></tr>
+              <tr><td><code>any</code></td><td class="bad">"Turn type checking off for this." Avoid.</td><td><code>let f: any = 5;</code></td></tr>
+              <tr><td><code>void</code></td><td>Used as a return type meaning "returns nothing".</td><td><code>function g(): void { }</code></td></tr>
+              <tr><td><code>Date</code></td><td>A point in time.</td><td><code>let h = new Date();</code></td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Two things that trip up Java developers</span>
+            <strong>1.</strong> There is only <code>number</code> — no <code>int</code>, <code>long</code>, <code>float</code> or <code>double</code>. Every number is the same type.<br>
+            <strong>2.</strong> <code>null</code> and <code>undefined</code> are <em>two different things</em>. <code>undefined</code> means "this was never set"; <code>null</code> means "someone set this to empty on purpose". You will see both.
+          </div>
+        </section>
+
+        <!-- 19. TS 3 — ANY -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 3 of 12</p>
+          <h2>The <code>any</code> escape hatch — and why to resist it</h2>
+          <p class="deep"><code>any</code> means "this can be anything; stop checking". It makes every error disappear, which is exactly why it is dangerous.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>❌ With <code>any</code></h3>
+              <pre><code>let emp: any = { name: "Anoop" };
+
+emp.nmae;          // no error — typo!
+emp.salary * 2;    // no error — NaN at runtime
+emp.doAnything();  // no error — crash at runtime</code></pre>
+              <p style="font-size:15px;">TypeScript has been told to look away. You are writing plain JavaScript again, but with extra steps.</p>
+            </div>
+            <div class="panel good">
+              <h3>✅ With a real type</h3>
+              <pre><code>let emp: { name: string } = { name: "Anoop" };
+
+emp.nmae;          // ✖ 'nmae' does not exist
+emp.salary * 2;    // ✖ 'salary' does not exist
+emp.doAnything();  // ✖ not a function</code></pre>
+              <p style="font-size:15px;">Three bugs caught in your editor, in the second you typed them, for free.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The rule for this series</span>
+            You are allowed to use <code>any</code> when you are genuinely stuck and want to move on — but treat it as a <strong>note to come back</strong>, never as a solution. Every <code>any</code> is a place where TypeScript has stopped protecting you. Angular projects created by the CLI even switch on a "strict" setting that discourages it.
+          </div>
+        </section>
+
+        <!-- 20. TS 4 — INTERFACES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 4 of 12 — this one matters a lot</p>
+          <h2>Interfaces — giving an object a shape</h2>
+          <p class="deep">So far we have typed single values. Real applications move <strong>objects</strong> around — an employee, a customer, an order. An <span class="term">interface</span> describes what such an object must look like.</p>
+          <div class="fname">src/app/models/employee.ts</div>
+          <pre><code>export interface Employee {
   id: number;
   name: string;
-  private salary: number;         // private — only usable inside this class
+  designation: string;
+  salary: number;
+}</code></pre>
+          <p class="deep">Now TypeScript can check every employee object you create anywhere in the app:</p>
+          <pre><code>const e1: Employee = {
+  id: 1001,
+  name: "Anoop",
+  designation: "Software Engineer",
+  salary: 25000
+};                          // ✔ all four properties, correct types
 
+const e2: Employee = {
+  id: 1002,
+  name: "Ajay"
+};                          // ✖ Error: missing 'designation' and 'salary'
+
+const e3: Employee = {
+  id: "1003",               // ✖ Error: 'string' is not assignable to 'number'
+  name: "Rekha",
+  designation: "Tester",
+  salary: 22000
+};</code></pre>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            An interface is a <strong>form with required fields</strong>. It doesn't fill anything in itself — it just refuses to accept your submission if a field is missing or the wrong kind of thing.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why you will use these constantly</span>
+            When JSON arrives from your Spring Boot API, you will tell Angular "the response is an <code>Employee[]</code>". From that moment your editor autocompletes <code>emp.designation</code> and flags <code>emp.designtaion</code> as a typo. An interface is how you make server data trustworthy on the client. The word <code>export</code> just means "other files may import this".
+          </div>
+        </section>
+
+        <!-- 21. TS 5 — OPTIONAL -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 5 of 12</p>
+          <h2>Optional properties — the <code>?</code> marker</h2>
+          <p class="deep">Sometimes a field genuinely might not be there. A single <code>?</code> after the property name means <strong>"this one is allowed to be missing"</strong>.</p>
+          <pre><code>export interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+  email?: string;        // ← optional
+  phone?: string;        // ← optional
+}
+
+const e1: Employee = {
+  id: 1001, name: "Anoop", designation: "Engineer", salary: 25000
+};                                     // ✔ valid — no email, no phone
+
+const e2: Employee = {
+  id: 1002, name: "Ajay", designation: "Team Lead", salary: 45000,
+  email: "ajay@example.com"
+};                                     // ✔ also valid</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The consequence you must handle</span>
+            Because <code>email</code> might be missing, TypeScript will not let you use it carelessly. This is a <em>good</em> thing — it is forcing you to think about the empty case, which is exactly the bug you would otherwise ship.
+          </div>
+          <pre><code>console.log(e1.email.toUpperCase());
+// ✖ Error: 'e1.email' is possibly 'undefined'
+
+// Fix 1 — check first
+if (e1.email) { console.log(e1.email.toUpperCase()); }
+
+// Fix 2 — optional chaining: "if it exists, then call it"
+console.log(e1.email?.toUpperCase());     // prints: undefined
+
+// Fix 3 — supply a fallback with ??  ("nullish coalescing")
+console.log(e1.email ?? "no email on file");</code></pre>
+          <div class="plainbox">
+            <span class="lbl">Remember these two operators</span>
+            <code>?.</code> means <strong>"only carry on if the thing on the left exists"</strong>. <code>??</code> means <strong>"use the right-hand value if the left is null or undefined"</strong>. You will use <code>?.</code> in Angular templates all the time, while you are waiting for server data to arrive.
+          </div>
+        </section>
+
+        <!-- 22. TS 6 — UNIONS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 6 of 12</p>
+          <h2>Union types — "one of these"</h2>
+          <p class="deep">A <span class="term">union type</span> uses the <code>|</code> symbol to say a value may be one of several types. Read <code>|</code> as the word <strong>"or"</strong>.</p>
+          <pre><code>let empId: number | string;
+
+empId = 1001;        // ✔ a number
+empId = "EMP-1001";  // ✔ a string
+empId = true;        // ✖ Error: 'boolean' is not assignable to 'number | string'</code></pre>
+          <p class="deep">The genuinely useful version restricts a value to <strong>specific allowed words</strong>. This is called a <em>literal union</em>, and it is TypeScript's answer to a Java <code>enum</code>:</p>
+          <pre><code>type Status = "Active" | "Inactive" | "OnLeave";
+
+let s: Status = "Active";      // ✔
+let t: Status = "active";      // ✖ Error — wrong case, caught immediately
+let u: Status = "Retired";     // ✖ Error — not one of the three</code></pre>
+          <div class="fname">Using it inside an interface</div>
+          <pre><code>export interface Employee {
+  id: number;
+  name: string;
+  status: "Active" | "Inactive";     // only these two strings are legal
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why this is better than a plain <code>string</code></span>
+            If <code>status</code> were just a <code>string</code>, then <code>"Actve"</code> would compile happily and your colour-coded table would silently show the wrong colour. As a union, that typo is a red squiggle before you save. Your editor also <strong>autocompletes the three valid values</strong> — you cannot get them wrong.
+          </div>
+        </section>
+
+        <!-- 23. TS 7 — ARRAYS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 7 of 12</p>
+          <h2>Typed arrays</h2>
+          <p class="deep">An array holds many values of the same type. Write the element type, then <code>[]</code>.</p>
+          <pre><code>let names: string[] = ["Anoop", "Ajay", "Rekha"];
+let salaries: number[] = [25000, 45000, 22000];
+let flags: boolean[] = [true, false, true];
+
+names.push("Suresh");     // ✔ fine
+names.push(42);           // ✖ Error: 'number' is not assignable to 'string'</code></pre>
+          <p class="deep">Arrays of your own interfaces are the shape almost all real data takes — this is what a list of employees from your API looks like:</p>
+          <pre><code>let employees: Employee[] = [
+  { id: 1001, name: "Anoop", designation: "Software Engineer", salary: 25000 },
+  { id: 1002, name: "Ajay",  designation: "Team Lead",         salary: 45000 },
+  { id: 1003, name: "Rekha", designation: "Tester",            salary: 22000 }
+];
+
+console.log(employees.length);        // 3
+console.log(employees[0].name);       // Anoop  — and autocomplete works here</code></pre>
+          <h3>Array methods you will use in every Angular app</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:24%">Method</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>filter(fn)</code></td><td>Returns a <strong>new</strong> array containing only items where <code>fn</code> is true. This is how search boxes work.</td></tr>
+              <tr><td><code>find(fn)</code></td><td>Returns the <strong>first</strong> matching item, or <code>undefined</code>. This is how "edit row 1002" works.</td></tr>
+              <tr><td><code>map(fn)</code></td><td>Returns a new array with every item transformed.</td></tr>
+              <tr><td><code>findIndex(fn)</code></td><td>Returns the position of the first match, or <code>-1</code>. Needed for update and delete.</td></tr>
+              <tr><td><code>push(item)</code></td><td>Adds to the end. This is how "insert" works.</td></tr>
+              <tr><td><code>splice(i, 1)</code></td><td>Removes 1 item at position <code>i</code>. This is how "delete" works.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Bookmark this slide</span>
+            In Session 4 you will build a full CRUD screen, and it is <strong>literally these six methods</strong>: <code>push</code> to insert, <code>filter</code> to search, <code>findIndex</code> + <code>splice</code> to delete, <code>find</code> to load a row for editing. Learn them now and Session 4 will feel easy.
+          </div>
+        </section>
+
+        <!-- 24. TS 8 — TUPLES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 8 of 12</p>
+          <h2>Tuples — a fixed-length, mixed-type array</h2>
+          <p class="deep">An ordinary array holds many of <em>one</em> type. A <span class="term">tuple</span> holds a fixed number of values, each with its <em>own</em> type, in a fixed order.</p>
+          <pre><code>// A tuple: exactly two items — a number, then a string, in that order
+let emp: [number, string] = [1001, "Anoop"];
+
+console.log(emp[0] + 1);              // 1002 — TypeScript knows [0] is a number
+console.log(emp[1].toUpperCase());    // ANOOP — and [1] is a string
+
+let wrong: [number, string] = ["Anoop", 1001];   // ✖ Error — order matters
+let tooMany: [number, string] = [1001, "Anoop", true];  // ✖ Error — length is fixed</code></pre>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            An array is a <strong>shopping bag</strong> — put in as many apples as you like. A tuple is an <strong>egg carton</strong> — a fixed number of slots, and each slot expects a specific thing.
+          </div>
+          <div class="note">
+            <span class="lbl">Honest guidance: you will not use these much</span>
+            Tuples appear in exam questions far more often than in real Angular code, because an <strong>interface is almost always clearer</strong>. Compare: <code>[1001, "Anoop"]</code> tells you nothing about what the two values mean, whereas <code>{ id: 1001, name: "Anoop" }</code> is self-documenting. Recognise tuples when you see them; reach for interfaces when you write.
+          </div>
+        </section>
+
+        <!-- 25. TS 9 — LOOPS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 9 of 12</p>
+          <h2>Three ways to loop</h2>
+          <p class="deep">All three appear in real code, and the difference between the middle two catches everyone out once.</p>
+          <h3>1 · The classic <code>for</code> — when you need the index</h3>
+          <pre><code>let names: string[] = ["Anoop", "Ajay", "Rekha"];
+
+for (let i = 0; i &lt; names.length; i++) {
+  console.log(i + " → " + names[i]);
+}
+// 0 → Anoop
+// 1 → Ajay
+// 2 → Rekha</code></pre>
+          <h3>2 · <code>for...of</code> — gives you each <strong>value</strong> <span class="muted">(use this one)</span></h3>
+          <pre><code>for (const n of names) {
+  console.log(n);           // Anoop, Ajay, Rekha
+}</code></pre>
+          <h3>3 · <code>for...in</code> — gives you each <strong>index</strong>, as a string</h3>
+          <pre><code>for (const i in names) {
+  console.log(i);           // "0", "1", "2"  ← strings, not numbers!
+  console.log(names[i]);    // Anoop, Ajay, Rekha
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The classic mix-up — memorise this line</span>
+            <code>for...<strong>of</strong></code> gives you the <strong>o</strong>bject / value. <code>for...<strong>in</strong></code> gives you the <strong>i</strong>ndex / key. Nearly every time you want <code>of</code>. Using <code>in</code> on an array by mistake gives you the strings <code>"0"</code>, <code>"1"</code>, <code>"2"</code>, so <code>i + 1</code> produces <code>"01"</code> instead of <code>1</code> — a memorably confusing bug.
+          </div>
+          <div class="keybox">
+            <span class="lbl">And in Angular?</span>
+            You will rarely write any of these in a template. Angular gives you <code>*ngFor</code>, which loops in the HTML itself. But you will write <code>for...of</code> and the array methods from two slides ago inside your component classes constantly.
+          </div>
+        </section>
+
+        <!-- 26. TS 10 — FUNCTIONS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 10 of 12</p>
+          <h2>Functions — parameters, return types, defaults</h2>
+          <p class="deep">A function in TypeScript types its parameters <em>and</em> its return value. The return type goes after the parameter list, following a colon.</p>
+          <pre><code>function add(a: number, b: number): number {
+  return a + b;
+}
+
+console.log(add(5, 3));         // 8
+console.log(add("5", 3));       // ✖ Error: 'string' is not assignable to 'number'
+console.log(add(5));            // ✖ Error: Expected 2 arguments, but got 1</code></pre>
+          <h3>Returning nothing — <code>void</code></h3>
+          <pre><code>function logEmployee(e: Employee): void {
+  console.log(e.name + " earns " + e.salary);
+  // no return statement — so the return type is void
+}</code></pre>
+          <h3>Optional and default parameters</h3>
+          <pre><code>// greeting is optional — the ? again
+function greet(name: string, greeting?: string): string {
+  return (greeting ?? "Hello") + ", " + name;
+}
+greet("Anoop");            // "Hello, Anoop"
+greet("Anoop", "Welcome"); // "Welcome, Anoop"
+
+// Or give it a default value directly
+function raise(salary: number, percent: number = 10): number {
+  return salary + (salary * percent / 100);
+}
+raise(20000);        // 22000  — used the default 10
+raise(20000, 25);    // 25000</code></pre>
+          <div class="warnbox">
+            <span class="lbl">One rule about optional parameters</span>
+            Every optional parameter must come <strong>after</strong> all the required ones. <code>function f(a?: string, b: number)</code> is an error — TypeScript would have no way to know which argument you meant.
+          </div>
+        </section>
+
+        <!-- 27. TS 11 — ARROW FUNCTIONS -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 11 of 12</p>
+          <h2>Arrow functions — shorter, and everywhere in Angular</h2>
+          <p class="deep">An <span class="term">arrow function</span> is a compact way to write a function. You will meet these constantly in Angular — inside <code>.filter()</code>, inside <code>.subscribe()</code>, inside every event handler.</p>
+          <div class="anno-map">
+            <div class="anno-row">
+              <div class="anno-tag">function (a, b) { return a + b; }</div>
+              <div>The traditional form. Works fine, just wordy.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">(a, b) =&gt; { return a + b; }</div>
+              <div>Arrow form. <code>function</code> is gone; <code>=&gt;</code> sits between the parameters and the body.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">(a, b) =&gt; a + b</div>
+              <div>One-expression form. With no braces, the value is <strong>returned automatically</strong> — no <code>return</code> keyword.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">n =&gt; n * 2</div>
+              <div>A single parameter needs no brackets either. This is the form you will see most often.</div>
+            </div>
+          </div>
+          <h3>Why they matter — this is the real use case</h3>
+          <pre><code>let employees: Employee[] = [ /* ...four employees... */ ];
+
+// "give me employees earning over 30000"
+const rich = employees.filter(e =&gt; e.salary &gt; 30000);
+
+// "give me just their names"
+const names = employees.map(e =&gt; e.name);
+
+// "find the one with id 1002"
+const one = employees.find(e =&gt; e.id === 1002);</code></pre>
+          <p class="deep">Read <code>e =&gt; e.salary &gt; 30000</code> as the sentence: <em>"given an employee <code>e</code>, is its salary greater than 30000?"</em> If you have used Java streams, this is exactly a lambda: <code>e -&gt; e.getSalary() &gt; 30000</code>. Same idea, different arrow.</p>
+          <div class="warnbox">
+            <span class="lbl">Also: always compare with <code>===</code>, never <code>==</code></span>
+            <code>===</code> compares value <strong>and</strong> type — which is what you want, always. <code>==</code> tries to convert types first, giving nonsense like <code>0 == ""</code> being <code>true</code>. Use three equals signs every single time.
+          </div>
+        </section>
+
+        <!-- 28. TS 12 — CLASSES -->
+        <section class="slide">
+          <p class="eyebrow">TypeScript step 12 of 12 — the most important one</p>
+          <h2>Classes — because every Angular component is one</h2>
+          <p class="deep">If you know Java classes, you already know this. Three differences to spot: <code>public</code> is the default, a field's type comes after a colon, and the constructor is always called <code>constructor</code>.</p>
+          <pre><code>export class Employee {
+  // fields — declared with their types
+  id: number;
+  name: string;
+  salary: number;
+
+  // the constructor — always literally named 'constructor'
   constructor(id: number, name: string, salary: number) {
     this.id = id;
     this.name = name;
     this.salary = salary;
   }
 
-  // a method — note the return type after the parentheses
+  // a method — no 'public' needed, it's the default
   getDetails(): string {
-    return this.id + " - " + this.name;
+    return this.id + " — " + this.name;
+  }
+
+  applyRaise(percent: number): void {
+    this.salary = this.salary + (this.salary * percent / 100);
   }
 }
 
-let e1 = new Employee(1001, "Anoop", 25000);
-console.log(e1.getDetails());    // 1001 - Anoop
-console.log(e1.salary);          // ✖ Property 'salary' is private</code></pre>
-          <h3>The constructor shorthand you'll see everywhere in Angular</h3>
-          <pre><code>// These two classes are IDENTICAL. TypeScript declares AND assigns
-// the property for you when you put an access modifier on the parameter.
-class Employee {
-  constructor(public id: number, public name: string) { }
-}</code></pre>
+// Creating one — 'new', exactly like Java
+const e = new Employee(1001, "Anoop", 25000);
+console.log(e.getDetails());     // 1001 — Anoop
+e.applyRaise(10);
+console.log(e.salary);           // 27500</code></pre>
           <div class="keybox">
-            <span class="lbl">Remember this shorthand</span>
-            In Session 3 you will write <code>constructor(private employeeService: EmployeeService) { }</code> and it will look like nothing is happening. It is: that one line declares a private field <em>and</em> assigns Angular's injected service to it. This shorthand is the single most common line of code in a real Angular app.
+            <span class="lbl">Interface or class — which do I use?</span>
+            An <strong>interface</strong> is a shape check only; it disappears at compile time and cannot hold logic. A <strong>class</strong> is real code that exists at runtime and can have methods. Rule of thumb: use an <strong>interface for data</strong> coming from your API, and a <strong>class when you need behaviour</strong>. Every Angular component you write will be a class.
           </div>
-          <table class="cmp">
-            <thead><tr><th>Modifier</th><th>Visible where</th></tr></thead>
+        </section>
+
+        <!-- 29. TS — ACCESS MODIFIERS + SHORTHAND -->
+        <section class="slide">
+          <p class="eyebrow">Classes continued — remember this slide in Session 3</p>
+          <h2>Access modifiers and the constructor shorthand</h2>
+          <h3>Access modifiers work as you would expect</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:18%">Modifier</th><th>Visible where</th><th>Note</th></tr></thead>
             <tbody>
-              <tr><td><code>public</code> (the default)</td><td>Everywhere — including the component's HTML template</td></tr>
-              <tr><td><code>private</code></td><td>Only inside the same class</td></tr>
-              <tr><td><code>protected</code></td><td>The class and its subclasses</td></tr>
-              <tr><td><code>readonly</code></td><td>Assignable once, in the constructor; never again</td></tr>
+              <tr><td><code>public</code></td><td>Everywhere</td><td>The <strong>default</strong> — you rarely type it</td></tr>
+              <tr><td><code>private</code></td><td>Only inside this class</td><td>Use it to protect internal data</td></tr>
+              <tr><td><code>protected</code></td><td>This class and its subclasses</td><td>Uncommon in Angular code</td></tr>
+              <tr><td><code>readonly</code></td><td>Everywhere, but cannot be reassigned</td><td>Like Java's <code>final</code></td></tr>
             </tbody>
           </table>
-          <div class="warnbox">
-            <span class="lbl">Angular-specific gotcha</span>
-            A component's HTML template can only see <strong>public</strong> members. If you mark a property <code>private</code> and then use it in your template with <code>{{ }}</code>, the build fails. Keep template-bound properties public.
-          </div>
-        </section>
+          <h3>Now the shorthand — and it is the one you must recognise</h3>
+          <p class="deep">Writing the same field name three times (declare, parameter, assign) is tedious, so TypeScript has a shortcut: <strong>put an access modifier on a constructor parameter, and it becomes a field automatically.</strong></p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The long way</h3>
+              <pre><code>class Employee {
+  private id: number;
+  private name: string;
 
-        <!-- 19. TS: FUNCTIONS -->
-        <section class="slide">
-          <p class="eyebrow">TypeScript bonus — you'll need this in Session 3</p>
-          <h2>Functions &amp; arrow functions</h2>
-          <p class="deep">Typed parameters and a typed return value turn a function into a contract the compiler enforces at every call site.</p>
-          <pre><code>// Normal function: typed parameters, typed return
-function add(a: number, b: number): number {
-  return a + b;
-}
-
-// Optional parameter (?) and a default value
-function greet(name: string, title?: string): string {
-  return title ? title + " " + name : name;
-}
-
-// void = returns nothing
-function logIt(msg: string): void {
-  console.log(msg);
+  constructor(id: number,
+              name: string) {
+    this.id = id;
+    this.name = name;
+  }
 }</code></pre>
-          <h3>Arrow functions — the compact form Angular uses constantly</h3>
-          <pre><code>// long form
-let double = function (n: number): number { return n * 2; };
-
-// arrow form — identical behaviour
-let double2 = (n: number): number =&gt; n * 2;
-
-// This shape is what you'll write when subscribing to HTTP calls:
-this.http.get('/api/users').subscribe(
-  data =&gt; { this.users = data; },        // success handler
-  error =&gt; { console.log(error); }       // error handler
-);</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Identical, using the shorthand</h3>
+              <pre><code>class Employee {
+  constructor(
+    private id: number,
+    private name: string
+  ) { }
+}</code></pre>
+            </div>
+          </div>
           <div class="keybox">
-            <span class="lbl">Why arrow functions matter in Angular specifically</span>
-            An arrow function keeps <code>this</code> pointing at your component. A traditional <code>function () { }</code> callback does <em>not</em> — inside it, <code>this</code> becomes something else entirely and <code>this.users = data</code> silently fails. Always use arrow functions for callbacks in Angular. This one habit prevents a genuinely baffling class of bug.
+            <span class="lbl">Why this slide exists</span>
+            In Session 3 you will write <code>constructor(private http: HttpClient) { }</code> and wonder where the <code>http</code> field came from. <strong>This is where.</strong> The word <code>private</code> on that parameter silently declared and assigned the field for you. If you have used Spring's constructor injection, this is the same pattern with less typing.
           </div>
         </section>
 
-        <!-- 20. COMPILATION -->
+        <!-- 30. TS CHEAT SHEET -->
         <section class="slide">
-          <p class="eyebrow">How it actually runs</p>
-          <h2>From TypeScript to a running page</h2>
-          <p class="deep">Browsers do not understand TypeScript. Something has to translate it — and the Angular CLI does this for you, automatically, every time you save a file.</p>
-          <div class="flow">
-            <div class="flow-box">You write <span class="sm">.ts files</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">TS compiler <span class="sm">checks types, strips them</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">Angular compiler <span class="sm">templates → render code</span></div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">Bundled JS <span class="sm">served to the browser</span></div>
+          <p class="eyebrow">One slide to revise the whole language from</p>
+          <h2>TypeScript cheat sheet</h2>
+          <pre><code>// ── Variables ───────────────────────────────────────────────
+let   mutable: string = "can be reassigned";
+const fixed:   number = 42;                    // prefer const
+
+// ── Interfaces: the shape of an object ──────────────────────
+export interface Employee {
+  id: number;
+  name: string;
+  status: "Active" | "Inactive";               // union of literals
+  email?: string;                              // optional
+}
+
+// ── Arrays &amp; tuples ────────────────────────────────────────
+let names: string[]      = ["Anoop", "Ajay"];
+let staff: Employee[]    = [];
+let pair:  [number, string] = [1001, "Anoop"];
+
+// ── Loops ───────────────────────────────────────────────────
+for (let i = 0; i &lt; names.length; i++) { }     // index, manual
+for (const n of names) { }                     // VALUE   ← usual choice
+for (const i in names) { }                     // INDEX, as a string
+
+// ── Functions ───────────────────────────────────────────────
+function add(a: number, b: number): number { return a + b; }
+function log(msg: string): void { console.log(msg); }
+const double = (n: number): number =&gt; n * 2;   // arrow function
+
+// ── Array helpers you will use daily ───────────────────────
+staff.filter(e =&gt; e.salary &gt; 30000);           // search
+staff.find(e =&gt; e.id === 1002);                // fetch one
+staff.findIndex(e =&gt; e.id === 1002);           // position, or -1
+staff.map(e =&gt; e.name);                        // transform
+staff.push(newEmployee);                       // insert
+staff.splice(index, 1);                        // delete
+
+// ── Classes ─────────────────────────────────────────────────
+export class EmployeeService {
+  private staff: Employee[] = [];              // private field
+  constructor(private http: HttpClient) { }    // shorthand: declares + assigns
+  getAll(): Employee[] { return this.staff; }
+}
+
+// ── Safety operators ────────────────────────────────────────
+emp.email?.toUpperCase();                      // only if email exists
+emp.email ?? "none";                           // fallback if null/undefined
+if (a === b) { }                               // ALWAYS ===, never ==</code></pre>
+        </section>
+
+
+        <!-- 31. SETUP — NODE -->
+        <section class="slide">
+          <p class="eyebrow">Part 3 — getting Angular running · Concept 6</p>
+          <h2>Environment setup, step 1: Node.js and npm</h2>
+          <p class="deep">Angular's tooling — the compiler, the development server, the bundler — is itself written in JavaScript. To run JavaScript on your own machine rather than in a browser, you need <strong>Node.js</strong>.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🟩</div><h3>Node.js</h3><p>A JavaScript runtime for your computer. Think of it as the <strong>JVM of the JavaScript world</strong>: the thing that executes the code.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>npm</h3><p>Node Package Manager. Downloads libraries and records them in a file. It is <strong>Maven, for JavaScript</strong> — and it is installed automatically with Node.</p></div>
           </div>
-          <p class="deep" style="margin-top:18px;">Two things are worth internalising here:</p>
-          <ul>
-            <li><strong>Types vanish.</strong> The JavaScript that reaches the browser has no type annotations at all. Types are a development-time safety net with zero runtime cost.</li>
-            <li><strong>Type errors stop the build.</strong> If your types don't line up, <code>ng serve</code> prints the error and the browser shows the previous working version. That red text in the terminal is your friend — read it, it names the file and line.</li>
-          </ul>
-          <div class="note">
-            <span class="lbl">You will never run the compiler by hand</span>
-            <code>ng serve</code> starts a watcher: save a file → recompile → the browser refreshes itself in under a second. That loop is what makes front-end development feel fast, and it's the first thing you'll verify in the lab.
+          <h3>Install and verify</h3>
+          <ol class="steps" style="font-size:16.5px;">
+            <li>Go to <code>nodejs.org</code> and download the <strong>LTS</strong> build. LTS means "Long Term Support" — the stable one. Do <em>not</em> take "Current".</li>
+            <li>Run the installer and accept every default. On Windows, leave "Add to PATH" ticked.</li>
+            <li><strong>Close your terminal and open a new one.</strong> This step is skipped constantly and it is why the next command appears to fail.</li>
+            <li>Check both tools respond:</li>
+          </ol>
+          <pre><code>node -v
+npm -v</code></pre>
+          <div class="keybox">
+            <span class="lbl">What good looks like</span>
+            <code>node -v</code> prints something like <code>v20.11.1</code> and <code>npm -v</code> prints something like <code>10.2.4</code>. You want Node <strong>18 or higher</strong>. If either command says "not found", Node is either not installed or not on your PATH — reopen the terminal first, then reinstall if it persists.
+          </div>
+          <div class="analogy">
+            <span class="lbl">The Java parallel, line for line</span>
+            <code>node -v</code> is your <code>java -version</code>. <code>npm</code> is your <code>mvn</code>. <code>package.json</code> is your <code>pom.xml</code>. <code>node_modules/</code> is your <code>~/.m2</code> folder of downloaded dependencies. Nothing here is a new idea — only new names.
           </div>
         </section>
 
-        <!-- 21. SETUP -->
+        <!-- 32. SETUP — CLI -->
         <section class="slide">
-          <p class="eyebrow">Setup · step 1</p>
-          <h2>Environment setup</h2>
-          <p class="deep">Exactly two installs. Node.js first, then the Angular CLI — in that order, because the CLI is installed <em>by</em> Node's package manager.</p>
-          <h3>1 · Install Node.js (choose the LTS version)</h3>
-          <p class="deep">Download from <code>nodejs.org</code>. Node gives you two commands: <code>node</code> (a JavaScript runtime outside the browser) and <code>npm</code> (Node Package Manager — the Maven of the JavaScript world). Verify:</p>
-          <pre><code>node -v      # e.g. v20.11.1
-npm -v       # e.g. 10.2.4</code></pre>
-          <h3>2 · Install the Angular CLI, globally</h3>
-          <pre><code>npm install -g @angular/cli
-
-ng version   # confirms the install</code></pre>
+          <p class="eyebrow">Concept 6 continued</p>
+          <h2>Environment setup, step 2: the Angular CLI</h2>
+          <p class="deep">The <strong>Angular CLI</strong> is the command-line tool that creates projects, generates files, runs a development server and builds for production. You install it once, globally, and then use it in every project.</p>
+          <pre><code>npm install -g @angular/cli</code></pre>
           <div class="anno-map">
-            <div class="anno-row"><div class="anno-tag">npm install</div><div>Download and install a package</div></div>
-            <div class="anno-row"><div class="anno-tag">-g</div><div><strong>Globally</strong> — available from any folder, not just one project. Needed here because you run <code>ng new</code> <em>before</em> a project exists.</div></div>
-            <div class="anno-row"><div class="anno-tag">@angular/cli</div><div>The package name. The <code>@angular/</code> prefix is a "scope" — Angular's official namespace on npm.</div></div>
+            <div class="anno-row"><div class="anno-tag">npm install</div><div>Download a package.</div></div>
+            <div class="anno-row"><div class="anno-tag">-g</div><div>Globally — available from any folder, not just this one. Without <code>-g</code> it installs into the current project only.</div></div>
+            <div class="anno-row"><div class="anno-tag">@angular/cli</div><div>The package name. The <code>@angular/</code> prefix is a "scope" — it marks the package as officially published by the Angular team.</div></div>
           </div>
+          <p class="deep" style="margin-top:16px;">Then confirm it worked:</p>
+          <pre><code>ng version</code></pre>
+          <p class="deep">You should see an ASCII Angular logo and a table of versions. From now on, every Angular command starts with <code>ng</code>.</p>
           <div class="warnbox">
-            <span class="lbl">If <code>ng</code> is "not recognised" after installing</span>
-            <strong>Close and reopen your terminal.</strong> The PATH is only read when a shell starts. On macOS/Linux you may need <code>sudo npm install -g @angular/cli</code>. Behind a corporate proxy, set <code>npm config set proxy http://your-proxy:port</code> first.
+            <span class="lbl">If <code>ng</code> is "not recognised"</span>
+            The install probably succeeded but the terminal was already open when it finished. <strong>Close it and open a new one.</strong> On Windows PowerShell you may also hit a script-execution block — the fix is <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>. Behind a corporate proxy, set <code>npm config set proxy http://your-proxy:port</code> and the matching <code>https-proxy</code> first.
           </div>
         </section>
 
-        <!-- 22. HELLO WORLD -->
+        <!-- 33. FIRST APP -->
         <section class="slide">
-          <p class="eyebrow">Setup · step 2</p>
+          <p class="eyebrow">Concept 7 — the moment it becomes real</p>
           <h2>Your first app — three commands</h2>
           <pre><code>ng new hello-world
 cd hello-world
-ng serve</code></pre>
-          <p class="deep"><code>ng new</code> asks you two or three questions. For today:</p>
-          <table class="cmp">
-            <thead><tr><th>Prompt</th><th>Answer</th><th>Why</th></tr></thead>
+ng serve -o</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">ng new hello-world</div><div>Creates a complete, working project in a new folder called <code>hello-world</code>. It asks you two or three questions, then downloads dependencies. Give it two or three minutes.</div></div>
+            <div class="anno-row"><div class="anno-tag">cd hello-world</div><div>Move into the folder it just made. Every <code>ng</code> command after this must be run from inside the project.</div></div>
+            <div class="anno-row"><div class="anno-tag">ng serve -o</div><div>Compiles the app, starts a small development server on port <strong>4200</strong>, and <code>-o</code> opens your browser automatically.</div></div>
+          </div>
+          <h3>The questions <code>ng new</code> asks — and what to answer today</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:44%">Question</th><th>Answer for this series</th><th>Why</th></tr></thead>
             <tbody>
-              <tr><td>Would you like to add Angular routing?</td><td><strong>No</strong> (press N)</td><td>We add routing deliberately in Session 4, so you see what it does.</td></tr>
-              <tr><td>Which stylesheet format?</td><td><strong>CSS</strong> (press Enter)</td><td>Plain CSS — no extra syntax to learn on day one.</td></tr>
-              <tr><td>Share usage data with Google?</td><td>Either</td><td>Doesn't affect anything.</td></tr>
+              <tr><td>Which stylesheet format?</td><td><strong>CSS</strong></td><td>Plain CSS. SCSS is excellent but it is one more thing to learn today.</td></tr>
+              <tr><td>Enable server-side rendering / SSR?</td><td><strong>No</strong></td><td>Adds a server layer we do not need and extra files that would confuse the tour.</td></tr>
+              <tr><td>Share pseudonymous usage data?</td><td><strong>No</strong></td><td>Entirely your choice; it changes nothing about the app.</td></tr>
             </tbody>
           </table>
-          <p class="deep">Then <code>ng serve</code> compiles the app, starts a development web server, and watches your files:</p>
-          <pre><code>✔ Compiled successfully.
-** Angular Live Development Server is listening on localhost:4200 **</code></pre>
-          <p class="deep">Open <code>http://localhost:4200</code> and you'll see Angular's welcome page:</p>
           <div class="browser">
             <div class="bar">
               <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
               <span class="url">http://localhost:4200</span>
             </div>
-            <div class="viewport" style="text-align:center;">
-              <p style="font-size:22px;font-weight:700;margin:6px 0 2px;">🅰️ hello-world app is running!</p>
-              <p class="muted" style="font-size:14px;">Resources · Next Steps · More Angular …</p>
+            <div class="viewport">
+              <p style="text-align:center;font-size:22px;font-weight:700;">Hello, hello-world 🅰️</p>
+              <p style="text-align:center;" class="muted">Congratulations! Your app is running. Resources · Next steps</p>
+            </div>
+          </div>
+          <div class="expected">
+            <span class="lbl">This is the milestone</span>
+            A welcome page on <code>localhost:4200</code>. It is generated placeholder content — we replace it in a moment — but if you can see it, <strong>your entire toolchain works</strong>. That is Task 2 of the lab.
+          </div>
+        </section>
+
+        <!-- 34. WHAT JUST HAPPENED -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 continued — don't skip this</p>
+          <h2>What those three commands actually did</h2>
+          <p class="deep">A lot happened invisibly. Understanding it now prevents a great deal of confusion later.</p>
+          <div class="flow vert">
+            <div class="flow-box">1 · <code>ng new</code> creates ~20 config and source files<span class="sm">the project skeleton, ready to run</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">2 · It runs <code>npm install</code> for you<span class="sm">downloading a few hundred MB into node_modules/</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">3 · <code>ng serve</code> compiles your TypeScript to JavaScript<span class="sm">and bundles it into a handful of .js files</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">4 · It starts a development web server on port 4200<span class="sm">serving those bundles, only on your machine</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">5 · It <strong>watches your files</strong> and recompiles on every save<span class="sm">the browser then refreshes itself — "live reload"</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Step 5 is the one that changes how you work</span>
+            Leave <code>ng serve</code> running in its own terminal <strong>all day</strong>. Edit a file, press save, and glance at the browser — it has already updated. You never manually rebuild and you never manually refresh. Open a <em>second</em> terminal for other <code>ng</code> commands.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two things beginners do here</span>
+            <strong>1.</strong> Pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> in that terminal stops the server, and then <code>localhost:4200</code> goes blank. That is not a bug — restart it with <code>ng serve</code>.<br>
+            <strong>2.</strong> Running <code>ng serve</code> twice gives "port 4200 is already in use". You already have one running; use the tab you already had, or start the second on another port with <code>ng serve --port 4300</code>.
+          </div>
+        </section>
+
+        <!-- 35. PROJECT ANATOMY -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 — the guided tour</p>
+          <h2>Anatomy of a generated project</h2>
+          <p class="deep">Twenty files appeared. That is intimidating for about ten minutes, and then you realise you only ever touch three of them. Here is the whole tree:</p>
+          <div class="tree">hello-world/
+├── node_modules/          <span class="c">every downloaded library — never edit, never commit</span>
+├── src/                   <span class="c">★ YOUR CODE LIVES HERE — this is the only folder you open</span>
+│   ├── app/               <span class="c">★ your components, services and models</span>
+│   ├── assets/            <span class="c">images, fonts, static JSON files</span>
+│   ├── index.html         <span class="c">the ONE page of your single-page application</span>
+│   ├── main.ts            <span class="c">the entry point — the first code that runs</span>
+│   └── styles.css         <span class="c">global styles, applied to the whole app</span>
+├── angular.json           <span class="c">CLI configuration — build options, file paths</span>
+├── package.json           <span class="c">dependency list + the npm scripts (your pom.xml)</span>
+├── package-lock.json      <span class="c">exact resolved versions, so every machine matches</span>
+├── tsconfig.json          <span class="c">TypeScript compiler settings, including strict mode</span>
+└── .gitignore             <span class="c">tells git to skip node_modules/ and dist/</span></div>
+          <div class="plainbox">
+            <span class="lbl">The 90% rule</span>
+            Ninety percent of your work happens inside <code>src/app/</code>. Everything above that line is configuration you will not touch for months. If a slide mentions a file outside <code>src/</code>, it is for context — not something you need to memorise.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">About <code>node_modules/</code></span>
+            It is huge — often hundreds of megabytes and tens of thousands of files — and it is <strong>never committed to git</strong>. It can always be recreated by running <code>npm install</code>, because <code>package.json</code> lists everything needed. If a teammate's project won't start after they clone it, "did you run <code>npm install</code>?" is the first question.
+          </div>
+        </section>
+
+        <!-- 36. INSIDE SRC/APP -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 continued</p>
+          <h2>Inside <code>src/app/</code> — the four files that matter</h2>
+          <div class="tree">src/app/
+├── app.component.ts       <span class="c">★ the CLASS — your logic and data (TypeScript)</span>
+├── app.component.html     <span class="c">★ the TEMPLATE — what the user sees (HTML)</span>
+├── app.component.css      <span class="c">★ the STYLES — scoped to this component only</span>
+├── app.component.spec.ts  <span class="c">unit tests — ignore for this series</span>
+└── app.module.ts          <span class="c">the app's registry of components and features</span></div>
+          <p class="deep">Those first three files are <strong>one component split three ways</strong>: behaviour, markup, appearance. Every component you ever generate follows this identical pattern, which is why Angular projects are so easy to navigate.</p>
+          <div class="fname">src/app/app.component.ts</div>
+          <pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',                   // the HTML tag that renders this
+  templateUrl: './app.component.html',    // where its markup lives
+  styleUrls: ['./app.component.css']      // where its styles live
+})
+export class AppComponent {
+  title = 'hello-world';                  // data the template can display
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">@Component({ ... })</div><div>A <strong>decorator</strong> — extra information attached to the class. It tells Angular "this class is a component, and here is how to render it". It is Angular's <code>@RestController</code>.</div></div>
+            <div class="anno-row"><div class="anno-tag">selector: 'app-root'</div><div>The custom HTML tag name. Wherever <code>&lt;app-root&gt;&lt;/app-root&gt;</code> appears, Angular puts this component.</div></div>
+            <div class="anno-row"><div class="anno-tag">title = 'hello-world'</div><div>An ordinary class field. The template can display it with <code>{{ title }}</code> — that is Session 2's first topic.</div></div>
+          </div>
+        </section>
+
+        <!-- 37. THE BOOT CHAIN -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 continued — the question everyone asks</p>
+          <h2>How does the browser find your component?</h2>
+          <p class="deep">You never wrote a line linking <code>index.html</code> to <code>AppComponent</code>, yet it works. There is a four-step chain, and it is worth being able to recite it.</p>
+          <div class="flow vert">
+            <div class="flow-box">1 · <code>src/index.html</code><span class="sm">contains just &lt;app-root&gt;&lt;/app-root&gt; in its body</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">2 · <code>src/main.ts</code><span class="sm">the entry point — it bootstraps AppModule</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">3 · <code>app.module.ts</code><span class="sm">its bootstrap: [AppComponent] names the starting component</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">4 · <code>app.component.ts</code><span class="sm">selector 'app-root' matches the tag — Angular renders it there</span></div>
+          </div>
+          <div class="panels" style="margin-top:18px;">
+            <div class="panel">
+              <h3><code>src/index.html</code> — the whole body</h3>
+              <pre><code>&lt;body&gt;
+  &lt;app-root&gt;&lt;/app-root&gt;
+&lt;/body&gt;</code></pre>
+              <p style="font-size:15px;">That is genuinely all of it. Your entire application is injected into that one empty tag.</p>
+            </div>
+            <div class="panel">
+              <h3><code>src/main.ts</code></h3>
+              <pre><code>platformBrowserDynamic()
+  .bootstrapModule(AppModule)
+  .catch(err =&gt; console.error(err));</code></pre>
+              <p style="font-size:15px;">"Start Angular in a browser, beginning from <code>AppModule</code>." You will almost never edit this file.</p>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">Why port 4200?</span>
-            It's simply Angular's default development port — nothing magic. Add <code>--port 4300</code> if 4200 is taken. <code>ng serve</code> keeps running: leave that terminal open all session and use a second one for other commands.
+            <span class="lbl">Learn this sentence</span>
+            <strong><code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code> → the tag <code>&lt;app-root&gt;</code>.</strong> It is a standard interview question, and more usefully it is how you debug a blank white page: check each link in the chain in order.
           </div>
         </section>
 
-        <!-- 23. PROJECT ANATOMY -->
+        <!-- 38. NGMODULE -->
         <section class="slide">
-          <p class="eyebrow">Understanding what you just generated</p>
-          <h2>Anatomy of a generated project</h2>
-          <div class="tree">hello-world/
-├── <span class="c">node_modules/</span>        <span class="c">← every downloaded library (huge; never edit, never commit)</span>
-├── src/                 <span class="c">← YOUR CODE LIVES HERE. 95% of your time is in this folder.</span>
-│   ├── app/
-│   │   ├── app.component.css       <span class="c">styles for this component only</span>
-│   │   ├── app.component.html      <span class="c">the TEMPLATE — what the user sees</span>
-│   │   ├── app.component.spec.ts   <span class="c">unit tests for this component</span>
-│   │   ├── app.component.ts        <span class="c">the CLASS — data &amp; logic</span>
-│   │   └── app.module.ts           <span class="c">declares what belongs to this app</span>
-│   ├── assets/          <span class="c">images, fonts, static files</span>
-│   ├── index.html       <span class="c">the ONE page of the single-page app</span>
-│   ├── main.ts          <span class="c">the entry point — starts Angular</span>
-│   └── styles.css       <span class="c">global styles, applied app-wide</span>
-├── angular.json         <span class="c">CLI/build configuration</span>
-├── package.json         <span class="c">dependencies + scripts (the pom.xml of npm)</span>
-└── tsconfig.json        <span class="c">TypeScript compiler settings</span></div>
-          <div class="warnbox">
-            <span class="lbl">Beginner note — "why are there so many files?!"</span>
-            Your Hello World has a dozen-plus files, whereas a Java Hello World is one class with a <code>main()</code>. That's normal and it's a trade: Angular front-loads structure so that a <em>large</em> app stays organised. Every project you ever open will have this same layout — which means you'll always know where to look. You'll only touch <code>src/app/</code> today.
-          </div>
-        </section>
+          <p class="eyebrow">Concept 8 continued</p>
+          <h2><code>app.module.ts</code> — the app's registry</h2>
+          <p class="deep">An <span class="term">NgModule</span> is a list: "here is everything my application is made of". Angular will not use a component it has not been told about, and that single fact explains most beginner errors.</p>
+          <div class="fname">src/app/app.module.ts</div>
+          <pre><code>import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
 
-        <!-- 24. THE FIVE FILES -->
-        <section class="slide">
-          <p class="eyebrow">The five files that matter today</p>
-          <h2>Inside <code>src/app/</code></h2>
-          <div class="stack">
-            <div class="stack-row l1"><span class="layer">app.component.ts</span><span class="desc">The <strong>class</strong>. Properties (data) and methods (behaviour), plus the <code>@Component</code> decorator that links it to its template and styles.</span></div>
-            <div class="stack-row l2"><span class="layer">app.component.html</span><span class="desc">The <strong>template</strong>. The HTML the user actually sees, with Angular syntax like <code>{{ title }}</code> woven in.</span></div>
-            <div class="stack-row l3"><span class="layer">app.component.css</span><span class="desc">Styles <strong>scoped to this component only</strong>. A rule here cannot leak out and break another component — a genuinely valuable guarantee.</span></div>
-            <div class="stack-row l4"><span class="layer">app.component.spec.ts</span><span class="desc">Unit tests for this component. Generated for you; safe to ignore for these four sessions.</span></div>
-            <div class="stack-row l2"><span class="layer">app.module.ts</span><span class="desc">The <strong>manifest</strong>. Declares which components belong to the app, which Angular modules it imports (e.g. <code>FormsModule</code>), and which component to boot first.</span></div>
-          </div>
-          <p class="deep" style="margin-top:16px;">Notice the naming pattern — it is rigidly consistent and worth learning now:</p>
-          <div class="keybox">
-            <span class="lbl">The naming convention</span>
-            <code>&lt;name&gt;.component.&lt;type&gt;</code> — so <code>login.component.ts</code>, <code>login.component.html</code>, <code>login.component.css</code>, <code>login.component.spec.ts</code>. Services follow the same idea: <code>employee.service.ts</code>. Every Angular developer in the world uses this, and the CLI enforces it.
-          </div>
-        </section>
-
-        <!-- 25. HOW IT BOOTS -->
-        <section class="slide">
-          <p class="eyebrow">Deep dive — the question everyone asks</p>
-          <h2>How does the browser find your component?</h2>
-          <p class="deep">You open <code>index.html</code> and there's almost nothing in it. So how does your app appear? Follow the chain:</p>
-          <div class="flow vert" style="max-width:760px;">
-            <div class="flow-box">1 · <code>index.html</code> loads <span class="sm">its &lt;body&gt; contains just: &lt;app-root&gt;&lt;/app-root&gt;</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box alt">2 · <code>main.ts</code> runs <span class="sm">bootstrapModule(AppModule) — hands control to Angular</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box alt">3 · <code>app.module.ts</code> is read <span class="sm">bootstrap: [AppComponent] — "start with this component"</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box green">4 · <code>AppComponent</code> renders <span class="sm">its selector is 'app-root', so its template replaces that tag</span></div>
-          </div>
-          <p class="deep" style="margin-top:18px;">That's the whole mechanism. The <code>selector</code> in the <code>@Component</code> decorator is a <strong>custom HTML tag name</strong>. Wherever that tag appears, Angular renders that component's template.</p>
-          <pre><code>@Component({
-  selector: 'app-root',                 // ← matches &lt;app-root&gt; in index.html
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+@NgModule({
+  declarations: [
+    AppComponent          // ← every component of MINE goes in this list
+  ],
+  imports: [
+    BrowserModule         // ← features from Angular or other libraries
+  ],
+  providers: [],          // ← services (Session 3)
+  bootstrap: [AppComponent]  // ← the component to start the app with
 })
-export class AppComponent {
-  title = 'hello-world';
-}</code></pre>
-          <div class="keybox">
-            <span class="lbl">The unlock for Session 2</span>
-            Once you see that a component is just "a tag plus a template", nesting becomes obvious. Generate a <code>header</code> component, drop <code>&lt;app-header&gt;&lt;/app-header&gt;</code> into another template, and it appears there. That's how the component tree is built — and it's the first thing you'll do in Session 2's lab.
-          </div>
-        </section>
-
-        <!-- 26. CLI CHEATSHEET -->
-        <section class="slide">
-          <p class="eyebrow">Your daily toolbox</p>
-          <h2>Angular CLI commands worth knowing</h2>
-          <table class="cmp">
-            <thead><tr><th style="width:34%">Command</th><th>What it does</th></tr></thead>
+export class AppModule { }</code></pre>
+          <table class="cmp tight">
+            <thead><tr><th style="width:22%">Section</th><th>What goes in it</th></tr></thead>
             <tbody>
-              <tr><td><code>ng new my-app</code></td><td>Creates a complete new project, folder structure and all</td></tr>
-              <tr><td><code>ng serve</code></td><td>Compiles and serves at <code>localhost:4200</code>, watching for changes</td></tr>
-              <tr><td><code>ng serve -o</code></td><td>Same, and opens your browser automatically</td></tr>
-              <tr><td><code>ng generate component login</code></td><td>Creates a component's four files <em>and</em> registers it in the module</td></tr>
-              <tr><td><code>ng g c login</code></td><td>The short form of the line above — what you'll actually type</td></tr>
-              <tr><td><code>ng generate service employee</code></td><td>Creates a service (Session 3)</td></tr>
-              <tr><td><code>ng build</code></td><td>Produces optimised files in <code>dist/</code> ready to deploy</td></tr>
-              <tr><td><code>ng test</code></td><td>Runs the unit tests</td></tr>
-              <tr><td><code>ng version</code></td><td>Prints Angular, CLI, Node and TypeScript versions — the first thing to check when something's odd</td></tr>
-              <tr><td><code>ng --help</code></td><td>Lists every command; add <code>--help</code> to any command for its options</td></tr>
+              <tr><td><code>declarations</code></td><td><strong>Your own</strong> components, directives and pipes. Miss one out and you get "is not a known element".</td></tr>
+              <tr><td><code>imports</code></td><td>Whole feature modules from elsewhere — <code>FormsModule</code> for forms, <code>HttpClientModule</code> for HTTP, <code>RouterModule</code> for routing. Sessions 2, 3 and 4 each add one.</td></tr>
+              <tr><td><code>providers</code></td><td>Services, when registered the older way. Session 3 explains why you usually don't need this list any more.</td></tr>
+              <tr><td><code>bootstrap</code></td><td>The single root component. Only <code>AppModule</code> has this, and it never changes.</td></tr>
             </tbody>
           </table>
           <div class="keybox">
-            <span class="lbl">Why the CLI is a big deal</span>
-            <code>ng generate</code> doesn't just create files — it creates them with the right names, the right boilerplate, and it <strong>wires them into <code>app.module.ts</code> for you</strong>. Hand-creating components is where beginners lose an hour to "component not found" errors. Let the CLI do it, always.
+            <span class="lbl">Good news, twice over</span>
+            <strong>1.</strong> When you create a component with <code>ng generate</code>, the CLI adds it to <code>declarations</code> <em>for you</em>. That is the single biggest reason to always use the CLI rather than creating files by hand.<br>
+            <strong>2.</strong> Angular 15+ offers "standalone components", which skip modules entirely. This series uses modules because they are what you will find in existing corporate projects — and because <code>declarations</code> makes the "Angular must be told about everything" rule visible rather than magical.
           </div>
         </section>
 
-        <!-- 27. RECAP -->
+        <!-- 39. CLI COMMANDS -->
+        <section class="slide">
+          <p class="eyebrow">Reference — you will come back to this slide all week</p>
+          <h2>Angular CLI commands worth knowing</h2>
+          <table class="cmp tight">
+            <thead><tr><th style="width:32%">Command</th><th>What it does</th><th style="width:16%">Short form</th></tr></thead>
+            <tbody>
+              <tr><td><code>ng new my-app</code></td><td>Create a new project in a new folder</td><td>—</td></tr>
+              <tr><td><code>ng serve</code></td><td>Compile, serve on port 4200, and watch for changes</td><td><code>ng s</code></td></tr>
+              <tr><td><code>ng serve -o</code></td><td>The same, and open the browser for you</td><td>—</td></tr>
+              <tr><td><code>ng serve --port 4300</code></td><td>Serve on a different port</td><td>—</td></tr>
+              <tr><td><code>ng generate component employee-list</code></td><td>Create a component — 4 files, and register it in the module</td><td><code>ng g c</code></td></tr>
+              <tr><td><code>ng generate service employee</code></td><td>Create a service (Session 3)</td><td><code>ng g s</code></td></tr>
+              <tr><td><code>ng generate interface models/employee</code></td><td>Create an interface file</td><td><code>ng g i</code></td></tr>
+              <tr><td><code>ng build</code></td><td>Produce optimised files in <code>dist/</code> for deployment</td><td><code>ng b</code></td></tr>
+              <tr><td><code>ng test</code></td><td>Run unit tests</td><td><code>ng t</code></td></tr>
+              <tr><td><code>ng version</code></td><td>Show installed versions — the first thing to check when stuck</td><td><code>ng v</code></td></tr>
+              <tr><td><code>ng generate component x --dry-run</code></td><td>Show what <em>would</em> be created, without creating it</td><td><code>-d</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why <code>ng generate</code> is not optional</span>
+            It does not merely create files. It creates them with the <strong>correct names</strong>, the <strong>correct boilerplate</strong>, and it <strong>registers them in <code>app.module.ts</code></strong>. Hand-creating a component is where beginners lose an hour to "component not found". Let the CLI do it — every time.
+          </div>
+        </section>
+
+        <!-- 40. DAY-1 ERRORS -->
+        <section class="slide">
+          <p class="eyebrow">Before you start the lab — read this once</p>
+          <h2>The errors you will probably hit today</h2>
+          <p class="deep">These are not signs that you are doing badly. Every one of them is normal, and each has a one-line fix.</p>
+          <table class="cmp tight">
+            <thead><tr><th style="width:38%">What you see</th><th>What it means, and the fix</th></tr></thead>
+            <tbody>
+              <tr><td><code>'ng' is not recognized</code></td><td>The CLI isn't on your PATH. <strong>Close the terminal and open a new one</strong> — that fixes it nine times out of ten. Otherwise re-run <code>npm install -g @angular/cli</code>.</td></tr>
+              <tr><td><code>Port 4200 is already in use</code></td><td><code>ng serve</code> is already running somewhere. Use the tab you already have, or run <code>ng serve --port 4300</code>.</td></tr>
+              <tr><td><code>The serve command requires to be run in an Angular project</code></td><td>You are in the wrong folder. Run <code>cd hello-world</code> first — the project folder, not its parent.</td></tr>
+              <tr><td><code>Cannot find module '@angular/core'</code></td><td><code>node_modules/</code> is missing or incomplete. Run <code>npm install</code> inside the project.</td></tr>
+              <tr><td><code>'app-employee' is not a known element</code></td><td>The component isn't in <code>declarations</code> in <code>app.module.ts</code>, or the selector is misspelled. Use <code>ng g c</code> and it never happens.</td></tr>
+              <tr><td>A blank white page, no error on screen</td><td>Open the browser's <strong>Console</strong> tab (F12). The real error is always there — it is not shown on the page itself.</td></tr>
+              <tr><td>Errors mentioning <code>$scope</code> in a tutorial</td><td>You are reading AngularJS 1.x documentation. Close it and search again with a version number.</td></tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">The single most useful habit you can build today</span>
+            <strong>Read the error message before reacting to it.</strong> Angular's messages name the file and the line, and usually state the fix outright. The instinct to immediately re-run the command, or to start deleting things, is what turns a thirty-second fix into a lost afternoon.
+          </div>
+        </section>
+
+        <!-- 41. RECAP -->
         <section class="slide">
           <p class="eyebrow">Recap</p>
           <h2>What you now know</h2>
           <ul class="checklist">
-            <li>Angular is a Google-built, TypeScript-based framework for <strong>single-page applications</strong>, structured as a <strong>tree of components</strong>.</li>
-            <li>"AngularJS" = 1.x (legacy, JavaScript, MVC). "Angular" = 2+ (modern, TypeScript, components). Different frameworks.</li>
-            <li>Angular replaces five reloading JSPs with a few reusable components, and turns your Spring Boot app into a clean JSON API.</li>
-            <li>TypeScript = JavaScript + static types, so mistakes surface in your editor instead of in production.</li>
-            <li>You can declare types, define <strong>interfaces</strong>, mark properties <strong>optional</strong> with <code>?</code>, allow several types with <strong>unions</strong>, loop three ways, and type <strong>arrays</strong> and <strong>tuples</strong>.</li>
-            <li>Every Angular component is a TypeScript <strong>class</strong> — including the constructor shorthand you'll rely on in Session 3.</li>
-            <li>Two installs (Node, then the CLI) and three commands (<code>ng new</code>, <code>cd</code>, <code>ng serve</code>) give you a running app on port 4200.</li>
-            <li>You can name every file in <code>src/app/</code> and explain the boot chain: <code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code>.</li>
+            <li>Angular is a Google-built, TypeScript-based <strong>framework</strong> for <strong>single-page applications</strong>, structured as a <strong>tree of components</strong>.</li>
+            <li>"AngularJS" means 1.x — legacy, JavaScript, MVC. "Angular" means 2+ — modern, TypeScript, components. They are different frameworks.</li>
+            <li>An SPA loads one page once and then swaps sections; only JSON travels afterwards. Your Spring Boot app becomes a pure API.</li>
+            <li>TypeScript is JavaScript plus static types, and those types <strong>vanish at compile time</strong> — so they cost nothing at runtime.</li>
+            <li>You can declare types, define <strong>interfaces</strong>, mark properties optional with <code>?</code>, restrict values with <strong>unions</strong>, type <strong>arrays</strong> and <strong>tuples</strong>, loop three ways, and write <strong>arrow functions</strong>.</li>
+            <li>Every Angular component is a TypeScript <strong>class</strong> — including the <code>constructor(private x: X)</code> shorthand you will rely on in Session 3.</li>
+            <li>Two installs (Node, then the CLI) and three commands (<code>ng new</code>, <code>cd</code>, <code>ng serve</code>) give you a live app on port 4200 that reloads as you type.</li>
+            <li>You can name every file in <code>src/app/</code> and recite the boot chain: <code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code>.</li>
           </ul>
           <div class="keybox">
             <span class="lbl">Now go and build it</span>
-            Everything on this slide is in today's lab sheet as a hands-on task — the TypeScript drills, the install, the Hello World, the file hunt, and your first live-reload edit. Open <code>angular-session1-lab.html</code> and work down it. Target: the green checkpoint at the bottom.
+            Every item above is a hands-on task in today's lab — the TypeScript drills, the install, the Hello World, the file hunt, and your first live-reload edit. Open <code>angular-session1-lab.html</code> and work down it. Target: the green checkpoint at the bottom.
           </div>
         </section>
 
-        <!-- 28. NEXT -->
+        <!-- 42. NEXT -->
         <section class="slide">
           <p class="eyebrow">Where we're headed</p>
           <h2>Coming up in Session 2</h2>
-          <p class="deep">With TypeScript and a running project in place, Session 2 is where Angular starts to feel powerful — you'll make the screen react to your data.</p>
+          <p class="deep">With the language and a running project in place, Session 2 is where Angular starts to feel powerful — you make the screen respond to your data.</p>
           <div class="cards">
-            <div class="card"><div class="ic">🧱</div><h3>Components in depth</h3><p>Class + metadata + template. Generating them, nesting them, building a tree.</p></div>
-            <div class="card"><div class="ic">🔁</div><h3>The four data bindings</h3><p>Interpolation, property binding, event binding and two-way binding with <code>ngModel</code>.</p></div>
-            <div class="card"><div class="ic">🔀</div><h3>Directives</h3><p><code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code> to shape the DOM; <code>ngClass</code>/<code>ngStyle</code> to style it conditionally.</p></div>
-            <div class="card"><div class="ic">🎨</div><h3>Pipes</h3><p>Transform what's displayed — uppercase, dates, currency — without touching your data.</p></div>
+            <div class="card"><div class="ic">🧱</div><h3>Components in depth</h3><p>Class + metadata + template. Generating them, nesting them, and building a real tree.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>The four data bindings</h3><p>Interpolation, property binding, event binding, and two-way binding with <code>ngModel</code>.</p></div>
+            <div class="card"><div class="ic">🔀</div><h3>Directives</h3><p><code>*ngIf</code>, <code>*ngFor</code> and <code>*ngSwitch</code> to shape the page; <code>ngClass</code> and <code>ngStyle</code> to style it conditionally.</p></div>
+            <div class="card"><div class="ic">📨</div><h3>Talking between components</h3><p><code>@Input</code> to pass data down to a child, <code>@Output</code> to send events back up. Plus pipes, to format what you display.</p></div>
           </div>
           <div class="note">
             <span class="lbl">Bring this with you</span>
-            Keep your <code>hello-world</code> project — Session 2 builds directly on top of it. If <code>ng serve</code> still runs and you can edit the title text, you're ready.
+            Keep your <code>hello-world</code> project — Session 2 builds directly on top of it. If <code>ng serve</code> still runs and you can edit the heading text and see it change, you are ready.
           </div>
         </section>
 
-        <!-- 29. CLOSING -->
+        <!-- 43. CLOSING -->
         <section class="slide">
           <div class="cover">
             <span class="badge">End of Session 1</span>

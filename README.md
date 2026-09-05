@@ -52,14 +52,21 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 
 The four Angular sessions build **one application**, adding a layer each time. Nothing is thrown away.
 
-1. **TypeScript & Angular basics** — what Angular and single-page applications are, the AngularJS-vs-Angular split, and TypeScript from scratch (inference, interfaces, optionals, unions, loops, arrays, tuples, classes, arrow functions). Then Node + the Angular CLI, `ng new` → `ng serve`, a full tour of a generated project, and the boot chain from `index.html` to your component. **Output:** a Hello World app you edited yourself.
-2. **Components & data binding** — components as class + metadata + template, generated with the CLI and nested into a tree. All four bindings (interpolation, property, event, two-way with `ngModel`), structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`), attribute directives (`ngClass`, `ngStyle`) and pipes. **Output:** a working login form and a colour-coded employee table.
-3. **Forms, services & HTTP** — template-driven *and* reactive forms with `Validators` and friendly error messages; services, `@Injectable` and dependency injection; `HttpClient` (GET/POST/PUT/DELETE) and Observables. **Output:** employee data moves from a hardcoded array into a service, then live data arrives from a real API.
-4. **Routing & full CRUD** — routing with `<router-outlet>`, `routerLink`, route parameters, a default redirect and a 404 page; then the Customer Management case study (list, search, insert, update with read-only ID/Name, delete-with-confirm) built against an in-memory array and then refactored onto a service with `HttpClient`. **Output:** a complete, navigable, service-backed application.
+1. **TypeScript & Angular basics** — a jargon-buster covering every term used on day one, then what Angular and single-page applications are, framework vs library, the AngularJS-vs-Angular split, and where Angular sits relative to your Spring Boot API. TypeScript is taught in twelve graded steps (inference, the built-in types, the `any` trap, interfaces, optionals with `?.`/`??`, unions, arrays and the six array methods, tuples, the three loops, functions, arrow functions, classes, access modifiers and the constructor shorthand) and closes with a one-page cheat sheet. Then Node + the Angular CLI, `ng new` → `ng serve`, a guided tour of every generated file, the boot chain from `index.html` to your component, what an `NgModule` is for, and a table of the errors you will hit on day one. **Output:** a Hello World app you edited yourself, plus a typed `Employee` array rendering on screen.
+2. **Components & data binding** — components as class + metadata + template, generated with the CLI, nested into a tree, with automatically scoped styles. All four bindings introduced one at a time with the direction each flows (interpolation, property, event with `$event`, two-way with `ngModel`), structural directives (`*ngIf` with `else`, `*ngFor` with `index` and `trackBy`, `*ngSwitch`), attribute directives (`ngClass`, `ngStyle`) and pipes with parameters and chaining. Then parent–child communication with `@Input` and `@Output`/`EventEmitter`, and the `ngOnInit` lifecycle hook. **Output:** a working login form, a colour-coded employee table, and a reusable employee card whose delete button updates the parent's data.
+3. **Forms, services & HTTP** — why `ngModel` alone isn't enough, then the *same form built twice*: template-driven (with `ngForm`, the `touched`/`dirty`/`valid` state flags and attribute validation) and reactive (`FormGroup`, `FormControl`, `Validators`, `FormBuilder`, `patchValue`), followed by a decision table. Services, `@Injectable`, dependency injection and why `providedIn: 'root'` makes a singleton. `HttpClient` (GET/POST/PUT/DELETE) mapped one-for-one onto Spring Boot annotations, Observables explained against Promises, `subscribe({ next, error })`, loading/error/empty states, the `async` pipe, and CORS. **Output:** employee data moves from a hardcoded array into a service — with two components proving they share one instance — then live data arrives from a real API.
+4. **Routing & full CRUD** — why routing matters, what a route is, `RouterModule.forRoot`, `<router-outlet>`, `routerLink` vs `href`, `routerLinkActive`, a default redirect, a 404 wildcard, why route order matters, route parameters read via `ActivatedRoute` (and the string-vs-number trap), and navigating from code with `Router.navigate`. Then the Customer Management case study — list, search, insert, update-with-one-form, delete-with-confirm — built **three times**: against an in-memory array, then through a service, then over `HttpClient`. Closes with `ng build`, deployment, and where to go next. **Output:** a complete, navigable, service-backed application with five routed screens.
 
 ### Putting the two halves together
 
 The Angular series is designed to sit directly on top of the Spring Boot series. Session 4's final stretch task points the Angular app at your own Spring Boot API by changing **one line** (`baseUrl`) plus adding `@CrossOrigin` on the controller — giving you a genuine full-stack application built end to end.
+
+### The teaching thread that runs through all four sessions
+
+Two ideas are deliberately reinforced across every session rather than mentioned once:
+
+- **Swapping the data layer never changes the template.** The employee table is written in Session 2 against a hardcoded array, then re-pointed at a service, then at an HTTP call, and in Session 4 the CRUD moves onto a service again. Four complete changes to how data is fetched, and the template is never touched. Each session stops and points this out.
+- **Most Angular bugs are silent.** A missing `*`, a missing `()`, a self-closing component tag, a wildcard route in the wrong place, a route parameter compared as a string — none of these report an error. Every lab deliberately walks the reader *into* these bugs and back out again, and every lab ends with a troubleshooting table organised by symptom rather than by error message.
 
 ## Delivery model
 
@@ -79,6 +86,20 @@ The two series are distinguished only by their accent ramp:
 - **Angular** — Angular brand red (`#dd0031`) with Angular purple (`#9327f0`).
 
 The Angular files also add a few components on top of the shared system: a version **timeline**, a **mock browser** frame that shows associates exactly what they should be seeing, a **data-flow map** for the four binding directions, a **component-tree** visual, and "Ask the batch" discussion callouts for the trainer.
+
+Three callout types were added for the beginner-first rewrite and are used throughout both the decks and the labs:
+
+| Callout | Colour | Purpose |
+|---------|--------|---------|
+| **Analogy** | teal (`#00b3a4`) | An everyday mental model for an abstract idea — an Observable as a coffee ticket, a component as a LEGO brick. |
+| **In plain English** | blue (`#0a84ff`) | The same idea restated in the simplest possible words, for anyone who lost the thread. |
+| **Jargon buster** | accent red | A term-and-meaning grid; Session 1 opens with one covering every word used that day. |
+
+The labs also use a **line-by-line explanation table** (`table.lines`) under longer snippets, so beginners can see *why* each line is written the way it is rather than only what to copy.
+
+### Regenerating the Angular files
+
+The eight Angular files share a large amount of chrome — the `THEME-SYNC` token block, the full stylesheet, the slideshow navigator, and the lab progress/clipboard script — and keeping eight hand-maintained copies in sync is error-prone. They are therefore assembled from a small build script that holds the shared parts once and injects each file's slides or tasks. If you are making a change that affects **all** the files (a token, a callout style, the navigator), change it in one place and rebuild; if you are only editing one session's content, editing the generated HTML directly is perfectly fine.
 
 ## Viewing on GitHub
 

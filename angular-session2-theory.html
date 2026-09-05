@@ -202,8 +202,57 @@
       font-size: 16.5px;
     }
     .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Expected-result box — "this is what success looks like" */
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
     .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    /* Numbered procedure list */
+    .slide ol.steps { padding-left: 24px; }
+    .slide ol.steps > li { margin: 12px 0; }
+    .slide ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .slide kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
     .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Jargon-buster rows — term on the left, plain-English meaning on the right */
+    .jargon { display: grid; gap: 8px; margin-top: 14px; }
+    .jargon .jrow {
+      display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start;
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      background: #fafafc; padding: 10px 15px;
+    }
+    .jargon .jt { font-weight: 700; color: var(--mac-accent); font-size: 16px; }
+    .jargon .jd { font-size: 15.5px; line-height: 1.5; }
 
     /* Cover slide */
     .cover {
@@ -279,6 +328,8 @@
     table.cmp td.good { background: rgba(40,200,64,0.10); }
     table.cmp td.bad { background: rgba(255,95,87,0.08); }
     table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.tight { font-size: 15px; }
+    table.cmp.tight th, table.cmp.tight td { padding: 8px 11px; }
 
     /* Architecture diagram */
     .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
@@ -462,12 +513,14 @@
       display: inline-block; background: var(--mac-accent); color: #fff;
       border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
     }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
     .browser .viewport .navbar {
-      display: flex; gap: 16px; border-bottom: 2px solid var(--mac-accent);
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
       padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
     }
     .browser .viewport .navbar .on { color: var(--mac-accent); }
     .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
 
     /* Data-flow direction map (used for the four binding types) */
     .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
@@ -582,6 +635,7 @@
       .slide { padding: 28px 26px 92px; }
       .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
       .anno-row { grid-template-columns: 1fr; }
+      .jargon .jrow { grid-template-columns: 1fr; gap: 4px; }
     }
   </style>
 </head>
@@ -603,936 +657,1772 @@
           <div class="cover">
             <span class="badge">Session 2 of 4 — Angular Series</span>
             <h1>Components &amp; Data Binding</h1>
-            <div class="sub">The two ideas that make Angular click: build your UI out of small components, then let data flow between the class and the screen automatically.</div>
+            <div class="sub">The two ideas that Angular is really made of — small reusable pieces of screen, and keeping what's on screen in step with your data.</div>
             <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
           </div>
         </section>
 
         <!-- 2. RECAP + ROADMAP -->
         <section class="slide">
-          <p class="eyebrow">Where we left off</p>
+          <p class="eyebrow">Where we left off, and where we're going</p>
           <h2>Recap of Session 1, and today's roadmap</h2>
           <div class="note">
-            <span class="lbl">You already know</span>
-            Angular is a TypeScript framework for single-page applications, built as a tree of components. You can
-            write typed variables, interfaces, unions and classes in TypeScript. You installed the CLI, created
-            <code>hello-world</code>, toured <code>src/app/</code>, and — crucially — you used <code>{{ title }}</code>
-            to show a class property on screen. <strong>That last thing was data binding. Today we do all four kinds.</strong>
+            <span class="lbl">You should arrive today with</span>
+            A <code>hello-world</code> project that runs on <code>localhost:4200</code>, an <code>Employee</code>
+            interface, a typed array of four employees, and a page showing them one index at a time —
+            <code>employees[0]</code>, <code>employees[1]</code>… which was <strong>deliberately annoying</strong>.
+            Today we fix that, and a great deal more.
           </div>
           <ul class="agenda">
-            <li><span class="num">1</span> What a component really is — class + metadata + template</li>
-            <li><span class="num">2</span> Generating components with the CLI &amp; nesting them into a tree</li>
-            <li><span class="num">3</span> Templates: inline vs <code>templateUrl</code></li>
-            <li><span class="num">4</span> The four data bindings — interpolation, property, event, two-way</li>
-            <li><span class="num">5</span> Structural directives — <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code></li>
-            <li><span class="num">6</span> Attribute directives — <code>ngClass</code>, <code>ngStyle</code></li>
-            <li><span class="num">7</span> Pipes — transforming what's displayed</li>
+            <li><span class="num">1</span> What a component really is, and the three parts every one has</li>
+            <li><span class="num">2</span> Generating components with the CLI, and nesting them into a <strong>tree</strong></li>
+            <li><span class="num">3</span> <strong>Data binding</strong> — all four kinds, one at a time, with the direction each one flows</li>
+            <li><span class="num">4</span> Structural directives: <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code></li>
+            <li><span class="num">5</span> Attribute directives: <code>ngClass</code> and <code>ngStyle</code> for conditional styling</li>
+            <li><span class="num">6</span> A full worked example — the colour-coded employee table</li>
+            <li><span class="num">7</span> <strong>Pipes</strong> — formatting what you display without changing your data</li>
+            <li><span class="num">8</span> Components talking to each other: <code>@Input</code> down, <code>@Output</code> up</li>
+            <li><span class="num">9</span> <code>ngOnInit</code> — the lifecycle hook you will use in every component from now on</li>
           </ul>
-          <div class="keybox">
-            <span class="lbl">Today's destination</span>
-            By the end of the lab you'll have a working <strong>login form</strong> and a <strong>colour-coded
-            employee table</strong> — built from scratch, in the project you created last session.
+          <div class="plainbox">
+            <span class="lbl">Today in one sentence</span>
+            Session 1 was about the language and the tools. <strong>Today is about putting things on the screen and
+            making them react.</strong> By the end you will have a login form that responds to typing and a table that
+            colours its own rows.
           </div>
         </section>
 
         <!-- 3. WHAT IS A COMPONENT -->
         <section class="slide">
-          <p class="eyebrow">Concept 1 — the core building block</p>
+          <p class="eyebrow">Concept 1 — the single most important idea in Angular</p>
           <h2>What is a component?</h2>
-          <p class="deep">A component is <strong>one self-contained piece of user interface</strong>: a navigation bar, a search box, a table, a login form. An Angular application is nothing but components nested inside components. Every single one is made of exactly three parts:</p>
-          <div class="cards c3">
-            <div class="card">
-              <div class="ic">🧠</div><h3>1 · Class</h3>
-              <p>An ordinary TypeScript class holding <strong>properties</strong> (the data) and <strong>methods</strong> (the behaviour). This is the component's brain — it knows nothing about HTML.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🏷️</div><h3>2 · Metadata</h3>
-              <p>The <code>@Component({...})</code> <strong>decorator</strong> above the class. It tells Angular "this class is a component", what tag renders it, and where its template and styles live.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🖼️</div><h3>3 · Template</h3>
-              <p>The HTML the user sees. It can read the class's properties and call its methods — that link is what data binding provides.</p>
-            </div>
+          <p class="lead">A <span class="term">component</span> is one self-contained piece of user interface: its own
+             logic, its own markup, its own styling — bundled together and reusable.</p>
+          <p class="deep">Think about any application you use. A dashboard is not one big thing; it is a header, a
+             sidebar, a set of summary cards, a chart and a table. Each of those is independent. Each could appear on
+             another page unchanged. <strong>Each of those is a component.</strong></p>
+          <div class="cards">
+            <div class="card"><div class="ic">📦</div><h3>Self-contained</h3><p>Everything the piece needs lives together in one folder. You can understand it without reading the rest of the app.</p></div>
+            <div class="card"><div class="ic">♻️</div><h3>Reusable</h3><p>Write a <code>employee-card</code> once, then use it on the list page, the search page and the dashboard.</p></div>
+            <div class="card"><div class="ic">🔒</div><h3>Isolated</h3><p>Its CSS cannot leak out and break another component. Its data is its own.</p></div>
+            <div class="card"><div class="ic">🧩</div><h3>Composable</h3><p>Components nest inside components. That nesting is how a whole page gets built.</p></div>
           </div>
-          <p class="deep" style="margin-top:16px;">Remove any one of the three and it stops being a component. The class alone is just a class; the HTML alone is just a file; the decorator is the glue that introduces them to Angular.</p>
-          <div class="askbox">
-            <span class="lbl">Ask the batch</span>
-            If a component is a class plus a template, what do you think the <strong>decorator's</strong> job is?
-            <span class="muted">(Look for: it's how the class <em>declares itself</em> to Angular — without it Angular has no idea the class exists, which template belongs to it, or what tag should render it.)</span>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            A component is a <strong>LEGO brick</strong>. Each brick is complete in itself, and you build anything by
+            connecting bricks — you never carve a castle from one solid block. The old way of building web pages was
+            carving from one block; components are the bricks.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The Java parallel</span>
+            You already do this on the backend. You don't write one enormous <code>Main</code> class — you write a
+            <code>Controller</code>, a <code>Service</code>, a <code>Repository</code>, each with one job.
+            <strong>A component is that same discipline, applied to the screen.</strong>
           </div>
         </section>
 
-        <!-- 4. THE COMPONENT TREE -->
+        <!-- 4. THE THREE PARTS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 continued</p>
+          <h2>The three parts of every component</h2>
+          <p class="deep">Every component in every Angular project is the same three things. Once you have seen it once,
+             you have seen every component you will ever meet.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">1 · The class</span>
+              <span class="desc"><code>employee-list.component.ts</code> — the <strong>brain</strong>. Your data and your logic: fields to hold values, methods to respond to clicks.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">2 · The template</span>
+              <span class="desc"><code>employee-list.component.html</code> — the <strong>face</strong>. The HTML the user actually sees, which can read from the class.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">3 · The styles</span>
+              <span class="desc"><code>employee-list.component.css</code> — the <strong>clothes</strong>. CSS that applies to this component only and cannot leak elsewhere.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">4 · The metadata</span>
+              <span class="desc">The <code>@Component({ ... })</code> decorator sitting on top of the class — it is the <strong>label</strong> that ties the other three together and tells Angular the HTML tag name.</span>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">Read it as a sentence</span>
+            "This class holds the data. That HTML file displays it. That CSS file styles it. And this decorator tells
+            Angular that all three belong together, and that they appear wherever the tag
+            <code>&lt;app-employee-list&gt;</code> is written."
+          </div>
+          <div class="note">
+            <span class="lbl">There is a fourth file, and you can ignore it</span>
+            The CLI also creates <code>employee-list.component.spec.ts</code> — a starter file for unit tests. Testing
+            is a genuinely valuable topic and it is out of scope for these four sessions. Leave the file alone; it does
+            not affect your app.
+          </div>
+        </section>
+
+        <!-- 5. TREE OF COMPONENTS -->
         <section class="slide">
           <p class="eyebrow">Concept 1 continued</p>
           <h2>Your app is a tree of components</h2>
-          <p class="deep">There is always <strong>exactly one root component</strong> — <code>AppComponent</code>, rendered by the <code>&lt;app-root&gt;</code> tag in <code>index.html</code>. Everything else lives <em>inside</em> it, or inside one of its children.</p>
+          <p class="deep">There is always exactly one component at the top — <code>AppComponent</code>, the one Session 1
+             traced from <code>index.html</code>. Every other component hangs beneath it.</p>
           <div class="tree-vis" data-label="Component tree">
             <div class="tv-row">
-              <div class="node root"><div class="bn">app-root</div><div class="bd">AppComponent — the one root</div></div>
+              <div class="node root"><div class="bn">app-root</div><div class="bd">AppComponent — the only root</div></div>
             </div>
             <div class="tv-tick">│</div>
             <div class="tv-row">
-              <div class="node"><div class="bn">app-header</div><div class="bd">HeaderComponent</div></div>
-              <div class="node"><div class="bn">app-employee-list</div><div class="bd">EmployeeListComponent</div></div>
-              <div class="node"><div class="bn">app-login</div><div class="bd">LoginComponent</div></div>
+              <div class="node"><div class="bn">app-header</div><div class="bd">the title bar</div></div>
+              <div class="node"><div class="bn">app-employee-list</div><div class="bd">the table</div></div>
+              <div class="node"><div class="bn">app-footer</div><div class="bd">the credits line</div></div>
             </div>
             <div class="tv-tick">│</div>
             <div class="tv-row">
               <div class="node"><div class="bn">app-employee-row</div><div class="bd">one row of the table</div></div>
-              <div class="node"><div class="bn">app-status-badge</div><div class="bd">Active / Inactive pill</div></div>
+              <div class="node"><div class="bn">app-search-box</div><div class="bd">the filter input</div></div>
             </div>
-            <div class="tv-note">Nesting is done purely by placing a component's selector tag inside another component's template.</div>
+            <div class="tv-note">Parents hold children. Children can hold their own children. There is no depth limit.</div>
           </div>
           <div class="keybox">
-            <span class="lbl">Why break a page into components at all?</span>
-            <strong>Reuse</strong> (one <code>status-badge</code> used in five places), <strong>isolation</strong> (a bug in the table can't break the header), <strong>testability</strong> (test a small class, not a whole page) and <strong>teamwork</strong> (two people edit two components without merge conflicts). This is the same reasoning that made you split a Java class into methods — one level up.
+            <span class="lbl">Two rules that follow from the tree, and they matter</span>
+            <strong>1.</strong> Data flows <strong>down</strong> — a parent hands values to a child. That is <code>@Input</code>.<br>
+            <strong>2.</strong> Events flow <strong>up</strong> — a child tells its parent something happened. That is <code>@Output</code>.<br>
+            Because the flow is always one direction per mechanism, you can always trace where a change came from.
+            This is the exact problem AngularJS 1.x had, and it is why Angular 2 was rewritten.
           </div>
         </section>
 
-        <!-- 5. GENERATING A COMPONENT -->
+        <!-- 6. HOW A COMPONENT GETS ON SCREEN -->
         <section class="slide">
-          <p class="eyebrow">Concept 2 — creating one</p>
-          <h2>Generating a component</h2>
-          <pre><code>ng generate component login
+          <p class="eyebrow">Concept 1 continued — the part that clicks</p>
+          <h2>How a component actually gets on screen</h2>
+          <p class="deep">This is the mechanism, and it is simpler than people expect. A component declares a
+             <strong>selector</strong> — a made-up HTML tag name. Write that tag anywhere, and Angular puts the
+             component there.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>1 · The component declares its tag</h3>
+              <pre><code>@Component({
+  selector: 'app-employee-list',
+  ...
+})
+export class EmployeeListComponent { }</code></pre>
+            </div>
+            <div class="panel">
+              <h3>2 · Any template can then use that tag</h3>
+              <pre><code>&lt;h1&gt;My Directory&lt;/h1&gt;
 
-# the short form everyone actually types:
-ng g c login</code></pre>
-          <div class="term-out" style="background:#12121c;color:#d7dae0;font-family:var(--mac-mono);font-size:14px;line-height:1.6;padding:14px 18px;border-radius:10px;margin:14px 0;white-space:pre;">CREATE src/app/login/login.component.css (0 bytes)
-CREATE src/app/login/login.component.html (20 bytes)
-CREATE src/app/login/login.component.spec.ts (612 bytes)
-CREATE src/app/login/login.component.ts (296 bytes)
-UPDATE src/app/app.module.ts (412 bytes)</div>
-          <p class="deep">Read that output carefully — it does <strong>two</strong> jobs:</p>
-          <ul>
-            <li><strong>CREATE</strong> — a new folder <code>src/app/login/</code> containing four files, all correctly named and pre-populated with valid boilerplate.</li>
-            <li><strong>UPDATE</strong> — it adds <code>LoginComponent</code> to the <code>declarations</code> array in <code>app.module.ts</code>. This registration step is what makes the component usable anywhere in the app.</li>
-          </ul>
+&lt;app-employee-list&gt;&lt;/app-employee-list&gt;
+
+&lt;p&gt;Footer text&lt;/p&gt;</code></pre>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Angular finds <code>&lt;app-employee-list&gt;</code>, looks up the
+             component whose selector matches, renders that component's template, and drops the result in at exactly
+             that spot.</p>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            The selector is a <strong>picture frame hook on the wall</strong>. You put the hook where you want the
+            picture. Angular hangs the picture on it.
+          </div>
           <div class="warnbox">
-            <span class="lbl">Beginner note — always use the CLI</span>
-            If you hand-create the files, you will forget the <code>declarations</code> entry, and Angular will tell you
-            <em>"'app-login' is not a known element"</em> — an error that has cost every Angular beginner at least
-            twenty minutes. The CLI never forgets. Use it every single time.
+            <span class="lbl">Why <code>app-</code> at the front of every selector?</span>
+            It is a <strong>prefix</strong>, added by the CLI, to guarantee your tag names never collide with real HTML
+            tags or with a third-party library's components. Imagine naming a component <code>button</code> — chaos.
+            Keep the prefix. And note that these tags are <strong>never self-closing</strong>: write
+            <code>&lt;app-x&gt;&lt;/app-x&gt;</code>, not <code>&lt;app-x /&gt;</code>, which silently fails.
           </div>
         </section>
 
-        <!-- 6. FILE ANATOMY -->
+        <!-- 7. GENERATING A COMPONENT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — let the tool do the work</p>
+          <h2>Generating a component</h2>
+          <p class="deep">You could create the files by hand. You should not. One command does it correctly, every time:</p>
+          <pre><code>ng generate component employee-list
+
+# the short form everyone actually types
+ng g c employee-list</code></pre>
+          <div class="fname">what the CLI prints</div>
+          <pre><code>CREATE src/app/employee-list/employee-list.component.css (0 bytes)
+CREATE src/app/employee-list/employee-list.component.html (28 bytes)
+CREATE src/app/employee-list/employee-list.component.spec.ts (595 bytes)
+CREATE src/app/employee-list/employee-list.component.ts (222 bytes)
+UPDATE src/app/app.module.ts (412 bytes)</code></pre>
+          <div class="keybox">
+            <span class="lbl">Read that last line again — it is the whole reason to use the CLI</span>
+            <code>UPDATE src/app/app.module.ts</code>. The CLI did not just make files; it
+            <strong>registered your component</strong> in the module's <code>declarations</code> list. Angular refuses
+            to render a component it has not been told about, and hand-created components are where beginners lose an
+            hour to <em>"'app-employee-list' is not a known element"</em>.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two things to get right</span>
+            <strong>1.</strong> Run it from the <strong>project folder</strong> (the one containing
+            <code>angular.json</code>), in a <em>second</em> terminal — leave <code>ng serve</code> running in the first.<br>
+            <strong>2.</strong> Name it in <code>lowercase-with-hyphens</code>: <code>employee-list</code>, not
+            <code>EmployeeList</code> or <code>employeeList</code>. The CLI converts it to the right form everywhere.
+          </div>
+        </section>
+
+        <!-- 8. THE FOUR FILES + NAMING -->
         <section class="slide">
           <p class="eyebrow">Concept 2 continued</p>
           <h2>The four files, and the naming rule</h2>
-          <div class="tree">src/app/login/
-├── login.component.css        <span class="c">styles — scoped to this component only</span>
-├── login.component.html       <span class="c">the template</span>
-├── login.component.spec.ts    <span class="c">unit tests</span>
-└── login.component.ts         <span class="c">the class + @Component decorator</span></div>
-          <div class="keybox">
-            <span class="lbl">The naming convention — non-negotiable</span>
-            <code>&lt;component-name&gt;.component.&lt;file-type&gt;</code>
-            <br>Multi-word names use <strong>kebab-case</strong> in the file name and <strong>PascalCase</strong> in the class name:
-            <code>ng g c employee-list</code> → files <code>employee-list.component.ts</code> → class <code>EmployeeListComponent</code> → selector <code>app-employee-list</code>.
-          </div>
+          <div class="tree">src/app/employee-list/
+├── employee-list.component.ts        <span class="c">★ the class — your logic</span>
+├── employee-list.component.html      <span class="c">★ the template — what's on screen</span>
+├── employee-list.component.css       <span class="c">★ the styles — this component only</span>
+└── employee-list.component.spec.ts   <span class="c">tests — ignore for this series</span></div>
+          <p class="deep">Notice the pattern: <strong>one folder per component</strong>, and every file named
+             <code>&lt;name&gt;.component.&lt;ext&gt;</code>. This is not a suggestion — it is the convention every
+             Angular project on earth follows, which is why you can open a stranger's repository and navigate it
+             immediately.</p>
+          <h3>The naming rule you must be able to translate</h3>
           <table class="cmp">
-            <thead><tr><th style="width:30%">You type</th><th>You get</th></tr></thead>
+            <thead><tr><th style="width:30%">You type</th><th>The CLI produces</th><th>Used as</th></tr></thead>
             <tbody>
-              <tr><td><code>ng g c login</code></td><td>Folder <code>login/</code>, class <code>LoginComponent</code>, selector <code>app-login</code></td></tr>
-              <tr><td><code>ng g c employee-list</code></td><td>Folder <code>employee-list/</code>, class <code>EmployeeListComponent</code>, selector <code>app-employee-list</code></td></tr>
-              <tr><td><code>ng g c shared/header</code></td><td>Same, nested inside a <code>shared/</code> folder — how you organise a larger app</td></tr>
+              <tr><td><code>employee-list</code></td><td>folder + file names</td><td>on disk</td></tr>
+              <tr><td>→ <code>EmployeeListComponent</code></td><td>the class name (PascalCase + "Component")</td><td>in TypeScript</td></tr>
+              <tr><td>→ <code>app-employee-list</code></td><td>the selector (prefix + kebab-case)</td><td>in HTML templates</td></tr>
             </tbody>
           </table>
-          <p class="muted">The <code>app-</code> prefix on selectors is there so your components can never collide with a real HTML tag or a third-party library's tags. It's configurable, but leave it alone.</p>
+          <div class="plainbox">
+            <span class="lbl">Learn to read this both ways</span>
+            If you see <code>&lt;app-customer-form&gt;</code> in a template, you know instantly that the class is
+            <code>CustomerFormComponent</code> and it lives in
+            <code>src/app/customer-form/customer-form.component.ts</code>. That translation, done automatically in your
+            head, is most of what "knowing your way around an Angular project" means.
+          </div>
         </section>
 
-        <!-- 7. THE CLASS -->
+        <!-- 9. WHAT THE CLI CHANGED IN THE MODULE -->
         <section class="slide">
-          <p class="eyebrow">Concept 2 · walkthrough 1 of 2</p>
+          <p class="eyebrow">Concept 2 continued — the invisible edit</p>
+          <h2>What the CLI changed in <code>app.module.ts</code></h2>
+          <p class="deep">Let's look at the edit the CLI made for you, because understanding it is what makes the
+             "not a known element" error obvious rather than mysterious.</p>
+          <div class="fname">src/app/app.module.ts — after generating two components</div>
+          <pre><code>import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppComponent } from './app.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';   // ← added
+import { LoginComponent } from './login/login.component';                          // ← added
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    EmployeeListComponent,      // ← added
+    LoginComponent              // ← added
+  ],
+  imports: [
+    BrowserModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">import { X } from '...'</div><div>Tells this file where to find the class. Two lines were added, one per component.</div></div>
+            <div class="anno-row"><div class="anno-tag">declarations: [ ... ]</div><div>The list of <strong>your own</strong> components. This is the one that matters. If a component is not in here, its tag does nothing.</div></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The error this prevents — and you will still meet it</span>
+            <code>'app-employee-list' is not a known element</code> means one of exactly three things:
+            <strong>(a)</strong> the component isn't in <code>declarations</code>, <strong>(b)</strong> you spelled the
+            tag differently from the selector, or <strong>(c)</strong> you created the files by hand. Check them in that
+            order and you will find it in seconds.
+          </div>
+        </section>
+
+        <!-- 10. INSIDE THE CLASS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 continued</p>
           <h2>Inside the component class</h2>
-          <div class="fname">src/app/login/login.component.ts</div>
+          <div class="fname">src/app/employee-list/employee-list.component.ts</div>
           <pre><code>import { Component } from '@angular/core';
+import { Employee } from '../models/employee';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
 })
-export class LoginComponent {
+export class EmployeeListComponent {
 
-  uname: string = '';          // bound to the username input
-  pass: string = '';           // bound to the password input
-  message: string = '';        // shown back to the user
+  // ── FIELDS: data the template can display ──────────────
+  heading = 'Employee Directory';
+  showTable = true;
 
-  performLogin(): void {
-    if (this.uname === 'admin' &amp;&amp; this.pass === 'admin123') {
-      this.message = 'Login successful. Welcome, ' + this.uname + '!';
-    } else {
-      this.message = 'Invalid username or password.';
-    }
+  employees: Employee[] = [
+    { id: 1001, name: 'Anoop', designation: 'Software Engineer', salary: 25000, status: 'Active' },
+    { id: 1002, name: 'Ajay',  designation: 'Team Lead',         salary: 45000, status: 'Inactive' }
+  ];
+
+  // ── METHODS: things the template can call ──────────────
+  toggleTable(): void {
+    this.showTable = !this.showTable;
+  }
+
+  getActiveCount(): number {
+    return this.employees.filter(e =&gt; e.status === 'Active').length;
   }
 }</code></pre>
-          <div class="anno-map">
-            <div class="anno-row"><div class="anno-tag">import { Component }</div><div>Pulls the <code>Component</code> decorator in from Angular's core package. TypeScript requires you to import anything you use.</div></div>
-            <div class="anno-row"><div class="anno-tag">selector</div><div>The custom tag that renders this component: <code>&lt;app-login&gt;&lt;/app-login&gt;</code>.</div></div>
-            <div class="anno-row"><div class="anno-tag">templateUrl</div><div>The path to this component's HTML file. Relative to this <code>.ts</code> file.</div></div>
-            <div class="anno-row"><div class="anno-tag">styleUrls</div><div>An <strong>array</strong> of CSS files — a component may have more than one.</div></div>
-            <div class="anno-row"><div class="anno-tag">export class</div><div><code>export</code> makes the class visible outside its own file, so <code>app.module.ts</code> can import and declare it. Miss it, and nothing else can see your component.</div></div>
-            <div class="anno-row"><div class="anno-tag">this.uname</div><div>Inside a class method you must write <code>this.</code> to reach a property. Forgetting it is the #1 beginner compile error.</div></div>
+          <div class="plainbox">
+            <span class="lbl">The mental model for the rest of this series</span>
+            A component class is a <strong>box of values and behaviours that its own template is allowed to read</strong>.
+            Put a field on the class, and the template can display it. Put a method on the class, and the template can
+            call it on a click. That is the entire relationship — and every one of today's four bindings is just a
+            different way of crossing that line.
           </div>
         </section>
 
-        <!-- 8. THE TEMPLATE -->
+        <!-- 11. THE DECORATOR -->
         <section class="slide">
-          <p class="eyebrow">Concept 2 · walkthrough 2 of 2</p>
-          <h2>Inside the component template</h2>
-          <div class="fname">src/app/login/login.component.html</div>
-          <pre><code>&lt;h2&gt;Login&lt;/h2&gt;
-
-&lt;label&gt;Username:&lt;/label&gt;
-&lt;input type="text" [(ngModel)]="uname" placeholder="admin"&gt;
-
-&lt;label&gt;Password:&lt;/label&gt;
-&lt;input type="password" [(ngModel)]="pass" placeholder="admin123"&gt;
-
-&lt;button (click)="performLogin()"&gt;Login&lt;/button&gt;
-
-&lt;p&gt;{{ message }}&lt;/p&gt;</code></pre>
-          <p class="deep">Nine lines, and three different bindings are already at work. Notice how the template never <em>stores</em> anything — it only points at the class:</p>
+          <p class="eyebrow">Concept 2 continued</p>
+          <h2>The <code>@Component</code> decorator, line by line</h2>
+          <p class="deep">A <span class="term">decorator</span> is extra information attached to a class. It does not
+             change what the class <em>does</em> — it tells the framework how to <em>treat</em> it. If you have written
+             <code>@RestController</code> or <code>@Service</code> in Java, this is precisely the same idea.</p>
+          <pre><code>@Component({
+  selector:    'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls:   ['./employee-list.component.css']
+})
+export class EmployeeListComponent { }</code></pre>
           <table class="cmp">
-            <thead><tr><th style="width:30%">Syntax</th><th>What it does</th><th>Direction</th></tr></thead>
+            <thead><tr><th style="width:24%">Property</th><th>Meaning</th></tr></thead>
             <tbody>
-              <tr><td><code>[(ngModel)]="uname"</code></td><td>Keeps the input box and the <code>uname</code> property in sync</td><td>Both ways</td></tr>
-              <tr><td><code>(click)="performLogin()"</code></td><td>Runs the class method when the button is clicked</td><td>View → class</td></tr>
-              <tr><td><code>{{ message }}</code></td><td>Displays the current value of the <code>message</code> property</td><td>Class → view</td></tr>
+              <tr><td><code>selector</code></td><td>The HTML tag name that renders this component. Write <code>&lt;app-employee-list&gt;&lt;/app-employee-list&gt;</code> and this component appears there.</td></tr>
+              <tr><td><code>templateUrl</code></td><td>The path to the HTML file. The <code>./</code> means "in the same folder as this .ts file".</td></tr>
+              <tr><td><code>styleUrls</code></td><td>An <strong>array</strong> of CSS file paths — a component may have several. Newer CLI versions generate <code>styleUrl</code> (singular, no array) instead; both work.</td></tr>
             </tbody>
           </table>
+          <div class="warnbox">
+            <span class="lbl">Three rules about decorators</span>
+            <strong>1.</strong> It sits <em>immediately</em> above the class — no blank line, no other code between.<br>
+            <strong>2.</strong> The comma-separated properties go inside <code>({ ... })</code> — note it is braces
+            inside brackets, which is the single most common syntax error here.<br>
+            <strong>3.</strong> One class gets one <code>@Component</code>. If you need a second component, make a
+            second file.
+          </div>
+          <div class="note">
+            <span class="lbl">A clarification, since people coming from React ask</span>
+            An Angular template <strong>may</strong> have several root-level elements — you do not need to wrap
+            everything in a single outer <code>&lt;div&gt;</code>. Angular is happy with a template that starts with
+            three sibling <code>&lt;p&gt;</code> tags.
+          </div>
+        </section>
+
+        <!-- 12. TEMPLATES: INLINE VS URL -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 continued</p>
+          <h2>Two ways to write a template</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>Option 1 — <code>template</code> (inline)</h3>
+              <pre><code>@Component({
+  selector: 'app-hello',
+  template: `
+    &lt;h2&gt;Hello!&lt;/h2&gt;
+    &lt;p&gt;{{ message }}&lt;/p&gt;
+  `
+})
+export class HelloComponent {
+  message = 'Inline template';
+}</code></pre>
+              <p style="font-size:15px;">Everything in one file. Fine for a two-line component.</p>
+            </div>
+            <div class="panel good">
+              <h3>Option 2 — <code>templateUrl</code> (separate file)</h3>
+              <pre><code>@Component({
+  selector: 'app-hello',
+  templateUrl: './hello.component.html'
+})
+export class HelloComponent {
+  message = 'External template';
+}</code></pre>
+              <p style="font-size:15px;">HTML in its own file. <strong>This is what the CLI generates and what you should use.</strong></p>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">If you write an inline template, you must use backticks</span>
+            Not <code>'single'</code> and not <code>"double"</code> quotes — <strong>backticks</strong>
+            (<code>`</code>, the key above Tab on most keyboards). Backticks are the only string form in JavaScript
+            that may span multiple lines. Using ordinary quotes for a multi-line template is a classic beginner error
+            with a confusing error message.
+          </div>
           <div class="keybox">
-            <span class="lbl">The separation to appreciate</span>
-            The class contains <strong>zero HTML</strong>. The template contains <strong>zero logic</strong> — it doesn't compare passwords, it just calls a method. That clean split is exactly why components are easy to test and easy to change.
+            <span class="lbl">Which should you use? Almost always <code>templateUrl</code></span>
+            Separate files give you HTML syntax highlighting, autocomplete, easier diffs in code review, and they stop
+            your <code>.ts</code> file becoming a wall of markup. Use <code>template</code> only for something genuinely
+            tiny. The same choice exists for styles: <code>styles: ['...']</code> inline versus
+            <code>styleUrls: ['...']</code> in a file.
           </div>
         </section>
 
-        <!-- 9. DECORATORS & NESTING -->
+        <!-- 13. VIEW ENCAPSULATION -->
         <section class="slide">
-          <p class="eyebrow">Two things worth pausing on</p>
-          <h2>Decorators, and the one-root rule</h2>
-          <h3>What a decorator actually is</h3>
-          <p class="deep">A <span class="term">decorator</span> is a TypeScript feature: a function, written as <code>@Name({...})</code>, that <strong>attaches metadata</strong> to the thing below it. It doesn't change your class's behaviour — it describes your class <em>to the framework</em>. If you've used Java annotations like <code>@RestController</code> or <code>@Service</code>, this is the same idea with the same purpose.</p>
-          <table class="cmp">
-            <thead><tr><th>Angular decorator</th><th>Its Spring Boot cousin</th><th>Says</th></tr></thead>
-            <tbody>
-              <tr><td><code>@Component</code></td><td><code>@Controller</code></td><td>"This class renders a piece of UI"</td></tr>
-              <tr><td><code>@Injectable</code></td><td><code>@Service</code></td><td>"This class can be injected into others"</td></tr>
-              <tr><td><code>@NgModule</code></td><td><code>@Configuration</code></td><td>"This class groups and configures a set of things"</td></tr>
-            </tbody>
-          </table>
-          <h3>The one-root rule</h3>
-          <p class="deep">Every Angular app has exactly one root component, and <strong>everything else lives inside it</strong>. To display a new component you put its selector into a template that is already being rendered:</p>
-          <div class="fname">src/app/app.component.html</div>
+          <p class="eyebrow">Concept 2 continued — a genuinely great feature</p>
+          <h2>Component styles cannot leak out</h2>
+          <p class="deep">This is worth a slide of its own because it solves a problem that has plagued web development
+             for twenty years. Put this in one component's CSS file:</p>
+          <div class="fname">employee-list.component.css</div>
+          <pre><code>h2    { color: red; }
+table { width: 100%; border-collapse: collapse; }</code></pre>
+          <p class="deep">That <code>h2</code> rule affects <strong>only the <code>h2</code> tags inside this
+             component's template</strong>. An <code>h2</code> in the header component, or in the footer, or anywhere
+             else in the app, is completely untouched.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Traditional CSS</h3>
+              <ul>
+                <li>Every rule is global</li>
+                <li>Two developers both style <code>.card</code> and break each other</li>
+                <li>You defend yourself with long names like <code>.employee-list-table-header</code></li>
+                <li>Nobody dares delete an old rule</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>Angular component CSS</h3>
+              <ul>
+                <li>Rules are scoped automatically</li>
+                <li><code>h2</code> here cannot affect <code>h2</code> there</li>
+                <li>Short, obvious selectors are safe again</li>
+                <li>Delete a component, its CSS goes with it</li>
+              </ul>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">How it works, briefly</span>
+            Angular adds a unique attribute to this component's elements (something like <code>_ngcontent-abc-1</code>)
+            and quietly rewrites your CSS selectors to require it. Inspect an element in your browser's dev tools and
+            you can see it. The feature is called <strong>view encapsulation</strong>, and it is on by default.
+          </div>
+          <div class="keybox">
+            <span class="lbl">So where do global styles go?</span>
+            <code>src/styles.css</code> — that file <em>is</em> global, and it is where a CSS framework like Bootstrap
+            would be imported, or where you would set the app's font.
+          </div>
+        </section>
+
+        <!-- 14. NESTING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 continued — building the tree for real</p>
+          <h2>Nesting: putting a child inside a parent</h2>
+          <p class="deep">You have components. Now assemble them. This is three lines of work, and it is how every
+             Angular page is composed.</p>
+          <div class="fname">src/app/app.component.html — the parent</div>
           <pre><code>&lt;app-header&gt;&lt;/app-header&gt;
 
-&lt;app-login&gt;&lt;/app-login&gt;
+&lt;app-employee-list&gt;&lt;/app-employee-list&gt;
 
-&lt;app-employee-list&gt;&lt;/app-employee-list&gt;</code></pre>
+&lt;app-footer&gt;&lt;/app-footer&gt;</code></pre>
+          <p class="deep">That is the whole root template. <code>AppComponent</code> now contains almost no markup of
+             its own — it is a <strong>layout</strong>, arranging three children. This is very common and very healthy:
+             top-level components arrange, leaf components display.</p>
+          <div class="browser">
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200</span>
+            </div>
+            <div class="viewport">
+              <p style="border:1px dashed #dd0031;padding:6px 10px;margin:0 0 8px;"><strong>app-header</strong> → "Employee Portal"</p>
+              <p style="border:1px dashed #9327f0;padding:6px 10px;margin:0 0 8px;"><strong>app-employee-list</strong> → the table of employees</p>
+              <p style="border:1px dashed #28c840;padding:6px 10px;margin:0;"><strong>app-footer</strong> → "© 2026 · Faculty AHD"</p>
+            </div>
+          </div>
           <div class="warnbox">
-            <span class="lbl">Generated a component and nothing appeared?</span>
-            That's expected — and it catches everyone once. <code>ng g c</code> creates and registers a component, but it can't guess <em>where</em> you want it. Nothing renders until you add its selector tag to a template that's already on screen. Start with <code>app.component.html</code>.
+            <span class="lbl">Nothing appeared? Check these three, in order</span>
+            <strong>1.</strong> Is the tag spelled exactly like the <code>selector</code>? <strong>2.</strong> Is the
+            component in <code>declarations</code> in <code>app.module.ts</code>? <strong>3.</strong> Did you write a
+            closing tag — <code>&lt;app-header&gt;&lt;/app-header&gt;</code> and not
+            <code>&lt;app-header /&gt;</code>? That third one fails <em>silently</em>, which makes it the nastiest.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            If the employee table also needs to appear on a "reports" page later, how much work is that now?
+            <span class="muted">(One line. That is the payoff for having built it as a component rather than as markup
+            inside a page.)</span>
           </div>
         </section>
 
-        <!-- 10. TEMPLATES INLINE -->
-        <section class="slide">
-          <p class="eyebrow">Concept 3 — where the HTML lives</p>
-          <h2>Templates, option 1: inline</h2>
-          <p class="deep">You can write the HTML directly inside the decorator using the <code>template</code> property instead of <code>templateUrl</code>. Backticks (<code>`</code>) let the string span multiple lines.</p>
-          <pre><code>import { Component } from '@angular/core';
 
-@Component({
-  selector: 'app-root',
-  template: `
-    &lt;h1&gt;{{ appTitle }}&lt;/h1&gt;
-    &lt;p&gt;This HTML lives inside the TypeScript file.&lt;/p&gt;
-  `,
-  styles: [`
-    h1 { color: #dd0031; }
-  `]
-})
-export class AppComponent {
-  appTitle: string = 'My Angular App';
-}</code></pre>
-          <p class="deep">Note the plurals: <code>template</code> + <code>styles</code> for inline, versus <code>templateUrl</code> + <code>styleUrls</code> for external files. Mixing them up produces a confusing error, so read carefully.</p>
-          <div class="keybox">
-            <span class="lbl">When inline is genuinely the right choice</span>
-            Only for very small templates — a badge, an icon, a two-line label. Everything sits in one file, which is convenient when there's barely any HTML to hold.
-          </div>
-        </section>
-
-        <!-- 11. TEMPLATES URL -->
+        <!-- 15. DATA BINDING OVERVIEW -->
         <section class="slide">
-          <p class="eyebrow">Concept 3 continued</p>
-          <h2>Templates, option 2: <code>templateUrl</code></h2>
-          <pre><code>@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',      // separate .html file
-  styleUrls: ['./app.component.css']        // separate .css file(s)
-})
-export class AppComponent {
-  appTitle: string = 'My Angular App';
-}</code></pre>
-          <table class="cmp">
-            <thead><tr><th style="width:22%">&nbsp;</th><th>Inline <code>template</code></th><th><code>templateUrl</code></th></tr></thead>
-            <tbody>
-              <tr><td><strong>Best for</strong></td><td>Tiny templates — a handful of lines</td><td class="good">Anything real</td></tr>
-              <tr><td><strong>Editor support</strong></td><td class="bad">Weaker HTML highlighting inside a string</td><td class="good">Full HTML tooling, formatting &amp; autocomplete</td></tr>
-              <tr><td><strong>Readability</strong></td><td class="bad">The <code>.ts</code> file grows quickly and mixes concerns</td><td class="good">Logic and markup stay in separate files</td></tr>
-              <tr><td><strong>CLI default</strong></td><td>—</td><td class="good">✔ This is what <code>ng g c</code> generates</td></tr>
-            </tbody>
-          </table>
-          <div class="keybox">
-            <span class="lbl">The practical rule</span>
-            Use <code>templateUrl</code> — always, unless the template is trivially small. It's the CLI default for good reason. Know that inline exists mainly so you can read other people's code and understand tutorials.
-          </div>
-        </section>
-
-        <!-- 12. BINDING BIG PICTURE -->
-        <section class="slide">
-          <p class="eyebrow">Concept 4 — the heart of Angular</p>
+          <p class="eyebrow">Concept 3 — today's centrepiece</p>
           <h2>Data binding: the whole picture on one slide</h2>
-          <p class="deep"><span class="term">Data binding</span> is the automatic connection between your component <strong>class</strong> and its <strong>template</strong>. Change a property and the screen updates. Type in a box and the property updates. You never write code to copy values back and forth — that is Angular's central promise.</p>
-          <div class="bindmap">
-            <div class="side">
-              <h3>🧠 Component class</h3>
-              <p>Properties and methods — the source of truth. Plain TypeScript.</p>
-            </div>
-            <div class="dir"><span class="a">⇄</span>four kinds of binding</div>
-            <div class="side">
-              <h3>🖼️ Template (view)</h3>
-              <p>What the user sees and interacts with. Plain HTML plus Angular syntax.</p>
-            </div>
-          </div>
+          <p class="deep"><span class="term">Data binding</span> is the connection between your <strong>component class</strong>
+             and your <strong>template</strong>. There are four kinds, and the only thing that really distinguishes them
+             is <strong>which direction the information travels</strong>. Get the direction right and the syntax follows.</p>
           <table class="cmp">
-            <thead><tr><th style="width:20%">Binding</th><th style="width:26%">Syntax</th><th>Direction</th><th>Use it to…</th></tr></thead>
+            <thead><tr><th style="width:16%">Kind</th><th style="width:20%">Syntax</th><th style="width:22%">Direction</th><th>Use it when</th></tr></thead>
             <tbody>
-              <tr><td><strong>Interpolation</strong></td><td><code>{{ property }}</code></td><td>Class → View</td><td>Display a value as text</td></tr>
-              <tr><td><strong>Property</strong></td><td><code>[attr]="property"</code></td><td>Class → View</td><td>Set an element's property/attribute</td></tr>
-              <tr><td><strong>Event</strong></td><td><code>(event)="method()"</code></td><td>View → Class</td><td>React to clicks, typing, submits</td></tr>
-              <tr><td><strong>Two-way</strong></td><td><code>[(ngModel)]="property"</code></td><td class="good">Both ways</td><td>Keep a form field and a property in sync</td></tr>
+              <tr>
+                <td><strong>Interpolation</strong></td>
+                <td><code>{{ value }}</code></td>
+                <td>Class → Template</td>
+                <td>You want to <strong>display text</strong> on the page.</td>
+              </tr>
+              <tr>
+                <td><strong>Property binding</strong></td>
+                <td><code>[property]="value"</code></td>
+                <td>Class → Template</td>
+                <td>You want to <strong>set an HTML attribute</strong> from your data.</td>
+              </tr>
+              <tr>
+                <td><strong>Event binding</strong></td>
+                <td><code>(event)="method()"</code></td>
+                <td>Template → Class</td>
+                <td>You want to <strong>react to a click</strong> or other user action.</td>
+              </tr>
+              <tr>
+                <td><strong>Two-way binding</strong></td>
+                <td><code>[(ngModel)]="value"</code></td>
+                <td>Class ⇄ Template</td>
+                <td>You have a <strong>form input</strong> that must stay in sync both ways.</td>
+              </tr>
             </tbody>
           </table>
+          <div class="plainbox">
+            <span class="lbl">A memory trick for the punctuation</span>
+            <strong>Square brackets <code>[ ]</code> look like a box being filled</strong> → data flowing <em>in</em>, from
+            class to template. <strong>Round brackets <code>( )</code> look like a mouth shouting</strong> → an event
+            flowing <em>out</em>, from template to class. And <strong><code>[( )]</code> is both at once</strong> — hence
+            its nickname, "banana in a box": the banana <code>( )</code> inside the box <code>[ ]</code>.
+          </div>
           <div class="keybox">
-            <span class="lbl">A memory aid that actually works</span>
-            <strong>Square brackets</strong> <code>[ ]</code> = data flowing <strong>in</strong> to the element.
-            <strong>Round brackets</strong> <code>( )</code> = events flowing <strong>out</strong> of the element.
-            <strong>Both together</strong> <code>[( )]</code> = data flowing both ways. Angular developers call it
-            "<strong>banana in a box</strong>" — the banana <code>( )</code> goes inside the box <code>[ ]</code>. That
-            silly image will stop you writing <code>([ngModel])</code> by mistake.
+            <span class="lbl">Why this beats what you did before</span>
+            In a JSP you print a value into HTML once, and it is frozen. In Angular the binding is <strong>live</strong>:
+            change the field in your class, and the screen updates by itself. You never write code to "refresh the
+            display" — that is Angular's entire job.
           </div>
         </section>
 
-        <!-- 13. INTERPOLATION -->
+        <!-- 16. INTERPOLATION -->
         <section class="slide">
-          <p class="eyebrow">Binding 1 of 4</p>
+          <p class="eyebrow">Binding 1 of 4 · Class → Template</p>
           <h2>Interpolation — <code>{{ }}</code></h2>
-          <p class="deep">One-way binding, <strong>class → view</strong>. Angular evaluates whatever is inside the double curly braces, converts the result to a string, and drops it into the HTML.</p>
+          <p class="deep">The simplest binding, and the one you already used in Session 1. Double curly braces put a
+             value from the class into the page as <strong>text</strong>.</p>
           <div class="panels">
             <div class="panel">
               <h3>The class</h3>
-              <pre><code>export class HelloComponent {
-  name: string = 'Ajay Kishan';
-  age: number = 28;
-  city: string = 'Chennai';
+              <pre><code>export class AppComponent {
+  title = 'Employee Portal';
+  count = 4;
+  user  = { name: 'Anoop' };
+
+  getGreeting(): string {
+    return 'Welcome back';
+  }
 }</code></pre>
             </div>
             <div class="panel">
               <h3>The template</h3>
-              <pre><code>&lt;p&gt;Hello user: &lt;b&gt;{{ name }}&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;Age next year: {{ age + 1 }}&lt;/p&gt;
-&lt;p&gt;{{ name }} — {{ city }}&lt;/p&gt;
-&lt;p&gt;{{ name.toUpperCase() }}&lt;/p&gt;</code></pre>
+              <pre><code>&lt;h1&gt;{{ title }}&lt;/h1&gt;
+
+&lt;p&gt;{{ count }} employees&lt;/p&gt;
+
+&lt;p&gt;{{ user.name }}&lt;/p&gt;
+
+&lt;p&gt;{{ getGreeting() }}&lt;/p&gt;
+
+&lt;p&gt;{{ count * 2 }}&lt;/p&gt;
+
+&lt;p&gt;{{ title.toUpperCase() }}&lt;/p&gt;</code></pre>
             </div>
           </div>
           <div class="browser">
-            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200</span>
+            </div>
             <div class="viewport">
-              <p>Hello user: <b>Ajay Kishan</b></p>
-              <p>Age next year: 29</p>
-              <p>Ajay Kishan — Chennai</p>
-              <p>AJAY KISHAN</p>
+              <p style="font-size:20px;font-weight:700;margin:0 0 6px;">Employee Portal</p>
+              <p>4 employees</p>
+              <p>Anoop</p>
+              <p>Welcome back</p>
+              <p>8</p>
+              <p>EMPLOYEE PORTAL</p>
             </div>
           </div>
-          <div class="warnbox">
-            <span class="lbl">What you may put inside <code>{{ }}</code></span>
-            Simple expressions only: properties, arithmetic, string concatenation, method calls that just return a value.
-            <strong>Not allowed:</strong> assignments (<code>{{ x = 5 }}</code>), <code>new</code>, <code>;</code>, or
-            <code>if</code>/<code>for</code>. And keep it lightweight — Angular re-evaluates every expression on every
-            change-detection pass, so heavy computation belongs in the class, not the template.
+          <div class="keybox">
+            <span class="lbl">What you can put between the braces</span>
+            A field, a nested property, a method call, or a small expression — arithmetic, string methods, comparisons.
+            Angular evaluates it and inserts the result as text.
           </div>
         </section>
 
-        <!-- 14. PROPERTY BINDING -->
+        <!-- 17. INTERPOLATION RULES -->
         <section class="slide">
-          <p class="eyebrow">Binding 2 of 4</p>
+          <p class="eyebrow">Binding 1 continued — the rules, and the traps</p>
+          <h2>What you can and cannot put inside <code>{{ }}</code></h2>
+          <div class="panels">
+            <div class="panel good">
+              <h3>✅ Allowed</h3>
+              <pre><code>{{ title }}
+{{ user.name }}
+{{ employees.length }}
+{{ salary * 12 }}
+{{ firstName + ' ' + lastName }}
+{{ getTotal() }}
+{{ isActive ? 'Yes' : 'No' }}
+{{ employees[0].name }}
+{{ user?.address?.city }}</code></pre>
+            </div>
+            <div class="panel bad">
+              <h3>❌ Not allowed</h3>
+              <pre><code>{{ let x = 5 }}
+{{ if (a) { } }}
+{{ for (...) { } }}
+{{ count++ }}
+{{ salary = 30000 }}
+{{ new Date() }}
+{{ window.alert('hi') }}
+{{ myVar ?? doSomething() }}
+{{ console.log(x) }}</code></pre>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The one rule that covers all of it</span>
+            A template expression must <strong>produce a value</strong> and must have <strong>no side effects</strong>.
+            You may <em>read</em>; you may not <em>change</em>. So <code>a + b</code> is fine, but <code>a = b</code> and
+            <code>count++</code> are not. Declarations, loops and <code>if</code> statements are out too — Angular gives
+            you <code>*ngIf</code> and <code>*ngFor</code> for those, which is exactly why they exist.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two traps worth knowing now</span>
+            <strong>1. A misspelled field shows nothing at all.</strong> <code>{{ titel }}</code> renders an empty
+            string — no error, no warning. When text mysteriously fails to appear, check your spelling and
+            capitalisation first.<br>
+            <strong>2. Don't put heavy work in a method call.</strong> <code>{{ getTotal() }}</code> is re-run every time
+            Angular checks the screen, which is often. Fine for adding four numbers; bad for looping ten thousand rows.
+          </div>
+        </section>
+
+        <!-- 18. PROPERTY BINDING -->
+        <section class="slide">
+          <p class="eyebrow">Binding 2 of 4 · Class → Template</p>
           <h2>Property binding — <code>[ ]</code></h2>
-          <p class="deep">Also one-way, <strong>class → view</strong> — but instead of writing text into the page, it sets a <strong>property of an HTML element</strong>. Square brackets around the property name mean "the right-hand side is an expression, not a literal string."</p>
+          <p class="deep">Interpolation puts text <em>between</em> tags. Property binding sets a value <em>on</em> a tag —
+             its <code>src</code>, its <code>disabled</code>, its <code>value</code>. Wrap the property name in square
+             brackets and the right-hand side becomes an <strong>expression</strong> rather than a literal string.</p>
           <div class="panels">
             <div class="panel">
               <h3>The class</h3>
-              <pre><code>export class DemoComponent {
-  name: string = 'Ajay Kishan';
-  imgPath: string = 'assets/logo.png';
-  isDisabled: boolean = true;
-  rowCount: number = 5;
+              <pre><code>export class AppComponent {
+  imageUrl = 'assets/logo.png';
+  isSaveDisabled = true;
+  inputValue = 'Anoop';
+  rowCount = 4;
+  linkTarget = 'https://angular.dev';
 }</code></pre>
             </div>
             <div class="panel">
               <h3>The template</h3>
-              <pre><code>&lt;input type="text" [value]="name"&gt;
+              <pre><code>&lt;img [src]="imageUrl"&gt;
 
-&lt;img [src]="imgPath" [alt]="name"&gt;
+&lt;button [disabled]="isSaveDisabled"&gt;
+  Save
+&lt;/button&gt;
 
-&lt;button [disabled]="isDisabled"&gt;Save&lt;/button&gt;
+&lt;input [value]="inputValue"&gt;
 
-&lt;textarea [rows]="rowCount"&gt;&lt;/textarea&gt;</code></pre>
+&lt;a [href]="linkTarget"&gt;Docs&lt;/a&gt;
+
+&lt;button [disabled]="rowCount === 0"&gt;
+  Export
+&lt;/button&gt;</code></pre>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">The brackets change everything</span>
-            <code>&lt;button disabled="isDisabled"&gt;</code> — <strong>no brackets</strong>: the button is disabled by the
-            literal string "isDisabled", which is truthy. Always disabled, whatever your class says.<br>
-            <code>&lt;button [disabled]="isDisabled"&gt;</code> — <strong>brackets</strong>: Angular evaluates the property
-            and disables the button only when it's <code>true</code>. <em>This is a real bug people ship.</em>
+            <span class="lbl">The critical detail — brackets change the meaning entirely</span>
+            <code>&lt;img src="imageUrl"&gt;</code> looks for a <strong>file literally called "imageUrl"</strong> and gives
+            you a broken image.<br>
+            <code>&lt;img [src]="imageUrl"&gt;</code> reads the <strong>field named <code>imageUrl</code></strong> from your
+            class and uses its value.<br>
+            Without brackets it is a plain string. With brackets it is an expression. That single distinction accounts
+            for a large share of "why is my image broken" questions.
           </div>
-          <p class="muted">Property binding also passes data from a parent component into a child component — an important pattern you'll meet as soon as you build nested components.</p>
+          <div class="warnbox">
+            <span class="lbl">And a common variant of the same mistake</span>
+            <code>[disabled]="true"</code> — brackets, so <code>true</code> is the boolean. Correct.<br>
+            <code>disabled="false"</code> — no brackets, so <code>"false"</code> is a <em>non-empty string</em>, which
+            HTML treats as "yes, disabled". The button stays disabled and you are baffled. <strong>With booleans,
+            always use brackets.</strong>
+          </div>
         </section>
 
-        <!-- 15. INTERPOLATION VS PROPERTY -->
+        <!-- 19. INTERPOLATION OR PROPERTY BINDING -->
         <section class="slide">
-          <p class="eyebrow">Bindings 1 vs 2</p>
+          <p class="eyebrow">Bindings 1 and 2 — telling them apart</p>
           <h2>Interpolation or property binding?</h2>
-          <p class="deep">Both are one-way, class → view. Under the hood Angular actually converts interpolation <em>into</em> property binding — so for strings they are genuinely interchangeable:</p>
-          <pre><code>&lt;!-- these two lines do exactly the same thing --&gt;
-&lt;img src="{{ imgPath }}"&gt;
-&lt;img [src]="imgPath"&gt;</code></pre>
-          <table class="cmp">
-            <thead><tr><th style="width:32%">Situation</th><th>Use</th><th>Because</th></tr></thead>
+          <p class="deep">They both send data the same direction, so how do you choose? Ask what you are filling in.</p>
+          <div class="bindmap">
+            <div class="side">
+              <h3><code>{{ }}</code> Interpolation</h3>
+              <p>Puts <strong>text content</strong> between an opening and closing tag.</p>
+              <p style="margin-top:8px;"><code>&lt;p&gt;{{ name }}&lt;/p&gt;</code></p>
+            </div>
+            <div class="dir"><span class="a">↔</span>choose by<br>position</div>
+            <div class="side">
+              <h3><code>[ ]</code> Property binding</h3>
+              <p>Sets an <strong>attribute</strong> inside the opening tag.</p>
+              <p style="margin-top:8px;"><code>&lt;img [src]="url"&gt;</code></p>
+            </div>
+          </div>
+          <table class="cmp" style="margin-top:18px;">
+            <thead><tr><th style="width:40%">What you want</th><th>Write</th></tr></thead>
             <tbody>
-              <tr><td>Text content inside an element</td><td><code>{{ }}</code></td><td>It reads naturally: <code>&lt;p&gt;Hello {{ name }}&lt;/p&gt;</code></td></tr>
-              <tr><td>Mixing text and values together</td><td><code>{{ }}</code></td><td>Concatenation is effortless: <code>title="Emp {{ id }} - {{ name }}"</code></td></tr>
-              <tr><td>A <strong>non-string</strong> value — boolean, number, object, array</td><td class="good"><code>[ ]</code></td><td>Interpolation stringifies everything. <code>[disabled]="false"</code> works; <code>disabled="{{false}}"</code> passes the <em>string</em> "false", which is truthy.</td></tr>
-              <tr><td>Passing data to a child component</td><td class="good"><code>[ ]</code></td><td>The child expects a real typed object, not text</td></tr>
+              <tr><td>Show a name as page text</td><td class="good"><code>&lt;p&gt;{{ empName }}&lt;/p&gt;</code></td></tr>
+              <tr><td>Set an image's source</td><td class="good"><code>&lt;img [src]="imageUrl"&gt;</code></td></tr>
+              <tr><td>Disable a button conditionally</td><td class="good"><code>&lt;button [disabled]="!isValid"&gt;</code></td></tr>
+              <tr><td>Set an input's starting value</td><td class="good"><code>&lt;input [value]="empName"&gt;</code></td></tr>
+              <tr><td>Show a total inside a heading</td><td class="good"><code>&lt;h3&gt;Total: {{ total }}&lt;/h3&gt;</code></td></tr>
             </tbody>
           </table>
-          <div class="keybox">
-            <span class="lbl">The one-line rule</span>
-            <strong>Showing text? Use <code>{{ }}</code>. Setting anything that isn't text? Use <code>[ ]</code>.</strong>
+          <div class="note">
+            <span class="lbl">Technically they are the same thing</span>
+            Under the bonnet, <code>&lt;p&gt;{{ name }}&lt;/p&gt;</code> compiles to
+            <code>&lt;p [textContent]="name"&gt;</code>. Interpolation is a friendly shorthand for property-binding the
+            text content. That is why the rules about what you may write inside them are identical — you are not
+            learning two systems, just two spellings of one.
           </div>
         </section>
 
-        <!-- 16. EVENT BINDING CLASS -->
+        <!-- 20. EVENT BINDING -->
         <section class="slide">
-          <p class="eyebrow">Binding 3 of 4 — part 1</p>
-          <h2>Event binding — the class side</h2>
-          <p class="deep">So far data has only flowed <strong>class → view</strong>. Event binding is the return path: the user does something, and a method on your class runs. Direction: <strong>view → class</strong>.</p>
-          <div class="fname">status.component.ts</div>
-          <pre><code>import { Component } from '@angular/core';
+          <p class="eyebrow">Binding 3 of 4 · Template → Class</p>
+          <h2>Event binding — <code>( )</code></h2>
+          <p class="deep">The first binding that goes the <strong>other way</strong>. Round brackets around an event name
+             say: "when this happens in the template, run that method on the class."</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class — the methods</h3>
+              <pre><code>export class LoginComponent {
+  message = '';
+  clickCount = 0;
 
-@Component({
-  selector: 'app-status',
-  templateUrl: './status.component.html'
-})
-export class StatusComponent {
+  onLogin(): void {
+    this.message = 'Login clicked!';
+  }
 
-  Status: boolean = true;
-  clickCount: number = 0;
-
-  clicked(): void {
-    this.Status = !this.Status;      // flip true ⇄ false
+  increment(): void {
     this.clickCount++;
   }
 
-  onKey(event: any): void {
-    console.log('You typed: ' + event.target.value);
+  greet(who: string): void {
+    this.message = 'Hello, ' + who;
   }
 }</code></pre>
-          <p class="deep">These are ordinary TypeScript methods — nothing Angular-specific about them. The wiring happens entirely in the template, which is why the class stays testable in isolation.</p>
-          <div class="note">
-            <span class="lbl">The <code>$event</code> object</span>
-            If a method needs details about what happened — which key, what the input contains, the mouse position —
-            declare a parameter and pass <code>$event</code> from the template. For an input box,
-            <code>event.target.value</code> holds the current text.
-          </div>
-        </section>
+            </div>
+            <div class="panel">
+              <h3>The template — the wiring</h3>
+              <pre><code>&lt;button (click)="onLogin()"&gt;
+  Login
+&lt;/button&gt;
 
-        <!-- 17. EVENT BINDING TEMPLATE -->
-        <section class="slide">
-          <p class="eyebrow">Binding 3 of 4 — part 2</p>
-          <h2>Event binding — the template side</h2>
-          <div class="fname">status.component.html</div>
-          <pre><code>&lt;button (click)="clicked()"&gt;Click&lt;/button&gt;
+&lt;button (click)="increment()"&gt;
+  Clicked {{ clickCount }} times
+&lt;/button&gt;
 
-&lt;p&gt;Status: {{ Status }}&lt;/p&gt;
-&lt;p&gt;Clicked {{ clickCount }} times&lt;/p&gt;
+&lt;button (click)="greet('Anoop')"&gt;
+  Greet Anoop
+&lt;/button&gt;
 
-&lt;input (keyup)="onKey($event)" placeholder="type here..."&gt;
-
-&lt;div (mouseenter)="clicked()"&gt;Hover me&lt;/div&gt;</code></pre>
-          <div class="browser">
-            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
-            <div class="viewport">
-              <p><span class="btn">Click</span></p>
-              <p>Status: false</p>
-              <p>Clicked 3 times</p>
+&lt;p&gt;{{ message }}&lt;/p&gt;</code></pre>
             </div>
           </div>
-          <p class="deep">Watch what happens on one click: the method changes <code>Status</code> and <code>clickCount</code> → Angular notices the properties changed → the two interpolations re-render. <strong>Event binding in, interpolation out</strong> — that round trip is a complete interactive feature, and you wrote no DOM code at all.</p>
-          <table class="cmp">
-            <thead><tr><th>Event</th><th>Fires when</th></tr></thead>
+          <div class="keybox">
+            <span class="lbl">Watch what happens after a click — this is the payoff</span>
+            <code>onLogin()</code> changes a field. It does <strong>not</strong> touch the page. Yet the
+            <code>&lt;p&gt;{{ message }}&lt;/p&gt;</code> updates immediately, because interpolation is a live binding.
+            <strong>You change data; Angular updates the screen.</strong> You will never write
+            <code>document.getElementById(...)</code> again.
+          </div>
+          <h3>Events you will actually use</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:22%">Event</th><th>Fires when</th></tr></thead>
             <tbody>
-              <tr><td><code>(click)</code></td><td>The element is clicked — by far the most common</td></tr>
-              <tr><td><code>(keyup)</code> / <code>(keydown)</code></td><td>A key is released / pressed</td></tr>
-              <tr><td><code>(change)</code></td><td>An input loses focus after its value changed</td></tr>
-              <tr><td><code>(input)</code></td><td>Every keystroke in a text field</td></tr>
-              <tr><td><code>(submit)</code></td><td>A form is submitted (Session 3)</td></tr>
-              <tr><td><code>(mouseenter)</code> / <code>(mouseleave)</code></td><td>The pointer enters / leaves the element</td></tr>
+              <tr><td><code>(click)</code></td><td>The element is clicked. By far the most common.</td></tr>
+              <tr><td><code>(input)</code></td><td>The user types in a text box — on every keystroke.</td></tr>
+              <tr><td><code>(change)</code></td><td>A field's value is committed — on leaving the field, or on selecting from a dropdown.</td></tr>
+              <tr><td><code>(submit)</code></td><td>A form is submitted. Used in Session 3.</td></tr>
+              <tr><td><code>(keyup)</code></td><td>A key is released. <code>(keyup.enter)</code> narrows it to just the Enter key.</td></tr>
+              <tr><td><code>(mouseenter)</code></td><td>The pointer moves over the element.</td></tr>
             </tbody>
           </table>
+          <div class="warnbox">
+            <span class="lbl">Don't forget the parentheses on the method</span>
+            <code>(click)="onLogin()"</code> <strong>calls</strong> the method. <code>(click)="onLogin"</code> merely
+            names it and does nothing at all — silently. If a button appears dead, check for the missing <code>()</code>.
+          </div>
         </section>
 
-        <!-- 18. TWO-WAY CONCEPT -->
+        <!-- 21. $EVENT -->
         <section class="slide">
-          <p class="eyebrow">Binding 4 of 4 — part 1</p>
-          <h2>Two-way binding with <code>ngModel</code></h2>
-          <p class="deep">Two-way binding is not a new mechanism — it is <strong>property binding and event binding combined</strong> into one piece of syntax. These two blocks behave identically:</p>
-          <div class="panels">
-            <div class="panel bad">
-              <h3>The long way — two bindings</h3>
-              <pre><code>&lt;input
-  [value]="userName"
-  (input)="userName = $event.target.value"&gt;</code></pre>
-              <p style="font-size:15px;">Data in via <code>[value]</code>, data out via <code>(input)</code>. Verbose and easy to get wrong.</p>
+          <p class="eyebrow">Binding 3 continued</p>
+          <h2><code>$event</code> — getting data out of the event</h2>
+          <p class="deep">Often you don't just want to know that something happened — you want to know <em>what the user
+             typed</em>. Angular hands you the event object under the special name <code>$event</code>.</p>
+          <div class="fname">the template</div>
+          <pre><code>&lt;input (input)="onType($event)" placeholder="Type something"&gt;
+&lt;p&gt;You typed: {{ typed }}&lt;/p&gt;</code></pre>
+          <div class="fname">the class</div>
+          <pre><code>typed = '';
+
+onType(event: Event): void {
+  // event.target is the input element; .value is what's in it
+  this.typed = (event.target as HTMLInputElement).value;
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">$event</div><div>Angular's name for the event object. Only meaningful inside an event binding.</div></div>
+            <div class="anno-row"><div class="anno-tag">event.target</div><div>The element the event came from — here, the <code>&lt;input&gt;</code>.</div></div>
+            <div class="anno-row"><div class="anno-tag">as HTMLInputElement</div><div>A <strong>type assertion</strong>: "trust me, this is an input element, so it has a <code>.value</code>." Needed because TypeScript only knows it is <em>some</em> element.</div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">There is a much nicer way, and it's on the next slide</span>
+            That <code>as HTMLInputElement</code> cast is clumsy — and for form inputs you will almost never need it,
+            because <strong>two-way binding does this job in one clean line</strong>. Learn <code>$event</code> because
+            you will meet it (and you need it for non-form events), but reach for <code>[(ngModel)]</code> first.
+          </div>
+          <div class="note">
+            <span class="lbl">A useful shortcut worth remembering</span>
+            <code>&lt;input (keyup.enter)="search($event)"&gt;</code> — the <code>.enter</code> part means "only when the
+            Enter key is released". Angular supports this for any key, e.g. <code>(keyup.escape)</code>. It saves you
+            writing an <code>if</code> to check which key it was.
+          </div>
+        </section>
+
+        <!-- 22. TWO-WAY BINDING -->
+        <section class="slide">
+          <p class="eyebrow">Binding 4 of 4 · Class ⇄ Template</p>
+          <h2>Two-way binding with <code>[(ngModel)]</code></h2>
+          <p class="deep">A text box has a genuine two-directional need: the class should be able to <em>set</em> its
+             contents, <strong>and</strong> the class should learn when the user <em>types</em>. Doing that with the
+             bindings you already know takes two attributes:</p>
+          <pre><code>&lt;!-- the manual way — property binding IN, event binding OUT --&gt;
+&lt;input [value]="empName" (input)="empName = getValue($event)"&gt;</code></pre>
+          <p class="deep">That works, and it is verbose. <code>[(ngModel)]</code> collapses both directions into one:</p>
+          <pre><code>&lt;!-- the same thing, in one attribute --&gt;
+&lt;input [(ngModel)]="empName"&gt;</code></pre>
+          <div class="bindmap">
+            <div class="side">
+              <h3>Component class</h3>
+              <p><code>empName = 'Anoop';</code></p>
+              <p class="muted" style="margin-top:6px;">The single source of truth.</p>
             </div>
-            <div class="panel good">
-              <h3>The Angular way — one binding</h3>
-              <pre><code>&lt;input [(ngModel)]="userName"&gt;</code></pre>
-              <p style="font-size:15px;">Same behaviour: typing updates the property, and changing the property updates the box. <strong>Banana in a box.</strong></p>
+            <div class="dir"><span class="a">⇄</span>[(ngModel)]<br>both ways, always</div>
+            <div class="side">
+              <h3>The input on screen</h3>
+              <p>Shows <code>Anoop</code>, and reports every keystroke back.</p>
+              <p class="muted" style="margin-top:6px;">Never out of step.</p>
             </div>
           </div>
-          <div class="warnbox">
-            <span class="lbl">⚠️ Beginner note — the single most common Angular failure</span>
-            <code>ngModel</code> lives in <strong><code>FormsModule</code></strong>, which is <em>not</em> imported by default.
-            Forget it and the input simply does nothing — often with no visible error at all. <strong>If two-way binding
-            isn't working, check this first, before anything else.</strong>
+          <div class="plainbox">
+            <span class="lbl">Why it's called "banana in a box"</span>
+            <code>[( )]</code> — the round banana <code>( )</code> sits inside the square box <code>[ ]</code>. It is a
+            silly name that works: <strong>box on the outside, banana on the inside</strong>. Get the order wrong and
+            you get <code>([ngModel])</code>, which is an error people stare at for a long time.
           </div>
-          <div class="fname">src/app/app.module.ts</div>
-          <pre><code>import { FormsModule } from '@angular/forms';     // ① import it
+        </section>
+
+        <!-- 23. FORMSMODULE -->
+        <section class="slide">
+          <p class="eyebrow">Binding 4 continued — the error everyone hits exactly once</p>
+          <h2><code>ngModel</code> needs <code>FormsModule</code></h2>
+          <p class="deep">Write <code>[(ngModel)]</code> in a fresh project and you get this, and it stops the build:</p>
+          <div class="fname">the error in your terminal</div>
+          <pre><code>Error: Can't bind to 'ngModel' since it isn't a known property of 'input'.</code></pre>
+          <p class="deep">The message is genuinely confusing, because nothing looks wrong with your line. The real cause:
+             <code>ngModel</code> is not part of Angular's core — it lives in a separate feature module, and you have to
+             ask for it.</p>
+          <div class="fname">src/app/app.module.ts — the two lines to add</div>
+          <pre><code>import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';        // ← 1. import it
+import { AppComponent } from './app.component';
 
 @NgModule({
-  declarations: [ AppComponent, LoginComponent ],
+  declarations: [ AppComponent ],
   imports: [
     BrowserModule,
-    FormsModule                                    // ② list it here
+    FormsModule                                       // ← 2. list it here
   ],
+  providers: [],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }</code></pre>
-          <p class="muted">Both steps are required. Adding the <code>import</code> line at the top without adding <code>FormsModule</code> to the <code>imports</code> array changes nothing.</p>
+          <div class="keybox">
+            <span class="lbl">Remember the pattern, not just this instance</span>
+            <strong>"Can't bind to X since it isn't a known property"</strong> almost always means <em>a module is
+            missing from <code>imports</code></em>. You will meet the same shape of error twice more:
+            <code>HttpClientModule</code> for HTTP in Session 3, and <code>RouterModule</code> for routing in Session 4.
+            Recognise the pattern once and you will fix all three in seconds.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Also: <code>imports</code>, not <code>declarations</code></span>
+            <code>FormsModule</code> is somebody else's module, so it goes in <code>imports</code>.
+            <code>declarations</code> is only ever for <strong>your own</strong> components, directives and pipes.
+            Putting a module in <code>declarations</code> produces a long, unhelpful error.
+          </div>
         </section>
 
-        <!-- 19. TWO-WAY CODE -->
+        <!-- 24. TWO-WAY IN FULL -->
         <section class="slide">
-          <p class="eyebrow">Binding 4 of 4 — part 2</p>
-          <h2>Two-way binding in full</h2>
+          <p class="eyebrow">Binding 4 continued — a complete working example</p>
+          <h2>Two-way binding in full: a login form</h2>
           <div class="panels">
             <div class="panel">
-              <h3>hello.component.ts</h3>
-              <pre><code>export class HelloComponent {
+              <h3>login.component.ts</h3>
+              <pre><code>export class LoginComponent {
+  username = '';
+  password = '';
+  message  = '';
 
-  private _userName: string = '';
-
-  get userName(): string {
-    return this._userName;
+  onLogin(): void {
+    if (this.username === 'admin' &amp;&amp;
+        this.password === 'admin123') {
+      this.message = '✅ Login successful!';
+    } else {
+      this.message = '❌ Invalid credentials';
+    }
   }
 
-  set userName(value: string) {
-    console.log('changed to: ' + value);
-    this._userName = value;
+  onClear(): void {
+    this.username = '';
+    this.password = '';
+    this.message  = '';
   }
 }</code></pre>
             </div>
             <div class="panel">
-              <h3>hello.component.html</h3>
-              <pre><code>&lt;label&gt;Your name:&lt;/label&gt;
-&lt;input [(ngModel)]="userName"&gt;
+              <h3>login.component.html</h3>
+              <pre><code>&lt;h2&gt;Login&lt;/h2&gt;
 
-&lt;p&gt;Hello, {{ userName }}!&lt;/p&gt;
+&lt;label&gt;Username:&lt;/label&gt;
+&lt;input [(ngModel)]="username"
+       name="username"&gt;
 
-&lt;p&gt;Characters: {{ userName.length }}&lt;/p&gt;</code></pre>
+&lt;label&gt;Password:&lt;/label&gt;
+&lt;input type="password"
+       [(ngModel)]="password"
+       name="password"&gt;
+
+&lt;button (click)="onLogin()"
+        [disabled]="!username || !password"&gt;
+  Login
+&lt;/button&gt;
+
+&lt;button (click)="onClear()"&gt;Clear&lt;/button&gt;
+
+&lt;p&gt;{{ message }}&lt;/p&gt;
+
+&lt;p class="hint"&gt;
+  Live preview: {{ username }}
+&lt;/p&gt;</code></pre>
             </div>
           </div>
-          <div class="browser">
-            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
-            <div class="viewport">
-              <p>Your name: <span class="fld">Purvam</span></p>
-              <p>Hello, Purvam!</p>
-              <p>Characters: 6</p>
-            </div>
-          </div>
-          <p class="deep">Type a single letter and three things update at once — the property, the greeting and the character count — with no event handler written by you.</p>
           <div class="keybox">
-            <span class="lbl">Why a getter/setter pair here?</span>
-            A plain property (<code>userName: string = ''</code>) works perfectly and is what you'd normally write. The
-            getter/setter version is shown because it <strong>proves</strong> the two-way part: open the browser console
-            and you'll see "changed to: …" logged on every keystroke — the view genuinely writing back into the class.
+            <span class="lbl">Count the bindings in that template — all four are there</span>
+            <code>[(ngModel)]</code> two-way on both inputs · <code>(click)</code> events on both buttons ·
+            <code>[disabled]</code> property binding that greys out Login until both fields have content ·
+            <code>{{ message }}</code> and <code>{{ username }}</code> interpolation. <strong>That is the whole of
+            today's Concept 3, in one screen of markup.</strong>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Note the <code>name</code> attribute on each input</span>
+            When an <code>ngModel</code> input sits inside a <code>&lt;form&gt;</code> tag, Angular requires a
+            <code>name</code>. Adding it always is a harmless habit that avoids a puzzling error later, and Session 3
+            explains what Angular does with it.
           </div>
         </section>
 
-        <!-- 20. DIRECTIVES OVERVIEW -->
+        <!-- 25. FOUR BINDINGS SUMMARY -->
         <section class="slide">
-          <p class="eyebrow">Concept 5 — directives</p>
-          <h2>What is a directive?</h2>
-          <p class="deep">A <span class="term">directive</span> is an instruction you place in your HTML that tells Angular to <strong>change that element</strong> — add it, remove it, restyle it. Components are technically directives that come with their own template; the ones on this slide are the two "plain" kinds.</p>
-          <div class="cards">
-            <div class="card">
-              <div class="ic">🏗️</div><h3>Structural directives</h3>
-              <p>Change the <strong>structure</strong> of the DOM — they add and remove elements entirely.
-              Always prefixed with an asterisk <code>*</code>.</p>
-              <p style="margin-top:8px;"><code>*ngIf</code> · <code>*ngFor</code> · <code>*ngSwitch</code></p>
+          <p class="eyebrow">Concept 3 — revision slide</p>
+          <h2>The four bindings, side by side</h2>
+          <div class="bindmap">
+            <div class="side">
+              <h3>Component class</h3>
+              <p><code>title = 'Portal';</code></p>
+              <p><code>isDisabled = false;</code></p>
+              <p><code>empName = '';</code></p>
+              <p><code>onSave() { ... }</code></p>
             </div>
-            <div class="card">
-              <div class="ic">🎨</div><h3>Attribute directives</h3>
-              <p>Change the <strong>appearance or behaviour</strong> of an element that already exists. No asterisk;
-              they use property-binding brackets.</p>
-              <p style="margin-top:8px;"><code>ngClass</code> · <code>ngStyle</code></p>
+            <div class="dir"><span class="a">⇄</span>four bridges</div>
+            <div class="side">
+              <h3>Template</h3>
+              <p><code>{{ title }}</code> <span class="muted">→ text</span></p>
+              <p><code>[disabled]="isDisabled"</code> <span class="muted">→ attribute</span></p>
+              <p><code>(click)="onSave()"</code> <span class="muted">← event</span></p>
+              <p><code>[(ngModel)]="empName"</code> <span class="muted">⇄ both</span></p>
             </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">Why the asterisk?</span>
-            The <code>*</code> is shorthand for something bigger: Angular wraps that element in an invisible
-            <code>&lt;ng-template&gt;</code> and stamps it out (or doesn't) as needed. You don't need the details — but
-            you <strong>do</strong> need to remember the asterisk. Writing <code>ngIf</code> without it is a silent
-            no-op: no error, and your element simply always shows.
+          <table class="cmp" style="margin-top:16px;">
+            <thead><tr><th style="width:20%">Punctuation</th><th style="width:24%">Name</th><th>Remember it as</th></tr></thead>
+            <tbody>
+              <tr><td><code>{{ }}</code></td><td>Interpolation</td><td>"Print this value here as text."</td></tr>
+              <tr><td><code>[ ]</code></td><td>Property binding</td><td>"Fill this attribute <strong>in</strong>." A box being filled.</td></tr>
+              <tr><td><code>( )</code></td><td>Event binding</td><td>"Shout <strong>out</strong> when this happens." A mouth.</td></tr>
+              <tr><td><code>[( )]</code></td><td>Two-way binding</td><td>"Keep these in step." Banana in a box.</td></tr>
+            </tbody>
+          </table>
+          <div class="askbox">
+            <span class="lbl">Ask the batch — quick fire</span>
+            Which binding would you use to: <strong>(a)</strong> show a customer's city in a paragraph?
+            <strong>(b)</strong> grey out a Delete button when nothing is selected? <strong>(c)</strong> run a search
+            when a button is pressed? <strong>(d)</strong> keep a search box and a class field in sync?
+            <span class="muted">(Answers: {{ }} · [ ] · ( ) · [( )] )</span>
           </div>
         </section>
 
-        <!-- 21. NGIF -->
+
+        <!-- 26. WHAT IS A DIRECTIVE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — making the page change shape</p>
+          <h2>What is a directive?</h2>
+          <p class="lead">A <span class="term">directive</span> is an instruction you attach to an HTML element to change
+             its behaviour or appearance.</p>
+          <p class="deep">Bindings let you push data <em>into</em> a fixed page. Directives let you change the page
+             <em>itself</em> — hide a section, repeat a row four times, swap a colour. There are three kinds:</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">1 · Structural</span>
+              <span class="desc">Add or remove elements from the page. Always written with a <strong>leading asterisk</strong>: <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitchCase</code>.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">2 · Attribute</span>
+              <span class="desc">Change the look or behaviour of an element that is <em>already</em> there. No asterisk: <code>ngClass</code>, <code>ngStyle</code>, <code>ngModel</code>.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">3 · Components</span>
+              <span class="desc">Technically a component <em>is</em> a directive — one that comes with its own template. Interesting trivia; changes nothing about how you use them.</span>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The asterisk is the whole distinction — memorise this</span>
+            <strong>Asterisk = the element may not exist at all.</strong> <code>*ngIf</code> and <code>*ngFor</code> add
+            and remove elements from the page.<br>
+            <strong>No asterisk = the element definitely exists, we're just changing it.</strong> <code>ngClass</code> and
+            <code>ngStyle</code> restyle something already on screen.<br>
+            Forgetting the asterisk on <code>*ngIf</code> is the most common directive mistake there is — and it fails
+            silently, showing the element always.
+          </div>
+        </section>
+
+        <!-- 27. NGIF -->
         <section class="slide">
           <p class="eyebrow">Structural directive 1 of 3</p>
-          <h2><code>*ngIf</code> — show it or don't</h2>
-          <pre><code>&lt;!-- renders only when the expression is truthy --&gt;
-&lt;div *ngIf="employee"&gt;
-  &lt;p&gt;Name: {{ employee.name }}&lt;/p&gt;
-&lt;/div&gt;
+          <h2><code>*ngIf</code> — show it, or don't</h2>
+          <p class="deep">Put <code>*ngIf</code> on an element and it appears only when the condition is true.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class</h3>
+              <pre><code>export class AppComponent {
+  isLoggedIn = false;
+  employees = [];
+  errorMessage = '';
 
-&lt;p *ngIf="employees.length === 0"&gt;No employees found.&lt;/p&gt;
+  toggle(): void {
+    this.isLoggedIn = !this.isLoggedIn;
+  }
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;button (click)="toggle()"&gt;
+  Toggle
+&lt;/button&gt;
 
-&lt;p *ngIf="isLoggedIn"&gt;Welcome back!&lt;/p&gt;</code></pre>
-          <h3>With an else branch</h3>
-          <pre><code>&lt;div *ngIf="employees.length &gt; 0; else emptyState"&gt;
-  &lt;p&gt;Showing {{ employees.length }} employees.&lt;/p&gt;
-&lt;/div&gt;
+&lt;p *ngIf="isLoggedIn"&gt;
+  Welcome back!
+&lt;/p&gt;
 
-&lt;ng-template #emptyState&gt;
-  &lt;p&gt;No employees to display. Add one to get started.&lt;/p&gt;
-&lt;/ng-template&gt;</code></pre>
+&lt;p *ngIf="employees.length === 0"&gt;
+  No employees found.
+&lt;/p&gt;
+
+&lt;div *ngIf="errorMessage"&gt;
+  {{ errorMessage }}
+&lt;/div&gt;</code></pre>
+            </div>
+          </div>
           <div class="keybox">
-            <span class="lbl">Removed, not hidden — and that matters</span>
-            When <code>*ngIf</code> is false the element is <strong>not in the DOM at all</strong>. Inspect the page and
-            it's genuinely absent. That's different from CSS <code>display: none</code>, which keeps the element
-            (and its cost) around. <code>*ngIf</code> is the right tool when the content is expensive or shouldn't exist yet.
+            <span class="lbl">It removes the element — it does not merely hide it</span>
+            When <code>isLoggedIn</code> is false, that <code>&lt;p&gt;</code> is <strong>not in the page at all</strong>.
+            Inspect it in your browser's dev tools and there is nothing there — not an invisible element, nothing.
+            That matters: a removed element costs no memory, runs no code, and cannot be read by someone poking at the
+            page. It is genuinely different from CSS's <code>display: none</code>.
           </div>
           <div class="warnbox">
-            <span class="lbl">Why <code>*ngIf</code> saves you from crashes</span>
-            <code>&lt;p&gt;{{ employee.name }}&lt;/p&gt;</code> throws when <code>employee</code> is still <code>undefined</code>
-            — which is exactly the case while an API call is in flight. Wrapping it in
-            <code>*ngIf="employee"</code> means Angular doesn't even evaluate the inside until there's data. You will
-            rely on this constantly in Session 3.
+            <span class="lbl">The mistake to expect</span>
+            <code>&lt;p ngIf="isLoggedIn"&gt;</code> — <strong>no asterisk.</strong> Angular treats it as a meaningless
+            attribute, ignores it, and the paragraph shows <em>always</em>. No error is reported. If a section refuses to
+            hide, look for the missing <code>*</code> first.
           </div>
         </section>
 
-        <!-- 22. NGFOR -->
+        <!-- 28. NGIF ELSE -->
         <section class="slide">
-          <p class="eyebrow">Structural directive 2 of 3</p>
-          <h2><code>*ngFor</code> — repeat for each item</h2>
-          <p class="deep">The workhorse of every real application. Put it on the element you want <strong>repeated</strong> — for a table, that's the <code>&lt;tr&gt;</code>, not the <code>&lt;table&gt;</code>.</p>
-          <pre><code>&lt;li *ngFor="let emp of employees"&gt;
-  {{ emp.name }} — {{ emp.designation }}
-&lt;/li&gt;</code></pre>
-          <h3>With the index, and other useful locals</h3>
-          <pre><code>&lt;tr *ngFor="let emp of employees; let i = index"&gt;
-  &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
-  &lt;td&gt;{{ emp.name }}&lt;/td&gt;
-&lt;/tr&gt;
+          <p class="eyebrow">Structural directive 1 continued</p>
+          <h2><code>*ngIf</code> with an <code>else</code></h2>
+          <p class="deep">Often you want one thing <em>or</em> the other. Angular does this with a
+             <strong>template reference</strong> — a named block of markup, marked with <code>#</code>.</p>
+          <pre><code>&lt;div *ngIf="isLoggedIn; else loginPrompt"&gt;
+  &lt;h3&gt;Welcome back, {{ username }}!&lt;/h3&gt;
+  &lt;button (click)="logout()"&gt;Log out&lt;/button&gt;
+&lt;/div&gt;
 
-&lt;!-- also available: first, last, even, odd --&gt;
-&lt;tr *ngFor="let emp of employees; let isEven = even"
-    [ngClass]="{'striped': isEven}"&gt;
+&lt;ng-template #loginPrompt&gt;
+  &lt;h3&gt;Please log in&lt;/h3&gt;
+  &lt;button (click)="showLogin()"&gt;Log in&lt;/button&gt;
+&lt;/ng-template&gt;</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">; else loginPrompt</div><div>Note the <strong>semicolon</strong>, then the word <code>else</code>, then a name. The name has no <code>#</code> here.</div></div>
+            <div class="anno-row"><div class="anno-tag">&lt;ng-template&gt;</div><div>A container that renders <strong>nothing by itself</strong>. It only exists to hold markup for something else to use.</div></div>
+            <div class="anno-row"><div class="anno-tag">#loginPrompt</div><div>Gives the template a name. The <code>#</code> is required <em>here</em>, at the definition.</div></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Where you'll really need this — Session 3</span>
+            The classic use is a loading state: <em>"show the table if the data has arrived, otherwise show
+            'Loading…'"</em>. That is exactly what you will write in Session 3 when the data comes from a server and
+            takes a moment to appear.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two easy syntax errors here</span>
+            A <strong>comma</strong> instead of a semicolon (<code>*ngIf="x, else y"</code>) fails. And writing
+            <code>else #loginPrompt</code> with a hash fails too — the <code>#</code> belongs only on the
+            <code>&lt;ng-template&gt;</code>.
+          </div>
+        </section>
+
+        <!-- 29. NGFOR -->
+        <section class="slide">
+          <p class="eyebrow">Structural directive 2 of 3 — the one you'll use most</p>
+          <h2><code>*ngFor</code> — repeat for each item</h2>
+          <p class="deep">This is the directive that fixes Session 1's annoyance. Instead of writing out
+             <code>employees[0]</code>, <code>employees[1]</code>, <code>employees[2]</code>… you write the markup
+             <strong>once</strong> and Angular repeats it for every item.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Session 1's approach</h3>
+              <pre style="background:#1e1e2e;padding:10px;border-radius:6px;margin:0;"><code style="font-size:12px;color:#f8f8f2;">&lt;p&gt;{{ employees[0].name }}&lt;/p&gt;
+&lt;p&gt;{{ employees[1].name }}&lt;/p&gt;
+&lt;p&gt;{{ employees[2].name }}&lt;/p&gt;
+&lt;p&gt;{{ employees[3].name }}&lt;/p&gt;</code></pre>
+              <p style="font-size:14px;margin-top:8px;">Breaks the moment there are five employees.</p>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>With <code>*ngFor</code></h3>
+              <pre style="background:#1e1e2e;padding:10px;border-radius:6px;margin:0;"><code style="font-size:12px;color:#f8f8f2;">&lt;p *ngFor="let emp of employees"&gt;
+  {{ emp.name }}
+&lt;/p&gt;</code></pre>
+              <p style="font-size:14px;margin-top:8px;">Works for four, for four hundred, for none.</p>
+            </div>
+          </div>
+          <h3>Reading the syntax</h3>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">*ngFor="let emp of employees"</div><div>"For each item in <code>employees</code>, call it <code>emp</code>, and repeat this element once per item."</div></div>
+            <div class="anno-row"><div class="anno-tag">let emp</div><div>A name <strong>you invent</strong>. It exists only inside this element. <code>emp</code>, <code>e</code>, <code>employee</code> — all fine.</div></div>
+            <div class="anno-row"><div class="anno-tag">of employees</div><div>The array on your class. It is <strong><code>of</code></strong>, exactly like <code>for...of</code> in TypeScript — never <code>in</code>.</div></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Put the <code>*ngFor</code> on the element you want repeated</span>
+            On a table row, it goes on the <code>&lt;tr&gt;</code> — not on the <code>&lt;table&gt;</code> (which would
+            give you four separate tables) and not on the <code>&lt;td&gt;</code> (which would repeat one cell).
+            <strong>Ask yourself: which single tag do I want four copies of?</strong> That is where the asterisk goes.
+          </div>
+        </section>
+
+        <!-- 30. NGFOR EXTRAS -->
+        <section class="slide">
+          <p class="eyebrow">Structural directive 2 continued</p>
+          <h2><code>*ngFor</code> extras: the index, and <code>trackBy</code></h2>
+          <h3>Getting the row number with <code>index</code></h3>
+          <pre><code>&lt;tr *ngFor="let emp of employees; let i = index"&gt;
+  &lt;td&gt;{{ i + 1 }}&lt;/td&gt;          &lt;!-- 1, 2, 3, 4 — humans count from 1 --&gt;
   &lt;td&gt;{{ emp.name }}&lt;/td&gt;
 &lt;/tr&gt;</code></pre>
-          <div class="anno-map">
-            <div class="anno-row"><div class="anno-tag">let emp</div><div>A local variable naming the current item. Only exists inside this element. Call it whatever reads best.</div></div>
-            <div class="anno-row"><div class="anno-tag">of employees</div><div><code>of</code> — the array to iterate, exactly like TypeScript's <code>for...of</code> from Session 1.</div></div>
-            <div class="anno-row"><div class="anno-tag">let i = index</div><div>The zero-based position. Use <code>i + 1</code> for a human-friendly serial number.</div></div>
-          </div>
-          <div class="warnbox">
-            <span class="lbl">Two mistakes to avoid</span>
-            <strong>1.</strong> Writing <code>*ngFor="let emp in employees"</code> — <code>in</code> is wrong here and gives
-            you nothing useful. It's always <code>of</code>.<br>
-            <strong>2.</strong> Putting <code>*ngFor</code> on the <code>&lt;table&gt;</code> instead of the
-            <code>&lt;tr&gt;</code> — you'll get four whole tables instead of four rows.
+          <p class="deep">Note the <strong>semicolon</strong> before <code>let i = index</code>. Angular also gives you
+             <code>first</code>, <code>last</code>, <code>even</code> and <code>odd</code> the same way — useful for
+             striping rows:</p>
+          <pre><code>&lt;tr *ngFor="let emp of employees; let isEven = even"
+    [class.striped]="isEven"&gt;
+  &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+          <h3><code>trackBy</code> — a performance habit worth forming early</h3>
+          <pre><code>&lt;!-- the template --&gt;
+&lt;tr *ngFor="let emp of employees; trackBy: trackById"&gt;
+  &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+          <pre><code>// the class
+trackById(index: number, emp: Employee): number {
+  return emp.id;             // "identify each row by its id"
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">What <code>trackBy</code> actually saves you</span>
+            Without it, when the array changes Angular cannot tell which items are the same ones, so it
+            <strong>destroys and rebuilds every row</strong>. With it, Angular matches rows by <code>id</code> and
+            touches only what genuinely changed. On four rows you will not notice. On a five-hundred-row table it is the
+            difference between instant and sluggish — and it also stops odd bugs where a half-typed input loses its
+            contents when the list refreshes.
           </div>
         </section>
 
-        <!-- 23. NGSWITCH -->
+        <!-- 31. NGSWITCH -->
         <section class="slide">
           <p class="eyebrow">Structural directive 3 of 3</p>
           <h2><code>*ngSwitch</code> — pick one of many</h2>
-          <p class="deep">When you'd otherwise chain four <code>*ngIf</code>s over the same variable, use <code>ngSwitch</code>. It reads better and evaluates the expression once.</p>
-          <pre><code>&lt;div [ngSwitch]="employee.department"&gt;
+          <p class="deep">When you have three or more mutually exclusive options, a chain of <code>*ngIf</code>s gets
+             ugly. <code>*ngSwitch</code> is the tidy version — and if you know Java's <code>switch</code>, you already
+             know it.</p>
+          <pre><code>&lt;div [ngSwitch]="employee.designation"&gt;
 
-  &lt;p *ngSwitchCase="'IT'"&gt;💻 Information Technology&lt;/p&gt;
-  &lt;p *ngSwitchCase="'HR'"&gt;👥 Human Resources&lt;/p&gt;
-  &lt;p *ngSwitchCase="'FIN'"&gt;💰 Finance&lt;/p&gt;
-  &lt;p *ngSwitchDefault&gt;🏢 General&lt;/p&gt;
+  &lt;span *ngSwitchCase="'Architect'"&gt;🏛️ Senior technical leadership&lt;/span&gt;
+  &lt;span *ngSwitchCase="'Team Lead'"&gt;👥 Manages a team&lt;/span&gt;
+  &lt;span *ngSwitchCase="'Tester'"&gt;🔍 Quality assurance&lt;/span&gt;
+  &lt;span *ngSwitchDefault&gt;💻 Individual contributor&lt;/span&gt;
 
 &lt;/div&gt;</code></pre>
           <table class="cmp">
-            <thead><tr><th style="width:30%">Part</th><th>Notes</th></tr></thead>
+            <thead><tr><th style="width:30%">Part</th><th>Note</th></tr></thead>
             <tbody>
-              <tr><td><code>[ngSwitch]</code></td><td>On the <strong>container</strong>. Square brackets, <strong>no</strong> asterisk — it's a property binding.</td></tr>
-              <tr><td><code>*ngSwitchCase</code></td><td>On each <strong>option</strong>. Asterisk required. String values need <strong>inner quotes</strong>: <code>"'IT'"</code>.</td></tr>
-              <tr><td><code>*ngSwitchDefault</code></td><td>The fallback when nothing matched. Optional but almost always worth adding.</td></tr>
+              <tr><td><code>[ngSwitch]</code></td><td>On the <strong>container</strong>. Square brackets, <strong>no asterisk</strong> — the container always exists.</td></tr>
+              <tr><td><code>*ngSwitchCase</code></td><td>On each <strong>option</strong>. <strong>With</strong> an asterisk — these come and go.</td></tr>
+              <tr><td><code>*ngSwitchDefault</code></td><td>The fallback when nothing matched. Optional, but include it.</td></tr>
             </tbody>
           </table>
           <div class="warnbox">
-            <span class="lbl">The quote trap</span>
-            <code>*ngSwitchCase="IT"</code> looks right and never matches — Angular reads <code>IT</code> as a
-            <em>property</em> of your component, finds nothing, and compares against <code>undefined</code>. String
-            literals need the inner single quotes: <code>*ngSwitchCase="'IT'"</code>.
+            <span class="lbl">The quotes-inside-quotes detail that catches everyone</span>
+            <code>*ngSwitchCase="'Architect'"</code> — <strong>double quotes outside, single quotes inside</strong>.
+            The value is a template <em>expression</em>, so a literal string needs its own quotes.
+            Writing <code>*ngSwitchCase="Architect"</code> makes Angular look for a <em>field</em> named
+            <code>Architect</code>, find nothing, and match nothing. This is the number one <code>ngSwitch</code> bug.
+          </div>
+          <div class="note">
+            <span class="lbl">When to use which</span>
+            One or two conditions → <code>*ngIf</code>, possibly with <code>else</code>. Three or more on the
+            <em>same value</em> → <code>*ngSwitch</code>. There is no correctness difference; it is purely about which
+            reads better in six months' time.
           </div>
         </section>
 
-        <!-- 24. NGFOR IN PRACTICE -->
+        <!-- 32. NGCLASS -->
         <section class="slide">
-          <p class="eyebrow">Putting it together — the pattern you'll build in the lab</p>
-          <h2>Worked example: the employee table</h2>
-          <div class="panels">
-            <div class="panel">
-              <h3>employee-list.component.ts</h3>
-              <pre><code>export class Employee {
-  constructor(
-    public id: number,
-    public name: string,
-    public designation: string,
-    public salary: number
-  ) { }
-}
+          <p class="eyebrow">Attribute directive 1 of 2</p>
+          <h2><code>ngClass</code> — apply CSS classes conditionally</h2>
+          <p class="deep">This is how you make a table colour its own rows: green for active employees, red for inactive.
+             You write CSS classes as normal, then let <code>ngClass</code> decide which apply.</p>
+          <div class="fname">the CSS — ordinary classes, nothing special</div>
+          <pre><code>.active-row   { background-color: #eefcf1; color: #1a9e34; }
+.inactive-row { background-color: #fff0ef; color: #b00027; }
+.high-earner  { font-weight: bold; }</code></pre>
+          <h3>Three ways to write it, from simplest to most useful</h3>
+          <pre><code>&lt;!-- 1. Object form — "apply each class when its condition is true" (use this) --&gt;
+&lt;tr [ngClass]="{
+      'active-row':   emp.status === 'Active',
+      'inactive-row': emp.status === 'Inactive',
+      'high-earner':  emp.salary &gt; 40000
+    }"&gt;
 
-export class EmployeeListComponent {
+&lt;!-- 2. Single-class shorthand — neat when there's only one --&gt;
+&lt;tr [class.active-row]="emp.status === 'Active'"&gt;
 
-  employees: Employee[] = [
-    new Employee(1001, 'Anoop',  'Software Engineer', 25000),
-    new Employee(1002, 'Ajay',   'Team Lead',         45000),
-    new Employee(1003, 'Rekha',  'Tester',            22000),
-    new Employee(1004, 'Suresh', 'Architect',         65000)
-  ];
-}</code></pre>
-            </div>
-            <div class="panel">
-              <h3>employee-list.component.html</h3>
-              <pre><code>&lt;h2&gt;Employees ({{ employees.length }})&lt;/h2&gt;
-
-&lt;table border="1"&gt;
-  &lt;tr&gt;
-    &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
-    &lt;th&gt;Designation&lt;/th&gt;&lt;th&gt;Salary&lt;/th&gt;
-  &lt;/tr&gt;
-
-  &lt;tr *ngFor="let emp of employees"&gt;
-    &lt;td&gt;{{ emp.id }}&lt;/td&gt;
-    &lt;td&gt;{{ emp.name }}&lt;/td&gt;
-    &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
-    &lt;td&gt;{{ emp.salary }}&lt;/td&gt;
-  &lt;/tr&gt;
-&lt;/table&gt;</code></pre>
-            </div>
-          </div>
+&lt;!-- 3. Expression form — returns a class name --&gt;
+&lt;tr [ngClass]="emp.status === 'Active' ? 'active-row' : 'inactive-row'"&gt;</code></pre>
           <div class="browser">
-            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200</span>
+            </div>
             <div class="viewport">
-              <p style="font-weight:700;margin-top:0;">Employees (4)</p>
               <table>
-                <tr><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th></tr>
-                <tr><td>1001</td><td>Anoop</td><td>Software Engineer</td><td>25000</td></tr>
-                <tr><td>1002</td><td>Ajay</td><td>Team Lead</td><td>45000</td></tr>
-                <tr><td>1003</td><td>Rekha</td><td>Tester</td><td>22000</td></tr>
-                <tr><td>1004</td><td>Suresh</td><td>Architect</td><td>65000</td></tr>
+                <thead><tr><th>ID</th><th>Name</th><th>Salary</th><th>Status</th></tr></thead>
+                <tbody>
+                  <tr class="row-active"><td>1001</td><td>Anoop</td><td>25,000</td><td>Active</td></tr>
+                  <tr class="row-inactive"><td>1002</td><td>Ajay</td><td><strong>45,000</strong></td><td>Inactive</td></tr>
+                  <tr class="row-active"><td>1003</td><td>Rekha</td><td>22,000</td><td>Active</td></tr>
+                  <tr class="row-inactive"><td>1004</td><td>Suresh</td><td><strong>65,000</strong></td><td>Inactive</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">Four rows of markup, four hundred rows of output</span>
-            Add a fifth employee to the array and the table grows by itself. Compare with the JSP version from Session 1,
-            where the table markup was duplicated across five files. <strong>This is the whole argument for Angular in ten lines of HTML.</strong>
+            <span class="lbl">Note that several classes can apply at once</span>
+            In the object form, <em>every</em> condition is evaluated independently. Suresh's row gets both
+            <code>inactive-row</code> (red) <strong>and</strong> <code>high-earner</code> (bold), because both are true.
+            That composability is why the object form is the one to reach for.
           </div>
         </section>
 
-        <!-- 25. ATTRIBUTE DIRECTIVES -->
+        <!-- 33. NGSTYLE -->
         <section class="slide">
-          <p class="eyebrow">Concept 6 — attribute directives</p>
-          <h2><code>ngClass</code> &amp; <code>ngStyle</code></h2>
-          <h3><code>ngClass</code> — apply CSS classes conditionally</h3>
-          <pre><code>&lt;tr *ngFor="let emp of employees"
-    [ngClass]="{
-      'text-success': emp.status === 'Active',
-      'text-danger':  emp.status === 'Inactive'
+          <p class="eyebrow">Attribute directive 2 of 2</p>
+          <h2><code>ngStyle</code> — set inline styles conditionally</h2>
+          <p class="deep">Same idea as <code>ngClass</code>, but it sets CSS <strong>properties directly</strong> instead of
+             naming a class. Reach for it when the value is <em>calculated</em> rather than chosen from a fixed set.</p>
+          <pre><code>&lt;!-- Object form --&gt;
+&lt;td [ngStyle]="{
+      'color':       emp.salary &gt; 40000 ? 'green' : 'red',
+      'font-weight': emp.status === 'Active' ? 'bold' : 'normal',
+      'font-size':   '16px'
     }"&gt;
-  &lt;td&gt;{{ emp.name }}&lt;/td&gt;
-  &lt;td&gt;{{ emp.status }}&lt;/td&gt;
-&lt;/tr&gt;</code></pre>
-          <p class="deep">You pass an object: each <strong>key</strong> is a class name, each <strong>value</strong> is a condition. When the condition is true the class is applied; when it flips to false Angular removes it. Multiple classes can be active at once.</p>
-          <h3><code>ngStyle</code> — apply inline styles conditionally</h3>
-          <pre><code>&lt;tr *ngFor="let emp of employees"
-    [ngStyle]="{
-      'background-color': emp.status === 'Active' ? '#eefcf1' : '#fff0ef',
-      'font-weight': emp.salary &gt; 40000 ? 'bold' : 'normal'
-    }"&gt;
-  &lt;td&gt;{{ emp.name }}&lt;/td&gt;
-&lt;/tr&gt;</code></pre>
-          <div class="browser">
-            <div class="bar"><span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span><span class="url">http://localhost:4200</span></div>
-            <div class="viewport">
-              <table>
-                <tr><th>Name</th><th>Designation</th><th>Status</th></tr>
-                <tr class="row-active"><td>Anoop</td><td>Software Engineer</td><td>Active</td></tr>
-                <tr class="row-inactive"><td>Ajay</td><td>Team Lead</td><td>Inactive</td></tr>
-                <tr class="row-active"><td>Rekha</td><td>Tester</td><td>Active</td></tr>
-                <tr class="row-inactive"><td>Suresh</td><td>Architect</td><td>Inactive</td></tr>
-              </table>
-            </div>
+  {{ emp.salary }}
+&lt;/td&gt;
+
+&lt;!-- Single-property shorthand --&gt;
+&lt;td [style.color]="emp.salary &gt; 40000 ? 'green' : 'red'"&gt;
+
+&lt;!-- With units baked into the property name — genuinely handy --&gt;
+&lt;div [style.width.px]="percentComplete * 3"&gt;&lt;/div&gt;
+&lt;div [style.height.%]="50"&gt;&lt;/div&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">The case where <code>ngStyle</code> is clearly right</span>
+            A progress bar. Its width is <code>72%</code> because a calculation said so — you cannot write a CSS class
+            for every possible percentage. Anything <strong>computed on a continuous scale</strong> belongs in
+            <code>ngStyle</code>.
           </div>
-          <p class="muted">Note there's no asterisk on either — they modify an element that already exists rather than creating or destroying it. They're property bindings, so they take square brackets.</p>
+          <div class="warnbox">
+            <span class="lbl">Two syntax notes</span>
+            <strong>1.</strong> Property names with a hyphen need quoting: <code>'font-weight'</code>. Or use the
+            camelCase form <code>fontWeight</code> with no quotes.<br>
+            <strong>2.</strong> Don't forget units. <code>'width': 300</code> does nothing; you need
+            <code>'width': '300px'</code> — or the <code>[style.width.px]</code> form, which adds them for you.
+          </div>
         </section>
 
-        <!-- 26. NGCLASS VS NGSTYLE -->
+        <!-- 34. NGCLASS VS NGSTYLE -->
         <section class="slide">
-          <p class="eyebrow">Choosing between them</p>
+          <p class="eyebrow">Attribute directives — choosing between them</p>
           <h2><code>ngClass</code> vs <code>ngStyle</code></h2>
           <table class="cmp">
-            <thead><tr><th style="width:22%">&nbsp;</th><th><code>ngClass</code></th><th><code>ngStyle</code></th></tr></thead>
+            <thead><tr><th style="width:22%">Question</th><th><code>ngClass</code></th><th><code>ngStyle</code></th></tr></thead>
             <tbody>
-              <tr><td><strong>Applies</strong></td><td>CSS class names</td><td>Individual inline CSS properties</td></tr>
-              <tr><td><strong>Styles live in</strong></td><td class="good">Your <code>.css</code> file — reusable, themeable</td><td>The template — scattered through your HTML</td></tr>
-              <tr><td><strong>Best for</strong></td><td class="good">Bundling several properties into one meaningful name</td><td>One or two properties, often computed from data</td></tr>
-              <tr><td><strong>Example use</strong></td><td>Row colouring, validation states, active tabs</td><td>A progress bar's width, a dynamic hex colour from an API</td></tr>
-              <tr><td><strong>Maintainability</strong></td><td class="good">High — designers can restyle without touching templates</td><td class="bad">Lower — style decisions get buried in markup</td></tr>
+              <tr><td><strong>What it sets</strong></td><td>CSS <strong>class names</strong></td><td>CSS <strong>properties</strong>, inline</td></tr>
+              <tr><td><strong>Where the styling lives</strong></td><td class="good">In your <code>.css</code> file, where it belongs</td><td>Scattered through your HTML</td></tr>
+              <tr><td><strong>Reusable elsewhere?</strong></td><td class="good">Yes — the class can be applied anywhere</td><td class="bad">No — it's tied to this one element</td></tr>
+              <tr><td><strong>Best for</strong></td><td class="good">A fixed set of states: active/inactive, valid/invalid, selected</td><td class="good">Calculated values: a width, a computed colour, a chart bar</td></tr>
+              <tr><td><strong>Readability at scale</strong></td><td class="good">Good — the HTML stays clean</td><td class="bad">Degrades quickly with several properties</td></tr>
             </tbody>
           </table>
+          <div class="plainbox">
+            <span class="lbl">The rule of thumb</span>
+            <strong>Default to <code>ngClass</code>.</strong> Reach for <code>ngStyle</code> only when the value is
+            genuinely computed and could not be expressed as a named class. In real projects you will use
+            <code>ngClass</code> ten times for every <code>ngStyle</code>.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            A dashboard shows each project's completion as a coloured bar: green above 75%, amber 40–75%, red below 40%,
+            and the bar's width is the exact percentage. Which directive handles the colour, and which the width?
+            <span class="muted">(Colour → <code>ngClass</code>, three named states. Width → <code>ngStyle</code>, a
+            continuous value. Often you use both on the same element.)</span>
+          </div>
+        </section>
+
+        <!-- 35. WORKED EXAMPLE -->
+        <section class="slide">
+          <p class="eyebrow">Putting Concepts 3 and 4 together</p>
+          <h2>Worked example: the employee table</h2>
+          <p class="deep">Every idea from today so far, in one component. This is Task 4 of your lab.</p>
+          <div class="fname">employee-list.component.html</div>
+          <pre><code>&lt;h2&gt;{{ heading }}&lt;/h2&gt;
+
+&lt;!-- event + property binding on a button --&gt;
+&lt;button (click)="toggleTable()"&gt;
+  {{ showTable ? 'Hide' : 'Show' }} table
+&lt;/button&gt;
+
+&lt;!-- structural: the whole table appears only if showTable is true --&gt;
+&lt;table *ngIf="showTable"&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;#&lt;/th&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Designation&lt;/th&gt;&lt;th&gt;Salary&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;!-- structural: one row per employee, with the index --&gt;
+    &lt;tr *ngFor="let emp of employees; let i = index; trackBy: trackById"
+        [ngClass]="{
+          'active-row':   emp.status === 'Active',
+          'inactive-row': emp.status === 'Inactive'
+        }"&gt;
+      &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.id }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+      &lt;td [ngStyle]="{ 'font-weight': emp.salary &gt; 40000 ? 'bold' : 'normal' }"&gt;
+        {{ emp.salary }}
+      &lt;/td&gt;
+      &lt;td&gt;{{ emp.status }}&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;!-- structural: the empty state --&gt;
+&lt;p *ngIf="employees.length === 0"&gt;No employees to display.&lt;/p&gt;
+
+&lt;p&gt;{{ getActiveCount() }} of {{ employees.length }} are Active.&lt;/p&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">Count what's in there</span>
+            Interpolation (seven times) · event binding on the button · property binding via <code>ngClass</code> and
+            <code>ngStyle</code> · <code>*ngIf</code> twice · <code>*ngFor</code> with <code>index</code> and
+            <code>trackBy</code> · a method call. <strong>That is the whole session, in forty lines</strong> — and there
+            is not one line of DOM manipulation anywhere.
+          </div>
+        </section>
+
+        <!-- 36. PIPES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 — formatting for humans</p>
+          <h2>Pipes — transform what's displayed</h2>
+          <p class="deep">Your data says <code>25000</code>. A user should see <code>₹25,000.00</code>. Your data says
+             <code>2026-09-05T18:30:00Z</code>. A user should see <code>5 Sep 2026</code>.</p>
+          <p class="deep">A <span class="term">pipe</span> formats a value <strong>for display only</strong>, using the
+             <code>|</code> character. Crucially, <strong>your underlying data is never changed</strong> — only what
+             appears on screen.</p>
+          <pre><code>{{ value | pipeName }}</code></pre>
+          <table class="cmp">
+            <thead><tr><th style="width:22%">Pipe</th><th style="width:34%">You write</th><th>They see</th></tr></thead>
+            <tbody>
+              <tr><td><code>uppercase</code></td><td><code>{{ 'anoop' | uppercase }}</code></td><td><code>ANOOP</code></td></tr>
+              <tr><td><code>lowercase</code></td><td><code>{{ 'ANOOP' | lowercase }}</code></td><td><code>anoop</code></td></tr>
+              <tr><td><code>titlecase</code></td><td><code>{{ 'anoop kumar' | titlecase }}</code></td><td><code>Anoop Kumar</code></td></tr>
+              <tr><td><code>number</code></td><td><code>{{ 25000 | number }}</code></td><td><code>25,000</code></td></tr>
+              <tr><td><code>currency</code></td><td><code>{{ 25000 | currency }}</code></td><td><code>$25,000.00</code></td></tr>
+              <tr><td><code>percent</code></td><td><code>{{ 0.756 | percent }}</code></td><td><code>76%</code></td></tr>
+              <tr><td><code>date</code></td><td><code>{{ today | date }}</code></td><td><code>Sep 5, 2026</code></td></tr>
+              <tr><td><code>slice</code></td><td><code>{{ 'Angular' | slice:0:3 }}</code></td><td><code>Ang</code></td></tr>
+              <tr><td><code>json</code></td><td><code>{{ emp | json }}</code></td><td>the whole object, readable — <strong>brilliant for debugging</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Learn <code>json</code> right now — it will save you in Session 3</span>
+            When data arrives from a server and you cannot work out its shape, put
+            <code>&lt;pre&gt;{{ myData | json }}&lt;/pre&gt;</code> on the page. You instantly see exactly what you
+            received. It is the fastest debugging tool in Angular and it costs one line.
+          </div>
+        </section>
+
+        <!-- 37. PIPES WITH PARAMS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 continued</p>
+          <h2>Pipes with parameters, and chaining</h2>
+          <h3>Parameters follow a colon</h3>
+          <pre><code>&lt;!-- currency: which currency, and how to show the symbol --&gt;
+{{ 25000 | currency:'INR' }}                    &lt;!-- ₹25,000.00 --&gt;
+{{ 25000 | currency:'INR':'symbol':'1.0-0' }}   &lt;!-- ₹25,000    --&gt;
+{{ 25000 | currency:'USD' }}                    &lt;!-- $25,000.00 --&gt;
+
+&lt;!-- date: a format string --&gt;
+{{ today | date:'shortDate' }}          &lt;!-- 9/5/26            --&gt;
+{{ today | date:'fullDate' }}           &lt;!-- Saturday, September 5, 2026 --&gt;
+{{ today | date:'dd/MM/yyyy' }}         &lt;!-- 05/09/2026        --&gt;
+{{ today | date:'dd MMM yyyy, h:mm a' }}&lt;!-- 05 Sep 2026, 6:30 PM --&gt;
+
+&lt;!-- number: minimum integer digits . min-max decimal places --&gt;
+{{ 3.14159 | number:'1.2-2' }}          &lt;!-- 3.14 --&gt;
+{{ 5       | number:'3.0-0' }}          &lt;!-- 005  --&gt;
+
+&lt;!-- slice: from index, to index --&gt;
+{{ longText | slice:0:50 }}</code></pre>
+          <h3>Chaining — pipes feed into each other, left to right</h3>
+          <pre><code>{{ emp.name | titlecase | slice:0:10 }}
+{{ today | date:'fullDate' | uppercase }}
+&lt;!-- SATURDAY, SEPTEMBER 5, 2026 --&gt;</code></pre>
+          <div class="analogy">
+            <span class="lbl">Analogy — and it's where the name comes from</span>
+            Think of a <strong>production line</strong>. The value enters at the left, passes through each station, and
+            comes out formatted at the right. Each pipe does one small job and hands the result on. It is exactly the
+            <code>|</code> of a Unix shell, and the same idea as chaining Java stream operations.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The important thing pipes do NOT do</span>
+            <code>{{ emp.name | uppercase }}</code> does not change <code>emp.name</code>. The stored value is still
+            <code>'Anoop'</code>; only the pixels say <code>ANOOP</code>. So if you later save that employee, you save
+            the original. That is the correct behaviour — <strong>format for display, store the truth</strong>.
+          </div>
+        </section>
+
+        <!-- 38. @INPUT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — components talking to each other · downwards</p>
+          <h2>Parent → child with <code>@Input</code></h2>
+          <p class="deep">You have a tree of components. Now the obvious question: how does a parent give a child some
+             data? Answer: the child declares an <span class="term">input</span>, and the parent fills it in with
+             property binding.</p>
           <div class="panels">
-            <div class="panel good">
-              <h3>✅ Prefer ngClass</h3>
-              <pre><code>/* employee-list.component.css */
-.text-success {
-  background: #eefcf1;
-  color: #1a9e34;
-  font-weight: 600;
+            <div class="panel">
+              <h3>The CHILD declares what it accepts</h3>
+              <pre><code>import { Component, Input }
+  from '@angular/core';
+import { Employee }
+  from '../models/employee';
+
+@Component({
+  selector: 'app-employee-card',
+  templateUrl:
+    './employee-card.component.html'
+})
+export class EmployeeCardComponent {
+
+  // "a parent may pass me an employee"
+  @Input() employee!: Employee;
+
+  @Input() showSalary = false;
 }</code></pre>
-              <pre><code>[ngClass]="{'text-success': emp.status === 'Active'}"</code></pre>
             </div>
             <div class="panel">
-              <h3>⚙️ ngStyle when it's truly dynamic</h3>
-              <pre><code>&lt;!-- a width you can't know in advance --&gt;
-&lt;div [ngStyle]="{'width': percent + '%'}"&gt;&lt;/div&gt;
+              <h3>The PARENT fills it in</h3>
+              <pre><code>&lt;!-- employee-list.component.html --&gt;
 
-&lt;!-- a colour that came from the API --&gt;
-&lt;span [ngStyle]="{'color': item.hexColour}"&gt;&lt;/span&gt;</code></pre>
+&lt;app-employee-card
+  *ngFor="let emp of employees"
+  [employee]="emp"
+  [showSalary]="true"&gt;
+&lt;/app-employee-card&gt;</code></pre>
+              <p style="font-size:15px;margin-top:10px;">The child's <code>@Input()</code> name becomes an attribute the
+                 parent can property-bind to. Note it is the <strong>same square brackets</strong> you already know.</p>
+            </div>
+          </div>
+          <div class="fname">employee-card.component.html — the child's own template</div>
+          <pre><code>&lt;div class="card"&gt;
+  &lt;h3&gt;{{ employee.name }}&lt;/h3&gt;
+  &lt;p&gt;{{ employee.designation }}&lt;/p&gt;
+  &lt;p *ngIf="showSalary"&gt;{{ employee.salary | currency:'INR' }}&lt;/p&gt;
+&lt;/div&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why bother? Because now the card is reusable</span>
+            <code>EmployeeCardComponent</code> knows nothing about where its employee came from — an array, a search
+            result, an API. It just renders whichever one it is handed. <strong>That is what makes it reusable on the
+            list page, the search page and the dashboard.</strong> A component that fetches its own data can only ever
+            be used one way.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two details in that code</span>
+            <strong>1.</strong> The <code>!</code> in <code>employee!: Employee</code> tells strict mode "I promise a
+            parent will set this". Without it you get <em>"has no initializer and is not definitely assigned"</em>.<br>
+            <strong>2.</strong> <code>[showSalary]="true"</code> needs the brackets to pass the <em>boolean</em>
+            <code>true</code>. Writing <code>showSalary="true"</code> passes the <em>string</em> <code>"true"</code>,
+            which is a different thing and a classic source of confusion.
+          </div>
+        </section>
+
+        <!-- 39. @OUTPUT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 continued · upwards</p>
+          <h2>Child → parent with <code>@Output</code></h2>
+          <p class="deep">The reverse problem: a Delete button lives on the child card, but the array lives on the
+             parent. The child cannot — and should not — reach up and modify the parent. Instead it
+             <strong>raises an event</strong>, and the parent decides what to do.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The CHILD announces</h3>
+              <pre><code>import { Component, Input, Output,
+         EventEmitter }
+  from '@angular/core';
+
+export class EmployeeCardComponent {
+  @Input() employee!: Employee;
+
+  // "I will emit a number when
+  //  someone clicks delete"
+  @Output() deleteRequested =
+    new EventEmitter&lt;number&gt;();
+
+  onDeleteClick(): void {
+    this.deleteRequested
+        .emit(this.employee.id);
+  }
+}</code></pre>
+              <pre><code>&lt;!-- the child's template --&gt;
+&lt;button (click)="onDeleteClick()"&gt;
+  Delete
+&lt;/button&gt;</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The PARENT listens</h3>
+              <pre><code>&lt;!-- the parent's template --&gt;
+&lt;app-employee-card
+  *ngFor="let emp of employees"
+  [employee]="emp"
+  (deleteRequested)="removeEmployee($event)"&gt;
+&lt;/app-employee-card&gt;</code></pre>
+              <pre><code>// the parent's class
+removeEmployee(id: number): void {
+  this.employees =
+    this.employees.filter(
+      e =&gt; e.id !== id);
+}</code></pre>
+              <p style="font-size:15px;margin-top:10px;">Same round brackets as <code>(click)</code> — because it
+                 <em>is</em> an event binding. And <code>$event</code> carries whatever the child emitted.</p>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">The rule of thumb</span>
-            Reach for <strong><code>ngClass</code> by default</strong> — it keeps styling in your stylesheet where it
-            belongs. Use <code>ngStyle</code> only when the value genuinely can't be expressed as a fixed class,
-            because it's calculated at runtime.
+            <span class="lbl">The principle behind this — worth understanding, not just copying</span>
+            The child <strong>reports</strong>; the parent <strong>decides</strong>. The card does not know whether
+            "delete" means removing from an array, calling an API, or showing a confirmation dialog — and it should not.
+            That separation is why you can drop the same card into a different screen with different delete behaviour.
+            The pattern has a name: <em>data down, events up</em>.
           </div>
         </section>
 
-        <!-- 27. PIPES -->
+        <!-- 40. INPUT/OUTPUT PICTURE -->
         <section class="slide">
-          <p class="eyebrow">Concept 7 — pipes</p>
-          <h2>Pipes — transform what's displayed</h2>
-          <p class="deep">A <span class="term">pipe</span> transforms a value <strong>on its way to the screen</strong>, without changing the underlying property. Syntax is the pipe character <code>|</code>, which will look familiar if you've used a Unix shell.</p>
-          <pre><code>&lt;p&gt;{{ name | uppercase }}&lt;/p&gt;          &lt;!-- ANOOP --&gt;
-&lt;p&gt;{{ name | lowercase }}&lt;/p&gt;          &lt;!-- anoop --&gt;
-&lt;p&gt;{{ salary | currency:'INR' }}&lt;/p&gt;   &lt;!-- ₹25,000.00 --&gt;
-&lt;p&gt;{{ joinDate | date:'dd/MM/yyyy' }}&lt;/p&gt;  &lt;!-- 15/08/2024 --&gt;
-&lt;p&gt;{{ ratio | percent }}&lt;/p&gt;           &lt;!-- 75% --&gt;
-&lt;p&gt;{{ emp | json }}&lt;/p&gt;                &lt;!-- the whole object, formatted --&gt;
-
-&lt;!-- pipes chain, left to right --&gt;
-&lt;p&gt;{{ name | uppercase | slice:0:3 }}&lt;/p&gt;  &lt;!-- ANO --&gt;</code></pre>
-          <table class="cmp">
-            <thead><tr><th style="width:24%">Pipe</th><th>Does</th><th>Parameters (after a colon)</th></tr></thead>
+          <p class="eyebrow">Concept 6 — one picture to remember it by</p>
+          <h2><code>@Input</code> and <code>@Output</code> in one diagram</h2>
+          <div class="flow vert">
+            <div class="flow-box">PARENT — <code>EmployeeListComponent</code><span class="sm">owns the array of employees</span></div>
+            <span class="flow-arrow">▼ &nbsp; @Input — data flows DOWN &nbsp; <code>[employee]="emp"</code></span>
+            <div class="flow-box alt">CHILD — <code>EmployeeCardComponent</code><span class="sm">displays whichever employee it is given</span></div>
+            <span class="flow-arrow">▲ &nbsp; @Output — events flow UP &nbsp; <code>(deleteRequested)="remove($event)"</code></span>
+            <div class="flow-box green">PARENT acts on it<span class="sm">updates the array — and every card re-renders automatically</span></div>
+          </div>
+          <table class="cmp" style="margin-top:18px;">
+            <thead><tr><th style="width:16%"></th><th><code>@Input</code></th><th><code>@Output</code></th></tr></thead>
             <tbody>
-              <tr><td><code>uppercase</code> / <code>lowercase</code></td><td>Changes case</td><td>none</td></tr>
-              <tr><td><code>date</code></td><td>Formats a date</td><td><code>'short'</code>, <code>'dd/MM/yyyy'</code>, <code>'fullDate'</code></td></tr>
-              <tr><td><code>currency</code></td><td>Adds a currency symbol &amp; grouping</td><td><code>'INR'</code>, <code>'USD'</code></td></tr>
-              <tr><td><code>number</code></td><td>Controls decimal places</td><td><code>'1.2-2'</code></td></tr>
-              <tr><td><code>percent</code></td><td>Shows a fraction as a percentage</td><td>optional digits</td></tr>
-              <tr><td><code>slice</code></td><td>Cuts a string or array</td><td><code>0:3</code></td></tr>
-              <tr><td><code>json</code></td><td>Dumps an object — brilliant for debugging</td><td>none</td></tr>
+              <tr><td><strong>Direction</strong></td><td>Parent → child</td><td>Child → parent</td></tr>
+              <tr><td><strong>Carries</strong></td><td>Data</td><td>An event, optionally with data</td></tr>
+              <tr><td><strong>Declared as</strong></td><td><code>@Input() employee!: Employee;</code></td><td><code>@Output() saved = new EventEmitter&lt;Employee&gt;();</code></td></tr>
+              <tr><td><strong>Parent writes</strong></td><td><code>[employee]="emp"</code></td><td><code>(saved)="onSaved($event)"</code></td></tr>
+              <tr><td><strong>Brackets</strong></td><td><code>[ ]</code> — a box being filled</td><td><code>( )</code> — a mouth shouting</td></tr>
             </tbody>
           </table>
-          <div class="keybox">
-            <span class="lbl">The key property of a pipe</span>
-            It changes the <strong>display only</strong>. <code>{{ name | uppercase }}</code> shows "ANOOP" while
-            <code>name</code> in your class is still <code>"Anoop"</code>. Your data stays clean; the presentation
-            adapts. And <code>{{ someObject | json }}</code> is the fastest debugging tool in Angular — remember it.
+          <div class="plainbox">
+            <span class="lbl">You already knew both syntaxes</span>
+            <code>@Input</code> is just <strong>property binding</strong> pointed at a component instead of an HTML tag.
+            <code>@Output</code> is just <strong>event binding</strong> for an event you invented yourself. Nothing new
+            to learn — only a new place to use it.
           </div>
         </section>
 
-        <!-- 28. RECAP -->
+        <!-- 41. NGONINIT -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 — the hook you'll use in every component from now on</p>
+          <h2><code>ngOnInit</code> — where setup code belongs</h2>
+          <p class="deep">Angular creates and destroys your components, and it lets you run code at specific moments in
+             that process. Those moments are called <span class="term">lifecycle hooks</span>. There are several; you
+             need exactly one today.</p>
+          <pre><code>import { Component, OnInit } from '@angular/core';
+
+@Component({ /* ... */ })
+export class EmployeeListComponent implements OnInit {
+
+  employees: Employee[] = [];
+
+  constructor() {
+    // Only for receiving dependencies (Session 3). Keep it empty for now.
+  }
+
+  ngOnInit(): void {
+    // Angular calls this ONCE, after the component is built
+    // and its @Input values have been set. Do setup here.
+    this.employees = this.loadEmployees();
+  }
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">implements OnInit</div><div>Declares that this class has an <code>ngOnInit</code>. Optional in practice, but include it — TypeScript then catches a misspelled method name.</div></div>
+            <div class="anno-row"><div class="anno-tag">ngOnInit()</div><div>Runs <strong>once</strong>, after construction and after <code>@Input</code> values arrive. The right place for fetching data and initialising forms.</div></div>
+            <div class="anno-row"><div class="anno-tag">constructor()</div><div>Runs <strong>first</strong>, before Angular has finished wiring the component. Use it only to receive injected dependencies.</div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">"Why not just do it in the constructor?"</span>
+            Because at constructor time your <code>@Input</code> values <strong>have not arrived yet</strong> — they are
+            still <code>undefined</code>. A child that reads <code>this.employee.name</code> in its constructor crashes;
+            the same line in <code>ngOnInit</code> works. The rule is simple and worth adopting permanently:
+            <strong>constructor for dependencies, <code>ngOnInit</code> for work.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">The other hooks, for awareness only</span>
+            <code>ngOnChanges</code> (an <code>@Input</code> changed), <code>ngAfterViewInit</code> (the template has
+            rendered), <code>ngOnDestroy</code> (the component is being removed — used for cleanup). You will not need
+            them in this series. <code>ngOnInit</code> covers the overwhelming majority of real cases.
+          </div>
+        </section>
+
+        <!-- 42. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Before the lab — the shortcuts to a working screen</p>
+          <h2>The mistakes you'll make today, and their fixes</h2>
+          <table class="cmp tight">
+            <thead><tr><th style="width:38%">Symptom</th><th>Cause and fix</th></tr></thead>
+            <tbody>
+              <tr><td><code>'app-employee-list' is not a known element</code></td><td>Not in <code>declarations</code>, or the tag doesn't match the <code>selector</code>. Use <code>ng g c</code> and it can't happen.</td></tr>
+              <tr><td><code>Can't bind to 'ngModel' since it isn't a known property of 'input'</code></td><td><code>FormsModule</code> is missing from <code>imports</code> in <code>app.module.ts</code>. This is <em>the</em> Session 2 error.</td></tr>
+              <tr><td>A section refuses to hide</td><td>Missing asterisk: <code>ngIf</code> instead of <code>*ngIf</code>. Fails silently.</td></tr>
+              <tr><td>The list shows nothing, but the array has items</td><td><code>*ngFor="let e in list"</code> — must be <code>of</code>, not <code>in</code>.</td></tr>
+              <tr><td>Four whole tables instead of four rows</td><td>The <code>*ngFor</code> is on <code>&lt;table&gt;</code>. Move it to <code>&lt;tr&gt;</code>.</td></tr>
+              <tr><td><code>{{ myField }}</code> shows nothing at all</td><td>A spelling or capitalisation mismatch. Angular renders missing fields as an empty string, with no warning.</td></tr>
+              <tr><td>A button does nothing</td><td><code>(click)="save"</code> without the <code>()</code> — it names the method instead of calling it.</td></tr>
+              <tr><td>A broken image icon</td><td><code>src="imageUrl"</code> without brackets, so it looks for a file called "imageUrl". Use <code>[src]</code>.</td></tr>
+              <tr><td>A button stays disabled forever</td><td><code>disabled="false"</code> — the string <code>"false"</code> is truthy to HTML. Use <code>[disabled]="false"</code>.</td></tr>
+              <tr><td><code>*ngSwitchCase</code> never matches</td><td>Missing inner quotes. It must be <code>*ngSwitchCase="'Tester'"</code>.</td></tr>
+              <tr><td>A child component shows blank</td><td>You wrote <code>&lt;app-card /&gt;</code>. Angular needs <code>&lt;app-card&gt;&lt;/app-card&gt;</code>. Fails silently.</td></tr>
+              <tr><td><code>Cannot read properties of undefined</code> in a child</td><td>You used an <code>@Input</code> value in the constructor. Move that code into <code>ngOnInit</code>.</td></tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">Notice how many of today's bugs are silent</span>
+            A missing asterisk, a missing <code>()</code>, a self-closing component tag — none of these report an error.
+            So when something "doesn't work" but nothing is red, <strong>suspect punctuation first</strong>. That single
+            habit will save you a great deal of time this afternoon.
+          </div>
+        </section>
+
+        <!-- 43. RECAP -->
         <section class="slide">
           <p class="eyebrow">Recap</p>
           <h2>What you now know</h2>
           <ul class="checklist">
-            <li>A component = <strong>class + metadata (<code>@Component</code>) + template</strong>, and an app is a tree of them with exactly one root.</li>
-            <li><code>ng g c name</code> creates four correctly-named files <em>and</em> registers the component in <code>app.module.ts</code>.</li>
-            <li>Nothing renders until you place a component's <strong>selector tag</strong> in a template that's already on screen.</li>
-            <li><code>templateUrl</code> for anything real; inline <code>template</code> only for tiny snippets.</li>
-            <li>The four bindings: <code>{{ }}</code> and <code>[ ]</code> in, <code>( )</code> out, <code>[( )]</code> both ways — banana in a box.</li>
-            <li><code>ngModel</code> needs <strong><code>FormsModule</code></strong> in <code>app.module.ts</code>. Check this first when two-way binding "does nothing".</li>
-            <li><code>*ngIf</code> adds/removes elements, <code>*ngFor</code> repeats them, <code>*ngSwitch</code> picks one — all with an asterisk.</li>
-            <li><code>ngClass</code> and <code>ngStyle</code> restyle existing elements conditionally — no asterisk, square brackets.</li>
-            <li>Pipes transform the display without touching the data, and <code>| json</code> is your debugging friend.</li>
+            <li>A <strong>component</strong> is a class + a template + scoped styles + a <code>@Component</code> decorator, and an app is a <strong>tree</strong> of them.</li>
+            <li>A component appears wherever its <strong>selector</strong> tag is written, and <code>ng g c</code> creates all four files <em>and</em> registers it in the module.</li>
+            <li>Component CSS <strong>cannot leak out</strong> — Angular scopes it for you, which makes short class names safe again.</li>
+            <li>The four bindings and their directions: <code>{{ }}</code> and <code>[ ]</code> go <strong>in</strong>, <code>( )</code> goes <strong>out</strong>, <code>[( )]</code> goes <strong>both</strong>.</li>
+            <li><code>[(ngModel)]</code> needs <code>FormsModule</code> in <code>imports</code> — and that error shape means "a module is missing" every time you see it.</li>
+            <li><strong>Structural</strong> directives (with an asterisk) add and remove elements: <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitch</code>.</li>
+            <li><strong>Attribute</strong> directives (no asterisk) restyle what's there: <code>ngClass</code> for named states, <code>ngStyle</code> for computed values.</li>
+            <li><strong>Pipes</strong> format for display without changing your data — and <code>| json</code> is the fastest debugging tool you have.</li>
+            <li><code>@Input</code> passes data <strong>down</strong>, <code>@Output</code> + <code>EventEmitter</code> sends events <strong>up</strong>: <em>data down, events up</em>.</li>
+            <li><code>ngOnInit</code> is where setup code goes — the constructor is only for dependencies.</li>
           </ul>
           <div class="keybox">
             <span class="lbl">Now go and build it</span>
-            The lab has you generate real components, build a working login form with two-way binding, render the
-            employee table with <code>*ngFor</code>, colour its rows with <code>ngClass</code>, and finish with a pipe.
-            Open <code>angular-session2-lab.html</code> and work down it.
+            Today's lab turns all of that into a running screen: a component tree, a working login form, a colour-coded
+            employee table with pipes, and a reusable card component with <code>@Input</code> and <code>@Output</code>.
+            Open <code>angular-session2-lab.html</code>.
           </div>
         </section>
 
-        <!-- 29. NEXT -->
+        <!-- 44. NEXT -->
         <section class="slide">
           <p class="eyebrow">Where we're headed</p>
           <h2>Coming up in Session 3</h2>
-          <p class="deep">Your data is currently hardcoded in a component — fine for learning, wrong for a real app. Session 3 fixes exactly that.</p>
+          <p class="deep">Your screen now reacts to your data — but the data is still hardcoded in a component. Session 3
+             connects it to the real world.</p>
           <div class="cards">
-            <div class="card"><div class="ic">📝</div><h3>Forms, both ways</h3><p>Template-driven forms with <code>ngForm</code>, and reactive forms built from <code>FormGroup</code> / <code>FormControl</code>.</p></div>
-            <div class="card"><div class="ic">✅</div><h3>Validation</h3><p><code>Validators.required</code>, <code>minLength</code>, and showing friendly error messages as the user types.</p></div>
-            <div class="card"><div class="ic">⚙️</div><h3>Services &amp; DI</h3><p>Move data and logic out of components into reusable, injectable services.</p></div>
-            <div class="card"><div class="ic">🌐</div><h3>HttpClient &amp; Observables</h3><p>Call a real API, subscribe to the response, and render live external data.</p></div>
+            <div class="card"><div class="ic">📝</div><h3>Forms, properly</h3><p>Both of Angular's form systems — template-driven and reactive — with real validation and friendly error messages.</p></div>
+            <div class="card"><div class="ic">🔧</div><h3>Services</h3><p>Move data out of components into a reusable service, and let Angular's <strong>dependency injection</strong> hand it to you.</p></div>
+            <div class="card"><div class="ic">🌐</div><h3><code>HttpClient</code></h3><p>GET, POST, PUT and DELETE against a real API — the moment Angular meets the Spring Boot backend you already know how to build.</p></div>
+            <div class="card"><div class="ic">🔭</div><h3>Observables</h3><p>How Angular handles data that arrives <em>later</em>, and the <code>async</code> pipe that makes it painless.</p></div>
           </div>
           <div class="note">
             <span class="lbl">Bring this with you</span>
-            Keep today's project. Session 3 lifts your hardcoded employee array straight out of the component and into
-            an <code>EmployeeService</code> — the table must keep working, sourced from a completely different place.
+            Keep the same project. Session 3 refactors <em>today's</em> employee table so its data comes from a service
+            and then from a live API — and the template will barely change, which is the whole point.
           </div>
         </section>
 
-        <!-- 30. CLOSING -->
+        <!-- 45. CLOSING -->
         <section class="slide">
           <div class="cover">
             <span class="badge">End of Session 2</span>
             <h1>Questions?</h1>
-            <div class="sub">Then open the lab sheet — let's build that employee table.</div>
+            <div class="sub">Then open the lab sheet — components, bindings, directives and pipes, all on one screen.</div>
             <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — Forms, services &amp; HTTP.</div>
           </div>
         </section>
@@ -1544,7 +2434,7 @@ export class EmployeeListComponent {
         <!-- Persistent footer band, shown on every slide -->
         <div class="slide-footer">
           <span class="who">Purvam Prajapati — Faculty, AHD</span>
-          <span>Angular · Session 2 — Components &amp; Binding</span>
+          <span>Angular · Session 2 — Components &amp; Data Binding</span>
         </div>
 
         <!-- Slide counter -->

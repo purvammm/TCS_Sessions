@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Angular Session 1 — Hands-on Lab Sheet</title>
+  <title>Angular Session 1 — Hands-on Lab</title>
   <style>
     /* THEME-SYNC START */
     /*
@@ -99,8 +99,10 @@
     h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
     h2 { font-size: 26px; margin: 0; }
     h3 { font-size: 19px; }
+    h4 { font-size: 16.5px; margin: 16px 0 4px; }
     p, li { line-height: 1.65; font-size: 17.5px; }
     a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
     code:not(pre code) {
       font-family: var(--mac-mono);
       font-size: 15px;
@@ -313,6 +315,46 @@
       font-size: 16.5px;
     }
     .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Key-point callout and reference note — shared vocabulary with the theory decks */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
 
     /* Code blocks with copy button */
     .codewrap { position: relative; margin: 14px 0; }
@@ -357,6 +399,29 @@
     table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
     table.issues tbody tr:nth-child(even) { background: #fafafc; }
 
+    /* Line-by-line code explanation */
+    table.lines { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.lines th, table.lines td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 13px; text-align: left; vertical-align: top;
+    }
+    table.lines thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.lines td:first-child {
+      font-family: var(--mac-mono); font-size: 14px; color: #b00027;
+      background: #fafafc; white-space: nowrap;
+    }
+
+    /* Comparison table (shared vocabulary with the theory decks) */
+    table.cmp { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px; text-align: left; vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
     .section-band {
       font-size: 15px;
       font-weight: 800;
@@ -375,6 +440,7 @@
     details.exp.lab4 { border-left-color: #ff9f0a; }
     details.exp.lab5 { border-left-color: #0a84ff; }
     details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
     details.exp.bonus { border-left-color: #ff375f; }
     details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
     details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
@@ -382,12 +448,14 @@
     details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
     details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
     details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf2ff,#f3e6ff); }
     details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
     details.exp.lab2 .lab-tag { background:#9327f0; }
     details.exp.lab3 .lab-tag { background:#28c840; }
     details.exp.lab4 .lab-tag { background:#ff9f0a; }
     details.exp.lab5 .lab-tag { background:#0a84ff; }
     details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
     /* === File banner: tells the beginner EXACTLY which file to create === */
@@ -466,6 +534,11 @@
       display: inline-block; background: var(--mac-accent); color: #fff;
       border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
     }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .btn-link {
+      display: inline-block; border: 1px solid #0a84ff; border-radius: 6px;
+      padding: 2px 9px; color: #0a84ff; font-size: 12.5px; font-weight: 600;
+    }
     .browser .viewport .navbar {
       display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
       padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
@@ -485,6 +558,17 @@
     .term-out .warn { color: #febc2e; }
     .term-out .bad { color: #ff6b6b; }
 
+    /* Cards (shared vocabulary with the theory decks) */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 14px 0; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fff;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 24px; margin-bottom: 4px; }
+
     /* Quick reference card */
     .qref {
       background: linear-gradient(135deg, #1e1e2e, #2a2a40);
@@ -494,6 +578,8 @@
       margin: 16px 0 0;
     }
     .qref h2 { color: #fff; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+    .qref p, .qref li { color: #d7dae0; }
     .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
     .qref th, .qref td {
       border: 1px solid rgba(255,255,255,0.18);
@@ -502,10 +588,10 @@
     .qref th { background: rgba(255,255,255,0.08); }
     .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
     .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
 
     @media (max-width: 900px) {
       .qref .grid { grid-template-columns: 1fr; }
+      .cards, .cards.c3 { grid-template-columns: 1fr; }
       .lab-canvas { padding: 8px 12px 24px; }
       .exp-body { padding: 14px 14px 20px; }
       details.exp > summary { flex-wrap: wrap; font-size: 18px; }
@@ -529,7 +615,7 @@
         <div class="hero-icon">🅰️</div>
         <div>
           <h1>Angular — Session 1 Hands-on Lab</h1>
-          <p class="section-intro">TypeScript drills, your first Angular app, and the project tour. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+          <p class="section-intro">TypeScript drills, your first Angular app, and a guided tour of every generated file. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
 
@@ -549,18 +635,25 @@
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">How to use this sheet</span>
-          This is your hands-on companion for Angular Session 1 — the theory stays on the main screen while you
-          work here on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge so you know
-          exactly which part of the talk it belongs to: when that slide is on screen, this is the task you build.
-          Click a heading to expand it, use the <strong>Copy</strong> button on any snippet instead of retyping,
-          and tick each checkbox as you go. The progress bar at the top fills as you complete steps — aim for 100%.
-          Read every "Expected output" box to confirm you're on track, and raise your hand the moment you're stuck.
+          This is your hands-on companion for Angular Session 1. The theory stays on the main screen while you
+          work here, on your own machine. Every task carries a <strong>"Theory slides …"</strong> badge, so you always
+          know which part of the talk it belongs to — when that slide is up, this is the task you build.
+          Click any heading to expand it, use the <strong>Copy</strong> button on a snippet instead of retyping it,
+          and tick each checkbox as you finish. The progress bar at the top fills as you go — aim for 100%.
+          Read every <strong>"What you should see"</strong> box to confirm you are on track.
+        </div>
+        <div class="analogy">
+          <span class="lbl">Two hours from now</span>
+          You will have written about fifty lines of TypeScript, installed two tools, created a real Angular
+          project, and changed what it displays — with the browser updating itself as you type. That is the whole
+          goal of today. Everything after this session is built on that foundation.
         </div>
         <div class="observe">
           <span class="lbl">Golden rule for today</span>
-          If you get an error, <strong>read it before reacting</strong>. Angular's error messages name the file and
-          the line. Nine times out of ten the message tells you the fix directly — and learning to read them today
-          will save you hours in Sessions 2, 3 and 4.
+          If you get an error, <strong>read it before reacting</strong>. Angular and TypeScript name the file and the
+          line, and usually state the fix outright. Nine times out of ten the message tells you exactly what to do —
+          and building that habit today will save you hours in Sessions 2, 3 and 4. There is a full
+          <strong>troubleshooting table</strong> at the bottom of this sheet covering every error you are likely to hit.
         </div>
       </section>
 
@@ -568,15 +661,15 @@
       <div class="section-band">Before you start</div>
       <section class="section">
         <details class="exp" open>
-          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–2</span></summary>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slides 1–4</span></summary>
           <div class="exp-body">
-            <p>Do this while the agenda is being covered. Tick each item once its verification passes — the
-               "Ready to begin" badge at the top lights up when all three are green.</p>
+            <p>Do this while the roadmap is being covered — it takes two minutes. Tick each item once its check
+               passes; the <strong>"Ready to begin"</strong> badge at the top lights up when all three are green.</p>
 
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Node.js 18 or higher</strong> installed
-                <span class="verify">Verify: run <code>node -v</code> → expect <code>v18.x</code> or higher. If the command isn't found, Node isn't installed or isn't on your PATH.</span>
+              <span class="ctext"><strong>Node.js 18 or higher</strong> is installed
+                <span class="verify">Check: run <code>node -v</code> → you want <code>v18.x</code> or higher. If the command is "not found", Node either isn't installed or isn't on your PATH.</span>
               </span>
             </label>
             <div class="codewrap"><pre><code>node -v
@@ -588,93 +681,99 @@ $ npm -v
 
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>npm</strong> responds to <code>npm -v</code>
-                <span class="verify">npm ships with Node — if <code>node -v</code> works but <code>npm -v</code> doesn't, reinstall Node from nodejs.org using the LTS installer.</span>
+              <span class="ctext"><strong>npm</strong> answers <code>npm -v</code>
+                <span class="verify">npm is installed together with Node. If <code>node -v</code> works but <code>npm -v</code> doesn't, reinstall Node using the LTS installer from nodejs.org.</span>
               </span>
             </label>
 
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>An editor</strong> ready — VS Code strongly recommended
-                <span class="verify">VS Code is free and has the best Angular/TypeScript support out of the box. Also useful: the "Angular Language Service" extension.</span>
+              <span class="ctext">An <strong>editor</strong> is ready — VS Code strongly recommended
+                <span class="verify">VS Code is free and has the best TypeScript and Angular support with no setup. One extension worth adding: <strong>Angular Language Service</strong>.</span>
               </span>
             </label>
 
             <div class="observe">
-              <span class="lbl">Don't have Node yet?</span>
-              Download the <strong>LTS</strong> build from <code>nodejs.org</code> (not "Current"), run the installer
-              with all defaults, then <strong>close and reopen your terminal</strong> so the new PATH is picked up.
-              On Windows, tick "Add to PATH" if the installer asks. Behind a corporate proxy you may also need:
-              <code>npm config set proxy http://your-proxy:port</code> and the matching <code>https-proxy</code>.
+              <span class="lbl">Don't have Node yet? Do this now</span>
+              Download the <strong>LTS</strong> build from <code>nodejs.org</code> — <em>not</em> "Current". Run the
+              installer accepting all defaults; on Windows leave "Add to PATH" ticked. Then
+              <strong>close your terminal and open a brand-new one</strong> so the updated PATH is picked up — skipping
+              that step is the single most common reason the next command appears to fail.
+              Behind a corporate proxy you may also need:
+              <code>npm config set proxy http://your-proxy:port</code> plus the matching <code>https-proxy</code>.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== TASK 1 — TYPESCRIPT DRILLS ===== -->
-      <div class="section-band">The tasks</div>
+      <!-- ===== PART 1 — TYPESCRIPT ===== -->
+      <div class="section-band">Part 1 — The language</div>
       <section class="section">
         <details class="exp lab1" open>
-          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> TypeScript Drills<span class="sync">Theory slides 12–19</span></summary>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> TypeScript Drills<span class="sync">Theory slides 17–30</span></summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Goal</span>
-              Practise every TypeScript concept <strong>the moment it's explained</strong>, while it's fresh. Seven
-              short drills, one per concept. Each has a "Try it yourself" prompt first — <em>attempt it before
-              opening the solution.</em> Struggling for thirty seconds is what makes it stick.
+              Practise each TypeScript idea <strong>the moment it is explained</strong>, while it is still fresh.
+              Twelve short drills, one per concept. Each drill gives you a <strong>"Try it yourself"</strong> prompt
+              first — <em>attempt it before opening the solution.</em> Struggling for thirty seconds is what makes
+              a thing stick; reading the answer straight away does not.
             </div>
 
             <div class="dothis">
-              <span class="lbl">Set up your scratch pad — pick one</span>
+              <span class="lbl">Set up your scratch pad — pick one option</span>
               <ol>
-                <li><strong>Easiest (recommended):</strong> open <code>https://www.typescriptlang.org/play</code>
-                    in a browser tab. It compiles as you type, shows errors with red squiggles, and the
-                    <em>Logs</em> panel shows your <code>console.log</code> output. Nothing to install.</li>
-                <li><strong>Local alternative:</strong> create a folder, add a file <code>drills.ts</code>, then run
-                    <code>npm install -g typescript</code> once and use <code>tsc drills.ts &amp;&amp; node drills.js</code>
-                    to compile and run.</li>
+                <li><strong>Easiest, and what we recommend:</strong> open
+                    <code>https://www.typescriptlang.org/play</code> in a browser tab. It compiles as you type,
+                    shows errors as red squiggles, and the <em>Logs</em> panel on the right shows your
+                    <code>console.log</code> output. Nothing to install.</li>
+                <li><strong>Local alternative:</strong> make a folder, add a file <code>drills.ts</code>, run
+                    <code>npm install -g typescript</code> once, then compile and run with
+                    <code>tsc drills.ts &amp;&amp; node drills.js</code>.</li>
               </ol>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">My scratch pad is open and I can see output from <code>console.log("hello")</code>.
-                <span class="verify">In the Playground, look at the "Logs" tab on the right-hand side.</span>
+              <span class="ctext">My scratch pad is open and I can see the output of <code>console.log("hello")</code>.
+                <span class="verify">In the Playground, that appears in the <strong>Logs</strong> tab on the right-hand side. If the Logs tab is empty, click "Run".</span>
               </span>
             </label>
 
             <!-- Drill A -->
-            <h3>Drill A — an inferred-type variable <span class="muted" style="font-size:14px;">(slide 12)</span></h3>
+            <h3>Drill A — an inferred variable <span class="muted" style="font-size:14px;">(slide 17)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Declare a variable holding the text <code>"Hello World"</code> <strong>without</strong> writing a type.
-              Then try to assign the number <code>100</code> to it. What does the compiler say — and why, if you
-              never mentioned a type?
+              Declare a variable holding the text <code>"Hello World"</code> <strong>without writing a type</strong>.
+              Print it. Then try to assign the number <code>100</code> to it. What does the compiler say — and why,
+              given that you never mentioned a type at all?
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution A</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>let str = "Hello World";     // TypeScript INFERS the type: string
-console.log(str);
+                <div class="codewrap"><pre><code>let greeting = "Hello World";   // TypeScript INFERS the type: string
+console.log(greeting);
 
-str = "Goodbye";             // OK — still a string
-// str = 100;                // ERROR: Type 'number' is not assignable to type 'string'</code></pre></div>
+greeting = "Goodbye";           // OK — still a string
+// greeting = 100;              // remove the // to see the error</code></pre></div>
                 <div class="expected">
                   <span class="lbl">What you should see</span>
-                  Hover over <code>str</code> in the Playground — a tooltip says <code>let str: string</code>. You
-                  never typed "string", but TypeScript worked it out from the initial value. <strong>Inference means
-                  you get type safety for free.</strong> Uncomment the last line to see the red squiggle appear.
+                  <code>Hello World</code> in the Logs. Now <strong>hover your mouse over <code>greeting</code></strong> —
+                  a tooltip says <code>let greeting: string</code>. You never typed the word "string", but TypeScript
+                  worked it out from the value you assigned. <strong>That is inference: type safety for free.</strong>
+                  Uncomment the last line and a red squiggle appears with
+                  <em>Type 'number' is not assignable to type 'string'</em>.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill A done</strong> — I saw the inferred type and triggered the error deliberately.</span>
+              <span class="ctext"><strong>Drill A done</strong> — I saw the inferred type in the tooltip and triggered the error on purpose.</span>
             </label>
 
             <!-- Drill B -->
-            <h3>Drill B — an explicitly-typed variable <span class="muted" style="font-size:14px;">(slide 12)</span></h3>
+            <h3>Drill B — explicit types <span class="muted" style="font-size:14px;">(slides 17–18)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Declare three variables with explicit types: a <code>string</code> name, a <code>number</code> age and
-              a <code>boolean</code> flag. Print all three in one <code>console.log</code>.
+              Declare three variables with <strong>explicit</strong> types: a <code>string</code> employee name, a
+              <code>number</code> age, and a <code>boolean</code> flag. Print all three on one line.
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution B</summary>
@@ -686,595 +785,1161 @@ let isActive: boolean = true;
 console.log(empName + " | " + empAge + " | " + isActive);
 // Anoop | 40 | true
 
-// Bonus — try each of these and read the error text:
+// Now break each one deliberately and READ the error text:
 // empAge = "forty";
-// isActive = "yes";</code></pre></div>
+// isActive = "yes";
+// empName = 42;</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  <code>Anoop | 40 | true</code>. Each commented line, when uncommented, gives its own clear
+                  message naming both types. Getting familiar with the <em>wording</em> of these errors now means you
+                  will recognise them instantly later.
+                </div>
                 <div class="observe">
-                  <span class="lbl">Note</span>
-                  Avoid naming a variable just <code>name</code> in the Playground — the browser already has a
-                  global <code>name</code> and you'll get a confusing conflict. <code>empName</code> is safer.
+                  <span class="lbl">Small gotcha in the Playground</span>
+                  Avoid naming a variable just <code>name</code>. The browser already has a global called
+                  <code>name</code> and you will get a confusing conflict. <code>empName</code> is safe.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill B done</strong> — three explicitly typed variables printed correctly.</span>
+              <span class="ctext"><strong>Drill B done</strong> — three typed variables printed, and I read all three error messages.</span>
             </label>
 
             <!-- Drill C -->
-            <h3>Drill C — an interface + an object <span class="muted" style="font-size:14px;">(slide 13)</span></h3>
+            <h3>Drill C — <code>let</code> vs <code>const</code> <span class="muted" style="font-size:14px;">(slide 17)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Define an interface <code>Person</code> with <code>name: string</code>, <code>city: string</code> and
-              <code>age: number</code>. Create an object that satisfies it. Then deliberately delete one property
-              and read the error.
+              Declare one variable with <code>let</code> and one with <code>const</code>. Try to reassign both.
+              Which one complains, and what exactly does it say?
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution C</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>interface Person {
-  name: string;
-  city: string;
-  age: number;
-}
+                <div class="codewrap"><pre><code>let counter = 0;
+counter = 1;              // ✔ fine — let allows reassignment
+counter = 2;              // ✔ fine
+console.log(counter);     // 2
 
-let myData: Person = {
-  name: "Anoop",
-  city: "Trivandrum",
-  age: 40
-};
+const companyName = "TCS";
+// companyName = "Infosys";   // ✖ Cannot assign to 'companyName' because it is a constant
+console.log(companyName);     // TCS
 
-console.log(myData.name + " from " + myData.city + ", age " + myData.age);
-// Anoop from Trivandrum, age 40
-
-// Try each of these to see the compiler protect you:
-// let bad1: Person = { name: "Ajay", city: "Chennai" };                    // missing 'age'
-// let bad2: Person = { name: "Ajay", city: "Chennai", age: "forty" };      // wrong type
-// let bad3: Person = { name: "Ajay", city: "Chennai", age: 30, pin: 1 };   // unknown property</code></pre></div>
+// IMPORTANT subtlety — const locks the VARIABLE, not the object's contents:
+const emp = { name: "Anoop", salary: 25000 };
+emp.salary = 30000;       // ✔ allowed! we changed a property, not the variable
+// emp = { name: "Ajay", salary: 40000 };   // ✖ NOT allowed — reassigning the variable
+console.log(emp.salary);  // 30000</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">The payoff to notice</span>
-                  Type <code>myData.</code> in the Playground and <strong>wait</strong> — autocomplete offers
-                  exactly <code>name</code>, <code>city</code>, <code>age</code> and nothing else. That is the
-                  everyday benefit of interfaces, and it's why we'll define an <code>Employee</code> interface in
-                  Session 2 rather than passing loose objects around.
+                  <span class="lbl">What you should see</span>
+                  <code>2</code>, then <code>TCS</code>, then <code>30000</code>. The important lesson is the last
+                  block: <strong><code>const</code> means "this name will always point at this same object" — not
+                  "this object can never change"</strong>. That surprises nearly everyone once.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Habit worth forming today</span>
+                  Reach for <code>const</code> first, every time. Switch to <code>let</code> only when you actually
+                  need to reassign. Real Angular code is mostly <code>const</code>, and a reader can then trust that
+                  a <code>const</code> never changes underneath them.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill C done</strong> — interface defined, object created, and I saw all three error variants.</span>
+              <span class="ctext"><strong>Drill C done</strong> — and I understand that <code>const</code> protects the variable, not the object's properties.</span>
             </label>
 
             <!-- Drill D -->
-            <h3>Drill D — an optional property <span class="muted" style="font-size:14px;">(slide 14)</span></h3>
+            <h3>Drill D — the <code>any</code> trap <span class="muted" style="font-size:14px;">(slide 19)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Take your <code>Person</code> interface and make <code>age</code> optional. Then create <em>two</em>
-              objects — one with an age, one without — and confirm both compile.
+              Create a variable typed <code>any</code> holding an object with a <code>name</code> property. Then
+              deliberately misspell the property when reading it, and call a method that does not exist. How many
+              errors does TypeScript report? Now change <code>any</code> to a proper type and count again.
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution D</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>interface PersonOpt {
-  name: string;
-  city: string;
-  age?: number;          // the ? makes it optional
-}
+                <div class="codewrap"><pre><code>// ---------- Version 1: any ----------
+let loose: any = { name: "Anoop" };
 
-let withAge: PersonOpt    = { name: "Anoop", city: "Trivandrum", age: 40 };
-let withoutAge: PersonOpt = { name: "Ajay",  city: "Chennai" };
+console.log(loose.nmae);        // no error reported — but prints: undefined
+// loose.doSomething();         // no error reported — CRASHES at runtime
 
-console.log(withAge.age);      // 40
-console.log(withoutAge.age);   // undefined  — absent, not an error
+// ---------- Version 2: a real type ----------
+let tight: { name: string } = { name: "Anoop" };
 
-// The safe way to use an optional value:
-if (withoutAge.age) {
-  console.log("Age is " + withoutAge.age);
-} else {
-  console.log("Age not provided");
-}
-// Age not provided</code></pre></div>
+// console.log(tight.nmae);     // ✖ Property 'nmae' does not exist on type '{ name: string; }'
+// tight.doSomething();         // ✖ Property 'doSomething' does not exist
+console.log(tight.name);       // Anoop</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  Version 1 reports <strong>zero errors</strong> and prints <code>undefined</code> — the typo sailed
+                  straight through. Version 2 reports <strong>two errors</strong>, both in your editor, before the code
+                  ever ran. That difference is the entire argument for TypeScript, in one drill.
+                </div>
                 <div class="observe">
-                  <span class="lbl">Why the <code>if</code> guard matters</span>
-                  An optional property may be <code>undefined</code>. Calling a method on it without checking
-                  produces the most common front-end error there is: <em>"cannot read properties of undefined"</em>.
-                  Building the habit of guarding now will save you real debugging time in Session 3.
+                  <span class="lbl">The rule for this series</span>
+                  You may use <code>any</code> when you are stuck and want to keep moving — but treat it as a
+                  <strong>note to come back to</strong>, never as a fix. Every <code>any</code> is a spot where
+                  TypeScript has stopped protecting you.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill D done</strong> — both objects compile and the missing value prints as <code>undefined</code>.</span>
+              <span class="ctext"><strong>Drill D done</strong> — I proved to myself that <code>any</code> silently lets typos through.</span>
             </label>
 
             <!-- Drill E -->
-            <h3>Drill E — a union type, used both ways <span class="muted" style="font-size:14px;">(slide 15)</span></h3>
+            <h3>Drill E — your first interface <span class="muted" style="font-size:14px;">(slide 20)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Change <code>age</code> so it accepts a <code>number</code> <strong>or</strong> a <code>string</code>.
-              Create one object with <code>40</code> and one with <code>"Forty"</code> — both must compile. Then try
-              <code>true</code> and confirm it does <em>not</em>.
+              Define an interface called <code>Employee</code> with four properties: <code>id</code> (number),
+              <code>name</code> (string), <code>designation</code> (string) and <code>salary</code> (number).
+              Create one valid employee object. Then create a second one that is <strong>missing a property</strong>,
+              and a third with a <strong>wrong type</strong>, and read both errors.
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution E</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>interface PersonU {
+                <div class="codewrap"><pre><code>interface Employee {
+  id: number;
   name: string;
-  city: string;
-  age: number | string;        // union: either type is allowed
+  designation: string;
+  salary: number;
 }
 
-let p1: PersonU = { name: "Anoop", city: "Trivandrum", age: 40 };      // OK
-let p2: PersonU = { name: "Ajay",  city: "Chennai",    age: "Forty" }; // OK
-// let p3: PersonU = { name: "Rekha", city: "Kochi",  age: true };     // ERROR
+// ✔ Valid — all four properties, all correct types
+const e1: Employee = {
+  id: 1001,
+  name: "Anoop",
+  designation: "Software Engineer",
+  salary: 25000
+};
+console.log(e1.name + " — " + e1.designation);
 
-console.log(typeof p1.age);   // number
-console.log(typeof p2.age);   // string
+// ✖ Missing properties
+// const e2: Employee = { id: 1002, name: "Ajay" };
+//    Property 'designation' is missing in type ... but required in type 'Employee'
 
-// Bonus — the form you'll actually use in Session 2:
-let status: "Active" | "Inactive" = "Active";
-// status = "active";     // ERROR — wrong case, caught at COMPILE time</code></pre></div>
+// ✖ Wrong type
+// const e3: Employee = { id: "1003", name: "Rekha", designation: "Tester", salary: 22000 };
+//    Type 'string' is not assignable to type 'number'
+
+// Now try the magic bit: on a new line, type   e1.   and then STOP.
+// Don't press anything else — just look at the list your editor pops up.</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">Expected logs</span>
-                  <code>number</code> then <code>string</code>. Note how <code>typeof</code> reports what's actually
-                  there at runtime, while the union describes what's <em>allowed</em> at compile time.
+                  <span class="lbl">What you should see</span>
+                  <code>Anoop — Software Engineer</code>. More importantly, when you type <code>e1.</code> and pause,
+                  your editor offers exactly four suggestions: <code>id</code>, <code>name</code>,
+                  <code>designation</code>, <code>salary</code>. <strong>That autocomplete list is the interface paying
+                  you back</strong> — and it is why experienced developers write interfaces before they write logic.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Why this drill matters more than the others</span>
+                  From Session 2 onwards, almost every piece of data in your app will be described by an interface
+                  exactly like this one. When JSON arrives from your Spring Boot API in Session 3, you will say
+                  "this response is an <code>Employee[]</code>" and get this same autocomplete and typo protection on
+                  live server data.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill E done</strong> — both valid forms compiled, and the invalid one errored. I also tried the literal union.</span>
+              <span class="ctext"><strong>Drill E done</strong> — interface written, both errors seen, and autocomplete confirmed.</span>
             </label>
 
             <!-- Drill F -->
-            <h3>Drill F — looping a typed array <span class="muted" style="font-size:14px;">(slide 16)</span></h3>
+            <h3>Drill F — optional properties, <code>?.</code> and <code>??</code> <span class="muted" style="font-size:14px;">(slide 21)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Create <code>let arr = [10, 20, 30, 40];</code> and print its contents <strong>three ways</strong>:
-              a classic <code>for</code>, a <code>for...of</code>, and a <code>for...in</code>. Predict the output of
-              each <em>before</em> you run it.
+              Add an <strong>optional</strong> <code>email</code> property to your <code>Employee</code> interface.
+              Create one employee with an email and one without. Then try to call <code>.toUpperCase()</code> on the
+              email of the one that hasn't got one — and fix the resulting error <strong>three different ways</strong>.
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution F</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>let arr: number[] = [10, 20, 30, 40];
-
-console.log("--- classic for ---");
-for (let i = 0; i &lt; arr.length; i++) {
-  console.log(i + " -> " + arr[i]);
+                <div class="codewrap"><pre><code>interface Employee {
+  id: number;
+  name: string;
+  email?: string;          // ← the ? makes it optional
 }
 
-console.log("--- for...of  (VALUES) ---");
-for (let value of arr) {
-  console.log(value);            // 10, 20, 30, 40
+const withEmail: Employee    = { id: 1, name: "Ajay", email: "ajay@example.com" };
+const withoutEmail: Employee = { id: 2, name: "Anoop" };   // ✔ valid — no email
+
+// ✖ This is an error: 'withoutEmail.email' is possibly 'undefined'
+// console.log(withoutEmail.email.toUpperCase());
+
+// Fix 1 — check that it exists first
+if (withoutEmail.email) {
+  console.log(withoutEmail.email.toUpperCase());
+} else {
+  console.log("no email on file");
 }
 
-console.log("--- for...in  (INDICES) ---");
-for (let index in arr) {
-  console.log(index + " holds " + arr[index]);   // "0" holds 10, ...
-}</code></pre></div>
+// Fix 2 — optional chaining: "only continue if the left side exists"
+console.log(withoutEmail.email?.toUpperCase());    // undefined
+console.log(withEmail.email?.toUpperCase());       // AJAY@EXAMPLE.COM
+
+// Fix 3 — nullish coalescing: supply a fallback value
+console.log(withoutEmail.email ?? "no email on file");   // no email on file
+console.log(withEmail.email ?? "no email on file");      // ajay@example.com</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">Expected output</span>
-                  <div class="term-out">--- classic for ---
-0 -&gt; 10
-1 -&gt; 20
-2 -&gt; 30
-3 -&gt; 40
---- for...of  (VALUES) ---
-10
-20
-30
-40
---- for...in  (INDICES) ---
-0 holds 10
-1 holds 20
-2 holds 30
-3 holds 40</div>
+                  <span class="lbl">What you should see</span>
+                  <code>no email on file</code>, then <code>undefined</code>, then <code>AJAY@EXAMPLE.COM</code>, then
+                  <code>no email on file</code>, then <code>ajay@example.com</code>. Note that Fix 2 gives you
+                  <code>undefined</code> rather than a crash — that is the whole point of <code>?.</code>
                 </div>
-                <div class="observe">
-                  <span class="lbl">Lock this in</span>
-                  <code>for...<strong>of</strong></code> → the <strong>values</strong>. <code>for...<strong>in</strong></code>
-                  → the <strong>indices</strong> (as strings!). Angular's <code>*ngFor="let emp of employees"</code>
-                  uses <code>of</code> for exactly this reason.
+                <div class="concept">
+                  <span class="lbl">Learn these two symbols properly — you will use them constantly</span>
+                  <code>?.</code> = <strong>"only carry on if the thing on the left actually exists"</strong>.<br>
+                  <code>??</code> = <strong>"use the right-hand value if the left is null or undefined"</strong>.<br>
+                  In Session 3 your template will render before the server has replied, so your data will briefly be
+                  undefined. <code>?.</code> is what stops that half-second from throwing an error.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill F done</strong> — all three loops ran and I can explain the <code>of</code> vs <code>in</code> difference.</span>
+              <span class="ctext"><strong>Drill F done</strong> — optional property added and fixed all three ways.</span>
             </label>
 
+
             <!-- Drill G -->
-            <h3>Drill G — a typed tuple <span class="muted" style="font-size:14px;">(slide 17)</span></h3>
+            <h3>Drill G — union types <span class="muted" style="font-size:14px;">(slide 22)</span></h3>
             <div class="tryit">
               <span class="lbl">Try it yourself</span>
-              Declare a tuple that holds, in this exact order: an employee id (number), a name (string), a
-              designation (string) and a salary (number). Assign real values, print position <code>1</code>, then
-              deliberately swap the first two values and read the error.
+              Declare a variable that may hold <strong>either</strong> a number or a string, and assign each in turn.
+              Then create a <code>Status</code> type that allows only the three exact words
+              <code>"Active"</code>, <code>"Inactive"</code> and <code>"OnLeave"</code>, and try assigning
+              <code>"active"</code> in lower case.
             </div>
             <details class="exp lab1" style="margin:10px 0;">
               <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution G</summary>
               <div class="exp-body">
-                <div class="codewrap"><pre><code>let employee: [number, string, string, number];
-employee = [1001, 'Anoop', 'Software Engineer', 25000.00];
+                <div class="codewrap"><pre><code>// A plain union — "either of these types"
+let empId: number | string;
 
-console.log(employee);        // [1001, "Anoop", "Software Engineer", 25000]
-console.log(employee[1]);     // Anoop   — TS knows position 1 is a string
+empId = 1001;            // ✔
+console.log(empId);
+empId = "EMP-1001";      // ✔
+console.log(empId);
+// empId = true;         // ✖ 'boolean' is not assignable to 'number | string'
 
-// Both of these fail — and that's the point of a tuple:
-// employee = ['Anoop', 1001, 'Software Engineer', 25000.00];   // wrong ORDER
-// employee = [1001, 'Anoop', 'Software Engineer'];             // wrong LENGTH
+// A LITERAL union — only these three exact strings are allowed.
+// This is TypeScript's answer to a Java enum.
+type Status = "Active" | "Inactive" | "OnLeave";
 
-// Compare with a plain array — flexible, but no per-position guarantee:
-let loose: (number | string)[] = ['Anoop', 1001, 'Software Engineer', 25000.00];  // fine</code></pre></div>
+let s1: Status = "Active";      // ✔
+console.log(s1);
+// let s2: Status = "active";   // ✖ wrong case — caught immediately
+// let s3: Status = "Retired";  // ✖ not one of the three
+
+// Using it inside an interface — this is the real-world shape
+interface Employee {
+  id: number;
+  name: string;
+  status: Status;
+}
+
+const e: Employee = { id: 1001, name: "Anoop", status: "Active" };
+console.log(e.name + " is " + e.status);</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">The takeaway</span>
-                  A tuple fixes both the <strong>length</strong> and the <strong>type at each position</strong>. It's
-                  precise but unreadable at scale — <code>employee[2]</code> tells you nothing. That's why real
-                  Angular code uses an <code>interface</code> with named fields, and tuples stay rare.
+                  <span class="lbl">What you should see</span>
+                  <code>1001</code>, <code>EMP-1001</code>, <code>Active</code>, then
+                  <code>Anoop is Active</code>. Now delete the word <code>"Active"</code> from the last object and
+                  retype the opening quote — your editor <strong>offers you the three legal values as a dropdown</strong>.
+                  You literally cannot get it wrong.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Why not just use <code>string</code>?</span>
+                  Because <code>"Actve"</code> would compile perfectly happily, and in Session 2 you will colour rows
+                  green or red based on this exact field. A one-letter typo would silently show the wrong colour, with
+                  no error anywhere. As a literal union, that typo is a red squiggle before you even save.
                 </div>
               </div>
             </details>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>Drill G done</strong> — tuple assigned successfully, and both wrong-order and wrong-length errors observed.</span>
+              <span class="ctext"><strong>Drill G done</strong> — and I saw my editor autocomplete the allowed status values.</span>
             </label>
 
+            <!-- Drill H -->
+            <h3>Drill H — typed arrays and the six methods that matter <span class="muted" style="font-size:14px;">(slide 23)</span></h3>
             <div class="tryit">
-              <span class="lbl">Bonus drill — a class (slide 18)</span>
-              If you're ahead: write a class <code>Employee</code> with <code>id</code> and <code>name</code>
-              properties, a constructor, and a <code>getDetails()</code> method returning
-              <code>"1001 - Anoop"</code>. Then rewrite it using the constructor shorthand
-              <code>constructor(public id: number, public name: string) { }</code> and confirm both behave
-              identically. That shorthand is the line you'll write most often in Session 3.
+              <span class="lbl">Try it yourself</span>
+              Build an array of four <code>Employee</code> objects. Then, without writing a single loop, answer these
+              four questions in code: <em>who earns more than 30000? who has id 1002? what are all the names? how many
+              are there?</em>
+            </div>
+            <details class="exp lab1" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution H</summary>
+              <div class="exp-body">
+                <div class="codewrap"><pre><code>interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+}
+
+let employees: Employee[] = [
+  { id: 1001, name: "Anoop",  designation: "Software Engineer", salary: 25000 },
+  { id: 1002, name: "Ajay",   designation: "Team Lead",         salary: 45000 },
+  { id: 1003, name: "Rekha",  designation: "Tester",            salary: 22000 },
+  { id: 1004, name: "Suresh", designation: "Architect",         salary: 65000 }
+];
+
+// How many?
+console.log(employees.length);                       // 4
+
+// Who earns more than 30000?  → filter returns a NEW array
+const wellPaid = employees.filter(e =&gt; e.salary &gt; 30000);
+console.log(wellPaid.length);                        // 2
+console.log(wellPaid.map(e =&gt; e.name));              // [ 'Ajay', 'Suresh' ]
+
+// Who has id 1002?  → find returns ONE item, or undefined
+const found = employees.find(e =&gt; e.id === 1002);
+console.log(found?.name);                            // Ajay
+
+// All the names → map transforms every item
+console.log(employees.map(e =&gt; e.name));             // [ 'Anoop', 'Ajay', 'Rekha', 'Suresh' ]
+
+// Where is id 1003?  → findIndex gives a position, or -1
+console.log(employees.findIndex(e =&gt; e.id === 1003));   // 2
+
+// Insert one
+employees.push({ id: 1005, name: "Priya", designation: "Analyst", salary: 28000 });
+console.log(employees.length);                       // 5
+
+// Delete the one at position 2 (Rekha) — remove 1 item starting at index 2
+employees.splice(2, 1);
+console.log(employees.map(e =&gt; e.name));             // [ 'Anoop', 'Ajay', 'Suresh', 'Priya' ]</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  In order: <code>4</code>, <code>2</code>, <code>[ 'Ajay', 'Suresh' ]</code>, <code>Ajay</code>,
+                  the four names, <code>2</code>, <code>5</code>, then the list with Rekha gone.
+                </div>
+                <div class="concept">
+                  <span class="lbl">This drill is secretly Session 4</span>
+                  In Session 4 you build a complete CRUD screen, and it is <strong>literally these six methods</strong>:
+                  <code>push</code> to insert, <code>filter</code> to search, <code>findIndex</code> + <code>splice</code>
+                  to delete, <code>find</code> to load a row for editing. If you are comfortable here, Session 4 will
+                  feel like revision. If not, redo this drill tonight — it is the highest-value fifteen minutes in
+                  the whole series.
+                </div>
+                <div class="observe">
+                  <span class="lbl">Note the <code>?.</code> coming back</span>
+                  <code>found?.name</code> uses optional chaining, because <code>find()</code> returns
+                  <code>Employee | undefined</code> — there may not <em>be</em> a match. TypeScript forces you to
+                  acknowledge that, which is exactly the null check you would otherwise have forgotten.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Drill H done</strong> — all six array methods run, with the output I expected.</span>
+            </label>
+
+            <!-- Drill I -->
+            <h3>Drill I — tuples <span class="muted" style="font-size:14px;">(slide 24)</span></h3>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Declare a tuple holding exactly a number then a string. Do arithmetic on the first item and call a
+              string method on the second. Then try putting them in the wrong order, and try adding a third item.
+            </div>
+            <details class="exp lab1" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution I</summary>
+              <div class="exp-body">
+                <div class="codewrap"><pre><code>// A tuple: exactly two items — a number first, then a string
+let emp: [number, string] = [1001, "Anoop"];
+
+console.log(emp[0] + 1);              // 1002    — TypeScript knows [0] is a number
+console.log(emp[1].toUpperCase());    // ANOOP   — and that [1] is a string
+
+// ✖ Wrong order — the position of each type is fixed
+// let bad: [number, string] = ["Anoop", 1001];
+
+// ✖ Wrong length — a tuple has a fixed number of slots
+// let tooMany: [number, string] = [1001, "Anoop", true];
+
+// Compare with the interface version of the same data:
+interface Emp { id: number; name: string; }
+const better: Emp = { id: 1001, name: "Anoop" };
+console.log(better.id + 1);           // 1002 — but now it's obvious WHAT id is</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  <code>1002</code>, then <code>ANOOP</code>, then <code>1002</code> again. Notice that
+                  <code>emp[0]</code> tells a reader nothing, while <code>better.id</code> explains itself.
+                </div>
+                <div class="observe">
+                  <span class="lbl">Honest guidance</span>
+                  Tuples turn up in exam questions far more often than in real Angular code, because an
+                  <strong>interface is nearly always clearer</strong>. Learn to recognise them; reach for interfaces
+                  when you write your own code.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Drill I done</strong> — and I can explain why an interface is usually the better choice.</span>
+            </label>
+
+            <!-- Drill J -->
+            <h3>Drill J — the three loops, and the classic trap <span class="muted" style="font-size:14px;">(slide 25)</span></h3>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Print the same array of three names using all three loop styles. Then, in the <code>for...in</code>
+              version, print <code>i + 1</code>. Look very carefully at what it prints — it is not what you expect.
+            </div>
+            <details class="exp lab1" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution J</summary>
+              <div class="exp-body">
+                <div class="codewrap"><pre><code>let names: string[] = ["Anoop", "Ajay", "Rekha"];
+
+// 1 — classic for: you control the index
+console.log("--- classic for ---");
+for (let i = 0; i &lt; names.length; i++) {
+  console.log(i + " → " + names[i]);
+}
+
+// 2 — for...OF: gives you each VALUE  (the one you usually want)
+console.log("--- for...of ---");
+for (const n of names) {
+  console.log(n);
+}
+
+// 3 — for...IN: gives you each INDEX, as a STRING
+console.log("--- for...in ---");
+for (const i in names) {
+  console.log(i + 1);             // ← LOOK CLOSELY at this output
+}</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see — and the trap</span>
+                  The first loop prints <code>0 → Anoop</code>, <code>1 → Ajay</code>, <code>2 → Rekha</code>.
+                  The second prints the three names.<br>
+                  The third prints <strong><code>01</code>, <code>11</code>, <code>21</code></strong> — not
+                  <code>1</code>, <code>2</code>, <code>3</code>! Because <code>for...in</code> hands you the string
+                  <code>"0"</code>, and <code>"0" + 1</code> in JavaScript means <em>join these together</em>, giving
+                  <code>"01"</code>. This is a genuinely famous bug and now you have seen it happen.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Memorise this one line</span>
+                  <code>for...<strong>of</strong></code> → the <strong>o</strong>bject / the value.
+                  <code>for...<strong>in</strong></code> → the <strong>i</strong>ndex / the key.
+                  For arrays you almost always want <code>of</code>.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Drill J done</strong> — I saw <code>for...in</code> print <code>01</code> and I understand why.</span>
+            </label>
+
+            <!-- Drill K -->
+            <h3>Drill K — functions and arrow functions <span class="muted" style="font-size:14px;">(slides 26–27)</span></h3>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Write a normal function <code>add(a, b)</code> that returns a number. Write a <code>void</code> function
+              that only prints. Write a function with a <strong>default</strong> parameter. Then rewrite
+              <code>add</code> as an arrow function, in the shortest form you can manage.
+            </div>
+            <details class="exp lab1" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution K</summary>
+              <div class="exp-body">
+                <div class="codewrap"><pre><code>// 1 — a normal typed function
+function add(a: number, b: number): number {
+  return a + b;
+}
+console.log(add(5, 3));            // 8
+// console.log(add("5", 3));       // ✖ 'string' is not assignable to 'number'
+// console.log(add(5));            // ✖ Expected 2 arguments, but got 1
+
+// 2 — returns nothing: void
+function logEmployee(name: string, salary: number): void {
+  console.log(name + " earns " + salary);
+}
+logEmployee("Anoop", 25000);       // Anoop earns 25000
+
+// 3 — a default parameter
+function raise(salary: number, percent: number = 10): number {
+  return salary + (salary * percent / 100);
+}
+console.log(raise(20000));         // 22000  — used the default 10
+console.log(raise(20000, 25));     // 25000
+
+// 4 — the same 'add', as an arrow function, three ways
+const addA = function (a: number, b: number): number { return a + b; };
+const addB = (a: number, b: number): number =&gt; { return a + b; };
+const addC = (a: number, b: number): number =&gt; a + b;    // shortest: implicit return
+console.log(addA(1, 2), addB(3, 4), addC(5, 6));         // 3 7 11
+
+// 5 — one parameter needs no brackets at all
+const double = (n: number) =&gt; n * 2;
+console.log(double(21));           // 42</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  <code>8</code>, <code>Anoop earns 25000</code>, <code>22000</code>, <code>25000</code>,
+                  <code>3 7 11</code>, <code>42</code>.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Read the arrow out loud</span>
+                  <code>(a, b) =&gt; a + b</code> reads as <em>"given a and b, produce a + b"</em>. When there are no
+                  curly braces, the value is returned automatically — you must <strong>not</strong> write
+                  <code>return</code>. If you have used Java streams, this is exactly a lambda; Java writes
+                  <code>-&gt;</code> where TypeScript writes <code>=&gt;</code>.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Drill K done</strong> — all five variations run, and I can write the short arrow form from memory.</span>
+            </label>
+
+            <!-- Drill L -->
+            <h3>Drill L — a class, and the constructor shorthand <span class="muted" style="font-size:14px;">(slides 28–29)</span></h3>
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              Write an <code>Employee</code> <strong>class</strong> with three fields, a constructor, and two methods:
+              one returning a formatted string, one applying a percentage pay rise. Create an instance and use both.
+              Then rewrite the constructor using the <strong>shorthand</strong> so the three assignment lines disappear.
+            </div>
+            <details class="exp lab1" style="margin:10px 0;">
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Show solution L</summary>
+              <div class="exp-body">
+                <h4>The long form</h4>
+                <div class="codewrap"><pre><code>class Employee {
+  id: number;
+  name: string;
+  salary: number;
+
+  constructor(id: number, name: string, salary: number) {
+    this.id = id;
+    this.name = name;
+    this.salary = salary;
+  }
+
+  getDetails(): string {
+    return this.id + " — " + this.name + " (" + this.salary + ")";
+  }
+
+  applyRaise(percent: number): void {
+    this.salary = this.salary + (this.salary * percent / 100);
+  }
+}
+
+const e = new Employee(1001, "Anoop", 25000);
+console.log(e.getDetails());     // 1001 — Anoop (25000)
+e.applyRaise(10);
+console.log(e.getDetails());     // 1001 — Anoop (27500)</code></pre></div>
+                <h4>The same class using the constructor shorthand</h4>
+                <div class="codewrap"><pre><code>class Employee2 {
+  // An access modifier on a constructor parameter declares AND assigns
+  // the field automatically. Those three 'this.x = x' lines are gone.
+  constructor(
+    public id: number,
+    public name: string,
+    private salary: number
+  ) { }
+
+  getDetails(): string {
+    return this.id + " — " + this.name + " (" + this.salary + ")";
+  }
+}
+
+const e2 = new Employee2(1002, "Ajay", 45000);
+console.log(e2.getDetails());    // 1002 — Ajay (45000)
+console.log(e2.name);            // Ajay  — public, so readable from outside
+// console.log(e2.salary);       // ✖ 'salary' is private and only accessible inside the class</code></pre></div>
+                <div class="expected">
+                  <span class="lbl">What you should see</span>
+                  <code>1001 — Anoop (25000)</code>, <code>1001 — Anoop (27500)</code>, then
+                  <code>1002 — Ajay (45000)</code> and <code>Ajay</code>. Uncomment the last line to confirm that
+                  <code>private</code> genuinely blocks outside access.
+                </div>
+                <div class="concept">
+                  <span class="lbl">Remember this drill in Session 3 — seriously</span>
+                  In Session 3 you will write <code>constructor(private http: HttpClient) { }</code> and reasonably
+                  wonder where the <code>http</code> field came from, since nothing declared it.
+                  <strong>This is where.</strong> The word <code>private</code> on that parameter declared and assigned
+                  the field for you. Every Angular component and service uses this exact pattern, so it is worth
+                  fixing in your memory now.
+                </div>
+              </div>
+            </details>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Drill L done</strong> — and I can explain what <code>constructor(private x: X) { }</code> does without looking it up.</span>
+            </label>
+
+            <div class="expected">
+              <span class="lbl">Task 1 complete — checkpoint</span>
+              You have now written and run every piece of TypeScript syntax this series needs. From here on, the
+              language is not the hard part — the framework is. If any drill still feels shaky, note which one and
+              come back to it tonight; slide 30 of the theory deck is a single-page cheat sheet covering all twelve.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== TASK 2 — INSTALL & SCAFFOLD ===== -->
+
+      <!-- ===== PART 2 — GETTING ANGULAR RUNNING ===== -->
+      <div class="section-band">Part 2 — Getting Angular running</div>
       <section class="section">
-        <details class="exp lab2">
-          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Install the CLI &amp; Scaffold Your First App<span class="sync">Theory slides 21–22</span></summary>
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Install the CLI &amp; Scaffold Your First App<span class="sync">Theory slides 31–34</span></summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Goal</span>
-              Install the Angular CLI globally, generate a real project with one command, and see it running in
-              your browser. This is the moment Angular stops being slides and starts being software.
+              Install the Angular CLI, create a real project, and see it running in your browser at
+              <code>localhost:4200</code>. This is the milestone of the whole session — everything in Sessions 2, 3
+              and 4 happens inside the project you are about to create.
             </div>
 
-            <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
-              <ol>
-                <li>Open a terminal and <code>cd</code> to a folder you'll remember — e.g.
-                    <code>cd Documents</code> (avoid folders synced by OneDrive/Dropbox; they can slow the build
-                    dramatically and occasionally lock files).</li>
-                <li>Install the CLI globally (one-time, takes a minute or two).</li>
-                <li>Generate the project with <code>ng new hello-world</code> and answer the prompts.</li>
-                <li><code>cd hello-world</code>, then <code>ng serve</code>.</li>
-                <li>Open <code>http://localhost:4200</code> in your browser.</li>
-              </ol>
-            </div>
-
-            <h3>① Install the CLI</h3>
+            <h3>Step 1 — install the Angular CLI (once per machine)</h3>
             <div class="codewrap"><pre><code>npm install -g @angular/cli</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:30%">Part</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td>npm install</td><td>Download a package from the npm registry.</td></tr>
+                <tr><td>-g</td><td><strong>Globally</strong> — usable from any folder. Without this it installs into the current project only, and the <code>ng</code> command won't exist.</td></tr>
+                <tr><td>@angular/cli</td><td>The package name. The <code>@angular/</code> prefix marks it as officially published by the Angular team.</td></tr>
+              </tbody>
+            </table>
+            <div class="observe">
+              <span class="lbl">This takes 1–3 minutes and prints warnings</span>
+              You will see lines mentioning "deprecated" packages. <strong>That is normal and harmless.</strong> Only
+              lines beginning <code>ERR!</code> matter.
+            </div>
+
+            <h3>Step 2 — verify it worked</h3>
             <div class="codewrap"><pre><code>ng version</code></pre></div>
             <div class="term-out">$ ng version
 
      _                      _                 ____ _     ___
     / \   _ __   __ _ _   _| | __ _ _ __     / ___| |   |_ _|
    / △ \ | '_ \ / _` | | | | |/ _` | '__|   | |   | |    | |
-  /_/ \_\|_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
+  /  ___ \| | | | (_| | |_| | | (_| | |      | |___| |___ | |
+ /_/   \_\_| |_|\__, |\__,_|_|\__,_|_|       \____|_____|___|
                 |___/
 
 <span class="ok">Angular CLI: 17.3.0</span>
 <span class="ok">Node: 20.11.1</span>
-Package Manager: npm 10.2.4</div>
+Package Manager: npm 10.2.4
+OS: win32 x64</div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>ng version</code> prints the Angular logo and a CLI version number.
-                <span class="verify">If you get "ng: command not found", close and reopen your terminal first — the PATH is only read when a shell starts.</span>
+              <span class="ctext"><strong>The Angular CLI is installed</strong> — <code>ng version</code> prints the logo and a version table.
+                <span class="verify">Any Angular CLI version 15 or above is fine for this series. Your exact numbers will differ from the screenshot and that is expected.</span>
+              </span>
+            </label>
+            <div class="observe">
+              <span class="lbl">If <code>ng</code> is "not recognized" / "command not found"</span>
+              <strong>Close the terminal completely and open a brand-new one.</strong> That fixes it the large
+              majority of the time — a terminal only reads the PATH when it starts, so one that was already open
+              cannot see a tool installed after it. If it still fails, see the troubleshooting table at the bottom
+              of this sheet.
+            </div>
+
+            <h3>Step 3 — create the project</h3>
+            <div class="dothis">
+              <span class="lbl">Do this — exactly, in order</span>
+              <ol>
+                <li>In your terminal, move to a folder where you keep code — for example
+                    <code>cd C:\work</code> on Windows or <code>cd ~/work</code> on macOS or Linux.
+                    <strong>Avoid folders synced by OneDrive or Google Drive</strong> — they interfere with
+                    <code>node_modules</code> and cause strange, hard-to-diagnose failures.</li>
+                <li>Run <code>ng new hello-world</code> and answer the questions using the table below.</li>
+                <li>Wait. It downloads a lot. Two to four minutes is normal.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>ng new hello-world</code></pre></div>
+            <table class="cmp">
+              <thead><tr><th style="width:46%">It asks…</th><th style="width:18%">Answer</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>Which stylesheet format would you like to use?</td><td class="good"><strong>CSS</strong></td><td>Plain CSS. SCSS is great but it is one extra thing to learn today.</td></tr>
+                <tr><td>Do you want to enable Server-Side Rendering (SSR)?</td><td class="good"><strong>No</strong> (<code>n</code>)</td><td>Adds a server layer we don't need, plus extra files that would confuse the project tour.</td></tr>
+                <tr><td>Would you like to share pseudonymous usage data…?</td><td><strong>No</strong> (<code>n</code>)</td><td>Entirely your choice — it changes nothing about your app.</td></tr>
+              </tbody>
+            </table>
+            <div class="observe">
+              <span class="lbl">Older CLI versions ask a different question</span>
+              CLI 15 and 16 ask <em>"Would you like to add Angular routing?"</em> instead of the SSR question. Answer
+              <strong>No</strong> — we add routing deliberately, by hand, in Session 4, so that you understand what it
+              actually does rather than having it appear by magic.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The project was created</strong> — a <code>hello-world</code> folder now exists.
+                <span class="verify">The command finishes with a list of <code>CREATE</code> lines and then <code>Packages installed successfully.</code></span>
               </span>
             </label>
 
-            <h3>② Create the project</h3>
-            <div class="codewrap"><pre><code>ng new hello-world</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Answer the prompts like this</span>
-              <ul style="margin:6px 0 0;">
-                <li><strong>Would you like to add Angular routing?</strong> → type <code>N</code> and press Enter.
-                    (We add routing on purpose in Session 4 so you see exactly what it changes.)</li>
-                <li><strong>Which stylesheet format would you like to use?</strong> → leave <code>CSS</code>
-                    highlighted and press Enter.</li>
-                <li><strong>Share pseudonymous usage data…?</strong> → either answer is fine.</li>
-              </ul>
-              Then wait. It creates the files and runs <code>npm install</code>, which downloads a lot of packages —
-              one to three minutes on a good connection is normal.
-            </div>
-            <div class="term-out">CREATE hello-world/README.md
-CREATE hello-world/angular.json
-CREATE hello-world/package.json
-CREATE hello-world/src/index.html
-CREATE hello-world/src/main.ts
-CREATE hello-world/src/app/app.component.html
-CREATE hello-world/src/app/app.component.ts
-CREATE hello-world/src/app/app.module.ts
-...
-<span class="ok">✔ Packages installed successfully.</span></div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">The <code>hello-world</code> folder was created and packages installed successfully.</span>
-            </label>
-
-            <h3>③ Run it</h3>
-            <div class="codewrap"><pre><code>cd hello-world
-ng serve</code></pre></div>
-            <div class="term-out">Initial chunk files | Names         |  Raw size
-main.js             | main          | 234.55 kB
-...
-<span class="ok">✔ Compiled successfully.</span>
-** Angular Live Development Server is listening on localhost:4200,
-   open your browser on http://localhost:4200/ **</div>
+            <h3>Step 4 — run it</h3>
             <div class="runbox">
-              <span class="lbl">Now open it</span>
+              <span class="lbl">Now run it</span>
               <ol>
-                <li>Go to <code>http://localhost:4200</code> in your browser.</li>
-                <li><strong>Leave this terminal running all session.</strong> <code>ng serve</code> is a watcher —
-                    it recompiles every time you save. Open a <em>second</em> terminal for any other commands.</li>
-                <li>To stop it later: <span class="kbd">Ctrl</span>+<span class="kbd">C</span> in that terminal.</li>
+                <li>Move into the project folder: <code>cd hello-world</code><br>
+                    <span class="muted">Every <code>ng</code> command from now on must be run from inside this folder.</span></li>
+                <li>Start the development server: <code>ng serve -o</code><br>
+                    <span class="muted">The <code>-o</code> means "open my browser automatically".</span></li>
+                <li>Wait for the line <code>Application bundle generation complete</code>, then look at your browser.</li>
+                <li><strong>Leave this terminal running all day.</strong> Open a <em>second</em> terminal tab for any
+                    other commands.</li>
               </ol>
             </div>
-            <div class="expected">
-              <span class="lbl">Expected — what the browser shows</span>
-              <div class="browser">
-                <div class="bar">
-                  <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
-                  <span class="url">http://localhost:4200</span>
-                </div>
-                <div class="viewport" style="text-align:center;">
-                  <p style="font-size:22px;font-weight:700;margin:6px 0 2px;">🅰️ hello-world app is running!</p>
-                  <p style="font-size:14px;color:var(--mac-text-muted);">Resources &nbsp;·&nbsp; Next Steps &nbsp;·&nbsp; More Angular</p>
-                </div>
+            <div class="codewrap"><pre><code>cd hello-world
+ng serve -o</code></pre></div>
+            <div class="term-out">$ ng serve -o
+
+Initial chunk files | Names         |  Raw size
+polyfills.js        | polyfills     | 234.31 kB
+main.js             | main          |  22.64 kB
+styles.css          | styles        |  96 bytes
+
+<span class="ok">Application bundle generation complete. [2.412 seconds]</span>
+
+Watch mode enabled. Watching for file changes...
+  <span class="ok">➜  Local:   http://localhost:4200/</span>
+  ➜  press h + enter to show help</div>
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="text-align:center;font-size:22px;font-weight:700;">Hello, hello-world 🅰️</p>
+                <p style="text-align:center;" class="muted">Congratulations! Your app is running.</p>
+                <p style="text-align:center;" class="muted">Resources &nbsp;·&nbsp; Next Steps &nbsp;·&nbsp; Learn Angular</p>
               </div>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">The default <strong>"hello-world app is running!"</strong> page loads at <code>localhost:4200</code>.</span>
+              <span class="ctext"><strong>🎉 My Angular app is running</strong> — I can see the welcome page at <code>localhost:4200</code>.
+                <span class="verify">The exact wording and artwork of the welcome page changes between Angular versions. As long as you get a styled page rather than an error, you are correct.</span>
+              </span>
             </label>
-
-            <h3 style="margin-top:18px;">Common issues</h3>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td><code>ng: command not found</code> / <code>'ng' is not recognized</code></td>
-                  <td>The global npm bin folder isn't on your PATH yet.</td>
-                  <td>Close and reopen the terminal. If it persists, run <code>npm config get prefix</code> and add that folder's <code>bin</code> to your PATH.</td>
-                </tr>
-                <tr>
-                  <td><code>EACCES: permission denied</code> during the global install</td>
-                  <td>No write access to the global npm folder (macOS/Linux).</td>
-                  <td>Use <code>sudo npm install -g @angular/cli</code>, or better, install Node via <code>nvm</code> so no sudo is needed.</td>
-                </tr>
-                <tr>
-                  <td><code>Port 4200 is already in use</code></td>
-                  <td>Another <code>ng serve</code> is still running.</td>
-                  <td>Stop it with <span class="kbd">Ctrl</span>+<span class="kbd">C</span>, or run <code>ng serve --port 4300</code>.</td>
-                </tr>
-                <tr>
-                  <td><code>npm ERR! network</code> / install hangs</td>
-                  <td>No internet, or a corporate proxy is blocking the npm registry.</td>
-                  <td><code>npm config set proxy http://proxy:port</code> and <code>npm config set https-proxy http://proxy:port</code>, then retry.</td>
-                </tr>
-                <tr>
-                  <td>Browser shows "This site can't be reached"</td>
-                  <td><code>ng serve</code> isn't actually running, or it failed to compile.</td>
-                  <td>Look back at the terminal. If you see red text, read the error — it names the file and line.</td>
-                </tr>
-              </tbody>
-            </table>
             <div class="expected">
-              <span class="lbl">What just happened?</span>
-              Two commands gave you a fully-configured TypeScript project, a compiler, a bundler, a test harness,
-              a linter config and a live-reloading development web server. Compare that with hand-assembling a
-              front-end build — this is the same "convention over configuration" idea you met in Spring Boot,
-              applied to the browser.
+              <span class="lbl">Why this moment matters</span>
+              That page is generated placeholder content and we replace it in Task 4. But if you can see it, then
+              <strong>your entire toolchain works</strong>: Node runs, npm installed hundreds of packages, the CLI
+              scaffolded a project, TypeScript compiled to JavaScript, and a web server is serving it to your browser.
+              Every single thing in the remaining three sessions runs through that pipeline.
+            </div>
+            <div class="observe">
+              <span class="lbl">Two things people do here</span>
+              <strong>1.</strong> Pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> in that terminal <em>stops the server</em>, and
+              then <code>localhost:4200</code> goes blank. That is not a bug — restart with <code>ng serve</code>.<br>
+              <strong>2.</strong> Running <code>ng serve</code> a second time gives <em>"Port 4200 is already in use"</em>.
+              You already have one running. Use the browser tab you already had, or start a second copy on another
+              port with <code>ng serve --port 4300</code>.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== TASK 3 — FILE EXPLORATION ===== -->
+      <!-- ===== TASK 3 — PROJECT TOUR ===== -->
       <section class="section">
-        <details class="exp lab3">
-          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> File Exploration — Match the File to Its Job<span class="sync">Theory slides 23–25</span></summary>
+        <details class="exp lab3" open>
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> The Project Tour — Match Each File to Its Job<span class="sync">Theory slides 35–38</span></summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Goal</span>
-              <strong>Actively identify</strong> what each generated file does instead of passively hearing it.
-              Open your project in VS Code (<code>code .</code> from the project folder, or File → Open Folder),
-              expand <code>src/app/</code>, and open each of the five files before you attempt the match below.
+              Twenty files appeared and that feels overwhelming for about ten minutes. This task removes the mystery:
+              you will open each important file, read it, and be able to say what it is for. Do it <strong>as a quiz
+              first</strong> — genuinely attempt it before opening the answer key.
             </div>
 
             <div class="dothis">
-              <span class="lbl">Do this first — open all five</span>
+              <span class="lbl">Do this</span>
               <ol>
-                <li><code>src/app/app.component.ts</code> — find the <code>@Component</code> decorator and the
-                    <code>title</code> property.</li>
-                <li><code>src/app/app.component.html</code> — scroll to the bottom; find where <code>{{ title }}</code>
-                    is used.</li>
-                <li><code>src/app/app.component.css</code> — note that it's empty.</li>
-                <li><code>src/app/app.component.spec.ts</code> — skim it; notice the words <code>describe</code>
-                    and <code>it</code>.</li>
-                <li><code>src/app/app.module.ts</code> — find <code>declarations</code>, <code>imports</code> and
-                    <code>bootstrap</code>.</li>
+                <li>Open the <code>hello-world</code> folder in VS Code (<em>File → Open Folder</em>).</li>
+                <li>Expand <code>src/</code> and then <code>src/app/</code> in the file explorer.</li>
+                <li>Open each file listed in the quiz below and skim it — most are under twenty lines.</li>
+                <li>Write your own one-line answer for each before revealing the key.</li>
               </ol>
             </div>
 
-            <h3>Now match them — write your answers down before opening the key</h3>
-            <p>Each file on the left matches exactly one description on the right. The descriptions are shuffled.</p>
+            <h3>The quiz — what is each of these for?</h3>
             <table class="issues">
-              <thead><tr><th style="width:32%">File</th><th>Your answer (A–E)</th><th style="width:44%">Descriptions (shuffled)</th></tr></thead>
+              <thead><tr><th style="width:34%">File</th><th>Your answer — one line</th></tr></thead>
               <tbody>
-                <tr><td><code>app.component.ts</code></td><td>_______</td><td><strong>A.</strong> Declares which components belong to this app, which Angular modules it imports, and which component starts first.</td></tr>
-                <tr><td><code>app.component.html</code></td><td>_______</td><td><strong>B.</strong> Styles that apply to this component <em>only</em> and cannot leak out to affect anything else.</td></tr>
-                <tr><td><code>app.component.css</code></td><td>_______</td><td><strong>C.</strong> The class: the component's data (properties) and behaviour (methods), plus the decorator linking it to its view.</td></tr>
-                <tr><td><code>app.component.spec.ts</code></td><td>_______</td><td><strong>D.</strong> The automated unit tests for this component — generated for you, not needed today.</td></tr>
-                <tr><td><code>app.module.ts</code></td><td>_______</td><td><strong>E.</strong> The template: the HTML the user actually sees, with Angular syntax woven into it.</td></tr>
+                <tr><td><code>src/index.html</code></td><td>Open it. It is tiny. What single unusual tag is in its <code>&lt;body&gt;</code>?</td></tr>
+                <tr><td><code>src/main.ts</code></td><td>Which class name does it mention, and what does the word "bootstrap" suggest?</td></tr>
+                <tr><td><code>src/app/app.module.ts</code></td><td>Find the four lists inside <code>@NgModule</code>. What is in <code>declarations</code>?</td></tr>
+                <tr><td><code>src/app/app.component.ts</code></td><td>What is the <code>selector</code> value — and where have you just seen that word?</td></tr>
+                <tr><td><code>src/app/app.component.html</code></td><td>Roughly how many lines? Where does the welcome page text come from?</td></tr>
+                <tr><td><code>src/app/app.component.css</code></td><td>What is in it right now?</td></tr>
+                <tr><td><code>src/styles.css</code></td><td>How is this different from <code>app.component.css</code>?</td></tr>
+                <tr><td><code>package.json</code></td><td>Find the <code>scripts</code> section. Which npm command would start the app?</td></tr>
+                <tr><td><code>angular.json</code></td><td>Search it for the number 4200 or the word "outputPath". What kind of file is this?</td></tr>
+                <tr><td><code>node_modules/</code></td><td>Right-click → Properties. How big is it? Should it go into git?</td></tr>
               </tbody>
             </table>
 
             <details class="exp lab3" style="margin:14px 0;">
-              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Reveal the answer key (attempt it first!)</summary>
+              <summary style="font-size:16px;padding:12px 18px;"><span class="chevron">▶</span> Reveal the answer key — attempt the quiz first!</summary>
               <div class="exp-body">
                 <table class="issues">
-                  <thead><tr><th>File</th><th>Answer</th><th>Why</th></tr></thead>
+                  <thead><tr><th style="width:30%">File</th><th>What it is for</th></tr></thead>
                   <tbody>
-                    <tr><td><code>app.component.ts</code></td><td><strong>C</strong></td><td>The <code>.ts</code> file is always the class — properties, methods, and the <code>@Component</code> decorator that points at the template and styles.</td></tr>
-                    <tr><td><code>app.component.html</code></td><td><strong>E</strong></td><td>The template. Anything the user sees lives here.</td></tr>
-                    <tr><td><code>app.component.css</code></td><td><strong>B</strong></td><td>Component-scoped styles. Angular rewrites your selectors so they can't escape this component.</td></tr>
-                    <tr><td><code>app.component.spec.ts</code></td><td><strong>D</strong></td><td><code>.spec.ts</code> always means "tests" in Angular.</td></tr>
-                    <tr><td><code>app.module.ts</code></td><td><strong>A</strong></td><td>The manifest: <code>declarations</code> (my components), <code>imports</code> (Angular features I need, e.g. <code>FormsModule</code>), <code>bootstrap</code> (start here).</td></tr>
+                    <tr><td><code>src/index.html</code></td><td><strong>The one and only page</strong> of your single-page application. Its body contains just <code>&lt;app-root&gt;&lt;/app-root&gt;</code> — your entire app gets injected into that empty tag.</td></tr>
+                    <tr><td><code>src/main.ts</code></td><td><strong>The entry point</strong> — the first of your code to run. It calls <code>bootstrapModule(AppModule)</code>, meaning "start Angular here". You will almost never edit it.</td></tr>
+                    <tr><td><code>src/app/app.module.ts</code></td><td><strong>The registry.</strong> <code>declarations</code> lists your own components; <code>imports</code> lists feature modules from elsewhere; <code>providers</code> lists services; <code>bootstrap</code> names the starting component. Angular refuses to use anything not listed here.</td></tr>
+                    <tr><td><code>src/app/app.component.ts</code></td><td><strong>The root component class</strong> — your logic and data. Its <code>selector</code> is <code>'app-root'</code>, which is exactly the tag you found in <code>index.html</code>. <em>That is the link you were looking for.</em></td></tr>
+                    <tr><td><code>src/app/app.component.html</code></td><td><strong>The root component's template</strong> — the markup the user sees. All of that generated welcome-page content lives here, which is why deleting it in Task 4 blanks the page.</td></tr>
+                    <tr><td><code>src/app/app.component.css</code></td><td><strong>Styles for this component only.</strong> Empty right now. Anything you put here <em>cannot leak out</em> and affect other components — Angular scopes it automatically.</td></tr>
+                    <tr><td><code>src/styles.css</code></td><td><strong>Global styles</strong>, applied to the whole application. This is where a CSS framework like Bootstrap would be imported.</td></tr>
+                    <tr><td><code>package.json</code></td><td><strong>Your <code>pom.xml</code>.</strong> Lists every dependency plus named scripts. <code>npm start</code> is wired to run <code>ng serve</code>.</td></tr>
+                    <tr><td><code>angular.json</code></td><td><strong>CLI configuration</strong> — build options, output folders, which files to include. Advanced; leave it alone for now.</td></tr>
+                    <tr><td><code>node_modules/</code></td><td><strong>Every downloaded library.</strong> Typically 200–400 MB and tens of thousands of files. <strong>Never</strong> commit it — it is in <code>.gitignore</code> already, and <code>npm install</code> recreates it from <code>package.json</code>.</td></tr>
                   </tbody>
                 </table>
               </div>
             </details>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I matched all five files to their descriptions correctly (or corrected myself against the key).</span>
-            </label>
-
-            <h3>Trace the boot chain yourself</h3>
-            <p>This is the single most clarifying five minutes of Session 1. Open these three files in order and
-               find the highlighted line in each:</p>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/index.html</span><span class="fb-tag">read only — find &lt;app-root&gt;</span></div>
-            <div class="codewrap"><pre><code>&lt;body&gt;
-  &lt;app-root&gt;&lt;/app-root&gt;      &lt;!-- ← the ONLY thing in the body --&gt;
-&lt;/body&gt;</code></pre></div>
-
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.ts</span><span class="fb-tag">read only — find the selector</span></div>
-            <div class="codewrap"><pre><code>@Component({
-  selector: 'app-root',                  // ← matches the tag in index.html
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {
-  title = 'hello-world';                 // ← the text you're about to change
-}</code></pre></div>
-
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.module.ts</span><span class="fb-tag">read only — find bootstrap</span></div>
-            <div class="codewrap"><pre><code>@NgModule({
-  declarations: [ AppComponent ],        // components that belong to this app
-  imports:      [ BrowserModule ],       // Angular features this app uses
-  providers:    [],                      // services (Session 3)
-  bootstrap:    [ AppComponent ]         // ← start with THIS component
-})
-export class AppModule { }</code></pre></div>
 
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I can explain the boot chain out loud: <code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code> → the <code>&lt;app-root&gt;</code> tag is replaced by its template.</span>
+              <span class="ctext"><strong>I attempted all ten before revealing the key</strong>, and I got at least six right.</span>
             </label>
-            <div class="observe">
-              <span class="lbl">Why this matters more than it looks</span>
-              A component's <code>selector</code> is just a custom HTML tag. Understanding that makes Session 2
-              trivial: you'll generate a component, drop <code>&lt;app-header&gt;&lt;/app-header&gt;</code> into
-              another template, and watch it appear. That's the entire component tree mechanism.
+
+            <h3>Now trace the boot chain yourself</h3>
+            <p>This is the single most useful thing to understand about an Angular project, and it is only four steps.
+               Follow them in your own files, in this order:</p>
+            <div class="dothis">
+              <span class="lbl">Follow the chain</span>
+              <ol>
+                <li>Open <code>src/index.html</code> → find <code>&lt;app-root&gt;&lt;/app-root&gt;</code>.</li>
+                <li>Open <code>src/main.ts</code> → find the word <code>AppModule</code>.</li>
+                <li>Open <code>src/app/app.module.ts</code> → find <code>bootstrap: [AppComponent]</code>.</li>
+                <li>Open <code>src/app/app.component.ts</code> → find <code>selector: 'app-root'</code>.
+                    <strong>That matches step 1 — the circle closes.</strong></li>
+              </ol>
             </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I traced the boot chain</strong> and can recite it: <code>index.html</code> → <code>main.ts</code> → <code>AppModule</code> → <code>AppComponent</code> → the <code>&lt;app-root&gt;</code> tag.
+                <span class="verify">Worth knowing by heart: it is a standard interview question, and more usefully it is how you debug a blank white page — check each link in order.</span>
+              </span>
+            </label>
+            <div class="tryit">
+              <span class="lbl">Prove it — a 20-second experiment</span>
+              In <code>src/app/app.component.ts</code>, change <code>selector: 'app-root'</code> to
+              <code>selector: 'app-rooot'</code> (three o's) and save. Look at your browser: the page goes
+              <strong>blank</strong>, because <code>index.html</code> is still asking for <code>&lt;app-root&gt;</code>
+              and nothing answers to that name any more. Press <kbd>F12</kbd> and read the console message. Then
+              <strong>change it back</strong> and the page returns. You have just proved the chain is real, and seen
+              what a blank page actually means.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I broke the selector on purpose, saw the blank page, and fixed it again.</strong></span>
+            </label>
           </div>
         </details>
       </section>
 
       <!-- ===== TASK 4 — FIRST EDIT ===== -->
       <section class="section">
-        <details class="exp lab4">
-          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Your First Edit — Prove Live Reload Works<span class="sync">Theory slide 25 (tail end)</span></summary>
+        <details class="exp lab4" open>
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Your First Edit — Prove Live Reload Works<span class="sync">Theory slides 34, 36</span></summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Goal</span>
-              Confirm the development loop — <strong>edit → save → the browser updates by itself</strong>. This loop
-              is what makes front-end work fast, and every remaining task in every remaining session depends on it.
+              Replace the generated welcome page with your own content, and watch the browser update
+              <strong>by itself</strong> the instant you save. This is what makes Angular development fast, and it is
+              worth experiencing rather than being told about.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Make sure <code>ng serve</code> is <strong>still running</strong> and
-                    <code>localhost:4200</code> is open. Put the editor and the browser side by side so you can
-                    watch both at once.</li>
-                <li>Open <code>src/app/app.component.html</code>. Press
-                    <span class="kbd">Ctrl</span>+<span class="kbd">A</span> then <strong>Delete</strong> to remove
-                    <em>all</em> of the generated welcome markup.</li>
-                <li>Paste the snippet below in its place.</li>
-                <li>Save with <span class="kbd">Ctrl</span>+<span class="kbd">S</span> and
-                    <strong>watch the browser</strong> — do not refresh it manually.</li>
+                <li>Arrange your windows so you can see <strong>VS Code and the browser at the same time</strong>.
+                    Side by side is ideal. This matters — the whole point is watching them stay in sync.</li>
+                <li>Make sure <code>ng serve</code> is still running in its terminal.</li>
+                <li>Open <code>src/app/app.component.html</code>.</li>
+                <li><strong>Select everything in that file and delete it.</strong> All of it. Save.
+                    Your browser goes blank — that is correct and expected.</li>
+                <li>Now paste the content below and save again.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.html</span><span class="fb-tag">REPLACE the whole file</span></div>
-            <div class="codewrap"><pre><code>&lt;h1&gt;Welcome to {{ title }}!&lt;/h1&gt;
-&lt;p&gt;My first Angular edit — Session 1.&lt;/p&gt;</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;h1&gt;My First Angular App&lt;/h1&gt;
 
-            <div class="expected">
-              <span class="lbl">Expected — the browser updates on its own</span>
-              <div class="browser">
-                <div class="bar">
-                  <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
-                  <span class="url">http://localhost:4200</span>
-                </div>
-                <div class="viewport">
-                  <p style="font-size:26px;font-weight:700;margin:2px 0 8px;">Welcome to hello-world!</p>
-                  <p>My first Angular edit — Session 1.</p>
-                </div>
+&lt;p&gt;Project name: {{ title }}&lt;/p&gt;
+&lt;p&gt;Written by: Your Name Here&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;p&gt;If you can read this, live reload is working.&lt;/p&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.ts</span>
+              <span class="fb-tag">Check it looks like this</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'hello-world';
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">If your generated file looks slightly different</span>
+              Newer CLI versions may write <code>styleUrl</code> (singular, no array) instead of
+              <code>styleUrls: [...]</code>, and may include <code>standalone: true</code> plus an
+              <code>imports: []</code> line. <strong>Leave whatever the CLI generated as it is</strong> — do not
+              copy over it. The only line that matters for this task is <code>title = 'hello-world';</code>.
+            </div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
               </div>
-              The word <strong>hello-world</strong> did not come from your HTML — it came from the
-              <code>title</code> property in <code>app.component.ts</code>, delivered by
-              <code>{{ title }}</code>. You have just used <strong>interpolation</strong>, the first of the four
-              data bindings, which is the opening topic of Session 2.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">The browser updated <strong>without me refreshing it</strong>, and I can see the interpolated title.</span>
-            </label>
-
-            <h3>Now change the data, not the template</h3>
-            <div class="dothis">
-              <span class="lbl">Do this</span>
-              <ol>
-                <li>Open <code>src/app/app.component.ts</code>.</li>
-                <li>Change <code>title = 'hello-world';</code> to <code>title = 'Angular Session 1';</code></li>
-                <li>Save and watch the heading change — <strong>without touching the HTML at all.</strong></li>
-              </ol>
+              <div class="viewport">
+                <p style="font-size:22px;font-weight:700;margin:0 0 10px;">My First Angular App</p>
+                <p>Project name: hello-world</p>
+                <p>Written by: Your Name Here</p>
+                <hr style="border:none;border-top:1px solid #d2d2d7;margin:10px 0;">
+                <p>If you can read this, live reload is working.</p>
+              </div>
             </div>
             <div class="expected">
-              <span class="lbl">Expected</span>
-              The heading now reads <strong>"Welcome to Angular Session 1!"</strong>. This is the whole point of
-              data binding: the template describes <em>where</em> the data goes, the class owns <em>what</em> the
-              data is, and Angular keeps them in sync automatically.
+              <span class="lbl">What you should see</span>
+              Your own page, and — crucially — <strong>you never touched the browser</strong>. You saved a file and the
+              page updated on its own. Note also that <code>{{ title }}</code> in the HTML became
+              <code>hello-world</code>, the value from the TypeScript class. That is your first piece of
+              <strong>data binding</strong>, and it is the entire opening topic of Session 2.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Changing only the <code>.ts</code> property changed what the browser displays.</span>
+              <span class="ctext"><strong>My own content is on screen</strong> and it appeared without me refreshing the browser.</span>
             </label>
 
             <div class="tryit">
-              <span class="lbl">Deliberately break it (30 seconds — genuinely worth doing)</span>
-              Change <code>{{ title }}</code> to <code>{{ titel }}</code>, save, and read the terminal:
-              <em>"Property 'titel' does not exist on type 'AppComponent'."</em> Angular type-checks your
-              <strong>templates</strong>, not just your TypeScript. Fix the typo and it recovers instantly. This is
-              the single most useful error message you'll meet in the next three sessions — recognise it now.
+              <span class="lbl">Try it yourself — three quick experiments</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>In <code>app.component.ts</code>, change <code>title = 'hello-world'</code> to
+                    <code>title = 'Angular is fun'</code>. Save. <strong>Watch the browser without touching it.</strong></li>
+                <li>Add a second field to the class — <code>myName = 'Anoop';</code> — and display it in the template
+                    with <code>&lt;p&gt;Hello, {{ myName }}&lt;/p&gt;</code>.</li>
+                <li>Try displaying something that does not exist: <code>{{ nonExistentField }}</code>. What happens?
+                    <span class="muted">(Answer: nothing at all — Angular renders an empty string rather than crashing.
+                    Useful, but it also means a typo shows up as silently missing text rather than an error. Remember
+                    that when text mysteriously fails to appear.)</span></li>
+              </ol>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I broke it on purpose, read the compiler error, and fixed it.</span>
+              <span class="ctext"><strong>All three experiments done</strong> — including the one that displays nothing.</span>
             </label>
 
-            <h3>Add a splash of style</h3>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/app/app.component.css</span><span class="fb-tag">paste — it's currently empty</span></div>
+            <h3>Now add some styling — and see component scoping in action</h3>
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/app.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
             <div class="codewrap"><pre><code>h1 {
-  color: #dd0031;
-  font-family: system-ui, sans-serif;
+  color: #dd0031;             /* Angular's brand red */
+  font-family: sans-serif;
+  border-bottom: 3px solid #dd0031;
+  padding-bottom: 8px;
 }
 
 p {
-  color: #6e6e73;
+  font-family: sans-serif;
+  font-size: 17px;
+  color: #333;
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Notice the scoping</span>
-              That <code>h1</code> rule applies <strong>only inside this component</strong>. If Session 2 adds
-              another component with an <code>h1</code>, it stays untouched. Angular achieves this by rewriting your
-              selectors behind the scenes — inspect the element in DevTools and you'll see an attribute like
-              <code>_ngcontent-abc-1</code>. Global styles, when you want them, go in <code>src/styles.css</code>.
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              A red heading with a red underline, and tidier paragraph text. The important idea:
+              <strong>these styles apply only to this component's template.</strong> Angular scopes them
+              automatically, so an <code>h1</code> rule here can never accidentally restyle an <code>h1</code>
+              somewhere else in the app. That is a genuinely large problem in traditional web development, solved for
+              you by default.
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">My heading is now Angular red, applied from the component's own CSS file.</span>
+              <span class="ctext"><strong>Styling applied</strong> — and I understand that component CSS cannot leak out to other components.</span>
             </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 — BRING IT TOGETHER ===== -->
+      <section class="section">
+        <details class="exp lab5" open>
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Bring It Together — Real TypeScript in a Real App<span class="sync">Theory slides 20, 23, 36</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              So far the TypeScript drills and the Angular project have been separate exercises. This task joins them:
+              you will define an <code>Employee</code> interface, build a typed array of employees in your component,
+              and display real data on screen. It is also a soft landing into Session 2 — you will end up wanting
+              exactly the features Session 2 teaches.
+            </div>
+
+            <h3>Step 1 — create the interface</h3>
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li>Open a <strong>second terminal</strong> (leave <code>ng serve</code> running in the first).</li>
+                <li>Make sure you are inside the <code>hello-world</code> folder.</li>
+                <li>Run the generate command below — the CLI creates the folder and the file for you.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>ng generate interface models/employee</code></pre></div>
+            <div class="term-out">$ ng generate interface models/employee
+<span class="ok">CREATE src/app/models/employee.ts (30 bytes)</span></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/models/employee.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>export interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+  status: 'Active' | 'Inactive';     // a literal union — only these two words
+  email?: string;                    // optional — may be missing
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Line</th><th>Why it is written that way</th></tr></thead>
+              <tbody>
+                <tr><td>export interface</td><td><code>export</code> means other files may import this. Without it, the interface is private to this file and you will get "has no exported member".</td></tr>
+                <tr><td>status: 'Active' | 'Inactive'</td><td>A literal union. Only those two exact strings compile — <code>'active'</code> in lower case is an error. In Session 2 you colour rows from this field, and this is what stops a typo silently breaking the colours.</td></tr>
+                <tr><td>email?: string</td><td>The <code>?</code> makes it optional. TypeScript will now force you to handle the case where it is missing.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The interface file exists</strong> at <code>src/app/models/employee.ts</code> with no red squiggles.</span>
+            </label>
+
+            <h3>Step 2 — use it in your component</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { Employee } from './models/employee';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'My Employee Directory';
+
+  // A typed array — TypeScript checks every single object below
+  employees: Employee[] = [
+    { id: 1001, name: 'Anoop',  designation: 'Software Engineer', salary: 25000, status: 'Active' },
+    { id: 1002, name: 'Ajay',   designation: 'Team Lead',         salary: 45000, status: 'Inactive' },
+    { id: 1003, name: 'Rekha',  designation: 'Tester',            salary: 22000, status: 'Active' },
+    { id: 1004, name: 'Suresh', designation: 'Architect',         salary: 65000, status: 'Inactive' }
+  ];
+
+  // A method the template can call
+  getTotalSalary(): number {
+    let total = 0;
+    for (const e of this.employees) {
+      total = total + e.salary;
+    }
+    return total;
+  }
+
+  getActiveCount(): number {
+    return this.employees.filter(e =&gt; e.status === 'Active').length;
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Keep whatever <code>@Component</code> block the CLI gave you</span>
+              If your generated file said <code>styleUrl</code> (singular) or included <code>standalone: true</code>,
+              keep those lines exactly as they were and change only the class body below them. Copying the block
+              above verbatim onto a newer CLI's file is a common cause of confusing errors.
+            </div>
+
+            <h3>Step 3 — display it</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;h1&gt;{{ title }}&lt;/h1&gt;
+
+&lt;p&gt;We have {{ employees.length }} employees on record.&lt;/p&gt;
+&lt;p&gt;{{ getActiveCount() }} of them are currently Active.&lt;/p&gt;
+&lt;p&gt;Total monthly salary bill: {{ getTotalSalary() }}&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h3&gt;The first employee&lt;/h3&gt;
+&lt;p&gt;
+  {{ employees[0].id }} —
+  {{ employees[0].name }},
+  {{ employees[0].designation }}
+  ({{ employees[0].status }})
+&lt;/p&gt;
+
+&lt;h3&gt;The second employee&lt;/h3&gt;
+&lt;p&gt;
+  {{ employees[1].id }} —
+  {{ employees[1].name }},
+  {{ employees[1].designation }}
+  ({{ employees[1].status }})
+&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;…and this is getting repetitive. Session 2 fixes that.&lt;/em&gt;&lt;/p&gt;</code></pre></div>
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-size:22px;font-weight:700;margin:0 0 10px;">My Employee Directory</p>
+                <p>We have 4 employees on record.</p>
+                <p>2 of them are currently Active.</p>
+                <p>Total monthly salary bill: 157000</p>
+                <hr style="border:none;border-top:1px solid #d2d2d7;margin:10px 0;">
+                <p style="font-weight:700;">The first employee</p>
+                <p>1001 — Anoop, Software Engineer (Active)</p>
+                <p style="font-weight:700;">The second employee</p>
+                <p>1002 — Ajay, Team Lead (Inactive)</p>
+                <p><em>…and this is getting repetitive. Session 2 fixes that.</em></p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              Exactly the numbers above — <code>4</code> employees, <code>2</code> active, and a total of
+              <code>157000</code>. If your total is different, check you copied all four salaries correctly.
+              Notice that <code>{{ getTotalSalary() }}</code> <strong>called a method</strong> from the template — the
+              template can read fields and call methods on its component class.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Real typed data is on screen</strong> — 4 employees, 2 active, total 157000.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — break it on purpose, twice</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>In <code>app.component.ts</code>, change one employee's <code>status</code> to
+                    <code>'active'</code> in lower case. <strong>Look at your terminal.</strong> The build fails with
+                    a clear message naming the allowed values. <em>That is the literal union protecting you.</em>
+                    Change it back.</li>
+                <li>Delete the <code>salary</code> property from one employee. The build fails again, telling you
+                    exactly which property is missing. <em>That is the interface protecting you.</em> Put it back.</li>
+              </ol>
+              This is the most valuable thirty seconds of the session. You have now watched TypeScript catch two bugs
+              that would have been invisible in plain JavaScript until a user hit them.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I broke it both ways deliberately</strong>, read both error messages, and fixed them.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Notice what is annoying — that is intentional</span>
+              Writing out <code>employees[0]</code>, then <code>employees[1]</code>, then <code>employees[2]</code>…
+              is obviously the wrong way to display a list. You are <em>feeling</em> the need for a loop in the
+              template. In Session 2 one line — <code>*ngFor</code> — replaces all of it, and because you have felt
+              the problem first, the solution will actually land.
+            </div>
           </div>
         </details>
       </section>
@@ -1282,175 +1947,270 @@ p {
       <!-- ===== STRETCH ===== -->
       <section class="section">
         <details class="exp bonus">
-          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> Get Comfortable Beyond <code>ng new</code><span class="sync">Optional — end of session</span></summary>
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> Get Comfortable Beyond <code>ng new</code><span class="sync">Optional — if you finish early</span></summary>
           <div class="exp-body">
-            <p>Entirely optional — for anyone who finished early. Nothing here is required for Session 2.</p>
-            <div class="codewrap"><pre><code>ng version          # versions of Angular, CLI, Node, TypeScript
-ng --help           # every available command
-ng generate --help  # everything the generator can scaffold
-ng serve --help     # every flag for the dev server</code></pre></div>
-            <ol class="steps">
-              <li><strong>Skim the generator list.</strong> Run <code>ng generate --help</code> and note the
-                  schematics: <code>component</code>, <code>service</code>, <code>directive</code>,
-                  <code>pipe</code>, <code>guard</code>, <code>interface</code>, <code>class</code>,
-                  <code>module</code>. You'll use the first two heavily in Sessions 2 and 3.</li>
-              <li><strong>Run on a different port.</strong> Stop the server and try
-                  <code>ng serve --port 4300 --open</code>. The <code>--open</code> (or <code>-o</code>) flag
-                  launches your browser for you.</li>
-              <li><strong>Build for production.</strong> Run <code>ng build</code> and look inside the new
-                  <code>dist/</code> folder. Those minified files are what you would actually deploy to a web
-                  server — plain HTML, CSS and JavaScript, with no Angular runtime installation required.</li>
-              <li><strong>Peek at <code>package.json</code>.</strong> Find the <code>scripts</code> block: this is
-                  why <code>npm start</code> also works, and it's the direct equivalent of a Maven goal.</li>
-            </ol>
+            <p>Only start these once Tasks 1–5 are complete and ticked. They are genuinely optional — nobody is
+               behind for skipping them.</p>
+
+            <h3>A · Explore the CLI safely with <code>--dry-run</code></h3>
+            <p><code>--dry-run</code> (or <code>-d</code>) shows you exactly what a command <em>would</em> create,
+               without creating anything. It is the safest way to explore.</p>
+            <div class="codewrap"><pre><code>ng generate component employee-list --dry-run</code></pre></div>
+            <div class="term-out">$ ng generate component employee-list --dry-run
+CREATE src/app/employee-list/employee-list.component.css (0 bytes)
+CREATE src/app/employee-list/employee-list.component.html (28 bytes)
+CREATE src/app/employee-list/employee-list.component.spec.ts (595 bytes)
+CREATE src/app/employee-list/employee-list.component.ts (222 bytes)
+UPDATE src/app/app.module.ts (412 bytes)
+
+<span class="warn">NOTE: The "--dry-run" option means no changes were made.</span></div>
+            <div class="expected">
+              <span class="lbl">Read that output carefully — it teaches you two things</span>
+              <strong>1.</strong> One component means <strong>four files</strong>, in their own folder, all following the
+              same naming pattern.<br>
+              <strong>2.</strong> The last line says <code>UPDATE src/app/app.module.ts</code> — the CLI would also
+              <strong>register the component for you</strong>. That single line is why you should always use
+              <code>ng generate</code> instead of creating files by hand. Session 2 starts here for real.
+            </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Stretch done — I explored the CLI, ran on a custom port, and looked inside <code>dist/</code>.</span>
+              <span class="ctext"><strong>Stretch A done</strong> — and I noticed the <code>UPDATE app.module.ts</code> line.</span>
+            </label>
+
+            <h3>B · See what a production build produces</h3>
+            <div class="codewrap"><pre><code>ng build</code></pre></div>
+            <p>Then look in the new <code>dist/</code> folder. Those files are what you would actually deploy to a web
+               server — plain HTML, CSS and JavaScript, with no TypeScript anywhere. Open one of the
+               <code>main-*.js</code> files and see how unreadable optimised output is; that is deliberate, and it is
+               why the browser's developer tools use "source maps" to show you your original code when debugging.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Stretch B done</strong> — I looked inside <code>dist/</code> and confirmed there is no TypeScript in it.</span>
+            </label>
+
+            <h3>C · Try strict mode's teeth</h3>
+            <p>Open <code>tsconfig.json</code> and find <code>"strict": true</code>. This is why TypeScript has been
+               so demanding. In <code>app.component.ts</code>, add this line inside the class and read the error:</p>
+            <div class="codewrap"><pre><code>selected: Employee = null;   // ✖ Type 'null' is not assignable to type 'Employee'</code></pre></div>
+            <p>Now fix it properly, in the way real Angular code does:</p>
+            <div class="codewrap"><pre><code>selected: Employee | null = null;   // ✔ "an Employee, or explicitly nothing"</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Why this matters in Session 4</span>
+              In Session 4 you will have a "currently selected customer" field that starts empty and fills in when a
+              row is clicked. <code>Employee | null</code> is exactly how you declare that honestly — and it forces
+              you to check for null before using it, which is the null-pointer bug you would otherwise have shipped.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Stretch C done</strong> — I triggered a strict-mode error and fixed it with a union type.</span>
             </label>
           </div>
         </details>
       </section>
 
-      <!-- ===== CHECKPOINT ===== -->
-      <section class="section">
-        <div class="section-band">Checkpoint</div>
-        <div class="expected" style="font-size:17px;">
-          <span class="lbl">✅ End-of-lab checkpoint — all five must be true</span>
-          <ol style="margin:6px 0 0;">
-            <li>Angular CLI is installed and <code>ng version</code> works.</li>
-            <li>The <code>hello-world</code> app runs and loads at <code>localhost:4200</code>.</li>
-            <li>I can name every file in <code>src/app/</code> and say what it does.</li>
-            <li>I made a live-reload edit and saw the browser update by itself.</li>
-            <li>I completed all seven TypeScript drills.</li>
-          </ol>
-        </div>
-        <label class="check"><input type="checkbox" class="labstep" />
-          <span class="ctext"><strong>I have reached the Session 1 checkpoint.</strong>
-            <span class="verify">If any of the five above isn't true, flag it now — Session 2 builds directly on this project.</span>
-          </span>
-        </label>
-      </section>
 
-      <!-- ===== GLOSSARY ===== -->
+      <!-- ===== CHECKPOINT ===== -->
+      <div class="section-band">Checkpoint</div>
       <section class="section">
-        <details class="exp">
-          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+        <details class="exp lab6" open>
+          <summary><span class="chevron">▶</span> Troubleshooting — every error you're likely to hit today<span class="sync">Theory slide 40</span></summary>
           <div class="exp-body">
+            <p>Find your error message in the left column. None of these mean you are doing badly — every one is
+               normal on day one, and every one has a one-line fix.</p>
             <table class="issues">
-              <thead><tr><th style="width:26%">Term</th><th>Plain-English meaning</th></tr></thead>
+              <thead><tr><th style="width:36%">Message / symptom</th><th>Cause and fix</th></tr></thead>
               <tbody>
-                <tr><td><strong>SPA</strong></td><td>Single-Page Application — one HTML page loads once; JavaScript then swaps sections in and out</td></tr>
-                <tr><td><strong>Component</strong></td><td>A reusable piece of UI = a TypeScript class + an HTML template + its own CSS</td></tr>
-                <tr><td><strong>Template</strong></td><td>The HTML file belonging to a component — what the user sees</td></tr>
-                <tr><td><strong>Selector</strong></td><td>The custom HTML tag name that renders a component, e.g. <code>&lt;app-root&gt;</code></td></tr>
-                <tr><td><strong>Decorator</strong></td><td>The <code>@Something({...})</code> syntax that attaches metadata to a class</td></tr>
-                <tr><td><strong>Module (NgModule)</strong></td><td>A manifest grouping components, directives and services that belong together</td></tr>
-                <tr><td><strong>Interpolation</strong></td><td>Showing a class property in a template using <code>{{ }}</code></td></tr>
-                <tr><td><strong>Interface</strong></td><td>A TypeScript description of an object's shape — which properties, of which types</td></tr>
-                <tr><td><strong>Union type</strong></td><td>"One of these types", written with a pipe: <code>number | string</code></td></tr>
-                <tr><td><strong>Tuple</strong></td><td>A fixed-length array with a specific type at each position</td></tr>
-                <tr><td><strong>Transpile / compile</strong></td><td>Translating TypeScript into the JavaScript the browser actually runs</td></tr>
-                <tr><td><strong>npm</strong></td><td>Node Package Manager — the Maven of the JavaScript world</td></tr>
-                <tr><td><strong>CLI</strong></td><td>Command Line Interface — Angular's <code>ng</code> tool</td></tr>
-                <tr><td><strong>node_modules</strong></td><td>Where npm puts downloaded libraries. Never edit it, never commit it</td></tr>
-                <tr><td><strong>Live reload / HMR</strong></td><td>The dev server rebuilding and refreshing the browser automatically when you save</td></tr>
+                <tr>
+                  <td><code>'ng' is not recognized as an internal or external command</code><br>
+                      <code>ng: command not found</code></td>
+                  <td><strong>Close the terminal and open a brand-new one</strong> — a terminal only reads the PATH when it starts, so one that was already open cannot see a tool installed afterwards. This fixes it most of the time. If not, re-run <code>npm install -g @angular/cli</code> and read the output for <code>ERR!</code> lines.</td>
+                </tr>
+                <tr>
+                  <td><code>cannot be loaded because running scripts is disabled on this system</code></td>
+                  <td>Windows PowerShell blocking scripts. Run: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code> and answer <code>Y</code>. Or just use Command Prompt / Git Bash instead.</td>
+                </tr>
+                <tr>
+                  <td><code>Port 4200 is already in use</code></td>
+                  <td><code>ng serve</code> is already running, probably in another terminal tab. Use the browser tab you already have, or start a second copy elsewhere: <code>ng serve --port 4300</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>The serve command requires to be run in an Angular project, but a project definition could not be found</code></td>
+                  <td>You are in the wrong folder — most likely the <em>parent</em> of your project. Run <code>cd hello-world</code> first. The rule: you must be in the folder that contains <code>angular.json</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot find module '@angular/core'</code></td>
+                  <td><code>node_modules/</code> is missing or was only partly downloaded. Run <code>npm install</code> inside the project folder. This is also the fix after cloning someone else's project.</td>
+                </tr>
+                <tr>
+                  <td><code>has no exported member 'Employee'</code></td>
+                  <td>You forgot the word <code>export</code> in front of <code>interface Employee</code>, or the import path is wrong. Note the path is relative: from <code>app.component.ts</code> it is <code>'./models/employee'</code> with no <code>.ts</code> on the end.</td>
+                </tr>
+                <tr>
+                  <td><code>Type '"active"' is not assignable to type '"Active" | "Inactive"'</code></td>
+                  <td>Working as designed — your literal union caught a case mismatch. Use the exact capitalisation, or let your editor's autocomplete insert it for you.</td>
+                </tr>
+                <tr>
+                  <td><code>Property 'salary' is missing in type ... but required in type 'Employee'</code></td>
+                  <td>Also working as designed — one of your objects is missing a property the interface requires. The error names both the property and the line.</td>
+                </tr>
+                <tr>
+                  <td>A blank white page, and no error visible anywhere</td>
+                  <td>Press <kbd>F12</kbd> and open the browser's <strong>Console</strong> tab. The real error is always there — Angular does not print it onto the page. Nine times out of ten it is a mismatched <code>selector</code> or a typo in <code>templateUrl</code>.</td>
+                </tr>
+                <tr>
+                  <td>The page never updates when I save</td>
+                  <td>Either <code>ng serve</code> has stopped (check its terminal for a crash or a stray <kbd>Ctrl</kbd>+<kbd>C</kbd>), or you edited a file outside the project folder. The terminal prints a fresh build line on every successful save — if it's silent, the watcher isn't seeing your file.</td>
+                </tr>
+                <tr>
+                  <td><code>{{ myField }}</code> shows nothing at all</td>
+                  <td>Angular renders a missing field as an empty string rather than erroring. Almost always a spelling mismatch between the template and the class — check the capitalisation of both very carefully.</td>
+                </tr>
+                <tr>
+                  <td>Tutorials online use <code>$scope</code> and nothing works</td>
+                  <td>You are reading <strong>AngularJS 1.x</strong> documentation, which is a different framework. Close the tab and search again including a version number, e.g. "Angular 17 ngFor".</td>
+                </tr>
+                <tr>
+                  <td><code>npm ERR! ETIMEDOUT</code> / <code>ECONNREFUSED</code> / proxy errors</td>
+                  <td>Corporate network. Configure npm's proxy: <code>npm config set proxy http://your-proxy:port</code> and <code>npm config set https-proxy http://your-proxy:port</code>, then retry.</td>
+                </tr>
+                <tr>
+                  <td>Everything is bizarrely slow, or files randomly lock</td>
+                  <td>Your project is inside a OneDrive / Google Drive / Dropbox synced folder. Move it somewhere local — those tools cannot cope with <code>node_modules</code>.</td>
+                </tr>
               </tbody>
             </table>
           </div>
         </details>
       </section>
 
-      <!-- ===== SELF-CHECK ===== -->
       <section class="section">
-        <details class="exp">
-          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Glossary — every term used today<span class="sync">Theory slide 5</span></summary>
           <div class="exp-body">
-            <p>If you can answer all eight, you're ready for Session 2. Try them with a neighbour rather than alone.</p>
+            <table class="issues">
+              <thead><tr><th style="width:26%">Term</th><th>Meaning in one sentence</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Angular</strong></td><td>Google's TypeScript front-end framework, version 2 and above, for building single-page applications.</td></tr>
+                <tr><td><strong>AngularJS</strong></td><td>The original version 1.x — a <em>different</em> framework. If a tutorial mentions <code>$scope</code>, it is this one.</td></tr>
+                <tr><td><strong>SPA</strong></td><td>Single-Page Application: one HTML page is loaded once, then JavaScript swaps sections in and out.</td></tr>
+                <tr><td><strong>Framework</strong></td><td>A toolkit that provides your app's structure and calls your code. Angular and Spring Boot are both frameworks.</td></tr>
+                <tr><td><strong>TypeScript</strong></td><td>JavaScript plus static types. Types are checked while you write and removed when compiled.</td></tr>
+                <tr><td><strong>Transpile / compile</strong></td><td>Converting your <code>.ts</code> files into the <code>.js</code> files a browser can run.</td></tr>
+                <tr><td><strong>Type inference</strong></td><td>TypeScript working out a type from the value you assigned, so you don't have to write it.</td></tr>
+                <tr><td><strong>Interface</strong></td><td>A description of the shape an object must have. Exists only at compile time.</td></tr>
+                <tr><td><strong>Union type</strong></td><td><code>A | B</code> — "either of these". With string literals it acts like an enum.</td></tr>
+                <tr><td><strong>Optional property</strong></td><td>A property marked with <code>?</code>, meaning it is allowed to be absent.</td></tr>
+                <tr><td><strong>Optional chaining</strong></td><td>The <code>?.</code> operator — "only continue if the thing on the left exists".</td></tr>
+                <tr><td><strong>Nullish coalescing</strong></td><td>The <code>??</code> operator — "use the right-hand value if the left is null or undefined".</td></tr>
+                <tr><td><strong>Tuple</strong></td><td>A fixed-length array where each position has its own type.</td></tr>
+                <tr><td><strong>Arrow function</strong></td><td><code>(a) =&gt; a * 2</code> — a compact function. TypeScript's version of a Java lambda.</td></tr>
+                <tr><td><strong>Node.js</strong></td><td>A runtime that executes JavaScript on your machine rather than in a browser. The "JVM" of this world.</td></tr>
+                <tr><td><strong>npm</strong></td><td>Node Package Manager — downloads libraries. The "Maven" of this world.</td></tr>
+                <tr><td><strong>package.json</strong></td><td>The dependency list and script definitions. The "pom.xml" of this world.</td></tr>
+                <tr><td><strong>node_modules/</strong></td><td>The folder holding every downloaded library. Huge, and never committed to git.</td></tr>
+                <tr><td><strong>Angular CLI</strong></td><td>The <code>ng</code> command-line tool — creates projects and files, serves, builds and tests.</td></tr>
+                <tr><td><strong>Component</strong></td><td>One piece of screen: a TypeScript class, an HTML template, and a CSS file.</td></tr>
+                <tr><td><strong>Template</strong></td><td>The HTML belonging to a component.</td></tr>
+                <tr><td><strong>Decorator</strong></td><td>An <code>@Something({...})</code> marker that attaches metadata to a class. Angular's <code>@Component</code> is one; Spring's <code>@RestController</code> is the same idea.</td></tr>
+                <tr><td><strong>Selector</strong></td><td>The custom HTML tag name that renders a component, e.g. <code>&lt;app-root&gt;</code>.</td></tr>
+                <tr><td><strong>NgModule</strong></td><td>The registry listing everything your app is made of — <code>declarations</code>, <code>imports</code>, <code>providers</code>, <code>bootstrap</code>.</td></tr>
+                <tr><td><strong>Bootstrap (verb)</strong></td><td>Starting the application. Not to be confused with Bootstrap the CSS framework.</td></tr>
+                <tr><td><strong>Interpolation</strong></td><td>The <code>{{ }}</code> syntax that puts a class value into the template. Session 2's first topic.</td></tr>
+                <tr><td><strong>Live reload</strong></td><td>The dev server watching your files, rebuilding on save, and refreshing the browser for you.</td></tr>
+                <tr><td><strong>localhost:4200</strong></td><td>The dev server's address on your own machine. Nobody else can reach it.</td></tr>
+                <tr><td><strong>dist/</strong></td><td>The folder <code>ng build</code> produces, holding the deployable files.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these without looking?<span class="sync">Theory slide 41</span></summary>
+          <div class="exp-body">
+            <p>Answer these out loud or in writing. If any one stumps you, the slide number in brackets is where to
+               look. These are also the questions most likely to come up in an interview.</p>
             <ol class="steps">
-              <li>What's the difference between "AngularJS" and "Angular"?</li>
-              <li>In one sentence: what makes an application a <em>single-page</em> application?</li>
-              <li>TypeScript adds what to JavaScript — and what happens to it before the browser runs it?</li>
-              <li>What does the <code>?</code> do in <code>age?: number</code>, and what must you do before using such a value?</li>
-              <li>Which loop gives you values, and which gives you indices?</li>
-              <li>Which two commands do you run to install the Angular CLI and create a project?</li>
-              <li>Which folder holds the code you write, and which one must you never edit or commit?</li>
-              <li>Trace it out loud: how does the browser get from <code>index.html</code> to your component's HTML?</li>
+              <li>What does <strong>SPA</strong> stand for, and what is the single biggest difference from a JSP application? <span class="muted">(slides 8–9)</span></li>
+              <li>Why is <strong>AngularJS</strong> not just "an older Angular"? <span class="muted">(slides 10–11)</span></li>
+              <li>Name three things Angular gives you <strong>out of the box</strong> that you would otherwise assemble yourself. <span class="muted">(slide 6)</span></li>
+              <li>TypeScript's types disappear when compiled. So what exactly are they <em>for</em>? <span class="muted">(slides 15–16)</span></li>
+              <li>What is the difference between <code>for...of</code> and <code>for...in</code>? Which do you want for an array? <span class="muted">(slide 25)</span></li>
+              <li>What does the <code>?</code> in <code>email?: string</code> mean, and what must you then do before using <code>email</code>? <span class="muted">(slide 21)</span></li>
+              <li>Why is <code>status: 'Active' | 'Inactive'</code> better than <code>status: string</code>? <span class="muted">(slide 22)</span></li>
+              <li>What does <code>constructor(private http: HttpClient) { }</code> actually do? <span class="muted">(slide 29 — you will need this in Session 3)</span></li>
+              <li>Which <strong>six array methods</strong> will you use to build a CRUD screen, and what does each do? <span class="muted">(slide 23)</span></li>
+              <li>Recite the <strong>boot chain</strong> from <code>index.html</code> to your component. <span class="muted">(slide 37)</span></li>
+              <li>What goes in <code>declarations</code> versus <code>imports</code> in <code>app.module.ts</code>? <span class="muted">(slide 38)</span></li>
+              <li>Why should you always use <code>ng generate</code> rather than creating component files by hand? <span class="muted">(slide 39)</span></li>
+              <li>Your page is blank and you see no error. What is the very first thing you do? <span class="muted">(slide 40)</span></li>
             </ol>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I can confidently answer all eight self-check questions.</span>
+              <span class="ctext"><strong>I can answer at least 10 of the 13</strong> without looking anything up.</span>
             </label>
           </div>
         </details>
       </section>
 
-      <!-- ===== QUICK REFERENCE ===== -->
       <section class="section">
-        <div class="qref">
-          <h2>Quick Reference Card</h2>
-          <div class="grid" style="margin-top:14px;">
-            <div>
-              <h3>Angular CLI commands</h3>
-              <table>
-                <thead><tr><th>Command</th><th>What it does</th></tr></thead>
-                <tbody>
-                  <tr><td><code>npm install -g @angular/cli</code></td><td>Install the CLI globally (once)</td></tr>
-                  <tr><td><code>ng new my-app</code></td><td>Create a new project</td></tr>
-                  <tr><td><code>ng serve</code></td><td>Run the dev server on port 4200</td></tr>
-                  <tr><td><code>ng serve -o --port 4300</code></td><td>Custom port + open the browser</td></tr>
-                  <tr><td><code>ng g c my-component</code></td><td>Generate a component (Session 2)</td></tr>
-                  <tr><td><code>ng g s my-service</code></td><td>Generate a service (Session 3)</td></tr>
-                  <tr><td><code>ng build</code></td><td>Production build into <code>dist/</code></td></tr>
-                  <tr><td><code>ng version</code></td><td>Print all versions — debug step #1</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div>
-              <h3>TypeScript syntax cheat sheet</h3>
-              <table>
-                <thead><tr><th>Syntax</th><th>Meaning</th></tr></thead>
-                <tbody>
-                  <tr><td><code>let x: string</code></td><td>Declared type</td></tr>
-                  <tr><td><code>let x = "hi"</code></td><td>Inferred type (string)</td></tr>
-                  <tr><td><code>interface P { … }</code></td><td>Object shape</td></tr>
-                  <tr><td><code>age?: number</code></td><td>Optional property</td></tr>
-                  <tr><td><code>number | string</code></td><td>Union — either type</td></tr>
-                  <tr><td><code>number[]</code></td><td>Array of numbers</td></tr>
-                  <tr><td><code>[number, string]</code></td><td>Tuple — fixed shape</td></tr>
-                  <tr><td><code>for (let v of arr)</code></td><td>Iterate values</td></tr>
-                  <tr><td><code>for (let i in arr)</code></td><td>Iterate indices</td></tr>
-                  <tr><td><code>(n: number) =&gt; n * 2</code></td><td>Arrow function</td></tr>
-                  <tr><td><code>constructor(public id: number)</code></td><td>Declare + assign in one line</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <h3 style="margin-top:18px;">Files in <code>src/app/</code></h3>
-          <table>
-            <thead><tr><th>File</th><th>Its one job</th></tr></thead>
-            <tbody>
-              <tr><td><code>app.component.ts</code></td><td>The class — data and logic, plus the <code>@Component</code> decorator</td></tr>
-              <tr><td><code>app.component.html</code></td><td>The template — what the user sees</td></tr>
-              <tr><td><code>app.component.css</code></td><td>Styles scoped to this component only</td></tr>
-              <tr><td><code>app.component.spec.ts</code></td><td>Unit tests for this component</td></tr>
-              <tr><td><code>app.module.ts</code></td><td>Declares components, imports Angular features, names the bootstrap component</td></tr>
-            </tbody>
-          </table>
+        <div class="expected" style="margin-top:20px;">
+          <span class="lbl">✅ Session 1 checkpoint — you are ready for Session 2 if…</span>
+          <ol style="margin:8px 0 0;padding-left:22px;font-size:16.5px;line-height:1.6;">
+            <li><code>node -v</code> and <code>ng version</code> both work in a fresh terminal.</li>
+            <li><code>ng serve</code> is running and <code>localhost:4200</code> shows <strong>your own</strong> content, not the generated welcome page.</li>
+            <li>You can edit a file, save, and see the browser update without touching it.</li>
+            <li>You have an <code>Employee</code> interface in <code>src/app/models/employee.ts</code> and a typed array of four employees rendering on screen.</li>
+            <li>You can name what <code>index.html</code>, <code>main.ts</code>, <code>app.module.ts</code> and the three <code>app.component.*</code> files each do.</li>
+            <li>You have deliberately caused at least three errors and read each message.</li>
+          </ol>
+          <p style="margin:12px 0 0;"><strong>Keep this project.</strong> Session 2 continues inside <code>hello-world</code> — do not delete it, and do not start a fresh one.</p>
         </div>
       </section>
 
-      <!-- ===== WHAT'S NEXT ===== -->
       <section class="section">
-        <div class="concept" style="margin-top:18px;">
-          <span class="lbl">Coming up in Session 2</span>
-          You'll turn this Hello World into something that actually reacts. We'll generate real components with
-          <code>ng generate component</code>, nest them into a component tree, and cover all four kinds of data
-          binding — interpolation, property binding, event binding and two-way binding with <code>ngModel</code>.
-          Then <code>*ngIf</code>, <code>*ngFor</code>, <code>ngClass</code> and pipes turn a hardcoded array into
-          a colour-coded employee table. <strong>Bring this <code>hello-world</code> project — we build straight on
-          top of it.</strong>
+        <div class="qref">
+          <h2>Quick reference — pin this for the rest of the series</h2>
+          <div class="grid">
+            <div>
+              <h3>Commands</h3>
+              <table>
+                <tr><td><code>node -v</code></td><td>Check Node is installed</td></tr>
+                <tr><td><code>npm install -g @angular/cli</code></td><td>Install the CLI, once per machine</td></tr>
+                <tr><td><code>ng version</code></td><td>Check the CLI, and what to report when stuck</td></tr>
+                <tr><td><code>ng new my-app</code></td><td>Create a project</td></tr>
+                <tr><td><code>ng serve -o</code></td><td>Run it and open the browser</td></tr>
+                <tr><td><code>ng serve --port 4300</code></td><td>Run on a different port</td></tr>
+                <tr><td><code>ng g c employee-list</code></td><td>Generate a component (Session 2)</td></tr>
+                <tr><td><code>ng g s employee</code></td><td>Generate a service (Session 3)</td></tr>
+                <tr><td><code>ng g i models/employee</code></td><td>Generate an interface</td></tr>
+                <tr><td><code>ng g c x --dry-run</code></td><td>Preview without creating anything</td></tr>
+                <tr><td><code>npm install</code></td><td>Restore <code>node_modules/</code> after cloning</td></tr>
+                <tr><td><code>ng build</code></td><td>Build deployable files into <code>dist/</code></td></tr>
+              </table>
+            </div>
+            <div>
+              <h3>TypeScript you'll reuse daily</h3>
+              <table>
+                <tr><td><code>let x: string = 'a'</code></td><td>Explicit type</td></tr>
+                <tr><td><code>const x = 'a'</code></td><td>Inferred, and cannot be reassigned</td></tr>
+                <tr><td><code>export interface E { }</code></td><td>The shape of an object</td></tr>
+                <tr><td><code>email?: string</code></td><td>Optional property</td></tr>
+                <tr><td><code>'A' | 'B'</code></td><td>Only these exact values</td></tr>
+                <tr><td><code>E[]</code></td><td>An array of E</td></tr>
+                <tr><td><code>for (const e of list)</code></td><td>Loop over values</td></tr>
+                <tr><td><code>list.filter(e =&gt; ...)</code></td><td>Search — returns a new array</td></tr>
+                <tr><td><code>list.find(e =&gt; ...)</code></td><td>Fetch one, or <code>undefined</code></td></tr>
+                <tr><td><code>list.findIndex(e =&gt; ...)</code></td><td>Position, or <code>-1</code></td></tr>
+                <tr><td><code>list.push(e)</code> / <code>splice(i,1)</code></td><td>Insert / delete</td></tr>
+                <tr><td><code>x?.y</code> &nbsp; <code>x ?? 'default'</code></td><td>Safe access / fallback</td></tr>
+                <tr><td><code>constructor(private s: S) { }</code></td><td>Declares + assigns a field</td></tr>
+                <tr><td><code>a === b</code></td><td>Always three equals, never two</td></tr>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:20px;">The boot chain — memorise this</h3>
+          <p style="font-family:var(--mac-mono);font-size:14.5px;margin:6px 0 0;">
+            index.html &nbsp;→&nbsp; main.ts &nbsp;→&nbsp; AppModule &nbsp;→&nbsp; AppComponent &nbsp;→&nbsp; rendered into &lt;app-root&gt;
+          </p>
         </div>
-        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
-          Angular — Session 1 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
-        </p>
       </section>
 
       </div><!-- /.lab-canvas -->
