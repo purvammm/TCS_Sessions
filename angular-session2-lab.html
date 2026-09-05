@@ -1,0 +1,2590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 2 — Hands-on Lab</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    h4 { font-size: 16.5px; margin: 16px 0 4px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(221,0,49,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dd0031, #9327f0, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff5f7, #fbeef4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(147,39,240,0.09);
+      border: 1px solid rgba(147,39,240,0.3);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffd0da;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Key-point callout and reference note — shared vocabulary with the theory decks */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* Line-by-line code explanation */
+    table.lines { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.lines th, table.lines td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 13px; text-align: left; vertical-align: top;
+    }
+    table.lines thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.lines td:first-child {
+      font-family: var(--mac-mono); font-size: 14px; color: #b00027;
+      background: #fafafc; white-space: nowrap;
+    }
+
+    /* Comparison table (shared vocabulary with the theory decks) */
+    table.cmp { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px; text-align: left; vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(221,0,49,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #dd0031; }
+    details.exp.lab2 { border-left-color: #9327f0; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf2ff,#f3e6ff); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#9327f0; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Mock browser preview — shows exactly what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin: 14px 0; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .btn-link {
+      display: inline-block; border: 1px solid #0a84ff; border-radius: 6px;
+      padding: 2px 9px; color: #0a84ff; font-size: 12.5px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+
+    /* Cards (shared vocabulary with the theory decks) */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 14px 0; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fff;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 24px; margin-bottom: 4px; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+    .qref p, .qref li { color: #d7dae0; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .cards, .cards.c3 { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session2-lab.html — Angular Session 2</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🅰️</div>
+        <div>
+          <h1>Angular — Session 2 Hands-on Lab</h1>
+          <p class="section-intro">Components, all four data bindings, directives, pipes and parent–child communication. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          Your hands-on companion for Angular Session 2. Every task carries a <strong>"Theory slides …"</strong> badge
+          telling you which part of the talk it belongs to. Use the <strong>Copy</strong> button rather than retyping,
+          tick each checkbox as you finish, and read every <strong>"What you should see"</strong> box before moving on —
+          they are how you know you are still on the rails.
+        </div>
+        <div class="plainbox">
+          <span class="lbl">What you're building today</span>
+          One page made of <strong>five components</strong>: a header, a login form that reacts as you type, a
+          colour-coded employee table, a reusable employee card, and a footer. By the end, every one of the four data
+          bindings and every directive from the theory deck will be running in your own code.
+        </div>
+        <div class="observe">
+          <span class="lbl">Today's golden rule — different from Session 1</span>
+          <strong>Most of today's bugs are silent.</strong> A missing asterisk, a missing <code>()</code>, a
+          self-closing component tag — none of these produce an error message. So when something simply "doesn't work"
+          and nothing is red anywhere, <strong>suspect punctuation before you suspect logic</strong>. The
+          troubleshooting table at the bottom of this sheet is organised around exactly that.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slide 2</span></summary>
+          <div class="exp-body">
+            <p>Two minutes. You are picking up the <code>hello-world</code> project from Session 1 — do
+               <strong>not</strong> start a new one.</p>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">My <strong>Session 1 project still runs</strong>
+                <span class="verify">Open a terminal, <code>cd hello-world</code>, run <code>ng serve -o</code>. You should see your own page from Session 1, not the generated welcome page.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>cd hello-world
+ng serve -o</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I have a <strong>second terminal open</strong> in the same folder
+                <span class="verify">You need one terminal for <code>ng serve</code> (leave it running all session) and a second for <code>ng generate</code> commands. In VS Code: <em>Terminal → Split Terminal</em>.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">My <code>Employee</code> <strong>interface exists</strong> from Session 1
+                <span class="verify">Check for <code>src/app/models/employee.ts</code>. If it's missing, create it with the snippet below — you need it for Tasks 4 to 7.</span>
+              </span>
+            </label>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/models/employee.ts</span>
+              <span class="fb-tag">Only if it's missing</span>
+            </div>
+            <div class="codewrap"><pre><code>export interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+  status: 'Active' | 'Inactive';
+  email?: string;
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Lost your Session 1 project?</span>
+              No problem, and don't lose time over it. Run <code>ng new hello-world</code> again (CSS, no SSR, no
+              routing), then create the interface file above. You will be caught up in three minutes.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PART 1 — COMPONENTS ===== -->
+      <div class="section-band">Part 1 — Components</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Generate Components &amp; Build a Tree<span class="sync">Theory slides 7–14</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Create four components with the CLI, then assemble them into a tree inside <code>AppComponent</code>.
+              By the end of this task you will see four visibly separate regions on one page, each owned by its own
+              component — and you will understand exactly why each one appeared.
+            </div>
+
+            <h3>Step 1 — generate four components</h3>
+            <p>In your <strong>second</strong> terminal, inside the project folder, run these four commands.
+               <code>ng g c</code> is the short form of <code>ng generate component</code>.</p>
+            <div class="codewrap"><pre><code>ng g c header
+ng g c login
+ng g c employee-list
+ng g c footer</code></pre></div>
+            <div class="term-out">$ ng g c header
+CREATE src/app/header/header.component.css (0 bytes)
+CREATE src/app/header/header.component.html (22 bytes)
+CREATE src/app/header/header.component.spec.ts (566 bytes)
+CREATE src/app/header/header.component.ts (203 bytes)
+<span class="ok">UPDATE src/app/app.module.ts (398 bytes)</span></div>
+            <div class="expected">
+              <span class="lbl">Read that last line — it's the important one</span>
+              <code>UPDATE src/app/app.module.ts</code>. The CLI created four files <em>and registered the component</em>
+              in the module's <code>declarations</code> list. Open <code>src/app/app.module.ts</code> now and confirm
+              all four class names are in there. <strong>That registration is why you use the CLI</strong> — Angular
+              refuses to render a component it has not been told about.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Four components generated</strong>, and I can see all four class names in <code>declarations</code> in <code>app.module.ts</code>.</span>
+            </label>
+
+            <h3>Step 2 — give each one some content</h3>
+            <p>Right now each component's template just says "header works!". Replace each one so you can tell them
+               apart on screen.</p>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/header/header.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;header class="app-header"&gt;
+  &lt;h1&gt;🏢 Employee Portal&lt;/h1&gt;
+  &lt;p&gt;Angular Session 2 — Components &amp;amp; Data Binding&lt;/p&gt;
+&lt;/header&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/header/header.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.app-header {
+  background: linear-gradient(135deg, #dd0031, #9327f0);
+  color: white;
+  padding: 18px 24px;
+  border-radius: 10px;
+}
+
+.app-header h1 { margin: 0 0 4px; font-size: 26px; }
+.app-header p  { margin: 0; opacity: 0.9; font-size: 15px; }</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/footer/footer.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;footer class="app-footer"&gt;
+  &lt;p&gt;© 2026 Employee Portal · Built in Angular Session 2&lt;/p&gt;
+&lt;/footer&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/footer/footer.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.app-footer {
+  border-top: 1px solid #d2d2d7;
+  margin-top: 24px;
+  padding-top: 12px;
+  text-align: center;
+  color: #6e6e73;
+  font-size: 14px;
+}</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Header and footer have real content and styling.</strong></span>
+            </label>
+
+            <h3>Step 3 — assemble the tree</h3>
+            <p>Now the part that makes it a tree. Replace the root template so it does nothing but arrange its children.</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page"&gt;
+
+  &lt;app-header&gt;&lt;/app-header&gt;
+
+  &lt;app-login&gt;&lt;/app-login&gt;
+
+  &lt;app-employee-list&gt;&lt;/app-employee-list&gt;
+
+  &lt;app-footer&gt;&lt;/app-footer&gt;
+
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/app.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+}</code></pre></div>
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:12px 16px;border-radius:8px;margin:0 0 10px;"><strong style="font-size:19px;">🏢 Employee Portal</strong><br><span style="font-size:14px;opacity:.9;">Angular Session 2 — Components &amp; Data Binding</span></p>
+                <p style="border:1px dashed #9327f0;padding:6px 10px;margin:0 0 8px;">login works!</p>
+                <p style="border:1px dashed #ff9f0a;padding:6px 10px;margin:0 0 8px;">employee-list works!</p>
+                <p style="border-top:1px solid #d2d2d7;padding-top:8px;text-align:center;color:#6e6e73;font-size:13px;margin:10px 0 0;">© 2026 Employee Portal · Built in Angular Session 2</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              A styled gradient header, then the placeholder text <code>login works!</code> and
+              <code>employee-list works!</code> (we fill those in next), then a footer line. <strong>Four components,
+              one page.</strong> Note that <code>AppComponent</code> now contains almost no markup of its own — it is
+              purely a layout arranging its children, which is exactly how real Angular apps are structured.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four components render on one page</strong> in the right order.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — three experiments that teach the rules</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Prove that order is yours to control.</strong> Move <code>&lt;app-footer&gt;</code> above
+                    <code>&lt;app-login&gt;</code> and save. The page rearranges. Put it back.</li>
+                <li><strong>Prove components are reusable.</strong> Add a second
+                    <code>&lt;app-header&gt;&lt;/app-header&gt;</code> at the bottom. Two headers appear, from one
+                    component. Delete it again.</li>
+                <li><strong>Prove the self-closing trap is real.</strong> Change <code>&lt;app-footer&gt;&lt;/app-footer&gt;</code>
+                    to <code>&lt;app-footer /&gt;</code> and save. The footer <strong>vanishes with no error at all.</strong>
+                    Angular components always need an explicit closing tag. Change it back — and remember this one,
+                    because it wastes a lot of people's afternoons.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — including watching the self-closing tag fail silently.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Check your understanding before moving on</span>
+              You should now be able to answer: <em>where does the tag <code>&lt;app-employee-list&gt;</code> come
+              from?</em> (The <code>selector</code> in <code>employee-list.component.ts</code>.) <em>And what makes
+              Angular willing to render it?</em> (Its entry in <code>declarations</code> in <code>app.module.ts</code>.)
+              If either answer isn't solid, open those two files and look now — everything today builds on it.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PART 2 — DATA BINDING ===== -->
+      <div class="section-band">Part 2 — Data binding</div>
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Binding Playground — Interpolation &amp; Property Binding<span class="sync">Theory slides 16–19</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Get both <em>class → template</em> bindings working before we add events. This is a deliberately small,
+              safe task whose real purpose is to make the difference between <code>{{ }}</code> and <code>[ ]</code>
+              permanent — because mixing them up is the most common Session 2 confusion.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/header/header.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent {
+  // ── plain fields, for interpolation ──
+  portalName = 'Employee Portal';
+  version = 2;
+  employeeCount = 4;
+
+  // ── values used with property binding ──
+  docsUrl = 'https://angular.dev';
+  isMaintenanceMode = false;
+
+  // ── a method the template can call ──
+  getSubtitle(): string {
+    return 'Session ' + this.version + ' — Components &amp; Data Binding';
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Keep the <code>@Component</code> block your CLI generated</span>
+              If yours says <code>styleUrl</code> (singular, no array), or includes <code>standalone: true</code> and an
+              <code>imports: []</code> line, <strong>leave those lines exactly as they are</strong> and change only the
+              class body underneath. This applies to every file in today's lab.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/header/header.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;header class="app-header"&gt;
+
+  &lt;!-- INTERPOLATION: a value becomes page text --&gt;
+  &lt;h1&gt;🏢 {{ portalName }}&lt;/h1&gt;
+
+  &lt;!-- interpolation can call a method, and do arithmetic --&gt;
+  &lt;p&gt;{{ getSubtitle() }}&lt;/p&gt;
+  &lt;p&gt;Tracking {{ employeeCount }} employees ({{ employeeCount * 12 }} payslips a year)&lt;/p&gt;
+
+  &lt;!-- PROPERTY BINDING: a value fills in an attribute --&gt;
+  &lt;a [href]="docsUrl" target="_blank"&gt;Angular docs&lt;/a&gt;
+
+  &lt;!-- property binding with an expression on the right --&gt;
+  &lt;button [disabled]="isMaintenanceMode"&gt;
+    Add employee
+  &lt;/button&gt;
+
+&lt;/header&gt;</code></pre></div>
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:14px 16px;border-radius:8px;margin:0;">
+                  <strong style="font-size:19px;">🏢 Employee Portal</strong><br>
+                  <span style="font-size:14px;">Session 2 — Components &amp; Data Binding</span><br>
+                  <span style="font-size:14px;">Tracking 4 employees (48 payslips a year)</span><br>
+                  <span style="font-size:14px;text-decoration:underline;">Angular docs</span>
+                  &nbsp; <span class="btn ghost">Add employee</span>
+                </p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              The header showing <code>Employee Portal</code>, the subtitle from the method, <code>Tracking 4 employees
+              (48 payslips a year)</code> — note Angular did the multiplication — a working link, and an
+              <strong>enabled</strong> button (because <code>isMaintenanceMode</code> is <code>false</code>).
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Both binding directions work</strong> — interpolated text and a bound <code>href</code>.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — four experiments, and #3 is the one that matters</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Set <code>isMaintenanceMode = true</code> in the class. Save. The button greys out —
+                    <strong>you changed data and the UI followed</strong>, with no UI code at all.</li>
+                <li>Misspell a field: change <code>{{ portalName }}</code> to <code>{{ portalname }}</code> (lower-case
+                    n). Save. <strong>The text simply disappears — no error anywhere.</strong> This is the silent bug to
+                    remember. Fix it.</li>
+                <li><strong>The key experiment.</strong> Remove the brackets: change <code>[href]="docsUrl"</code> to
+                    <code>href="docsUrl"</code>. Save, then click the link. It tries to navigate to a page literally
+                    named <code>docsUrl</code> and fails. <em>Without brackets the right-hand side is a plain string;
+                    with brackets it is an expression Angular evaluates.</em> Put them back.</li>
+                <li>Try something illegal: <code>{{ employeeCount = 10 }}</code>. The build fails, because a template
+                    expression may read but never assign. Remove it.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four experiments done</strong> — and I can explain what brackets change about the right-hand side.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 — LOGIN FORM ===== -->
+      <section class="section">
+        <details class="exp lab3" open>
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> A Working Login Form — Event &amp; Two-way Binding<span class="sync">Theory slides 20–24</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build a login form that responds as you type. This task uses <strong>all four bindings at once</strong>,
+              and it starts by deliberately walking you into the single most common Session 2 error so that you
+              recognise it forever.
+            </div>
+
+            <h3>Step 1 — first, the error (do this on purpose)</h3>
+            <p>Paste the template below and save <strong>without</strong> touching <code>app.module.ts</code>. It will
+               fail. That is the point.</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/login/login.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;Login&lt;/h2&gt;
+&lt;input [(ngModel)]="username" name="username" placeholder="Username"&gt;</code></pre></div>
+            <div class="term-out">$ ng serve
+<span class="bad">✘ [ERROR] NG8002: Can't bind to 'ngModel' since it isn't a known
+  property of 'input'.</span>
+
+  src/app/login/login.component.html:2:7</div>
+            <div class="expected">
+              <span class="lbl">Good — you broke it correctly</span>
+              Nothing is wrong with your line. <code>ngModel</code> simply is not part of Angular's core: it lives in
+              <strong><code>FormsModule</code></strong>, and you have to ask for it. Remember the <em>shape</em> of this
+              message — <em>"Can't bind to X since it isn't a known property"</em> means
+              <strong>a module is missing from <code>imports</code></strong>. You will meet the same shape twice more:
+              <code>HttpClientModule</code> in Session 3 and <code>RouterModule</code> in Session 4.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I triggered the <code>ngModel</code> error deliberately</strong> and read the message.</span>
+            </label>
+
+            <h3>Step 2 — fix it by registering <code>FormsModule</code></h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.module.ts</span>
+              <span class="fb-tag">Add the two marked lines</span>
+            </div>
+            <div class="codewrap"><pre><code>import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';          // ← 1. ADD THIS IMPORT
+
+import { AppComponent } from './app.component';
+import { HeaderComponent } from './header/header.component';
+import { LoginComponent } from './login/login.component';
+import { EmployeeListComponent } from './employee-list/employee-list.component';
+import { FooterComponent } from './footer/footer.component';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    HeaderComponent,
+    LoginComponent,
+    EmployeeListComponent,
+    FooterComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule                                        // ← 2. ADD THIS LINE
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Line</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>import { FormsModule }</td><td>Tells this file where to find it. Note the package is <code>@angular/forms</code>, not <code>@angular/core</code>.</td></tr>
+                <tr><td>imports: [ ..., FormsModule ]</td><td><strong>Registers</strong> it. It goes in <code>imports</code> — not <code>declarations</code> — because it is somebody else's module, not one of your components.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The error is gone</strong> — <code>FormsModule</code> is imported and listed in <code>imports</code>.</span>
+            </label>
+
+            <h3>Step 3 — the full login component</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/login/login.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+
+  // Two-way bound to the two inputs
+  username = '';
+  password = '';
+
+  // Set by the buttons, displayed by interpolation
+  message = '';
+  isSuccess = false;
+  attempts = 0;
+
+  onLogin(): void {
+    this.attempts++;
+
+    if (this.username === 'admin' &amp;&amp; this.password === 'admin123') {
+      this.message = '✅ Login successful! Welcome, ' + this.username + '.';
+      this.isSuccess = true;
+    } else {
+      this.message = '❌ Invalid credentials. Try admin / admin123.';
+      this.isSuccess = false;
+    }
+  }
+
+  onClear(): void {
+    this.username = '';
+    this.password = '';
+    this.message = '';
+    this.isSuccess = false;
+  }
+}</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/login/login.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="login-box"&gt;
+  &lt;h2&gt;Login&lt;/h2&gt;
+
+  &lt;!-- TWO-WAY BINDING: class ⇄ input --&gt;
+  &lt;label&gt;Username&lt;/label&gt;
+  &lt;input [(ngModel)]="username"
+         name="username"
+         placeholder="admin"&gt;
+
+  &lt;label&gt;Password&lt;/label&gt;
+  &lt;input type="password"
+         [(ngModel)]="password"
+         name="password"
+         placeholder="admin123"&gt;
+
+  &lt;!-- EVENT BINDING on the buttons,
+       PROPERTY BINDING on 'disabled' --&gt;
+  &lt;div class="row"&gt;
+    &lt;button (click)="onLogin()"
+            [disabled]="!username || !password"&gt;
+      Login
+    &lt;/button&gt;
+
+    &lt;button (click)="onClear()" class="ghost"&gt;
+      Clear
+    &lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;!-- INTERPOLATION, only shown once there's a message --&gt;
+  &lt;p *ngIf="message"
+     [ngClass]="isSuccess ? 'ok' : 'bad'"&gt;
+    {{ message }}
+  &lt;/p&gt;
+
+  &lt;!-- proof that two-way binding is live --&gt;
+  &lt;p class="hint"&gt;
+    Typing live: &lt;strong&gt;{{ username }}&lt;/strong&gt;
+    ({{ username.length }} characters) ·
+    login attempts: {{ attempts }}
+  &lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/login/login.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.login-box {
+  border: 1px solid #d2d2d7;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 18px 0;
+  background: #fafafc;
+  max-width: 420px;
+}
+
+h2 { margin: 0 0 12px; font-size: 21px; }
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 10px 0 4px;
+}
+
+input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.row { display: flex; gap: 10px; margin-top: 14px; }
+
+button {
+  padding: 8px 18px;
+  border: none;
+  border-radius: 7px;
+  background: #dd0031;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled { background: #c7c7cc; cursor: not-allowed; }
+
+button.ghost {
+  background: white;
+  color: #dd0031;
+  border: 1px solid #dd0031;
+}
+
+.ok   { color: #1a9e34; font-weight: 600; }
+.bad  { color: #b00027; font-weight: 600; }
+.hint { color: #6e6e73; font-size: 14px; margin-top: 12px; }</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-weight:700;font-size:19px;margin:0 0 8px;">Login</p>
+                <p style="margin:4px 0;"><span style="font-size:13px;font-weight:600;">Username</span><br><span class="fld">admin</span></p>
+                <p style="margin:4px 0;"><span style="font-size:13px;font-weight:600;">Password</span><br><span class="fld">••••••••</span></p>
+                <p style="margin:10px 0;"><span class="btn">Login</span> &nbsp; <span class="btn ghost">Clear</span></p>
+                <p style="color:#1a9e34;font-weight:600;">✅ Login successful! Welcome, admin.</p>
+                <p style="color:#6e6e73;font-size:14px;">Typing live: <strong>admin</strong> (5 characters) · login attempts: 1</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — test it properly</span>
+              <strong>1.</strong> With both boxes empty, the <em>Login</em> button is <strong>greyed out</strong>
+              (property binding).<br>
+              <strong>2.</strong> As you type in Username, the "Typing live" line updates <strong>on every
+              keystroke</strong>, and the character count with it (two-way binding).<br>
+              <strong>3.</strong> Typing anything into both boxes <strong>enables</strong> the button.<br>
+              <strong>4.</strong> <code>admin</code> / <code>admin123</code> gives a green success message; anything else
+              gives a red failure. The attempt counter climbs either way.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four behaviours work</strong> — disabled button, live typing readout, success and failure messages.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — see two-way binding go the <em>other</em> way</span>
+              This is the half of "two-way" that is easy to miss. In <code>login.component.ts</code>, change the field to
+              <code>username = 'admin';</code> and save. <strong>The input box already contains "admin"</strong> when the
+              page loads — the class pushed a value <em>into</em> the input. Combined with the typing you already saw
+              pushing values <em>out</em>, that is both directions, which is the whole reason
+              <code>[(ngModel)]</code> exists. Set it back to <code>''</code> when you're done.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I saw two-way binding work in both directions</strong> — class → input as well as input → class.</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">A word about the password check</span>
+              Comparing a password to a hardcoded string in front-end code is <strong>only a teaching device</strong> —
+              anyone can read your Angular source in their browser. Real authentication happens on the server: you POST
+              the credentials to an API and it returns a token. Session 3 shows you how to make that call.
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== PART 3 — DIRECTIVES & PIPES ===== -->
+      <div class="section-band">Part 3 — Directives &amp; pipes</div>
+      <section class="section">
+        <details class="exp lab4" open>
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> The Employee Table with <code>*ngFor</code><span class="sync">Theory slides 29–30</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Fix the annoyance from Session 1. Instead of writing <code>employees[0]</code>, <code>employees[1]</code>,
+              <code>employees[2]</code>… you write <strong>one row</strong> and let <code>*ngFor</code> repeat it. One
+              line replaces all of it, and the table then works for four employees or four hundred.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent {
+
+  heading = 'Employee Directory';
+
+  employees: Employee[] = [
+    { id: 1001, name: 'anoop kumar',  designation: 'Software Engineer', salary: 25000, status: 'Active',   email: 'anoop@example.com' },
+    { id: 1002, name: 'ajay sharma',  designation: 'Team Lead',         salary: 45000, status: 'Inactive' },
+    { id: 1003, name: 'rekha nair',   designation: 'Tester',            salary: 22000, status: 'Active',   email: 'rekha@example.com' },
+    { id: 1004, name: 'suresh patel', designation: 'Architect',         salary: 65000, status: 'Inactive' }
+  ];
+
+  // Used by trackBy — tells Angular how to identify each row
+  trackById(index: number, emp: Employee): number {
+    return emp.id;
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Yes, the names are deliberately in lower case</span>
+              <code>'anoop kumar'</code> looks wrong on purpose. In Task 6 you will fix the display with a single pipe —
+              <strong>without editing the data</strong>. That contrast is the whole lesson of pipes, so leave the names
+              as they are for now.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;{{ heading }}&lt;/h2&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;#&lt;/th&gt;
+      &lt;th&gt;ID&lt;/th&gt;
+      &lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;Designation&lt;/th&gt;
+      &lt;th&gt;Salary&lt;/th&gt;
+      &lt;th&gt;Status&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;!-- ONE row of markup. Angular repeats it once per employee. --&gt;
+    &lt;tr *ngFor="let emp of employees; let i = index; trackBy: trackById"&gt;
+      &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.id }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.salary }}&lt;/td&gt;
+      &lt;td&gt;{{ emp.status }}&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;{{ employees.length }} employees.&lt;/p&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>h2 { font-size: 21px; margin: 22px 0 10px; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+th, td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+thead th {
+  background: #e8e8ea;
+  font-weight: 700;
+}
+
+/* Used from Task 5 onwards */
+.active-row   { background-color: #eefcf1; }
+.inactive-row { background-color: #fff0ef; }
+.status-active   { color: #1a9e34; font-weight: 600; }
+.status-inactive { color: #b00027; font-weight: 600; }</code></pre></div>
+
+            <table class="lines">
+              <thead><tr><th style="width:38%">Part of the <code>*ngFor</code></th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td>*ngFor</td><td>The asterisk marks it <strong>structural</strong> — it adds and removes elements. Forget the asterisk and nothing happens, silently.</td></tr>
+                <tr><td>let emp</td><td>A name <strong>you invent</strong> for the current item. It only exists inside this <code>&lt;tr&gt;</code>.</td></tr>
+                <tr><td>of employees</td><td>The array on your class. It is <strong><code>of</code></strong>, never <code>in</code> — same as <code>for...of</code> in TypeScript.</td></tr>
+                <tr><td>; let i = index</td><td>Note the <strong>semicolon</strong>. Gives you the position, starting at 0 — which is why the template prints <code>i + 1</code>.</td></tr>
+                <tr><td>; trackBy: trackById</td><td>Tells Angular to identify rows by <code>id</code> instead of rebuilding them all. A good habit; essential on large tables.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-weight:700;font-size:19px;margin:0 0 8px;">Employee Directory</p>
+                <table>
+                  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>1001</td><td>anoop kumar</td><td>Software Engineer</td><td>25000</td><td>Active</td></tr>
+                    <tr><td>2</td><td>1002</td><td>ajay sharma</td><td>Team Lead</td><td>45000</td><td>Inactive</td></tr>
+                    <tr><td>3</td><td>1003</td><td>rekha nair</td><td>Tester</td><td>22000</td><td>Active</td></tr>
+                    <tr><td>4</td><td>1004</td><td>suresh patel</td><td>Architect</td><td>65000</td><td>Inactive</td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;margin-top:8px;">4 employees.</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              A four-row table, numbered 1 to 4, with lower-case names and unformatted salaries. <strong>You wrote one
+              row and got four.</strong> Compare this template with what you wrote in Session 1's Task 5 — that is what
+              <code>*ngFor</code> bought you.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The table renders four rows</strong> from one row of markup.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — four experiments, all instructive</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Prove it scales.</strong> Add a fifth employee to the array. The table grows on its own and
+                    the count updates. You touched no template code.</li>
+                <li><strong>See the wrong-element trap.</strong> Move the <code>*ngFor</code> from the
+                    <code>&lt;tr&gt;</code> up onto the <code>&lt;table&gt;</code>. You now get <strong>four complete
+                    tables</strong>, each with all four rows. Put it back. The lesson: the asterisk goes on the one tag
+                    you want copies of.</li>
+                <li><strong>See the silent failure.</strong> Change <code>of employees</code> to
+                    <code>in employees</code>. The table body goes empty, with no error at all. Change it back.</li>
+                <li><strong>See what the index really is.</strong> Change <code>{{ i + 1 }}</code> to
+                    <code>{{ i }}</code>. The rows are now numbered 0 to 3 — a reminder that <code>index</code> is
+                    zero-based and humans are not.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four experiments done</strong> — including the four-tables mistake and the silent <code>in</code>/<code>of</code> bug.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 — CONDITIONAL STYLING ===== -->
+      <section class="section">
+        <details class="exp lab5" open>
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Conditional Display &amp; Styling — <code>*ngIf</code>, <code>ngClass</code>, <code>ngStyle</code><span class="sync">Theory slides 27–28, 32–34</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Make the table react to its own data: green rows for Active employees, red for Inactive, bold salaries for
+              high earners, a working Show/Hide toggle, a live search box, and a sensible "nothing found" message.
+              Everything here is driven by data — you will not write a single line that manipulates the page directly.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent {
+
+  heading = 'Employee Directory';
+
+  // controls the Show / Hide toggle
+  showTable = true;
+
+  // two-way bound to the search box
+  searchTerm = '';
+
+  allEmployees: Employee[] = [
+    { id: 1001, name: 'anoop kumar',  designation: 'Software Engineer', salary: 25000, status: 'Active',   email: 'anoop@example.com' },
+    { id: 1002, name: 'ajay sharma',  designation: 'Team Lead',         salary: 45000, status: 'Inactive' },
+    { id: 1003, name: 'rekha nair',   designation: 'Tester',            salary: 22000, status: 'Active',   email: 'rekha@example.com' },
+    { id: 1004, name: 'suresh patel', designation: 'Architect',         salary: 65000, status: 'Inactive' }
+  ];
+
+  // What the table actually displays. Starts as everything.
+  employees: Employee[] = this.allEmployees;
+
+  toggleTable(): void {
+    this.showTable = !this.showTable;
+  }
+
+  // Called on every keystroke in the search box
+  onSearch(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+
+    if (term === '') {
+      this.employees = this.allEmployees;
+      return;
+    }
+
+    this.employees = this.allEmployees.filter(e =&gt;
+      e.name.toLowerCase().includes(term) ||
+      e.designation.toLowerCase().includes(term)
+    );
+  }
+
+  getActiveCount(): number {
+    return this.employees.filter(e =&gt; e.status === 'Active').length;
+  }
+
+  trackById(index: number, emp: Employee): number {
+    return emp.id;
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Design decision</th><th>Why it's done this way</th></tr></thead>
+              <tbody>
+                <tr><td>allEmployees + employees</td><td><strong>Two arrays.</strong> <code>allEmployees</code> is the full, untouched list; <code>employees</code> is what's on screen. Without this split, searching would permanently destroy rows and clearing the box could not bring them back.</td></tr>
+                <tr><td>.trim().toLowerCase()</td><td>Makes the search forgiving — stray spaces and any capitalisation still match. Small touch, big difference to how the app feels.</td></tr>
+                <tr><td>filter(...)</td><td>Returns a <strong>new</strong> array and leaves the original alone. This is exactly Drill H from Session 1's lab.</td></tr>
+                <tr><td>|| (or)</td><td>Matches on name <em>or</em> designation, so typing "lead" finds Ajay.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;h2&gt;{{ heading }}&lt;/h2&gt;
+
+&lt;div class="toolbar"&gt;
+  &lt;!-- EVENT BINDING + interpolated label --&gt;
+  &lt;button (click)="toggleTable()"&gt;
+    {{ showTable ? 'Hide' : 'Show' }} table
+  &lt;/button&gt;
+
+  &lt;!-- TWO-WAY BINDING + an event on every keystroke --&gt;
+  &lt;input [(ngModel)]="searchTerm"
+         (input)="onSearch()"
+         name="searchTerm"
+         placeholder="Search name or designation…"&gt;
+&lt;/div&gt;
+
+&lt;!-- STRUCTURAL: the whole table exists only when showTable is true --&gt;
+&lt;div *ngIf="showTable"&gt;
+
+  &lt;!-- ...and only when there is something to show; else the empty state --&gt;
+  &lt;table *ngIf="employees.length &gt; 0; else noResults"&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;#&lt;/th&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+        &lt;th&gt;Designation&lt;/th&gt;&lt;th&gt;Salary&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr *ngFor="let emp of employees; let i = index; trackBy: trackById"
+          [ngClass]="{
+            'active-row':   emp.status === 'Active',
+            'inactive-row': emp.status === 'Inactive'
+          }"&gt;
+        &lt;td&gt;{{ i + 1 }}&lt;/td&gt;
+        &lt;td&gt;{{ emp.id }}&lt;/td&gt;
+        &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+        &lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+
+        &lt;!-- NGSTYLE: a computed value, so a class won't do --&gt;
+        &lt;td [ngStyle]="{
+              'font-weight': emp.salary &gt; 40000 ? 'bold' : 'normal',
+              'color':       emp.salary &gt; 40000 ? '#1a9e34' : '#1d1d1f'
+            }"&gt;
+          {{ emp.salary }}
+        &lt;/td&gt;
+
+        &lt;!-- single-class shorthand — neat when there's only one --&gt;
+        &lt;td [class.status-active]="emp.status === 'Active'"
+            [class.status-inactive]="emp.status === 'Inactive'"&gt;
+          {{ emp.status }}
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;!-- the else branch, referenced above by name --&gt;
+  &lt;ng-template #noResults&gt;
+    &lt;p class="empty"&gt;
+      🔍 No employees match “{{ searchTerm }}”.
+      &lt;button (click)="searchTerm = ''; onSearch()" class="link"&gt;Clear search&lt;/button&gt;
+    &lt;/p&gt;
+  &lt;/ng-template&gt;
+
+  &lt;p class="summary"&gt;
+    Showing {{ employees.length }} of {{ allEmployees.length }} employees ·
+    {{ getActiveCount() }} Active
+  &lt;/p&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.css</span>
+              <span class="fb-tag">Add these to the end of the file</span>
+            </div>
+            <div class="codewrap"><pre><code>.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 7px;
+  background: #dd0031;
+  color: white;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toolbar input {
+  flex: 1 1 240px;
+  padding: 8px 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.empty {
+  padding: 20px;
+  background: #fffdf3;
+  border: 1px solid #f0e3a8;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.link {
+  background: none;
+  border: none;
+  color: #dd0031;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.summary { color: #6e6e73; font-size: 14px; }</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-weight:700;font-size:19px;margin:0 0 8px;">Employee Directory</p>
+                <p style="margin:0 0 10px;"><span class="btn">Hide table</span> &nbsp; <span class="fld">Search name or designation…</span></p>
+                <table>
+                  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr class="row-active"><td>1</td><td>1001</td><td>anoop kumar</td><td>Software Engineer</td><td>25000</td><td><span style="color:#1a9e34;font-weight:600;">Active</span></td></tr>
+                    <tr class="row-inactive"><td>2</td><td>1002</td><td>ajay sharma</td><td>Team Lead</td><td><strong style="color:#1a9e34;">45000</strong></td><td><span style="color:#b00027;font-weight:600;">Inactive</span></td></tr>
+                    <tr class="row-active"><td>3</td><td>1003</td><td>rekha nair</td><td>Tester</td><td>22000</td><td><span style="color:#1a9e34;font-weight:600;">Active</span></td></tr>
+                    <tr class="row-inactive"><td>4</td><td>1004</td><td>suresh patel</td><td>Architect</td><td><strong style="color:#1a9e34;">65000</strong></td><td><span style="color:#b00027;font-weight:600;">Inactive</span></td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;color:#6e6e73;margin-top:8px;">Showing 4 of 4 employees · 2 Active</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — check all five</span>
+              <strong>1.</strong> Rows 1 and 3 have a <strong>green</strong> tint, rows 2 and 4 a <strong>red</strong> tint.<br>
+              <strong>2.</strong> Ajay's and Suresh's salaries are <strong>bold and green</strong> (over 40000); the other two are not.<br>
+              <strong>3.</strong> The Status column text is green or red to match.<br>
+              <strong>4.</strong> Clicking <em>Hide table</em> removes the whole table and the button's label flips to <em>Show table</em>.<br>
+              <strong>5.</strong> Typing <code>lead</code> in the search box narrows it to Ajay alone, and the summary line becomes <em>Showing 1 of 4</em>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five behaviours work</strong> — row colours, bold salaries, coloured status, the toggle, and live search.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — see the empty state and prove <code>*ngIf</code> really removes things</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Type <code>zzz</code> into the search box. The table disappears and the yellow
+                    <strong>"No employees match"</strong> panel appears instead — that is the <code>; else noResults</code>
+                    branch firing. Click <em>Clear search</em> and everything comes back.</li>
+                <li>Click <em>Hide table</em>, then press <kbd>F12</kbd> and look at the Elements tab. The
+                    <code>&lt;table&gt;</code> is <strong>not there at all</strong> — not hidden, not invisible,
+                    genuinely absent. That is the difference between <code>*ngIf</code> and CSS
+                    <code>display: none</code>.</li>
+                <li>Remove the asterisk from one <code>*ngIf</code>, making it <code>ngIf</code>. Save. The element now
+                    shows <strong>always</strong>, and there is no error. Put the asterisk back. This is the most common
+                    directive bug there is.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — including confirming in dev tools that <code>*ngIf</code> removes the element entirely.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 6 — PIPES ===== -->
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> Apply Pipes to the Table<span class="sync">Theory slides 36–37</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Fix all that ugly display — <code>anoop kumar</code> and <code>25000</code> — <strong>without editing a
+              single piece of data</strong>. Only the template changes. That is the entire point of pipes, and doing it
+              this way makes the point stick.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — change only these four cells</span>
+              <ol>
+                <li>Open <code>employee-list.component.html</code>.</li>
+                <li>Find the four <code>&lt;td&gt;</code> cells for name, designation, salary and status.</li>
+                <li>Add the pipes shown below. <strong>Do not touch the array in the <code>.ts</code> file.</strong></li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>&lt;!-- BEFORE --&gt;
+&lt;td&gt;{{ emp.name }}&lt;/td&gt;
+&lt;td&gt;{{ emp.designation }}&lt;/td&gt;
+&lt;td&gt;{{ emp.salary }}&lt;/td&gt;
+&lt;td&gt;{{ emp.status }}&lt;/td&gt;
+
+&lt;!-- AFTER --&gt;
+&lt;td&gt;{{ emp.name | titlecase }}&lt;/td&gt;
+&lt;td&gt;{{ emp.designation | uppercase }}&lt;/td&gt;
+&lt;td&gt;{{ emp.salary | currency:'INR':'symbol':'1.0-0' }}&lt;/td&gt;
+&lt;td&gt;{{ emp.status | uppercase }}&lt;/td&gt;</code></pre></div>
+
+            <p>Then add a few more pipe examples below the table, to see the range of what they do:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.html</span>
+              <span class="fb-tag">Add before the closing &lt;/div&gt;</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;div class="pipe-demo"&gt;
+    &lt;h3&gt;Pipe examples&lt;/h3&gt;
+
+    &lt;p&gt;Report generated: {{ today | date:'fullDate' }}&lt;/p&gt;
+    &lt;p&gt;Short form: {{ today | date:'dd/MM/yyyy' }}&lt;/p&gt;
+    &lt;p&gt;With time: {{ today | date:'dd MMM yyyy, h:mm a' }}&lt;/p&gt;
+
+    &lt;p&gt;Total salary bill: {{ getTotalSalary() | currency:'INR':'symbol':'1.0-0' }}&lt;/p&gt;
+    &lt;p&gt;Active proportion: {{ getActiveRatio() | percent }}&lt;/p&gt;
+    &lt;p&gt;Chained pipes: {{ heading | uppercase | slice:0:8 }}&lt;/p&gt;
+
+    &lt;!-- The best debugging tool in Angular --&gt;
+    &lt;h4&gt;What the first employee actually contains&lt;/h4&gt;
+    &lt;pre&gt;{{ employees[0] | json }}&lt;/pre&gt;
+  &lt;/div&gt;</code></pre></div>
+
+            <p>Those need three additions to the class:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Add inside the class</span>
+            </div>
+            <div class="codewrap"><pre><code>  today = new Date();
+
+  getTotalSalary(): number {
+    let total = 0;
+    for (const e of this.employees) {
+      total = total + e.salary;
+    }
+    return total;
+  }
+
+  getActiveRatio(): number {
+    if (this.employees.length === 0) { return 0; }
+    return this.getActiveCount() / this.employees.length;
+  }</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.css</span>
+              <span class="fb-tag">Add to the end of the file</span>
+            </div>
+            <div class="codewrap"><pre><code>.pipe-demo {
+  margin-top: 22px;
+  padding: 14px 18px;
+  background: #fafafc;
+  border: 1px solid #d2d2d7;
+  border-radius: 10px;
+}
+
+.pipe-demo h3 { margin: 0 0 8px; font-size: 17px; }
+.pipe-demo h4 { margin: 14px 0 4px; font-size: 15px; }
+.pipe-demo p  { margin: 4px 0; font-size: 15px; }
+
+.pipe-demo pre {
+  background: #1e1e2e;
+  color: #f8f8f2;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  overflow-x: auto;
+}</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <table>
+                  <thead><tr><th>#</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr class="row-active"><td>1</td><td>Anoop Kumar</td><td>SOFTWARE ENGINEER</td><td>₹25,000</td><td><span style="color:#1a9e34;font-weight:600;">ACTIVE</span></td></tr>
+                    <tr class="row-inactive"><td>2</td><td>Ajay Sharma</td><td>TEAM LEAD</td><td><strong style="color:#1a9e34;">₹45,000</strong></td><td><span style="color:#b00027;font-weight:600;">INACTIVE</span></td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;margin-top:10px;">Report generated: Saturday, September 5, 2026</p>
+                <p style="font-size:14px;">Total salary bill: ₹157,000</p>
+                <p style="font-size:14px;">Active proportion: 50%</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              <code>anoop kumar</code> now displays as <strong>Anoop Kumar</strong>. <code>25000</code> displays as
+              <strong>₹25,000</strong>. Designations are upper case. And the <code>| json</code> block shows the raw
+              object — <strong>where the name is still stored as <code>"anoop kumar"</code>, in lower case.</strong>
+            </div>
+            <div class="analogy">
+              <span class="lbl">That last detail is the whole lesson — look at it deliberately</span>
+              Scroll to the <code>| json</code> output and read the <code>name</code> field. It says
+              <code>"anoop kumar"</code>. The table above it says <code>Anoop Kumar</code>. <strong>Pipes changed the
+              display and left your data untouched.</strong> That is exactly what you want: if you later save this
+              employee, you save the real value, not a formatted one.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Pipes are formatting the table</strong>, and the <code>| json</code> output proves the underlying data is unchanged.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — explore the pipe options</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Change <code>currency:'INR'</code> to <code>currency:'USD'</code> and then <code>'EUR'</code>. The
+                    symbol changes and no other code moves.</li>
+                <li>Drop the last argument: <code>{{ emp.salary | currency:'INR' }}</code>. You now get
+                    <code>₹25,000.00</code> with paise. The <code>'1.0-0'</code> was saying "no decimal places".</li>
+                <li>Try several date formats: <code>'short'</code>, <code>'medium'</code>, <code>'longDate'</code>,
+                    <code>'shortTime'</code>, <code>'EEEE'</code>.</li>
+                <li>Deliberately misspell a pipe: <code>{{ emp.name | titlcase }}</code>. Read the error —
+                    <em>"The pipe 'titlcase' could not be found"</em>. Unlike most of today's bugs, <strong>this one does
+                    report itself</strong>, which is a small mercy. Fix it.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four pipe experiments done</strong>, including reading the misspelled-pipe error.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== PART 4 — COMPONENT COMMUNICATION ===== -->
+      <div class="section-band">Part 4 — Components talking to each other</div>
+      <section class="section">
+        <details class="exp lab7" open>
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> A Reusable Card with <code>@Input</code> and <code>@Output</code><span class="sync">Theory slides 38–41</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build a small <code>employee-card</code> component that knows <strong>nothing</strong> about where its data
+              comes from. The parent hands it one employee (<code>@Input</code>), and when its Delete button is pressed
+              the card <em>reports</em> that upward (<code>@Output</code>) and lets the parent decide what to do.
+              This is the <em>data down, events up</em> pattern, and it is what makes components genuinely reusable.
+            </div>
+
+            <h3>Step 1 — generate the card</h3>
+            <div class="codewrap"><pre><code>ng g c employee-card</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The card component exists</strong> and appears in <code>declarations</code>.</span>
+            </label>
+
+            <h3>Step 2 — the child: declare what it accepts and what it announces</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-card/employee-card.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Component({
+  selector: 'app-employee-card',
+  templateUrl: './employee-card.component.html',
+  styleUrls: ['./employee-card.component.css']
+})
+export class EmployeeCardComponent implements OnInit {
+
+  // ── @Input: values the PARENT passes DOWN to me ──
+  @Input() employee!: Employee;
+  @Input() showSalary = true;
+
+  // ── @Output: events I send UP to my parent ──
+  @Output() deleteRequested = new EventEmitter&lt;number&gt;();
+  @Output() cardSelected = new EventEmitter&lt;Employee&gt;();
+
+  initials = '';
+
+  ngOnInit(): void {
+    // Safe to read @Input values HERE — they have arrived by now.
+    // Reading them in the constructor would crash: they'd still be undefined.
+    this.initials = this.employee.name
+      .split(' ')
+      .map(part =&gt; part.charAt(0).toUpperCase())
+      .join('');
+  }
+
+  onDeleteClick(): void {
+    // I don't delete anything. I just announce that someone asked.
+    this.deleteRequested.emit(this.employee.id);
+  }
+
+  onCardClick(): void {
+    this.cardSelected.emit(this.employee);
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:38%">Line</th><th>What it does, and why it's written that way</th></tr></thead>
+              <tbody>
+                <tr><td>@Input() employee!: Employee;</td><td>Declares an input. The <code>!</code> tells strict mode "a parent will definitely set this" — without it you get <em>"has no initializer and is not definitely assigned"</em>.</td></tr>
+                <tr><td>@Input() showSalary = true;</td><td>An input <em>with a default</em>, so the parent may leave it out. No <code>!</code> needed, because it already has a value.</td></tr>
+                <tr><td>@Output() deleteRequested = new EventEmitter&lt;number&gt;();</td><td>Declares a custom event. The <code>&lt;number&gt;</code> says "I will emit a number" — here, the employee's id. TypeScript then checks the parent's handler accepts a number.</td></tr>
+                <tr><td>.emit(this.employee.id)</td><td>Fires the event, carrying the id. The parent receives it as <code>$event</code>.</td></tr>
+                <tr><td>ngOnInit() { ... }</td><td><strong>The critical placement.</strong> <code>@Input</code> values are set <em>after</em> the constructor runs. Computing <code>initials</code> in the constructor would throw <em>"Cannot read properties of undefined"</em>. This is exactly why <code>ngOnInit</code> exists.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-card/employee-card.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="card"
+     [ngClass]="employee.status === 'Active' ? 'card-active' : 'card-inactive'"
+     (click)="onCardClick()"&gt;
+
+  &lt;div class="avatar"&gt;{{ initials }}&lt;/div&gt;
+
+  &lt;div class="body"&gt;
+    &lt;h4&gt;{{ employee.name | titlecase }}&lt;/h4&gt;
+    &lt;p class="role"&gt;{{ employee.designation }}&lt;/p&gt;
+
+    &lt;p *ngIf="showSalary" class="pay"&gt;
+      {{ employee.salary | currency:'INR':'symbol':'1.0-0' }}
+    &lt;/p&gt;
+
+    &lt;!-- optional property: ?. keeps it safe, ?? gives a fallback --&gt;
+    &lt;p class="mail"&gt;{{ employee.email ?? 'no email on file' }}&lt;/p&gt;
+
+    &lt;span class="chip"&gt;{{ employee.status }}&lt;/span&gt;
+  &lt;/div&gt;
+
+  &lt;!-- $event.stopPropagation() stops the card's own click firing too --&gt;
+  &lt;button class="del"
+          (click)="onDeleteClick(); $event.stopPropagation()"&gt;
+    ✕
+  &lt;/button&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-card/employee-card.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid #d2d2d7;
+  border-left: 5px solid #8e8e93;
+  border-radius: 10px;
+  padding: 12px 16px;
+  background: white;
+  cursor: pointer;
+  position: relative;
+}
+
+.card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.10); }
+
+.card-active   { border-left-color: #28c840; }
+.card-inactive { border-left-color: #ff5f57; }
+
+.avatar {
+  flex: 0 0 auto;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #dd0031, #9327f0);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 15px;
+}
+
+.body { flex: 1 1 auto; }
+.body h4   { margin: 0; font-size: 16px; }
+.role      { margin: 2px 0; font-size: 14px; color: #6e6e73; }
+.pay       { margin: 2px 0; font-size: 14px; font-weight: 600; }
+.mail      { margin: 2px 0; font-size: 13px; color: #6e6e73; }
+
+.chip {
+  display: inline-block;
+  font-size: 12px; font-weight: 700;
+  padding: 2px 9px; border-radius: 20px;
+  background: #e8e8ea; color: #1d1d1f;
+}
+
+.del {
+  position: absolute; top: 8px; right: 10px;
+  background: none; border: none;
+  color: #b00027; font-size: 16px; cursor: pointer;
+}</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The card component is written</strong> — inputs, outputs, template and styles.</span>
+            </label>
+
+            <h3>Step 3 — the parent: pass data down and handle events coming up</h3>
+            <p>Add this block to the bottom of the employee-list template, just before its closing
+               <code>&lt;/div&gt;</code>:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.html</span>
+              <span class="fb-tag">Add before the final &lt;/div&gt;</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;h3&gt;Card view&lt;/h3&gt;
+
+  &lt;p *ngIf="selectedEmployee" class="selected-banner"&gt;
+    Selected: &lt;strong&gt;{{ selectedEmployee.name | titlecase }}&lt;/strong&gt;
+    ({{ selectedEmployee.designation }})
+  &lt;/p&gt;
+
+  &lt;div class="card-grid"&gt;
+    &lt;app-employee-card
+      *ngFor="let emp of employees; trackBy: trackById"
+      [employee]="emp"
+      [showSalary]="true"
+      (deleteRequested)="onDeleteEmployee($event)"
+      (cardSelected)="onSelectEmployee($event)"&gt;
+    &lt;/app-employee-card&gt;
+  &lt;/div&gt;</code></pre></div>
+
+            <p>And the matching handlers on the parent class:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Add inside the class</span>
+            </div>
+            <div class="codewrap"><pre><code>  selectedEmployee: Employee | null = null;
+
+  // Fired by a child card's (deleteRequested). $event is the id.
+  onDeleteEmployee(id: number): void {
+    // Remove from BOTH arrays, or search would bring the row back
+    this.allEmployees = this.allEmployees.filter(e =&gt; e.id !== id);
+    this.employees    = this.employees.filter(e =&gt; e.id !== id);
+
+    if (this.selectedEmployee?.id === id) {
+      this.selectedEmployee = null;
+    }
+  }
+
+  // Fired by a child card's (cardSelected). $event is the whole Employee.
+  onSelectEmployee(emp: Employee): void {
+    this.selectedEmployee = emp;
+  }</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.css</span>
+              <span class="fb-tag">Add to the end of the file</span>
+            </div>
+            <div class="codewrap"><pre><code>.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.selected-banner {
+  background: #fff4f6;
+  border: 1px solid #ffd0da;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 15px;
+}</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-weight:700;font-size:17px;margin:0 0 8px;">Card view</p>
+                <p style="background:#fff4f6;border:1px solid #ffd0da;border-radius:8px;padding:6px 12px;font-size:14px;margin:0 0 10px;">Selected: <strong>Ajay Sharma</strong> (Team Lead)</p>
+                <p style="border:1px solid #d2d2d7;border-left:5px solid #28c840;border-radius:8px;padding:10px 14px;margin:0 0 8px;font-size:14px;">
+                  <strong>AK</strong> &nbsp; <strong>Anoop Kumar</strong> · Software Engineer · ₹25,000 · anoop@example.com &nbsp; <span style="background:#e8e8ea;padding:1px 8px;border-radius:20px;font-size:12px;font-weight:700;">Active</span> &nbsp; <span style="color:#b00027;">✕</span>
+                </p>
+                <p style="border:1px solid #d2d2d7;border-left:5px solid #ff5f57;border-radius:8px;padding:10px 14px;margin:0;font-size:14px;">
+                  <strong>AS</strong> &nbsp; <strong>Ajay Sharma</strong> · Team Lead · ₹45,000 · no email on file &nbsp; <span style="background:#e8e8ea;padding:1px 8px;border-radius:20px;font-size:12px;font-weight:700;">Inactive</span> &nbsp; <span style="color:#b00027;">✕</span>
+                </p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — check all five</span>
+              <strong>1.</strong> One card per employee, each with initials in a coloured circle
+              (<code>AK</code>, <code>AS</code>, <code>RN</code>, <code>SP</code>) — computed in <code>ngOnInit</code>.<br>
+              <strong>2.</strong> A <strong>green</strong> left edge for Active, <strong>red</strong> for Inactive.<br>
+              <strong>3.</strong> Ajay and Suresh show <code>no email on file</code> — that is the <code>??</code>
+              fallback handling an optional property.<br>
+              <strong>4.</strong> Clicking a card shows the pink "Selected:" banner with that employee's name.<br>
+              <strong>5.</strong> Clicking a card's <strong>✕</strong> removes it from <em>both</em> the card grid and the
+              table above — because the parent owns the array and both views read from it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five behaviours work</strong> — initials, colour coding, the email fallback, selection, and delete updating both views.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Stop and appreciate point 5 — it is the real lesson</span>
+              You clicked ✕ on a <em>card</em>, and a row vanished from the <em>table</em>. You wrote no code connecting
+              them. It works because there is <strong>one array, owned by the parent</strong>, and both views simply
+              display it. The child said "someone asked to delete id 1002" and the parent decided what that means.
+              <strong>Data down, events up.</strong> That is the pattern every large Angular application is built on.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — including the <code>ngOnInit</code> lesson</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Prove the input is optional-with-default.</strong> Change
+                    <code>[showSalary]="true"</code> to <code>[showSalary]="false"</code>. Salaries disappear from the
+                    cards while the table keeps them — one component, two configurations.</li>
+                <li><strong>See the boolean-string trap.</strong> Now write <code>showSalary="false"</code> with
+                    <em>no brackets</em>. Salaries come <strong>back</strong>, because you passed the non-empty string
+                    <code>"false"</code> instead of the boolean <code>false</code>. Put the brackets back.</li>
+                <li><strong>The important one — prove why <code>ngOnInit</code> exists.</strong> In the card's class,
+                    move the whole <code>initials = ...</code> calculation out of <code>ngOnInit</code> and into a
+                    <code>constructor()</code>. Save, then look at the browser console: <em>"Cannot read properties of
+                    undefined (reading 'name')"</em>. <strong>At constructor time the <code>@Input</code> has not
+                    arrived yet.</strong> Move it back into <code>ngOnInit</code> and it works again. This single
+                    experiment explains a bug that confuses people for weeks.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — especially the constructor crash that shows why <code>ngOnInit</code> is the right place for setup.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> A Role Badge with <code>*ngSwitch</code><span class="sync">Optional — theory slide 31</span></summary>
+          <div class="exp-body">
+            <p>Only start this once Tasks 1–7 are ticked. Goal: add a description column whose content depends on the
+               employee's designation — four possible outcomes, which is exactly when <code>*ngSwitch</code> beats a
+               chain of <code>*ngIf</code>s.</p>
+
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li>Add a <code>&lt;th&gt;Role&lt;/th&gt;</code> to the table header.</li>
+                <li>Add the <code>&lt;td&gt;</code> below as the last cell of the <code>*ngFor</code> row.</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>&lt;td [ngSwitch]="emp.designation"&gt;
+  &lt;span *ngSwitchCase="'Architect'"&gt;🏛️ Technical leadership&lt;/span&gt;
+  &lt;span *ngSwitchCase="'Team Lead'"&gt;👥 Manages a team&lt;/span&gt;
+  &lt;span *ngSwitchCase="'Tester'"&gt;🔍 Quality assurance&lt;/span&gt;
+  &lt;span *ngSwitchDefault&gt;💻 Individual contributor&lt;/span&gt;
+&lt;/td&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              Suresh gets 🏛️, Ajay gets 👥, Rekha gets 🔍, and Anoop — whose designation matches none of the cases —
+              falls through to 💻 via <code>*ngSwitchDefault</code>.
+            </div>
+            <div class="observe">
+              <span class="lbl">Note the bracket rules carefully — this trips people up</span>
+              <code>[ngSwitch]</code> on the container: <strong>square brackets, no asterisk</strong> (the container
+              always exists).<br>
+              <code>*ngSwitchCase</code> on each option: <strong>asterisk, no brackets</strong> (the options come and go).<br>
+              And the quotes: <code>*ngSwitchCase="'Tester'"</code> — <strong>double outside, single inside</strong>.
+              Drop the inner quotes and Angular looks for a <em>field</em> called <code>Tester</code>, finds nothing, and
+              matches nothing — with no error.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Stretch done</strong> — four role descriptions render, including the default case.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Prove the quotes matter</span>
+              Remove the inner single quotes from one case, making it <code>*ngSwitchCase="Tester"</code>. Save.
+              Rekha's cell falls through to the default 💻, with no error reported anywhere. Put the quotes back.
+              You have now seen the number one <code>ngSwitch</code> bug happen to you deliberately, which is far
+              better than meeting it at 6pm on a deadline.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I broke the <code>ngSwitchCase</code> quotes on purpose</strong> and saw it fail silently.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== CHECKPOINT ===== -->
+      <div class="section-band">Checkpoint</div>
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="chevron">▶</span> Troubleshooting — organised by symptom<span class="sync">Theory slide 42</span></summary>
+          <div class="exp-body">
+            <div class="observe">
+              <span class="lbl">Read this first</span>
+              Most Session 2 bugs are <strong>silent</strong> — no red text anywhere, the page just doesn't behave. So the
+              table below is organised by <em>what you observe</em>, not by error message. Scan the left column for what
+              you are seeing.
+            </div>
+            <table class="issues">
+              <thead><tr><th style="width:36%">What you observe</th><th>Cause and fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>Can't bind to 'ngModel' since it isn't a known property of 'input'</code></td>
+                  <td><strong>The Session 2 error.</strong> Add <code>import { FormsModule } from '@angular/forms';</code> and put <code>FormsModule</code> in the <code>imports</code> array of <code>app.module.ts</code>. Remember: <em>"can't bind to X"</em> = a module is missing.</td>
+                </tr>
+                <tr>
+                  <td><code>'app-employee-card' is not a known element</code></td>
+                  <td>Three possibilities, check in order: <strong>(a)</strong> not in <code>declarations</code>, <strong>(b)</strong> the tag doesn't match the <code>selector</code>, <strong>(c)</strong> you created the files by hand instead of with <code>ng g c</code>.</td>
+                </tr>
+                <tr>
+                  <td>A child component renders <strong>nothing</strong>, no error</td>
+                  <td>You wrote <code>&lt;app-card /&gt;</code>. Angular components need an explicit closing tag: <code>&lt;app-card&gt;&lt;/app-card&gt;</code>. Fails completely silently.</td>
+                </tr>
+                <tr>
+                  <td>A section refuses to hide</td>
+                  <td>Missing asterisk — <code>ngIf</code> instead of <code>*ngIf</code>. Angular treats it as a meaningless attribute and shows the element always. No error.</td>
+                </tr>
+                <tr>
+                  <td>The table body is empty but the array has data</td>
+                  <td><code>*ngFor="let e in list"</code>. It must be <code>of</code>, not <code>in</code>. Silent.</td>
+                </tr>
+                <tr>
+                  <td>Four whole tables instead of four rows</td>
+                  <td>The <code>*ngFor</code> is on <code>&lt;table&gt;</code>. Move it to <code>&lt;tr&gt;</code> — the asterisk goes on the single tag you want copies of.</td>
+                </tr>
+                <tr>
+                  <td><code>{{ something }}</code> shows nothing at all</td>
+                  <td>A spelling or capitalisation mismatch between template and class. Angular renders missing fields as an empty string with no warning. Check both very carefully.</td>
+                </tr>
+                <tr>
+                  <td>A button does nothing when clicked</td>
+                  <td><code>(click)="onSave"</code> — missing <code>()</code>, so you named the method instead of calling it. Should be <code>(click)="onSave()"</code>.</td>
+                </tr>
+                <tr>
+                  <td>A link or image points at a literal field name</td>
+                  <td>Brackets missing: <code>href="docsUrl"</code> instead of <code>[href]="docsUrl"</code>. Without brackets the right-hand side is a plain string, not an expression.</td>
+                </tr>
+                <tr>
+                  <td>A button stays disabled forever</td>
+                  <td><code>disabled="false"</code> — the <em>string</em> <code>"false"</code> is non-empty, and HTML reads any value as "yes". Use <code>[disabled]="false"</code>. Same trap applies to <code>@Input</code> booleans.</td>
+                </tr>
+                <tr>
+                  <td><code>*ngSwitchCase</code> never matches</td>
+                  <td>Missing inner quotes. Must be <code>*ngSwitchCase="'Tester'"</code> — double outside, single inside.</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot read properties of undefined (reading 'name')</code> in a child</td>
+                  <td>You used an <code>@Input</code> value in the <code>constructor</code>. Inputs arrive <em>after</em> construction — move the code into <code>ngOnInit</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Property 'employee' has no initializer and is not definitely assigned</code></td>
+                  <td>Strict mode. Add the <code>!</code>: <code>@Input() employee!: Employee;</code> — meaning "a parent will set this".</td>
+                </tr>
+                <tr>
+                  <td><code>The pipe 'titlcase' could not be found</code></td>
+                  <td>A misspelled pipe name. Helpfully, this one <em>does</em> report itself. Check the spelling.</td>
+                </tr>
+                <tr>
+                  <td>Row colours don't change</td>
+                  <td>Usually the CSS class names in <code>[ngClass]</code> don't match the ones in your <code>.css</code> file — or the condition is never true. Add <code>{{ emp.status }}</code> next to it temporarily to see the real value.</td>
+                </tr>
+                <tr>
+                  <td>Deleted a card, but the table row is still there</td>
+                  <td>You filtered only one of the two arrays. Remove the item from <code>allEmployees</code> <em>and</em> <code>employees</code>.</td>
+                </tr>
+                <tr>
+                  <td>Clearing the search box doesn't bring rows back</td>
+                  <td>You filtered <code>allEmployees</code> itself instead of assigning the result to <code>employees</code>. The full list must stay untouched.</td>
+                </tr>
+                <tr>
+                  <td>Clicking ✕ also selects the card</td>
+                  <td>The click "bubbles" up to the card's own handler. Add <code>$event.stopPropagation()</code> to the button's click, as shown in Task 7.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Glossary — Session 2 terms</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Meaning in one sentence</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Component</strong></td><td>One self-contained piece of screen: a class, a template, scoped styles, and a <code>@Component</code> decorator.</td></tr>
+                <tr><td><strong>Template</strong></td><td>The HTML belonging to a component.</td></tr>
+                <tr><td><strong>Selector</strong></td><td>The custom tag name that renders a component, e.g. <code>&lt;app-header&gt;</code>.</td></tr>
+                <tr><td><strong>Component tree</strong></td><td>The nesting of components, with <code>AppComponent</code> always at the top.</td></tr>
+                <tr><td><strong>View encapsulation</strong></td><td>Angular scoping a component's CSS so it cannot affect anything outside that component.</td></tr>
+                <tr><td><strong>Data binding</strong></td><td>The live connection between a component class and its template.</td></tr>
+                <tr><td><strong>Interpolation</strong></td><td><code>{{ value }}</code> — display a value as text. Class → template.</td></tr>
+                <tr><td><strong>Property binding</strong></td><td><code>[attr]="value"</code> — set an element's property from your data. Class → template.</td></tr>
+                <tr><td><strong>Event binding</strong></td><td><code>(click)="method()"</code> — run a method when something happens. Template → class.</td></tr>
+                <tr><td><strong>Two-way binding</strong></td><td><code>[(ngModel)]="field"</code> — keep an input and a field in step, both ways. "Banana in a box".</td></tr>
+                <tr><td><strong><code>$event</code></strong></td><td>The event object Angular passes into an event binding — or the emitted value, for a custom <code>@Output</code>.</td></tr>
+                <tr><td><strong>Template expression</strong></td><td>The code inside a binding. It must produce a value and must not change anything.</td></tr>
+                <tr><td><strong>Directive</strong></td><td>An instruction attached to an element that changes its behaviour or appearance.</td></tr>
+                <tr><td><strong>Structural directive</strong></td><td>Adds or removes elements. Always written with a leading asterisk: <code>*ngIf</code>, <code>*ngFor</code>, <code>*ngSwitchCase</code>.</td></tr>
+                <tr><td><strong>Attribute directive</strong></td><td>Changes an element that already exists. No asterisk: <code>ngClass</code>, <code>ngStyle</code>, <code>ngModel</code>.</td></tr>
+                <tr><td><strong><code>*ngIf</code></strong></td><td>Include the element only when the condition is true — it is genuinely removed, not hidden.</td></tr>
+                <tr><td><strong><code>*ngFor</code></strong></td><td>Repeat an element once per array item. Supports <code>index</code>, <code>first</code>, <code>last</code>, <code>even</code>, <code>odd</code>.</td></tr>
+                <tr><td><strong><code>trackBy</code></strong></td><td>Tells <code>*ngFor</code> how to identify items so Angular reuses rows instead of rebuilding them all.</td></tr>
+                <tr><td><strong><code>ng-template</code></strong></td><td>A container that renders nothing itself — it holds markup for something else, such as an <code>*ngIf</code> else branch.</td></tr>
+                <tr><td><strong>Pipe</strong></td><td><code>{{ value | pipeName }}</code> — formats a value for display only, leaving the data unchanged.</td></tr>
+                <tr><td><strong>Chaining pipes</strong></td><td>Feeding one pipe's output into the next: <code>{{ d | date:'fullDate' | uppercase }}</code>.</td></tr>
+                <tr><td><strong><code>@Input</code></strong></td><td>A property a parent may set on a child. Data flows <strong>down</strong>.</td></tr>
+                <tr><td><strong><code>@Output</code></strong></td><td>A custom event a child raises for its parent, using an <code>EventEmitter</code>. Events flow <strong>up</strong>.</td></tr>
+                <tr><td><strong><code>EventEmitter</code></strong></td><td>The object an <code>@Output</code> uses; you call <code>.emit(value)</code> on it.</td></tr>
+                <tr><td><strong>Data down, events up</strong></td><td>The convention that parents pass data to children and children report events back, never the reverse.</td></tr>
+                <tr><td><strong>Lifecycle hook</strong></td><td>A method Angular calls at a known moment in a component's life.</td></tr>
+                <tr><td><strong><code>ngOnInit</code></strong></td><td>Runs once, after construction and after <code>@Input</code> values arrive. Where setup code belongs.</td></tr>
+                <tr><td><strong><code>FormsModule</code></strong></td><td>The Angular module that provides <code>ngModel</code>. Must be in <code>imports</code>.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these without looking?<span class="sync">Theory slide 43</span></summary>
+          <div class="exp-body">
+            <p>Slide numbers in brackets tell you where to look if one stumps you.</p>
+            <ol class="steps">
+              <li>Name the <strong>three parts</strong> of every component, and what the <code>@Component</code> decorator adds. <span class="muted">(slide 4)</span></li>
+              <li>What makes a component appear on screen, and what makes Angular <em>willing</em> to render it? <span class="muted">(slides 6, 9)</span></li>
+              <li>Given <code>&lt;app-customer-form&gt;</code>, what is the class name and the file path? <span class="muted">(slide 8)</span></li>
+              <li>Name all <strong>four bindings</strong>, their punctuation, and the direction each flows. <span class="muted">(slides 15, 25)</span></li>
+              <li>What is the difference between <code>src="url"</code> and <code>[src]="url"</code>? <span class="muted">(slide 18)</span></li>
+              <li>Why does <code>disabled="false"</code> leave a button disabled? <span class="muted">(slide 18)</span></li>
+              <li>What does <code>[(ngModel)]</code> need in <code>app.module.ts</code>, and what does the error look like without it? <span class="muted">(slide 23)</span></li>
+              <li>What does the <strong>asterisk</strong> in <code>*ngIf</code> signify, and what happens if you leave it out? <span class="muted">(slides 26, 27)</span></li>
+              <li>How is <code>*ngIf</code> different from CSS <code>display: none</code>? <span class="muted">(slide 27)</span></li>
+              <li>Which single tag does the <code>*ngFor</code> go on when building a table, and why? <span class="muted">(slide 29)</span></li>
+              <li>What does <code>trackBy</code> save you, and when does it actually matter? <span class="muted">(slide 30)</span></li>
+              <li>When would you choose <code>ngStyle</code> over <code>ngClass</code>? <span class="muted">(slide 34)</span></li>
+              <li>Does <code>{{ name | uppercase }}</code> change the stored value? How would you prove it? <span class="muted">(slides 36–37)</span></li>
+              <li>Explain <em>data down, events up</em> using <code>@Input</code> and <code>@Output</code>. <span class="muted">(slides 38–40)</span></li>
+              <li>Why must you compute things from an <code>@Input</code> in <code>ngOnInit</code> rather than the constructor? <span class="muted">(slide 41)</span></li>
+              <li>Name three Session 2 bugs that produce <strong>no error message at all</strong>. <span class="muted">(slide 42)</span></li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I can answer at least 12 of the 16</strong> without looking anything up.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <div class="expected" style="margin-top:20px;">
+          <span class="lbl">✅ Session 2 checkpoint — you are ready for Session 3 if…</span>
+          <ol style="margin:8px 0 0;padding-left:22px;font-size:16.5px;line-height:1.6;">
+            <li>You have <strong>six components</strong> — app, header, login, employee-list, employee-card, footer — all rendering on one page.</li>
+            <li>The login form disables its button when empty, shows live typing, and gives a green or red message.</li>
+            <li>The employee table renders from <code>*ngFor</code>, colours rows by status, bolds high salaries, toggles with a button, and filters as you type.</li>
+            <li>An empty search shows the "no results" panel via <code>*ngIf ... else</code>.</li>
+            <li>Names and salaries are formatted with <strong>pipes</strong>, and <code>| json</code> proves the data underneath is unchanged.</li>
+            <li>Cards receive an employee via <code>@Input</code> and delete via <code>@Output</code> — and deleting updates both the cards <em>and</em> the table.</li>
+            <li>You have deliberately caused at least five of today's silent bugs and can recognise each one.</li>
+          </ol>
+          <p style="margin:12px 0 0;"><strong>Keep this project.</strong> Session 3 refactors <em>this</em> employee list so its data comes from a service and then from a live API — and the template will barely change, which is the whole point of the exercise.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference — Session 2</h2>
+          <div class="grid">
+            <div>
+              <h3>The four bindings</h3>
+              <table>
+                <tr><td><code>{{ value }}</code></td><td>Text into the page. Class → template.</td></tr>
+                <tr><td><code>[attr]="expr"</code></td><td>Set a property. Class → template.</td></tr>
+                <tr><td><code>(event)="fn()"</code></td><td>React to an action. Template → class.</td></tr>
+                <tr><td><code>[(ngModel)]="f"</code></td><td>Both ways. Needs <code>FormsModule</code>.</td></tr>
+                <tr><td><code>[class.x]="cond"</code></td><td>Toggle a single class.</td></tr>
+                <tr><td><code>[style.width.px]="n"</code></td><td>Set one style, with units.</td></tr>
+              </table>
+              <h3 style="margin-top:16px;">Directives</h3>
+              <table>
+                <tr><td><code>*ngIf="cond"</code></td><td>Include only if true.</td></tr>
+                <tr><td><code>*ngIf="c; else tpl"</code></td><td>With an <code>&lt;ng-template #tpl&gt;</code>.</td></tr>
+                <tr><td><code>*ngFor="let x of list"</code></td><td>Repeat per item. <code>of</code>, never <code>in</code>.</td></tr>
+                <tr><td><code>; let i = index</code></td><td>The position, from 0.</td></tr>
+                <tr><td><code>; trackBy: fn</code></td><td>Identify items so rows are reused.</td></tr>
+                <tr><td><code>[ngSwitch]</code> / <code>*ngSwitchCase="'A'"</code></td><td>Pick one of many.</td></tr>
+                <tr><td><code>[ngClass]="{ 'a': cond }"</code></td><td>Named states.</td></tr>
+                <tr><td><code>[ngStyle]="{ 'color': x }"</code></td><td>Computed values.</td></tr>
+              </table>
+            </div>
+            <div>
+              <h3>Pipes</h3>
+              <table>
+                <tr><td><code>| uppercase</code> <code>| lowercase</code></td><td>Case conversion.</td></tr>
+                <tr><td><code>| titlecase</code></td><td><code>anoop kumar</code> → <code>Anoop Kumar</code>.</td></tr>
+                <tr><td><code>| number:'1.2-2'</code></td><td>Digit control.</td></tr>
+                <tr><td><code>| currency:'INR':'symbol':'1.0-0'</code></td><td><code>₹25,000</code>.</td></tr>
+                <tr><td><code>| percent</code></td><td><code>0.5</code> → <code>50%</code>.</td></tr>
+                <tr><td><code>| date:'dd/MM/yyyy'</code></td><td>Date formatting.</td></tr>
+                <tr><td><code>| slice:0:10</code></td><td>Truncate.</td></tr>
+                <tr><td><code>| json</code></td><td><strong>Your best debugging tool.</strong></td></tr>
+              </table>
+              <h3 style="margin-top:16px;">Component communication</h3>
+              <table>
+                <tr><td><code>@Input() x!: T;</code></td><td>Child accepts a value.</td></tr>
+                <tr><td><code>[x]="value"</code></td><td>Parent supplies it.</td></tr>
+                <tr><td><code>@Output() done = new EventEmitter&lt;T&gt;();</code></td><td>Child declares an event.</td></tr>
+                <tr><td><code>this.done.emit(v)</code></td><td>Child fires it.</td></tr>
+                <tr><td><code>(done)="handler($event)"</code></td><td>Parent listens.</td></tr>
+                <tr><td><code>ngOnInit()</code></td><td>Setup — after inputs arrive.</td></tr>
+                <tr><td><code>constructor()</code></td><td>Dependencies only.</td></tr>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:20px;">CLI commands used today</h3>
+          <p style="font-family:var(--mac-mono);font-size:14px;margin:6px 0 0;">
+            ng g c header &nbsp;·&nbsp; ng g c login &nbsp;·&nbsp; ng g c employee-list &nbsp;·&nbsp; ng g c employee-card &nbsp;·&nbsp; ng g c footer
+          </p>
+        </div>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

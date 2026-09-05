@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 3 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(147,39,240,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Expected-result box — "this is what success looks like" */
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    /* Numbered procedure list */
+    .slide ol.steps { padding-left: 24px; }
+    .slide ol.steps > li { margin: 12px 0; }
+    .slide ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .slide kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Jargon-buster rows — term on the left, plain-English meaning on the right */
+    .jargon { display: grid; gap: 8px; margin-top: 14px; }
+    .jargon .jrow {
+      display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start;
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      background: #fafafc; padding: 10px 15px;
+    }
+    .jargon .jt { font-weight: 700; color: var(--mac-accent); font-size: 16px; }
+    .jargon .jd { font-size: 15.5px; line-height: 1.5; }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.tight { font-size: 15px; }
+    table.cmp.tight th, table.cmp.tight td { padding: 8px 11px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #f8f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Component tree visual (Angular's parent-child structure) */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #dd0031; }
+    .stack-row.l2 { border-left-color: #9327f0; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* Version timeline */
+    .timeline { position: relative; margin-top: 18px; padding: 0; list-style: none; }
+    .timeline::before {
+      content: ""; position: absolute; left: 14px; top: 8px; bottom: 8px;
+      width: 2px; background: linear-gradient(180deg, #dd0031, #9327f0);
+    }
+    .timeline li { position: relative; padding: 7px 0 7px 46px; font-size: 16.5px; margin: 0; }
+    .timeline li::before {
+      content: ""; position: absolute; left: 8px; top: 14px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--mac-accent);
+    }
+    .timeline li .yr { font-weight: 800; color: var(--mac-accent); margin-right: 10px; font-variant-numeric: tabular-nums; }
+
+    /* Mock browser preview — shows what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin-top: 14px; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Data-flow direction map (used for the four binding types) */
+    .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
+    .bindmap .side {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fafafc;
+    }
+    .bindmap .side h3 { margin: 0 0 6px; font-size: 16px; }
+    .bindmap .side p { font-size: 14.5px; margin: 0; }
+    .bindmap .dir { text-align: center; color: var(--mac-accent); font-weight: 700; font-size: 13px; min-width: 90px; }
+    .bindmap .dir .a { font-size: 24px; display: block; line-height: 1.1; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(221,0,49,0.09);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #dd0031, #9327f0);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+      .jargon .jrow { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session3-theory.html — Angular Session 3</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 3 of 4 — Angular Series</span>
+            <h1>Forms, Services &amp; HTTP</h1>
+            <div class="sub">Collecting data properly, organising your code so it can be reused — and the moment your Angular app finally talks to a real server.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. RECAP + ROADMAP -->
+        <section class="slide">
+          <p class="eyebrow">Where we left off, and where we're going</p>
+          <h2>Recap of Session 2, and today's roadmap</h2>
+          <div class="note">
+            <span class="lbl">You should arrive today with</span>
+            Six components rendering on one page: a header, a login form using all four bindings, a colour-coded
+            employee table with <code>*ngFor</code> and pipes, reusable cards using <code>@Input</code> and
+            <code>@Output</code>, and a footer. <strong>But every employee is still hardcoded inside a component.</strong>
+            That is the single limitation we remove today.
+          </div>
+          <ul class="agenda">
+            <li><span class="num">1</span> Why <code>ngModel</code> alone is not enough for a real form</li>
+            <li><span class="num">2</span> <strong>Template-driven forms</strong> — validation, error messages, control state</li>
+            <li><span class="num">3</span> <strong>Reactive forms</strong> — the model-first approach, <code>Validators</code>, <code>FormBuilder</code></li>
+            <li><span class="num">4</span> Which form style to choose, and why Angular has two</li>
+            <li><span class="num">5</span> <strong>Services</strong> — getting data and logic out of your components</li>
+            <li><span class="num">6</span> <strong>Dependency injection</strong> — how Angular hands you the things you ask for</li>
+            <li><span class="num">7</span> <code>HttpClient</code> — GET, POST, PUT and DELETE against a real API</li>
+            <li><span class="num">8</span> <strong>Observables</strong> — how Angular handles data that arrives <em>later</em></li>
+            <li><span class="num">9</span> Loading states, error handling, the <code>async</code> pipe, and <strong>CORS</strong></li>
+          </ul>
+          <div class="plainbox">
+            <span class="lbl">Today in one sentence</span>
+            Session 2 made the screen react to data. <strong>Today is about where that data comes from</strong> — from a
+            form the user fills in, from a service that owns it, and finally from a server over HTTP.
+          </div>
+        </section>
+
+        <!-- 3. WHY FORMS NEED MORE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 — the problem</p>
+          <h2>Why <code>ngModel</code> alone isn't enough</h2>
+          <p class="deep">In Session 2 you built a login form with <code>[(ngModel)]</code>, and it worked. So why is
+             there a whole topic called "forms"? Because a real form has to answer questions your login form cannot:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">❓</div><h3>Is this field valid?</h3><p>Is the email actually an email? Is the salary a number? Is the name long enough?</p></div>
+            <div class="card"><div class="ic">🙈</div><h3>When do I show the error?</h3><p>Not immediately — nobody wants "name is required" before they've had a chance to type. Only after they've touched it and left it empty.</p></div>
+            <div class="card"><div class="ic">🚦</div><h3>Can I submit yet?</h3><p>The Submit button should be disabled until <em>every</em> field is valid — not just non-empty.</p></div>
+            <div class="card"><div class="ic">🔄</div><h3>Has anything changed?</h3><p>"You have unsaved changes" needs to know whether the user actually edited anything.</p></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">You could answer all of those with your own fields and <code>if</code>
+             statements. It would be a hundred lines of fiddly code per form, and you would get the edge cases wrong.
+             Angular tracks all of it for you — that is what a <span class="term">form system</span> is.</p>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            <code>ngModel</code> on its own is a <strong>plain notepad</strong> — it holds whatever you write. A form
+            system is a <strong>proper application form</strong> that knows which boxes are compulsory, checks your entries,
+            marks the problems in red, and refuses to be submitted until it's right.
+          </div>
+        </section>
+
+        <!-- 4. TWO FORM SYSTEMS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 continued</p>
+          <h2>Angular has two form systems. Why?</h2>
+          <p class="deep">This surprises people and feels like a design flaw. It isn't — they solve the same problem from
+             opposite ends, and each is genuinely better for different work.</p>
+          <div class="ba">
+            <div class="ba-col before" style="background:#f0f7ff;border-color:#cfe4ff;">
+              <h3 style="color:#0a6fd6;">Template-driven</h3>
+              <ul>
+                <li>The <strong>HTML is in charge</strong></li>
+                <li>You add <code>required</code>, <code>minlength</code> etc. as HTML attributes</li>
+                <li>Angular builds the form model <em>from</em> your template, behind the scenes</li>
+                <li>Very little TypeScript</li>
+                <li>Needs <code>FormsModule</code></li>
+              </ul>
+            </div>
+            <div class="ba-mid">vs</div>
+            <div class="ba-col after" style="background:#f9f3ff;border-color:#e6d4ff;">
+              <h3 style="color:#7a13d0;">Reactive</h3>
+              <ul>
+                <li>The <strong>TypeScript is in charge</strong></li>
+                <li>You build the form as an object in your class</li>
+                <li>The template just <em>connects</em> to that object</li>
+                <li>More TypeScript, and far more control</li>
+                <li>Needs <code>ReactiveFormsModule</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The one-line difference</span>
+            <strong>Template-driven:</strong> "write the HTML, and Angular will work out the form."<br>
+            <strong>Reactive:</strong> "define the form in code, then point the HTML at it."
+          </div>
+          <div class="keybox">
+            <span class="lbl">Which will you use at work?</span>
+            <strong>Reactive</strong>, most likely — it is what the Angular team recommends for anything non-trivial, and
+            what you will find in serious codebases. But template-driven is quicker to read and quicker to write, so we
+            teach it first: you will build the <em>same form both ways</em> today and see the trade-off yourself rather
+            than taking anyone's word for it.
+          </div>
+        </section>
+
+        <!-- 5. TEMPLATE-DRIVEN SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — template-driven forms · step 1</p>
+          <h2>Setup: <code>FormsModule</code> and <code>ngForm</code></h2>
+          <p class="deep">You already added <code>FormsModule</code> in Session 2 for <code>ngModel</code>. It also
+             brings the rest of the template-driven machinery — the key piece being an invisible directive that attaches
+             itself to every <code>&lt;form&gt;</code> tag.</p>
+          <div class="fname">the important line</div>
+          <pre><code>&lt;form #empForm="ngForm" (ngSubmit)="onSubmit()"&gt;</code></pre>
+          <div class="anno-map">
+            <div class="anno-row">
+              <div class="anno-tag">#empForm</div>
+              <div>Creates a <strong>template reference variable</strong> — a name you can use elsewhere in this template. Call it whatever you like.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">="ngForm"</div>
+              <div>Says "set that variable to the <em>form object Angular built</em>", not to the HTML element. This is the part that gives you <code>empForm.valid</code>.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">(ngSubmit)</div>
+              <div>Angular's submit event. Use this rather than <code>(submit)</code> — it stops the browser's default behaviour of reloading the page, which would otherwise wipe your app.</div>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Once you have that reference, the whole form's state is available in
+             the template:</p>
+          <pre><code>&lt;button type="submit" [disabled]="empForm.invalid"&gt;Save&lt;/button&gt;
+
+&lt;p&gt;Form valid? {{ empForm.valid }}&lt;/p&gt;
+&lt;pre&gt;{{ empForm.value | json }}&lt;/pre&gt;   &lt;!-- everything the user has typed --&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">That last line is worth using immediately</span>
+            <code>{{ empForm.value | json }}</code> shows you the entire form as an object, live, updating as you type.
+            When a form "isn't working", put that on the page and you will usually see the problem in five seconds.
+            It is the same <code>| json</code> debugging trick from Session 2.
+          </div>
+        </section>
+
+        <!-- 6. TEMPLATE-DRIVEN FIELDS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — template-driven forms · step 2</p>
+          <h2>The fields: <code>name</code> + <code>ngModel</code></h2>
+          <p class="deep">For Angular to include a field in the form, that field needs <strong>two things</strong>. Miss
+             either one and the field is invisible to the form.</p>
+          <pre><code>&lt;input type="text"
+       name="empName"           &lt;!-- 1. a name attribute --&gt;
+       [(ngModel)]="employee.name"&gt;  &lt;!-- 2. ngModel --&gt;</code></pre>
+          <div class="cards">
+            <div class="card">
+              <div class="ic">🏷️</div>
+              <h3>Why <code>name</code>?</h3>
+              <p>It becomes the <strong>key</strong> in the form's value object. Without it Angular throws
+                 <em>"If ngModel is used within a form tag, either the name attribute must be set…"</em></p>
+            </div>
+            <div class="card">
+              <div class="ic">🔗</div>
+              <h3>Why <code>ngModel</code>?</h3>
+              <p>It registers the field with the parent form <em>and</em> binds it to your data. Both jobs, one directive.</p>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Given three fields named <code>empName</code>, <code>empEmail</code>
+             and <code>empSalary</code>, <code>empForm.value</code> is exactly this:</p>
+          <pre><code>{
+  "empName": "Anoop Kumar",
+  "empEmail": "anoop@example.com",
+  "empSalary": 25000
+}</code></pre>
+          <div class="note">
+            <span class="lbl">A useful variation you'll see</span>
+            You can register a field <em>without</em> two-way binding it, by writing bare <code>ngModel</code> with no
+            brackets: <code>&lt;input name="city" ngModel&gt;</code>. Angular still tracks it and it still appears in
+            <code>empForm.value</code> — you just read it from the form object instead of from your own field. Handy when
+            you don't need a class property for every input.
+          </div>
+        </section>
+
+        <!-- 7. CONTROL STATE FLAGS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — template-driven forms · step 3</p>
+          <h2>The state flags Angular tracks for you</h2>
+          <p class="deep">This is the part that makes a form system worth having. For <strong>every single field</strong>,
+             and for the form as a whole, Angular maintains these flags — continuously, for free.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:18%">Flag</th><th>True when</th><th>You use it to…</th></tr></thead>
+            <tbody>
+              <tr><td><code>valid</code></td><td>Every validation rule passes</td><td>Enable the Submit button</td></tr>
+              <tr><td><code>invalid</code></td><td>At least one rule fails</td><td>Disable Submit; the opposite of <code>valid</code></td></tr>
+              <tr><td><code>touched</code></td><td>The user has focused the field and then left it</td><td><strong>Decide when to show an error</strong></td></tr>
+              <tr><td><code>untouched</code></td><td>The user has never visited the field</td><td>Stay quiet — don't nag yet</td></tr>
+              <tr><td><code>dirty</code></td><td>The value has been changed</td><td>"You have unsaved changes"</td></tr>
+              <tr><td><code>pristine</code></td><td>Nothing has been changed</td><td>Disable a "Reset" button</td></tr>
+              <tr><td><code>errors</code></td><td>—</td><td>An object naming <em>which</em> rules failed</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl"><code>touched</code> is the flag that makes forms feel polite</span>
+            Showing <em>"Name is required"</em> the instant an empty form loads is aggressive and confusing. The
+            professional pattern is <strong>"invalid <em>and</em> touched"</strong> — complain only once the user has
+            actually visited the field and left it in a bad state. That single condition is the difference between a form
+            that feels considerate and one that feels like it's shouting at you.
+          </div>
+          <div class="plainbox">
+            <span class="lbl">Remember the pairs</span>
+            <code>valid</code>/<code>invalid</code> · <code>touched</code>/<code>untouched</code> ·
+            <code>dirty</code>/<code>pristine</code>. Three questions: <em>is it correct?</em>, <em>have they visited
+            it?</em>, <em>have they changed it?</em>
+          </div>
+        </section>
+
+        <!-- 8. TEMPLATE-DRIVEN VALIDATION -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — template-driven forms · step 4</p>
+          <h2>Validation, the template-driven way</h2>
+          <p class="deep">You declare the rules as <strong>ordinary HTML attributes</strong>. Angular notices them and
+             starts enforcing them.</p>
+          <pre><code>&lt;input type="text"
+       name="empName"
+       [(ngModel)]="employee.name"
+       #nameField="ngModel"        &lt;!-- a reference to THIS FIELD's state --&gt;
+       required
+       minlength="3"
+       maxlength="30"&gt;
+
+&lt;!-- Show errors only once the user has been here and left --&gt;
+&lt;div *ngIf="nameField.invalid &amp;&amp; nameField.touched" class="error"&gt;
+  &lt;small *ngIf="nameField.errors?.['required']"&gt;
+    Name is required.
+  &lt;/small&gt;
+  &lt;small *ngIf="nameField.errors?.['minlength']"&gt;
+    Name must be at least 3 characters.
+  &lt;/small&gt;
+&lt;/div&gt;</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">#nameField="ngModel"</div><div>Same trick as the form, one level down: gives you <em>this field's</em> flags. Note it's <code>="ngModel"</code>, not <code>="ngForm"</code>.</div></div>
+            <div class="anno-row"><div class="anno-tag">required minlength="3"</div><div>Plain HTML attributes. Angular reads them and builds the validation rules from them.</div></div>
+            <div class="anno-row"><div class="anno-tag">invalid &amp;&amp; touched</div><div>The politeness condition from the previous slide.</div></div>
+            <div class="anno-row"><div class="anno-tag">errors?.['required']</div><div>Which rule failed, so you can write a specific message. The <code>?.</code> is needed because <code>errors</code> is <code>null</code> when the field is valid.</div></div>
+          </div>
+          <h3>The validators you get out of the box</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:26%">Attribute</th><th>Checks</th></tr></thead>
+            <tbody>
+              <tr><td><code>required</code></td><td>Not empty</td></tr>
+              <tr><td><code>minlength="3"</code> / <code>maxlength="30"</code></td><td>Text length</td></tr>
+              <tr><td><code>min="0"</code> / <code>max="100"</code></td><td>Numeric range</td></tr>
+              <tr><td><code>email</code></td><td>Looks like an email address</td></tr>
+              <tr><td><code>pattern="[0-9]{10}"</code></td><td>Matches a regular expression</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 9. TEMPLATE-DRIVEN COMPLETE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — template-driven forms · the whole thing</p>
+          <h2>A complete template-driven form</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class — barely anything</h3>
+              <pre><code>export class RegisterComponent {
+
+  // one object holding the whole form
+  employee = {
+    name: '',
+    email: '',
+    salary: 0,
+    designation: ''
+  };
+
+  submitted = false;
+
+  onSubmit(): void {
+    this.submitted = true;
+    console.log(this.employee);
+    // later: send it to the server
+  }
+
+  onReset(): void {
+    this.employee = {
+      name: '', email: '',
+      salary: 0, designation: ''
+    };
+    this.submitted = false;
+  }
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template — where the work is</h3>
+              <pre><code>&lt;form #f="ngForm" (ngSubmit)="onSubmit()"&gt;
+
+  &lt;label&gt;Name&lt;/label&gt;
+  &lt;input name="name"
+         [(ngModel)]="employee.name"
+         #n="ngModel"
+         required minlength="3"&gt;
+  &lt;small *ngIf="n.invalid &amp;&amp; n.touched"&gt;
+    Name must be 3+ characters.
+  &lt;/small&gt;
+
+  &lt;label&gt;Email&lt;/label&gt;
+  &lt;input name="email" type="email"
+         [(ngModel)]="employee.email"
+         #e="ngModel"
+         required email&gt;
+  &lt;small *ngIf="e.invalid &amp;&amp; e.touched"&gt;
+    Enter a valid email.
+  &lt;/small&gt;
+
+  &lt;label&gt;Salary&lt;/label&gt;
+  &lt;input name="salary" type="number"
+         [(ngModel)]="employee.salary"
+         required min="1000"&gt;
+
+  &lt;button type="submit"
+          [disabled]="f.invalid"&gt;Save&lt;/button&gt;
+  &lt;button type="button"
+          (click)="onReset()"
+          [disabled]="f.pristine"&gt;Reset&lt;/button&gt;
+&lt;/form&gt;
+
+&lt;p *ngIf="submitted"&gt;Saved ✅&lt;/p&gt;</code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice the balance — this is the defining characteristic</span>
+            The class is almost empty; the template does everything. That is <strong>exactly</strong> the appeal of
+            template-driven forms, and exactly their limitation: all your validation logic lives in HTML, where it cannot
+            be unit-tested, reused, or changed at runtime.
+          </div>
+        </section>
+
+        <!-- 10. REACTIVE INTRO -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · the idea</p>
+          <h2>Reactive forms: the model comes first</h2>
+          <p class="deep">Now the same problem, inverted. In a <span class="term">reactive form</span> you build the form
+             as a <strong>real object in your TypeScript</strong>, and the template merely connects to it.</p>
+          <div class="flow vert">
+            <div class="flow-box alt">1 · You create a <code>FormGroup</code> in the class<span class="sm">naming every field and every rule, in code</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">2 · The template binds to it<span class="sm">[formGroup]="empForm" and formControlName="name"</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">3 · The form object is now yours to inspect and control<span class="sm">read values, set values, add rules, react to changes — all from code</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">The first step is registering a different module. This is the third
+             time today's error pattern appears, and you should recognise it now:</p>
+          <div class="fname">src/app/app.module.ts</div>
+          <pre><code>import { ReactiveFormsModule } from '@angular/forms';
+
+@NgModule({
+  imports: [
+    BrowserModule,
+    FormsModule,            // template-driven
+    ReactiveFormsModule     // reactive  ← add this
+  ]
+})</code></pre>
+          <div class="warnbox">
+            <span class="lbl">You may keep both</span>
+            <code>FormsModule</code> and <code>ReactiveFormsModule</code> coexist happily — you need both today because
+            your Session 2 login form and search box still use <code>ngModel</code>. What you must <strong>not</strong> do
+            is mix the two styles <em>on the same form</em>: never put <code>[(ngModel)]</code> and
+            <code>formControlName</code> on the same input.
+          </div>
+        </section>
+
+        <!-- 11. FORMGROUP / FORMCONTROL -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · building the model</p>
+          <h2><code>FormGroup</code> and <code>FormControl</code></h2>
+          <p class="deep">Two classes, and the relationship is simple: a <strong><code>FormControl</code> is one
+             field</strong>, a <strong><code>FormGroup</code> is a collection of them</strong>.</p>
+          <div class="fname">register.component.ts</div>
+          <pre><code>import { Component } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
+
+@Component({ /* ... */ })
+export class RegisterComponent {
+
+  empForm = new FormGroup({
+    name:        new FormControl(''),          // '' is the starting value
+    email:       new FormControl(''),
+    salary:      new FormControl(0),
+    designation: new FormControl('Software Engineer')
+  });
+
+  onSubmit(): void {
+    console.log(this.empForm.value);
+    // { name: '...', email: '...', salary: 0, designation: '...' }
+  }
+}</code></pre>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            A <code>FormControl</code> is <strong>one box on a paper form</strong> — it knows its own contents and
+            whether they're acceptable. A <code>FormGroup</code> is <strong>the whole sheet of paper</strong> — it is
+            valid only when every box on it is valid.
+          </div>
+          <div class="keybox">
+            <span class="lbl">What you gain immediately</span>
+            <code>empForm</code> is a genuine object in your class. You can <code>console.log</code> it, inspect it in a
+            debugger, write a unit test against it without rendering any HTML, and read or change any field from code.
+            None of that is possible with a template-driven form, where the form only exists once the HTML has rendered.
+          </div>
+        </section>
+
+        <!-- 12. REACTIVE TEMPLATE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · wiring the template</p>
+          <h2>Connecting the template to the model</h2>
+          <p class="deep">Two new attributes, and that is the entire template side.</p>
+          <pre><code>&lt;form [formGroup]="empForm" (ngSubmit)="onSubmit()"&gt;
+
+  &lt;label&gt;Name&lt;/label&gt;
+  &lt;input formControlName="name"&gt;
+
+  &lt;label&gt;Email&lt;/label&gt;
+  &lt;input formControlName="email" type="email"&gt;
+
+  &lt;label&gt;Salary&lt;/label&gt;
+  &lt;input formControlName="salary" type="number"&gt;
+
+  &lt;button type="submit" [disabled]="empForm.invalid"&gt;Save&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">[formGroup]="empForm"</div><div>Property binding, on the <code>&lt;form&gt;</code>: "this form <em>is</em> that object in my class". Square brackets, because <code>empForm</code> is an expression.</div></div>
+            <div class="anno-row"><div class="anno-tag">formControlName="name"</div><div><strong>No brackets</strong> — it's a plain string naming a key inside the group. The string must match the property name in your <code>FormGroup</code> exactly.</div></div>
+          </div>
+          <div class="ba" style="margin-top:16px;">
+            <div class="ba-col before" style="background:#f0f7ff;border-color:#cfe4ff;">
+              <h3 style="color:#0a6fd6;">Template-driven needed</h3>
+              <ul>
+                <li><code>name="empName"</code></li>
+                <li><code>[(ngModel)]="employee.name"</code></li>
+                <li><code>#n="ngModel"</code></li>
+                <li><code>required minlength="3"</code></li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after" style="background:#f9f3ff;border-color:#e6d4ff;">
+              <h3 style="color:#7a13d0;">Reactive needs</h3>
+              <ul>
+                <li><code>formControlName="name"</code></li>
+                <li style="color:#6e6e73;">…and that's it</li>
+                <li style="color:#6e6e73;">the rules live in the class</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The mistake that produces a very confusing error</span>
+            Writing <code>[formControlName]="name"</code> <em>with</em> brackets makes Angular look for a class field
+            called <code>name</code> to use as the control's name. It isn't there, and the error talks about a null
+            value. <strong><code>formControlName</code> takes a plain string, so no brackets.</strong>
+          </div>
+        </section>
+
+        <!-- 13. VALIDATORS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · validation</p>
+          <h2>Validation with the <code>Validators</code> class</h2>
+          <p class="deep">In a reactive form the rules are the <strong>second argument</strong> to each
+             <code>FormControl</code> — an array of validator functions.</p>
+          <pre><code>import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+empForm = new FormGroup({
+  name: new FormControl('', [
+    Validators.required,
+    Validators.minLength(3),
+    Validators.maxLength(30)
+  ]),
+  email: new FormControl('', [
+    Validators.required,
+    Validators.email
+  ]),
+  salary: new FormControl(0, [
+    Validators.required,
+    Validators.min(1000),
+    Validators.max(500000)
+  ]),
+  phone: new FormControl('', [
+    Validators.pattern('[0-9]{10}')       // exactly ten digits
+  ])
+});</code></pre>
+          <table class="cmp tight">
+            <thead><tr><th style="width:34%">Validator</th><th>Equivalent HTML attribute</th></tr></thead>
+            <tbody>
+              <tr><td><code>Validators.required</code></td><td><code>required</code></td></tr>
+              <tr><td><code>Validators.minLength(3)</code></td><td><code>minlength="3"</code></td></tr>
+              <tr><td><code>Validators.maxLength(30)</code></td><td><code>maxlength="30"</code></td></tr>
+              <tr><td><code>Validators.min(1000)</code></td><td><code>min="1000"</code></td></tr>
+              <tr><td><code>Validators.email</code></td><td><code>email</code></td></tr>
+              <tr><td><code>Validators.pattern('...')</code></td><td><code>pattern="..."</code></td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Watch the capitalisation — it differs from the HTML</span>
+            It is <code>Validators.minLength</code> with a <strong>capital L</strong>, but the HTML attribute is
+            <code>minlength</code> all lower case. Also note <code>Validators.required</code> has <strong>no
+            brackets</strong> (you're passing the function itself), while <code>Validators.minLength(3)</code>
+            <strong>does</strong> (you're calling it to build a function). Getting that wrong is a common early error.
+          </div>
+        </section>
+
+        <!-- 14. SHOWING ERRORS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · error messages</p>
+          <h2>Showing the errors</h2>
+          <p class="deep">Same politeness rule as before — <em>invalid <strong>and</strong> touched</em> — but you reach
+             the field through the form object rather than a template reference.</p>
+          <pre><code>&lt;label&gt;Name&lt;/label&gt;
+&lt;input formControlName="name"&gt;
+
+&lt;div *ngIf="empForm.get('name')?.invalid &amp;&amp; empForm.get('name')?.touched"&gt;
+  &lt;small *ngIf="empForm.get('name')?.errors?.['required']"&gt;
+    Name is required.
+  &lt;/small&gt;
+  &lt;small *ngIf="empForm.get('name')?.errors?.['minlength']"&gt;
+    At least 3 characters, please.
+  &lt;/small&gt;
+&lt;/div&gt;</code></pre>
+          <p class="deep">That is correct but repetitive. Two ways to tidy it, and you should know both:</p>
+          <h3>Tidy option 1 — a getter on the class</h3>
+          <pre><code>// in the class
+get name() { return this.empForm.get('name'); }
+
+// in the template — much easier to read
+&lt;div *ngIf="name?.invalid &amp;&amp; name?.touched"&gt;
+  &lt;small *ngIf="name?.errors?.['required']"&gt;Name is required.&lt;/small&gt;
+&lt;/div&gt;</code></pre>
+          <h3>Tidy option 2 — <code>ng-container</code> to hold the lookup</h3>
+          <pre><code>&lt;ng-container *ngIf="empForm.get('name') as nameCtrl"&gt;
+  &lt;div *ngIf="nameCtrl.invalid &amp;&amp; nameCtrl.touched"&gt;
+    &lt;small *ngIf="nameCtrl.errors?.['required']"&gt;Name is required.&lt;/small&gt;
+  &lt;/div&gt;
+&lt;/ng-container&gt;</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why all the <code>?.</code> marks?</span>
+            <code>empForm.get('name')</code> returns <code>AbstractControl | null</code> — it has to allow for you
+            passing a name that doesn't exist. Strict mode then insists you handle the null case, and <code>?.</code> is
+            the concise way. It is the same operator from Session 1, doing the same job.
+          </div>
+        </section>
+
+        <!-- 15. FORMBUILDER -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · the shorthand you'll actually see</p>
+          <h2><code>FormBuilder</code> — less typing, same result</h2>
+          <p class="deep">Writing <code>new FormControl(...)</code> for every field gets noisy.
+             <code>FormBuilder</code> is a service that builds the same structure with far less ceremony — and it is what
+             you will find in most real code, so you need to recognise it.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The long way</h3>
+              <pre><code>import { FormGroup, FormControl,
+         Validators }
+  from '@angular/forms';
+
+export class RegisterComponent {
+  empForm = new FormGroup({
+    name: new FormControl('', [
+      Validators.required,
+      Validators.minLength(3)
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email
+    ]),
+    salary: new FormControl(0, [
+      Validators.min(1000)
+    ])
+  });
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Identical, with <code>FormBuilder</code></h3>
+              <pre><code>import { FormBuilder,
+         Validators }
+  from '@angular/forms';
+
+export class RegisterComponent {
+  empForm;
+
+  constructor(private fb: FormBuilder) {
+    this.empForm = this.fb.group({
+      name:   ['', [Validators.required,
+                    Validators.minLength(3)]],
+      email:  ['', [Validators.required,
+                    Validators.email]],
+      salary: [0,  [Validators.min(1000)]]
+    });
+  }
+}</code></pre>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">How to read the shorthand</span>
+            Each field becomes an <strong>array of two things</strong>:
+            <code>fieldName: [ startingValue, [validators] ]</code>. That's all there is to it.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Look at that constructor — you have seen it before</span>
+            <code>constructor(private fb: FormBuilder) { }</code> is the exact shorthand from Session 1's slide 29, and
+            it is <strong>dependency injection</strong> — the topic we reach in six slides. You asked for a
+            <code>FormBuilder</code> and Angular handed you one. Note also that with <code>FormBuilder</code> the form
+            must be built <em>in</em> the constructor, because <code>this.fb</code> doesn't exist until then.
+          </div>
+        </section>
+
+        <!-- 16. READING AND SETTING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — reactive forms · the real payoff</p>
+          <h2>Reading and setting values from code</h2>
+          <p class="deep">Here is where reactive forms earn their keep. Because the form is an object, you can drive it
+             programmatically — and in Session 4 you will need exactly this to build an edit screen.</p>
+          <pre><code>// ── READ ────────────────────────────────────────────────
+console.log(this.empForm.value);            // the whole form as an object
+console.log(this.empForm.get('name')?.value);  // one field
+console.log(this.empForm.valid);            // true / false
+
+// ── WRITE all fields (every field must be supplied) ─────
+this.empForm.setValue({
+  name: 'Anoop Kumar',
+  email: 'anoop@example.com',
+  salary: 25000,
+  designation: 'Software Engineer'
+});
+
+// ── WRITE some fields (this is the one you'll use) ──────
+this.empForm.patchValue({ name: 'Ajay Sharma' });
+
+// ── CLEAR the form and reset every flag ─────────────────
+this.empForm.reset();
+
+// ── DISABLE / ENABLE a field ────────────────────────────
+this.empForm.get('salary')?.disable();
+this.empForm.get('salary')?.enable();
+
+// ── REACT to every change as it happens ─────────────────
+this.empForm.get('name')?.valueChanges.subscribe(value =&gt; {
+  console.log('name is now:', value);
+});</code></pre>
+          <div class="keybox">
+            <span class="lbl">Remember <code>patchValue</code> — Session 4 depends on it</span>
+            In Session 4 you build an "edit customer" screen: the user clicks a row and the form fills in with that
+            row's data. That is one line — <code>this.form.patchValue(selectedCustomer)</code>. Doing the same thing in a
+            template-driven form means manually assigning every property.
+          </div>
+          <div class="note">
+            <span class="lbl">And note that last one</span>
+            <code>valueChanges.subscribe(...)</code> gives you a live stream of every keystroke. That word
+            <strong>subscribe</strong> is about to become very important — it is how Observables work, and it is the
+            same mechanism <code>HttpClient</code> uses.
+          </div>
+        </section>
+
+        <!-- 17. TD VS REACTIVE -->
+        <section class="slide">
+          <p class="eyebrow">Concepts 2 and 3 — the decision</p>
+          <h2>Template-driven vs reactive</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:22%">Aspect</th><th>Template-driven</th><th>Reactive</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Module needed</strong></td><td><code>FormsModule</code></td><td><code>ReactiveFormsModule</code></td></tr>
+              <tr><td><strong>Where the form is defined</strong></td><td>In the HTML</td><td class="good">In the TypeScript class</td></tr>
+              <tr><td><strong>Where validation lives</strong></td><td>HTML attributes</td><td class="good"><code>Validators</code> in code</td></tr>
+              <tr><td><strong>Binding used</strong></td><td><code>[(ngModel)]</code></td><td><code>formControlName</code></td></tr>
+              <tr><td><strong>Amount of code</strong></td><td class="good">Very little</td><td>More upfront</td></tr>
+              <tr><td><strong>Unit testable?</strong></td><td class="bad">Hard — needs the template rendered</td><td class="good">Easy — it's a plain object</td></tr>
+              <tr><td><strong>Change rules at runtime?</strong></td><td class="bad">No</td><td class="good">Yes — add or remove validators any time</td></tr>
+              <tr><td><strong>Set values from code?</strong></td><td>Awkward</td><td class="good"><code>patchValue</code> / <code>setValue</code></td></tr>
+              <tr><td><strong>Dynamic fields</strong></td><td class="bad">Very difficult</td><td class="good"><code>FormArray</code> handles it</td></tr>
+              <tr><td><strong>Best for</strong></td><td class="good">Login, search, a contact form</td><td class="good">Anything with real rules, or an edit screen</td></tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">The practical rule</span>
+            <strong>Two or three simple fields → template-driven.</strong> It is genuinely faster and easier to read.<br>
+            <strong>Anything else → reactive.</strong> Real validation, edit screens, conditional rules, fields the user
+            can add or remove, or anything you want to test.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            An insurance quote form shows different questions depending on the policy type chosen, and the number of
+            "dependants" rows grows as the user clicks Add. Which system, and why?
+            <span class="muted">(Reactive — the field set changes at runtime, which template-driven cannot express, and
+            <code>FormArray</code> exists precisely for repeating rows.)</span>
+          </div>
+        </section>
+
+
+        <!-- 18. WHY A SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — services · the problem first</p>
+          <h2>What is a service, and why do you need one?</h2>
+          <p class="lead">A <span class="term">service</span> is an ordinary TypeScript class that holds reusable logic
+             and data access. It has no template and no UI — its job is to let components focus on one thing:
+             <strong>presentation</strong>.</p>
+          <p class="deep">Right now your <code>employees</code> array lives inside <code>EmployeeListComponent</code>.
+             Here is what that costs you:</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>❌ Without a service</h3>
+              <ul>
+                <li>The array lives inside <code>EmployeeListComponent</code></li>
+                <li>Need the same data in a dropdown? <strong>Copy the array.</strong></li>
+                <li>Search logic sits next to display logic</li>
+                <li>Switching to a real API means rewriting the component</li>
+                <li>Testing the data logic requires rendering a template</li>
+                <li>Two components with two copies drift apart</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✅ With a service</h3>
+              <ul>
+                <li>The data lives in <code>EmployeeService</code></li>
+                <li>Any component injects it and gets <strong>the same</strong> data</li>
+                <li>Component = display. Service = data.</li>
+                <li>Swap the array for an HTTP call — <strong>components don't change</strong></li>
+                <li>Test the service as a plain class</li>
+                <li>One source of truth, always</li>
+              </ul>
+            </div>
+          </div>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            A component is a <strong>shop window</strong> — its job is to display things attractively. A service is the
+            <strong>warehouse</strong> — it owns the stock. You would not store your entire inventory in the window, and
+            you would not want ten windows each keeping their own separate stock.
+          </div>
+          <div class="keybox">
+            <span class="lbl">You have already done this on the backend</span>
+            Your Spring Boot <code>@RestController</code> does not contain SQL — it delegates to a <code>@Service</code>,
+            which delegates to a <code>@Repository</code>. <strong>An Angular service is that same separation, on the
+            front end.</strong> Same reasoning, same benefits, same shape.
+          </div>
+        </section>
+
+        <!-- 19. THREE STEPS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — services · the whole pattern in three steps</p>
+          <h2>Three steps to use a service — that's all there is</h2>
+          <div class="flow vert">
+            <div class="flow-box">1 · <strong>Create it</strong><span class="sm">ng generate service employee</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">2 · <strong>Register it</strong><span class="sm">@Injectable({ providedIn: 'root' }) — the CLI writes this for you</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">3 · <strong>Inject it</strong><span class="sm">constructor(private employeeService: EmployeeService) { }</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">Step 2 is done automatically. Step 1 is one command. So in practice
+             using a service is <strong>one command and one constructor line</strong>.</p>
+          <div class="plainbox">
+            <span class="lbl">The Spring Boot comparison, line for line</span>
+            <code>@Injectable</code> is Angular's <code>@Service</code>.
+            <code>providedIn: 'root'</code> is "make it a singleton bean in the application context".
+            <code>constructor(private employeeService: EmployeeService)</code> is constructor injection —
+            <strong>exactly</strong> what you write in a Spring <code>@RestController</code>. If that pattern is familiar,
+            you already understand this topic and today is just new syntax.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The one rule that surprises people</span>
+            You <strong>never</strong> write <code>new EmployeeService()</code>. Angular creates it and hands it to you.
+            If you find yourself typing <code>new</code> in front of a service, stop — you are about to create a second,
+            separate copy, and your two components will silently stop sharing data.
+          </div>
+        </section>
+
+        <!-- 20. CREATING A SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — services · step 1</p>
+          <h2>Creating a service</h2>
+          <pre><code>ng generate service employee
+
+# the short form
+ng g s employee</code></pre>
+          <div class="fname">what the CLI prints</div>
+          <pre><code>CREATE src/app/employee.service.spec.ts (367 bytes)
+CREATE src/app/employee.service.ts (137 bytes)</code></pre>
+          <p class="deep">Note what is <em>not</em> there: no <code>UPDATE app.module.ts</code>. Unlike a component, a
+             service does not need registering in the module — the decorator handles it, as the next slide explains.</p>
+          <div class="fname">src/app/employee.service.ts — what you get</div>
+          <pre><code>import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+  constructor() { }
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">@Injectable</div><div>Marks the class as available for injection. It is Angular's <code>@Service</code>.</div></div>
+            <div class="anno-row"><div class="anno-tag">providedIn: 'root'</div><div><strong>This is the registration.</strong> "Make one instance, available everywhere in the app." Written for you by the CLI.</div></div>
+            <div class="anno-row"><div class="anno-tag">.service.ts</div><div>The naming convention. Class name = <code>EmployeeService</code>, file = <code>employee.service.ts</code>. Same pattern as <code>.component.ts</code>.</div></div>
+          </div>
+          <div class="note">
+            <span class="lbl">A tidiness suggestion</span>
+            The CLI drops the service in <code>src/app/</code>. In a real project you would put it in a folder:
+            <code>ng g s services/employee</code> creates <code>src/app/services/employee.service.ts</code>. Once you have
+            five services, you will be glad you did.
+          </div>
+        </section>
+
+        <!-- 21. INSIDE THE SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — services · filling it in</p>
+          <h2>Inside the service</h2>
+          <div class="fname">src/app/employee.service.ts</div>
+          <pre><code>import { Injectable } from '@angular/core';
+import { Employee } from './models/employee';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class EmployeeService {
+
+  // PRIVATE — the outside world can only reach this through my methods
+  private employees: Employee[] = [
+    { id: 1001, name: 'anoop kumar',  designation: 'Software Engineer', salary: 25000, status: 'Active', email: 'anoop@example.com' },
+    { id: 1002, name: 'ajay sharma',  designation: 'Team Lead',         salary: 45000, status: 'Inactive' },
+    { id: 1003, name: 'rekha nair',   designation: 'Tester',            salary: 22000, status: 'Active', email: 'rekha@example.com' },
+    { id: 1004, name: 'suresh patel', designation: 'Architect',         salary: 65000, status: 'Inactive' }
+  ];
+
+  getEmployees(): Employee[] {
+    return this.employees;
+  }
+
+  getById(id: number): Employee | undefined {
+    return this.employees.find(e =&gt; e.id === id);
+  }
+
+  searchByName(term: string): Employee[] {
+    const t = term.trim().toLowerCase();
+    if (t === '') { return this.employees; }
+    return this.employees.filter(e =&gt; e.name.toLowerCase().includes(t));
+  }
+
+  addEmployee(emp: Employee): void {
+    this.employees.push(emp);
+  }
+
+  deleteEmployee(id: number): void {
+    const i = this.employees.findIndex(e =&gt; e.id === id);
+    if (i !== -1) { this.employees.splice(i, 1); }
+  }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Two decisions in there worth copying</span>
+            <strong>1. The array is <code>private</code>.</strong> Nothing outside can reassign or corrupt it — every
+            access goes through a method you control. That is the same discipline as a private field with getters in Java.<br>
+            <strong>2. Those are the six array methods from Session 1's Drill H</strong> — <code>find</code>,
+            <code>filter</code>, <code>push</code>, <code>findIndex</code>, <code>splice</code>. This service is a
+            complete in-memory CRUD layer, and Session 4 will swap its innards for HTTP calls without touching a single
+            component.
+          </div>
+        </section>
+
+        <!-- 22. INJECTING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — services · step 3</p>
+          <h2>Injecting the service into a component</h2>
+          <div class="fname">src/app/employee-list/employee-list.component.ts</div>
+          <pre><code>import { Component, OnInit } from '@angular/core';
+import { Employee } from '../models/employee';
+import { EmployeeService } from '../employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent implements OnInit {
+
+  employees: Employee[] = [];
+
+  // ← the constructor shorthand from Session 1, slide 29
+  constructor(private employeeService: EmployeeService) { }
+
+  ngOnInit(): void {
+    this.employees = this.employeeService.getEmployees();
+  }
+
+  onSearch(term: string): void {
+    this.employees = this.employeeService.searchByName(term);
+  }
+}</code></pre>
+          <table class="cmp tight">
+            <thead><tr><th style="width:34%">Line</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>import { EmployeeService }</code></td><td>Tells this file where the class is.</td></tr>
+              <tr><td><code>constructor(private employeeService: EmployeeService)</code></td><td>Declares a private field <em>and</em> assigns Angular's injected instance to it, in one line. You never write <code>new</code>.</td></tr>
+              <tr><td><code>implements OnInit</code></td><td>Declares that this class has an <code>ngOnInit</code>, so TypeScript catches a misspelling.</td></tr>
+              <tr><td><code>ngOnInit()</code></td><td>Where the data is actually fetched. <strong>Not</strong> the constructor.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">"Why not fetch the data in the constructor?"</span>
+            For a synchronous array it would technically work — and it is still the wrong habit. The constructor runs
+            before Angular has finished setting the component up, and mixing <em>wiring</em> with <em>work</em> makes
+            components harder to test and harder to reason about. The rule from Session 2 stands:
+            <strong>constructor for dependencies, <code>ngOnInit</code> for work.</strong>
+          </div>
+        </section>
+
+        <!-- 23. DI EXPLAINED -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 — dependency injection · how it actually works</p>
+          <h2>Who created that service?</h2>
+          <p class="deep">You asked for an <code>EmployeeService</code> in a constructor parameter and one appeared. No
+             <code>new</code> anywhere. That is <span class="term">dependency injection</span>, and here is the mechanism —
+             worth understanding rather than treating as magic.</p>
+          <div class="flow vert">
+            <div class="flow-box">1 · Angular needs to create <code>EmployeeListComponent</code><span class="sm">so it reads the constructor's parameter TYPES</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">2 · It sees the parameter is an <code>EmployeeService</code><span class="sm">and asks the injector for one</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">3 · The injector: "do I already have one?"<span class="sm">Yes → hand back the existing instance. No → create it, cache it, hand it back.</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">4 · The instance is passed in, and your private field is set<span class="sm">your component never knew how it was built</span></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">The <span class="term">injector</span> is a registry that knows how to
+             build every registered service and hands out instances on request.</p>
+          <div class="keybox">
+            <span class="lbl">Why this is worth having, in two points</span>
+            <strong>1. Your component is decoupled.</strong> It declares <em>what</em> it needs, never <em>how</em> to
+            build it. If <code>EmployeeService</code> later needs an <code>HttpClient</code> and a logger, the component
+            doesn't change one character.<br>
+            <strong>2. It's testable.</strong> In a test, hand the component a fake service that returns two known
+            employees. Because the component never called <code>new</code>, it cannot tell the difference.
+          </div>
+        </section>
+
+        <!-- 24. SINGLETONS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 continued — a consequence that matters</p>
+          <h2>Singletons and <code>providedIn</code></h2>
+          <p class="deep">With <code>providedIn: 'root'</code> there is exactly <strong>one instance</strong> of your
+             service for the entire application. Ten components injecting <code>EmployeeService</code> all receive the
+             <em>same object</em>.</p>
+          <div class="tree-vis" data-label="One instance, shared by everyone">
+            <div class="tv-row">
+              <div class="node root"><div class="bn">EmployeeService</div><div class="bd">ONE instance · providedIn: 'root'</div></div>
+            </div>
+            <div class="tv-tick">╱ &nbsp; │ &nbsp; ╲</div>
+            <div class="tv-row">
+              <div class="node"><div class="bn">EmployeeListComponent</div><div class="bd">injects it</div></div>
+              <div class="node"><div class="bn">EmployeeFormComponent</div><div class="bd">injects it</div></div>
+              <div class="node"><div class="bn">DashboardComponent</div><div class="bd">injects it</div></div>
+            </div>
+            <div class="tv-note">All three hold a reference to the same object — so data added by one is visible to all.</div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why the singleton behaviour is the point, not a side effect</span>
+            In Session 4, a form component will add a customer and the list component will immediately show it — with no
+            code connecting them. That works <strong>only</strong> because both are talking to the same service instance.
+            Genuinely shared state, for free.
+          </div>
+          <h3>Two ways to register a service</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:36%">How</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td><code>@Injectable({ providedIn: 'root' })</code></td><td class="good"><strong>The modern default</strong>, and what the CLI generates. One shared instance; unused services are dropped from the build automatically.</td></tr>
+              <tr><td><code>providers: [EmployeeService]</code> in <code>app.module.ts</code></td><td>The older style. Still valid, still works, and what you'll see in legacy projects.</td></tr>
+              <tr><td><code>providers: [EmployeeService]</code> in a <code>@Component</code></td><td>Gives <em>that component</em> its own private instance. Occasionally exactly what you want; usually a bug.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">How many services should an app have?</span>
+            As many as it has feature areas — there is no "one service per app" rule. A banking app would naturally have
+            a <code>CustomerService</code>, a <code>TransactionService</code> and an <code>AuthService</code>.
+            <strong>One service, one responsibility</strong> — the same instinct that stops your Spring services becoming
+            a dumping ground.
+          </div>
+        </section>
+
+        <!-- 25. WHAT DIDN'T CHANGE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — the detail that proves the point</p>
+          <h2>Notice what did <em>not</em> change</h2>
+          <p class="deep">You have just moved your data out of the component and into a service. Now look at the template
+             from Session 2:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>Session 2's template</h3>
+              <pre><code>&lt;tr *ngFor="let emp of employees"&gt;
+  &lt;td&gt;{{ emp.name | titlecase }}&lt;/td&gt;
+  &lt;td&gt;{{ emp.salary | currency }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Session 3's template</h3>
+              <pre><code>&lt;tr *ngFor="let emp of employees"&gt;
+  &lt;td&gt;{{ emp.name | titlecase }}&lt;/td&gt;
+  &lt;td&gt;{{ emp.salary | currency }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+            </div>
+          </div>
+          <p class="lead" style="margin-top:16px;">They are <strong>identical</strong>. Not similar — identical.</p>
+          <div class="keybox">
+            <span class="lbl">This is what good architecture feels like</span>
+            The data now arrives from a completely different place, and <strong>the view neither knows nor cares</strong>.
+            The template's contract is "there is an array called <code>employees</code>" — and how it got there is
+            somebody else's business.<br><br>
+            Hold onto this, because in a few slides the data will start arriving from a <em>server</em>, over the network,
+            asynchronously — and this template <strong>still</strong> won't change. That is the whole reason we bothered
+            with the refactor.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            If the same employee data is needed on a dashboard screen too, what do you write now?
+            <span class="muted">(One constructor line and one <code>ngOnInit</code> line. Before the refactor, you would
+            have copy-pasted the array — and then had two versions of the truth.)</span>
+          </div>
+        </section>
+
+        <!-- 26. HTTPCLIENT INTRO -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — talking to a server · the main event</p>
+          <h2><code>HttpClient</code> — the bridge to your API</h2>
+          <p class="deep">Everything so far has been in memory. <code>HttpClient</code> is Angular's built-in way to send
+             HTTP requests and receive JSON — the piece that finally connects your Angular app to the Spring Boot API you
+             already know how to build.</p>
+          <div class="arch">
+            <div class="arch-node"><div class="t">Component</div><div class="d">displays data</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">Service</div><div class="d">owns the calls</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">HttpClient</div><div class="d">GET / POST / PUT / DELETE</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">REST API</div><div class="d">Spring Boot @RestController</div></div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-node"><div class="t">Database</div><div class="d">MySQL / H2</div></div>
+          </div>
+          <div class="arch-fallback">Component → Service → HttpClient → REST API → Database. JSON returns along the same path.</div>
+          <div class="keybox">
+            <span class="lbl">The rule about where HTTP calls belong</span>
+            <code>HttpClient</code> goes in your <strong>service</strong>, never in a component. The component asks the
+            service for data; the service knows about URLs and HTTP. Put an HTTP call in a component and you have merged
+            two layers that you spent the last eight slides separating.
+          </div>
+          <div class="plainbox">
+            <span class="lbl">This is the diagram from Session 1, slide 13 — now you're building it</span>
+            You have spent three sessions on the left-hand side and four Spring Boot sessions on the right.
+            <strong>Today the two halves meet.</strong>
+          </div>
+        </section>
+
+        <!-- 27. HTTPCLIENT SETUP -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — setup · third time you'll see this pattern</p>
+          <h2>Setting up <code>HttpClient</code></h2>
+          <p class="deep">Two steps, and if you remember the <code>FormsModule</code> lesson from Session 2 you can
+             predict both.</p>
+          <div class="fname">Step 1 — src/app/app.module.ts</div>
+          <pre><code>import { HttpClientModule } from '@angular/common/http';   // ← note the package
+
+@NgModule({
+  declarations: [ /* ...your components... */ ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule            // ← add this
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre>
+          <div class="fname">Step 2 — inject it into your service</div>
+          <pre><code>import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({ providedIn: 'root' })
+export class EmployeeService {
+
+  private baseUrl = 'https://jsonplaceholder.typicode.com/users';
+
+  constructor(private http: HttpClient) { }   // ← the shorthand again
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The error if you forget step 1 — you know its shape by now</span>
+            <code>NullInjectorError: No provider for HttpClient!</code><br>
+            That is the same family as <em>"Can't bind to 'ngModel'"</em>: <strong>a module is missing from
+            <code>imports</code></strong>. Third time today. Also note the package is <code>@angular/common/http</code>,
+            <em>not</em> <code>@angular/core</code> — a genuinely easy import to get wrong.
+          </div>
+          <div class="note">
+            <span class="lbl">On newer Angular versions</span>
+            Angular 15+ also offers <code>provideHttpClient()</code> in <code>main.ts</code> for standalone applications.
+            <code>HttpClientModule</code> still works and is what module-based projects — including yours, and most
+            corporate codebases — use.
+          </div>
+        </section>
+
+        <!-- 28. GET -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — reading data</p>
+          <h2>GET — reading from the server</h2>
+          <div class="fname">in the service</div>
+          <pre><code>getEmployees(): Observable&lt;Employee[]&gt; {
+  return this.http.get&lt;Employee[]&gt;(this.baseUrl);
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">this.http.get(...)</div><div>Sends an HTTP GET to the URL.</div></div>
+            <div class="anno-row"><div class="anno-tag">&lt;Employee[]&gt;</div><div>A <strong>generic type argument</strong>: "the JSON that comes back is an array of Employee". This is what gives you autocomplete on server data.</div></div>
+            <div class="anno-row"><div class="anno-tag">Observable&lt;Employee[]&gt;</div><div>The return type. <strong>Not</strong> the data itself — a <em>promise of future data</em>. Next slide explains why this matters enormously.</div></div>
+          </div>
+          <div class="fname">in the component</div>
+          <pre><code>employees: Employee[] = [];
+
+constructor(private employeeService: EmployeeService) { }
+
+ngOnInit(): void {
+  this.employeeService.getEmployees().subscribe(data =&gt; {
+    this.employees = data;              // runs LATER, when the reply arrives
+  });
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The mistake absolutely everyone makes once</span>
+            <pre style="margin:8px 0 0;"><code>// ✖ THIS DOES NOT WORK
+this.employees = this.employeeService.getEmployees();
+// Type 'Observable&lt;Employee[]&gt;' is not assignable to type 'Employee[]'</code></pre>
+            <p style="margin:8px 0 0;font-size:15.5px;">A <code>get()</code> does not return data — it returns an
+               <strong>Observable</strong>, which is a description of data that will arrive later. You must
+               <code>.subscribe()</code> to receive it. If you take one thing from this slide, take that.</p>
+          </div>
+        </section>
+
+        <!-- 29. OBSERVABLES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 — the idea behind <code>subscribe</code></p>
+          <h2>What is an Observable, and why does Angular use them?</h2>
+          <p class="deep">An HTTP request takes time — 50 milliseconds on a good day, several seconds on a bad one. Your
+             app cannot freeze while it waits, so the reply must be handled <strong>asynchronously</strong>: "carry on,
+             and run this code when the answer turns up."</p>
+          <p class="deep">An <span class="term">Observable</span> is Angular's way of representing "a value that will
+             arrive later, possibly more than once".</p>
+          <div class="analogy">
+            <span class="lbl">Analogy — this one is worth remembering</span>
+            You order a coffee. The barista gives you a <strong>numbered ticket</strong>, not a coffee.<br>
+            The ticket is the <strong>Observable</strong>. It is not the drink — it is a promise that a drink is coming.<br>
+            <strong><code>subscribe()</code></strong> is you saying <em>"call my number when it's ready, and here's what
+            I'll do when you do."</em><br>
+            And crucially: <strong>no subscribe, no coffee.</strong> An Observable nobody subscribes to never even sends
+            the request.
+          </div>
+          <table class="cmp">
+            <thead><tr><th style="width:22%"></th><th>Promise</th><th>Observable</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Values</strong></td><td>Exactly one</td><td class="good">One, many, or a continuous stream</td></tr>
+              <tr><td><strong>Starts</strong></td><td>Immediately, whether you want it or not</td><td class="good">Only when subscribed ("lazy")</td></tr>
+              <tr><td><strong>Cancellable?</strong></td><td class="bad">No</td><td class="good">Yes — <code>unsubscribe()</code></td></tr>
+              <tr><td><strong>Operators</strong></td><td>Few</td><td class="good">Many — <code>map</code>, <code>filter</code>, <code>debounceTime</code>…</td></tr>
+              <tr><td><strong>Used for</strong></td><td>One-off async work</td><td class="good">HTTP, form changes, route changes, events</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Where else you've already met them today</span>
+            <code>this.empForm.get('name')?.valueChanges.subscribe(...)</code> from the reactive-forms slide is an
+            Observable too — a stream of every keystroke. <strong>Observables are everywhere in Angular</strong>: HTTP,
+            form changes, route parameters. Learning <code>subscribe</code> once buys you all of them.
+          </div>
+        </section>
+
+        <!-- 30. SUBSCRIBE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 continued</p>
+          <h2><code>subscribe</code> — and always handle the error</h2>
+          <p class="deep"><code>subscribe</code> takes an object with up to three handlers. Most tutorials show only the
+             first, and that is why so many apps break silently when the network fails.</p>
+          <pre><code>this.employeeService.getEmployees().subscribe({
+
+  next: (data) =&gt; {
+    // ✅ the reply arrived
+    this.employees = data;
+    console.log('Received ' + data.length + ' employees');
+  },
+
+  error: (err) =&gt; {
+    // ❌ something went wrong — DON'T SKIP THIS
+    console.error('Request failed:', err);
+    this.errorMessage = 'Could not load employees. Please try again.';
+  },
+
+  complete: () =&gt; {
+    // 🏁 the Observable has finished. For HTTP, right after next.
+    console.log('Done');
+  }
+});</code></pre>
+          <table class="cmp tight">
+            <thead><tr><th style="width:18%">Handler</th><th>Runs when</th><th>Optional?</th></tr></thead>
+            <tbody>
+              <tr><td><code>next</code></td><td>A value arrives. For HTTP this happens exactly once.</td><td>You'll always want it</td></tr>
+              <tr><td><code>error</code></td><td>The request fails — network down, 404, 500, CORS blocked.</td><td class="bad">Technically yes. <strong>Never omit it.</strong></td></tr>
+              <tr><td><code>complete</code></td><td>The stream has ended.</td><td class="good">Usually omitted for HTTP</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">What "no error handler" looks like to a user</span>
+            The screen stays permanently blank. No message, no spinner, nothing — the failure was reported only to the
+            browser console, which the user will never open. <strong>Handling errors is not a polish task; it is the
+            difference between an app and a demo.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">You will also see the older style</span>
+            <code>.subscribe(data =&gt; { ... }, err =&gt; { ... })</code> — two positional arguments instead of an object.
+            It still works and it is deprecated. Prefer the object form, but recognise the old one in existing code.
+          </div>
+        </section>
+
+        <!-- 31. POST -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — creating data</p>
+          <h2>POST — sending data to the server</h2>
+          <div class="fname">in the service</div>
+          <pre><code>addEmployee(emp: Employee): Observable&lt;Employee&gt; {
+  return this.http.post&lt;Employee&gt;(this.baseUrl, emp);
+}</code></pre>
+          <p class="deep">The difference from GET: a <strong>second argument</strong> — the object to send. Angular
+             converts it to JSON and sets the <code>Content-Type</code> header for you.</p>
+          <div class="fname">in the component</div>
+          <pre><code>onSave(): void {
+  const newEmp: Employee = {
+    id: 0,                                   // the server assigns the real id
+    name: this.empForm.value.name,
+    designation: this.empForm.value.designation,
+    salary: this.empForm.value.salary,
+    status: 'Active'
+  };
+
+  this.employeeService.addEmployee(newEmp).subscribe({
+    next: (saved) =&gt; {
+      this.message = 'Saved with id ' + saved.id;
+      this.employees.push(saved);      // use what the SERVER returned
+      this.empForm.reset();
+    },
+    error: (err) =&gt; {
+      this.message = 'Save failed. Please try again.';
+      console.error(err);
+    }
+  });
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Push the <em>server's</em> object, not your own — this matters</span>
+            The reply usually differs from what you sent: the real database id, a server-generated timestamp, defaults
+            you left out. Always use the object from <code>next</code>. Pushing your local copy leaves you with an
+            employee whose id is <code>0</code>, and the delete button will then fail mysteriously.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">And remember: nothing is sent until you subscribe</span>
+            Calling <code>addEmployee(emp)</code> without <code>.subscribe()</code> sends <strong>no request at all</strong>.
+            No error, no warning, no network traffic — Observables are lazy. When "my POST isn't firing", this is almost
+            always why.
+          </div>
+        </section>
+
+        <!-- 32. PUT / DELETE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — updating and deleting</p>
+          <h2>PUT and DELETE</h2>
+          <div class="fname">in the service</div>
+          <pre><code>// PUT — replace an existing record. The id goes in the URL.
+updateEmployee(emp: Employee): Observable&lt;Employee&gt; {
+  return this.http.put&lt;Employee&gt;(this.baseUrl + '/' + emp.id, emp);
+}
+
+// DELETE — no body, just the URL
+deleteEmployee(id: number): Observable&lt;void&gt; {
+  return this.http.delete&lt;void&gt;(this.baseUrl + '/' + id);
+}
+
+// GET one — same idea
+getById(id: number): Observable&lt;Employee&gt; {
+  return this.http.get&lt;Employee&gt;(this.baseUrl + '/' + id);
+}</code></pre>
+          <div class="fname">in the component — note what happens after a successful delete</div>
+          <pre><code>onDelete(id: number): void {
+  if (!confirm('Delete this employee?')) { return; }
+
+  this.employeeService.deleteEmployee(id).subscribe({
+    next: () =&gt; {
+      // The SERVER has deleted it. Now update the local copy so the
+      // screen matches — otherwise the row stays visible until a reload.
+      this.employees = this.employees.filter(e =&gt; e.id !== id);
+      this.message = 'Deleted.';
+    },
+    error: (err) =&gt; {
+      this.message = 'Delete failed — the employee is still there.';
+      console.error(err);
+    }
+  });
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The habit to build: update the screen inside <code>next</code>, never before</span>
+            Removing the row <em>before</em> the server confirms means that when the delete fails, your screen is lying
+            to the user — the row is gone locally but still in the database. Do the local change
+            <strong>inside <code>next</code></strong>, so it only happens on genuine success.
+          </div>
+          <div class="note">
+            <span class="lbl">PUT vs PATCH, briefly</span>
+            <code>put()</code> replaces the whole record; <code>patch()</code> sends only the changed fields. Angular
+            supports both with identical syntax. Which one to use is decided by <em>your API</em>, not by Angular — check
+            what your Spring Boot controller expects.
+          </div>
+        </section>
+
+        <!-- 33. CRUD TABLE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — the complete set on one slide</p>
+          <h2>All four verbs, and the Spring Boot side</h2>
+          <table class="cmp">
+            <thead><tr><th style="width:14%">Action</th><th style="width:36%">Angular</th><th>Spring Boot</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Read all</strong></td>
+                <td><code>http.get&lt;Employee[]&gt;(url)</code></td>
+                <td><code>@GetMapping("/employees")</code></td>
+              </tr>
+              <tr>
+                <td><strong>Read one</strong></td>
+                <td><code>http.get&lt;Employee&gt;(url + '/' + id)</code></td>
+                <td><code>@GetMapping("/employees/{id}")</code></td>
+              </tr>
+              <tr>
+                <td><strong>Create</strong></td>
+                <td><code>http.post&lt;Employee&gt;(url, emp)</code></td>
+                <td><code>@PostMapping("/employees")</code></td>
+              </tr>
+              <tr>
+                <td><strong>Update</strong></td>
+                <td><code>http.put&lt;Employee&gt;(url + '/' + id, emp)</code></td>
+                <td><code>@PutMapping("/employees/{id}")</code></td>
+              </tr>
+              <tr>
+                <td><strong>Delete</strong></td>
+                <td><code>http.delete&lt;void&gt;(url + '/' + id)</code></td>
+                <td><code>@DeleteMapping("/employees/{id}")</code></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">The whole pattern, in one sentence</span>
+            <strong>Every method returns an <code>Observable</code>, so every call needs a <code>.subscribe()</code>.</strong>
+            The only differences between the four are the HTTP verb, whether there is a body, and whether the id is in
+            the URL.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Look at the right-hand column</span>
+            You already know how to write every one of those Spring Boot annotations — that was Spring Boot Session 2.
+            <strong>You now know both ends of the wire.</strong> The final stretch task in Session 4 points this Angular
+            app at your own Spring Boot API by changing one line.
+          </div>
+        </section>
+
+        <!-- 34. LOADING AND ERROR STATES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 — what separates a demo from an application</p>
+          <h2>Loading and error states</h2>
+          <p class="deep">A real request is not instant, and sometimes it fails. Your screen needs <strong>three</strong>
+             states, not one: loading, loaded, and failed. This is a small amount of code that makes an enormous
+             difference to how finished an app feels.</p>
+          <div class="fname">the class — three fields</div>
+          <pre><code>employees: Employee[] = [];
+isLoading = false;
+errorMessage = '';
+
+ngOnInit(): void {
+  this.loadEmployees();
+}
+
+loadEmployees(): void {
+  this.isLoading = true;         // 1. before the call
+  this.errorMessage = '';
+
+  this.employeeService.getEmployees().subscribe({
+    next: (data) =&gt; {
+      this.employees = data;
+      this.isLoading = false;    // 2. on success
+    },
+    error: (err) =&gt; {
+      this.errorMessage = 'Could not load employees. Is the server running?';
+      this.isLoading = false;    // 3. on failure — easy to forget!
+      console.error(err);
+    }
+  });
+}</code></pre>
+          <div class="fname">the template — three mutually exclusive blocks</div>
+          <pre><code>&lt;p *ngIf="isLoading"&gt;⏳ Loading employees…&lt;/p&gt;
+
+&lt;div *ngIf="errorMessage" class="error"&gt;
+  ⚠️ {{ errorMessage }}
+  &lt;button (click)="loadEmployees()"&gt;Retry&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;table *ngIf="!isLoading &amp;&amp; !errorMessage"&gt;
+  &lt;tr *ngFor="let emp of employees"&gt;
+    &lt;td&gt;{{ emp.name }}&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;p *ngIf="!isLoading &amp;&amp; !errorMessage &amp;&amp; employees.length === 0"&gt;
+  No employees found.
+&lt;/p&gt;</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The bug in every beginner's first version</span>
+            Forgetting <code>isLoading = false</code> in the <strong>error</strong> handler. The request fails, and the
+            user is left staring at "Loading…" forever. Set it in <em>both</em> branches, every time.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice the Retry button</span>
+            Because the whole call lives in a method, offering a retry costs one line:
+            <code>(click)="loadEmployees()"</code>. That is why you extract it into <code>loadEmployees()</code> rather
+            than writing it inline in <code>ngOnInit</code>.
+          </div>
+        </section>
+
+        <!-- 35. ASYNC PIPE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 continued — a tidier alternative</p>
+          <h2>The <code>async</code> pipe</h2>
+          <p class="deep">There is a way to skip <code>subscribe</code> entirely. Hand the <strong>Observable itself</strong>
+             to the template and let the <code>async</code> pipe do the subscribing.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>With <code>subscribe</code></h3>
+              <pre><code>// class
+employees: Employee[] = [];
+
+ngOnInit(): void {
+  this.service.getEmployees()
+    .subscribe(d =&gt; this.employees = d);
+}</code></pre>
+              <pre><code>&lt;!-- template --&gt;
+&lt;tr *ngFor="let e of employees"&gt;
+  &lt;td&gt;{{ e.name }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>With the <code>async</code> pipe</h3>
+              <pre><code>// class
+employees$!: Observable&lt;Employee[]&gt;;
+
+ngOnInit(): void {
+  this.employees$ =
+    this.service.getEmployees();
+}</code></pre>
+              <pre><code>&lt;!-- template --&gt;
+&lt;tr *ngFor="let e of employees$ | async"&gt;
+  &lt;td&gt;{{ e.name }}&lt;/td&gt;
+&lt;/tr&gt;</code></pre>
+            </div>
+          </div>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">employees$</div><div>A naming <strong>convention</strong>: a trailing <code>$</code> means "this variable holds an Observable". Not required by Angular, universally used by Angular developers.</div></div>
+            <div class="anno-row"><div class="anno-tag">| async</div><div>The pipe subscribes, hands the value to the template, and <strong>unsubscribes automatically</strong> when the component is destroyed.</div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why professionals prefer it</span>
+            <strong>Automatic cleanup.</strong> A manual <code>subscribe</code> can leak — the subscription outlives the
+            component unless you tidy up in <code>ngOnDestroy</code>. The <code>async</code> pipe cannot leak, because it
+            manages its own lifecycle. Less code, and one entire class of bug removed.
+          </div>
+          <div class="note">
+            <span class="lbl">Which should you use today?</span>
+            Learn <code>subscribe</code> first — it makes the "data arrives later" idea concrete, and you need it whenever
+            you must <em>do</em> something with the reply (show a message, navigate away, reset a form).
+            Reach for <code>async</code> when you are only displaying the data. Both are entirely correct.
+          </div>
+        </section>
+
+        <!-- 36. CORS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 9 — the error that will confuse you the most</p>
+          <h2>CORS — and why it isn't your Angular code</h2>
+          <p class="deep">You will point Angular at your own Spring Boot API and see this. Your code is fine. The request
+             never even reached your server.</p>
+          <div class="fname">the browser console</div>
+          <pre><code>Access to XMLHttpRequest at 'http://localhost:8080/api/employees'
+from origin 'http://localhost:4200' has been blocked by CORS policy:
+No 'Access-Control-Allow-Origin' header is present on the requested resource.</code></pre>
+          <p class="deep">Your Angular app is served from <strong>port 4200</strong>. Your API is on
+             <strong>port 8080</strong>. Different port means a <em>different origin</em>, and browsers block cross-origin
+             requests by default. This is a <strong>browser security rule</strong>, not an Angular bug — and the server has
+             to grant permission.</p>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            The browser is a <strong>security guard</strong> at your office. A visitor from another building arrives, and
+            the guard says "I'm not letting you in unless someone inside vouches for you." <strong>The server must
+            vouch.</strong> Nothing the visitor says will change the guard's mind.
+          </div>
+          <h3>The fix — on the Spring Boot side</h3>
+          <pre><code>// Option 1 — quick, per controller
+@CrossOrigin(origins = "http://localhost:4200")
+@RestController
+@RequestMapping("/api/employees")
+public class EmployeeController { }</code></pre>
+          <pre><code>// Option 2 — application-wide, and the better habit
+@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+            .allowedOrigins("http://localhost:4200")
+            .allowedMethods("GET", "POST", "PUT", "DELETE");
+  }
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">How to recognise it instantly, and what not to do</span>
+            The tell is <strong>the word CORS in the message</strong>, plus a request that shows as failed in the Network
+            tab with no response body. Do <em>not</em> start rewriting your Angular service — nothing in Angular can fix
+            it. Fix the server, or use the CLI's proxy configuration for local development.
+          </div>
+        </section>
+
+        <!-- 37. HOW IT FITS -->
+        <section class="slide">
+          <p class="eyebrow">Bringing today together</p>
+          <h2>How today's pieces fit together</h2>
+          <div class="flow vert">
+            <div class="flow-box">The user types into a <strong>form</strong><span class="sm">template-driven or reactive · validated as they go</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">The <strong>component</strong> handles the submit<span class="sm">it does not know any URLs — it just asks the service</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">The <strong>service</strong> makes the call<span class="sm">injected via DI · owns the base URL · returns an Observable</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt"><strong>HttpClient</strong> sends it over the network<span class="sm">GET / POST / PUT / DELETE, as JSON</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green">The reply arrives; <code>subscribe</code>'s <code>next</code> runs<span class="sm">the component updates a field — and every binding on screen follows</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The layering you just built, and its Spring Boot twin</span>
+            <strong>Template</strong> (what it looks like) → <strong>Component</strong> (screen logic) →
+            <strong>Service</strong> (data access) → <strong>HttpClient</strong> (the wire).<br>
+            That is the same discipline as <strong>Controller → Service → Repository</strong>. Each layer knows only about
+            the one beneath it. This is why you can swap the bottom layer — array to HTTP — without the top layer
+            noticing, exactly as you saw on slide 25.
+          </div>
+        </section>
+
+        <!-- 38. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Recap</p>
+          <h2>What you now know</h2>
+          <ul class="checklist">
+            <li>Angular has <strong>two form systems</strong>: template-driven (HTML in charge, <code>FormsModule</code>) and reactive (TypeScript in charge, <code>ReactiveFormsModule</code>).</li>
+            <li>Angular tracks <code>valid</code>, <code>touched</code> and <code>dirty</code> for every field — and <strong>"invalid <em>and</em> touched"</strong> is the polite condition for showing an error.</li>
+            <li>Reactive forms use <code>FormGroup</code> + <code>FormControl</code> + <code>Validators</code>, or the <code>FormBuilder</code> shorthand, and let you <code>patchValue</code> from code.</li>
+            <li>A <strong>service</strong> is a plain class holding data and logic, created with <code>ng g s</code> and registered by <code>@Injectable({ providedIn: 'root' })</code>.</li>
+            <li><strong>Dependency injection</strong> means you declare what you need in a constructor and Angular supplies it — you never write <code>new</code> for a service.</li>
+            <li><code>providedIn: 'root'</code> gives <strong>one shared instance</strong> app-wide, which is how two components see the same data.</li>
+            <li>Refactoring data into a service left the <strong>template completely unchanged</strong> — that is the whole point of layering.</li>
+            <li><code>HttpClient</code> (needs <code>HttpClientModule</code>) does <code>get</code>, <code>post</code>, <code>put</code> and <code>delete</code>, and belongs in a <strong>service</strong>, never a component.</li>
+            <li>Every HTTP method returns an <strong>Observable</strong> — a ticket, not the coffee. <strong>No <code>subscribe</code>, no request.</strong></li>
+            <li><code>subscribe({ next, error })</code> — and <strong>never skip <code>error</code></strong>, or failures are invisible to your user.</li>
+            <li>Real screens need <strong>loading, loaded and failed</strong> states; the <code>async</code> pipe subscribes and cleans up for you.</li>
+            <li><strong>CORS</strong> errors are a browser security rule fixed on the <em>server</em> — no amount of Angular changes will help.</li>
+          </ul>
+        </section>
+
+        <!-- 39. NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed — the finale</p>
+          <h2>Coming up in Session 4</h2>
+          <p class="deep">You have components, bindings, forms, services and HTTP. Session 4 assembles all of it into a
+             genuine multi-screen application.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🧭</div><h3>Routing</h3><p><code>&lt;router-outlet&gt;</code>, <code>routerLink</code>, route parameters, a default page and a 404 — a real navigation menu, with no page reloads.</p></div>
+            <div class="card"><div class="ic">📇</div><h3>Full CRUD</h3><p>The Customer Management case study: list, search, insert, update and delete — built once against an array, then moved onto a service.</p></div>
+            <div class="card"><div class="ic">🔗</div><h3>Your own API</h3><p>Point the finished app at <strong>your</strong> Spring Boot backend by changing one line — a genuine full-stack application, built end to end.</p></div>
+            <div class="card"><div class="ic">🚀</div><h3>And beyond</h3><p><code>ng build</code> for production, plus where to go next: guards, interceptors, lazy loading, signals.</p></div>
+          </div>
+          <div class="note">
+            <span class="lbl">Bring this with you</span>
+            Keep the same project, your service, and both forms. Session 4 needs <code>ReactiveFormsModule</code> and
+            <code>HttpClientModule</code> already registered — and it needs you comfortable with
+            <code>subscribe</code>, because every CRUD operation uses it.
+          </div>
+        </section>
+
+        <!-- 40. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 3</span>
+            <h1>Questions?</h1>
+            <div class="sub">Then open the lab sheet — two form styles, a service, and your first live API call.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 4 — Routing &amp; full CRUD.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Angular · Session 3 — Forms, Services &amp; HTTP</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

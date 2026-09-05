@@ -1,0 +1,2654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 3 — Hands-on Lab</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    h4 { font-size: 16.5px; margin: 16px 0 4px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(221,0,49,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dd0031, #9327f0, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff5f7, #fbeef4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(147,39,240,0.09);
+      border: 1px solid rgba(147,39,240,0.3);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffd0da;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Key-point callout and reference note — shared vocabulary with the theory decks */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* Line-by-line code explanation */
+    table.lines { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.lines th, table.lines td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 13px; text-align: left; vertical-align: top;
+    }
+    table.lines thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.lines td:first-child {
+      font-family: var(--mac-mono); font-size: 14px; color: #b00027;
+      background: #fafafc; white-space: nowrap;
+    }
+
+    /* Comparison table (shared vocabulary with the theory decks) */
+    table.cmp { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px; text-align: left; vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(221,0,49,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #dd0031; }
+    details.exp.lab2 { border-left-color: #9327f0; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf2ff,#f3e6ff); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#9327f0; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Mock browser preview — shows exactly what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin: 14px 0; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .btn-link {
+      display: inline-block; border: 1px solid #0a84ff; border-radius: 6px;
+      padding: 2px 9px; color: #0a84ff; font-size: 12.5px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+
+    /* Cards (shared vocabulary with the theory decks) */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 14px 0; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fff;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 24px; margin-bottom: 4px; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+    .qref p, .qref li { color: #d7dae0; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .cards, .cards.c3 { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session3-lab.html — Angular Session 3</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🅰️</div>
+        <div>
+          <h1>Angular — Session 3 Hands-on Lab</h1>
+          <p class="section-intro">Both form styles, validation, services with dependency injection, and live HTTP calls. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          Your hands-on companion for Angular Session 3. Every task carries a <strong>"Theory slides …"</strong> badge
+          telling you which part of the talk it belongs to. Use the <strong>Copy</strong> button rather than retyping,
+          tick each checkbox as you finish, and read every <strong>"What you should see"</strong> box before moving on.
+        </div>
+        <div class="plainbox">
+          <span class="lbl">What you're building today — in three acts</span>
+          <strong>Act 1:</strong> the same registration form built <em>twice</em>, once template-driven and once
+          reactive, so you can feel the difference rather than be told it.<br>
+          <strong>Act 2:</strong> move your employee data out of the component and into a <strong>service</strong> —
+          and watch the template not change at all.<br>
+          <strong>Act 3:</strong> replace the service's hardcoded array with a <strong>real HTTP call</strong> to a live
+          API on the internet. That is the moment your Angular app stops being a toy.
+        </div>
+        <div class="observe">
+          <span class="lbl">Today's golden rule</span>
+          <strong>No <code>subscribe</code>, no request.</strong> Observables are lazy — if you call an HTTP method and
+          never subscribe, absolutely nothing happens: no network traffic, no error, no warning. When something
+          "isn't firing" today, check for a missing <code>.subscribe()</code> first. Keep your browser's
+          <strong>Network tab</strong> (<kbd>F12</kbd>) open from Task 6 onwards; it shows you the truth.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slide 2</span></summary>
+          <div class="exp-body">
+            <p>Continuing in the same <code>hello-world</code> project from Sessions 1 and 2.</p>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">My <strong>Session 2 project still runs</strong>
+                <span class="verify"><code>cd hello-world</code> then <code>ng serve -o</code>. You should see the header, login form, employee table and cards.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>cd hello-world
+ng serve -o</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I have a <strong>second terminal</strong> for <code>ng generate</code> commands
+                <span class="verify">Leave <code>ng serve</code> running in the first one all session.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I have <strong>internet access from this machine</strong>
+                <span class="verify">Task 6 calls a public API. Open <code>https://jsonplaceholder.typicode.com/users</code> in a browser tab now — you should see a wall of JSON. If a corporate proxy blocks it, tell the trainer now; there is a fallback in Task 6.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I know how to open the browser's <strong>Network tab</strong>
+                <span class="verify">Press <kbd>F12</kbd>, click <strong>Network</strong>, tick "Fetch/XHR". You will use this constantly from Task 6 onwards — it is how you see what your app actually sent and received.</span>
+              </span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Lost your Session 2 project?</span>
+              Don't lose time. Run <code>ng new hello-world</code> (CSS, no SSR, no routing), then
+              <code>ng g c employee-list</code>, then create <code>src/app/models/employee.ts</code> with the interface
+              below. Task 4 onwards will work fine; you will just have no table to look at until then.
+            </div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/models/employee.ts</span>
+              <span class="fb-tag">Only if it's missing</span>
+            </div>
+            <div class="codewrap"><pre><code>export interface Employee {
+  id: number;
+  name: string;
+  designation: string;
+  salary: number;
+  status: 'Active' | 'Inactive';
+  email?: string;
+}</code></pre></div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PART 1 — FORMS ===== -->
+      <div class="section-band">Part 1 — Forms, both ways</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> A Template-Driven Registration Form<span class="sync">Theory slides 5–9</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build a four-field employee registration form where the <strong>HTML is in charge</strong>: validation
+              rules are HTML attributes, error messages appear only after the user has visited a field, and Submit stays
+              disabled until everything is valid. Barely any TypeScript.
+            </div>
+
+            <h3>Step 1 — generate the component</h3>
+            <div class="codewrap"><pre><code>ng g c employee-form-td</code></pre></div>
+            <p class="muted"><code>-td</code> for "template-driven", so you can compare it side by side with the reactive
+               version you build in Task 2.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Component generated</strong> and registered in <code>declarations</code>.</span>
+            </label>
+
+            <h3>Step 2 — the class (there's very little of it)</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-td/employee-form-td.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-employee-form-td',
+  templateUrl: './employee-form-td.component.html',
+  styleUrls: ['./employee-form-td.component.css']
+})
+export class EmployeeFormTdComponent {
+
+  // ONE object holding the whole form. Each field two-way binds to a property.
+  employee = {
+    name: '',
+    email: '',
+    salary: 0,
+    designation: 'Software Engineer'
+  };
+
+  designations = ['Software Engineer', 'Team Lead', 'Tester', 'Architect'];
+
+  submitted = false;
+  savedData = '';
+
+  onSubmit(): void {
+    this.submitted = true;
+    this.savedData = JSON.stringify(this.employee, null, 2);
+    console.log('Template-driven form submitted:', this.employee);
+  }
+
+  onReset(): void {
+    this.employee = { name: '', email: '', salary: 0, designation: 'Software Engineer' };
+    this.submitted = false;
+    this.savedData = '';
+  }
+}</code></pre></div>
+
+            <h3>Step 3 — the template (where all the work happens)</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-td/employee-form-td.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="form-card"&gt;
+  &lt;h2&gt;Register Employee &lt;span class="badge td"&gt;template-driven&lt;/span&gt;&lt;/h2&gt;
+
+  &lt;!-- #empForm gives us the FORM's state; ngSubmit stops the page reloading --&gt;
+  &lt;form #empForm="ngForm" (ngSubmit)="onSubmit()"&gt;
+
+    &lt;!-- ── NAME ───────────────────────────────────────── --&gt;
+    &lt;label&gt;Name *&lt;/label&gt;
+    &lt;input type="text"
+           name="name"
+           [(ngModel)]="employee.name"
+           #nameField="ngModel"
+           required
+           minlength="3"
+           maxlength="30"
+           placeholder="e.g. Anoop Kumar"&gt;
+
+    &lt;div *ngIf="nameField.invalid &amp;&amp; nameField.touched" class="err"&gt;
+      &lt;small *ngIf="nameField.errors?.['required']"&gt;Name is required.&lt;/small&gt;
+      &lt;small *ngIf="nameField.errors?.['minlength']"&gt;Name must be at least 3 characters.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;!-- ── EMAIL ──────────────────────────────────────── --&gt;
+    &lt;label&gt;Email *&lt;/label&gt;
+    &lt;input type="email"
+           name="email"
+           [(ngModel)]="employee.email"
+           #emailField="ngModel"
+           required
+           email
+           placeholder="e.g. anoop@example.com"&gt;
+
+    &lt;div *ngIf="emailField.invalid &amp;&amp; emailField.touched" class="err"&gt;
+      &lt;small *ngIf="emailField.errors?.['required']"&gt;Email is required.&lt;/small&gt;
+      &lt;small *ngIf="emailField.errors?.['email']"&gt;That doesn't look like a valid email.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;!-- ── SALARY ─────────────────────────────────────── --&gt;
+    &lt;label&gt;Monthly salary *&lt;/label&gt;
+    &lt;input type="number"
+           name="salary"
+           [(ngModel)]="employee.salary"
+           #salaryField="ngModel"
+           required
+           min="1000"
+           max="500000"&gt;
+
+    &lt;div *ngIf="salaryField.invalid &amp;&amp; salaryField.touched" class="err"&gt;
+      &lt;small *ngIf="salaryField.errors?.['required']"&gt;Salary is required.&lt;/small&gt;
+      &lt;small *ngIf="salaryField.errors?.['min']"&gt;Salary must be at least 1000.&lt;/small&gt;
+      &lt;small *ngIf="salaryField.errors?.['max']"&gt;Salary cannot exceed 500000.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;!-- ── DESIGNATION (a dropdown) ───────────────────── --&gt;
+    &lt;label&gt;Designation&lt;/label&gt;
+    &lt;select name="designation" [(ngModel)]="employee.designation"&gt;
+      &lt;option *ngFor="let d of designations" [value]="d"&gt;{{ d }}&lt;/option&gt;
+    &lt;/select&gt;
+
+    &lt;!-- ── BUTTONS ────────────────────────────────────── --&gt;
+    &lt;div class="row"&gt;
+      &lt;button type="submit" [disabled]="empForm.invalid"&gt;Save&lt;/button&gt;
+      &lt;button type="button" class="ghost"
+              (click)="onReset(); empForm.resetForm()"&gt;Reset&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+
+  &lt;!-- ── LIVE DEBUG PANEL — delete this in real code, keep it today ── --&gt;
+  &lt;div class="debug"&gt;
+    &lt;h4&gt;Form state, live&lt;/h4&gt;
+    &lt;p&gt;valid: &lt;strong&gt;{{ empForm.valid }}&lt;/strong&gt; ·
+       touched: &lt;strong&gt;{{ empForm.touched }}&lt;/strong&gt; ·
+       dirty: &lt;strong&gt;{{ empForm.dirty }}&lt;/strong&gt;&lt;/p&gt;
+    &lt;pre&gt;{{ empForm.value | json }}&lt;/pre&gt;
+  &lt;/div&gt;
+
+  &lt;div *ngIf="submitted" class="ok"&gt;
+    ✅ Saved. This is what would be sent to the server:
+    &lt;pre&gt;{{ savedData }}&lt;/pre&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-form-td/employee-form-td.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.form-card {
+  border: 1px solid #d2d2d7;
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin: 18px 0;
+  background: #fafafc;
+  max-width: 480px;
+}
+
+h2 { margin: 0 0 14px; font-size: 20px; }
+
+.badge {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  padding: 3px 9px; border-radius: 20px; vertical-align: middle;
+}
+.badge.td { background: #e6f1ff; color: #0a6fd6; }
+.badge.rx { background: #f1e8ff; color: #7a13d0; }
+
+label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+
+input, select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d2d2d7;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+/* Angular adds these classes to every form control automatically */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched { border-color: #dd0031; background: #fff8f9; }
+
+input.ng-valid.ng-touched { border-color: #28c840; }
+
+.err { margin-top: 4px; }
+.err small { display: block; color: #b00027; font-size: 13px; }
+
+.row { display: flex; gap: 10px; margin-top: 18px; }
+
+button {
+  padding: 8px 18px; border: none; border-radius: 7px;
+  background: #dd0031; color: white;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+button:disabled { background: #c7c7cc; cursor: not-allowed; }
+button.ghost { background: white; color: #dd0031; border: 1px solid #dd0031; }
+
+.debug {
+  margin-top: 18px; padding: 12px 14px;
+  background: #1e1e2e; color: #f8f8f2; border-radius: 8px;
+}
+.debug h4 { margin: 0 0 6px; font-size: 14px; color: #a6e22e; }
+.debug p  { margin: 0 0 6px; font-size: 13px; }
+.debug pre { margin: 0; font-size: 12.5px; overflow-x: auto; }
+
+.ok {
+  margin-top: 14px; padding: 12px 14px;
+  background: #eefcf1; border: 1px solid #b9ecc4;
+  border-radius: 8px; font-size: 15px;
+}
+.ok pre { font-size: 12.5px; overflow-x: auto; }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Notice those <code>ng-invalid</code> / <code>ng-touched</code> CSS rules</span>
+              Angular <strong>automatically</strong> adds classes like <code>ng-valid</code>, <code>ng-invalid</code>,
+              <code>ng-touched</code> and <code>ng-dirty</code> to every form control as its state changes. You never
+              write code for it — just style them, and your fields turn red or green on their own. Inspect an input with
+              <kbd>F12</kbd> and watch the classes change as you type.
+            </div>
+
+            <h3>Step 4 — put it on the page</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Add after &lt;app-login&gt;</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;app-employee-form-td&gt;&lt;/app-employee-form-td&gt;</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="font-weight:700;font-size:18px;margin:0 0 10px;">Register Employee <span style="font-size:11px;background:#e6f1ff;color:#0a6fd6;padding:2px 8px;border-radius:20px;font-weight:700;">TEMPLATE-DRIVEN</span></p>
+                <p style="margin:6px 0;"><span style="font-size:13px;font-weight:600;">Name *</span><br><span class="fld" style="border-color:#dd0031;">An</span><br><span class="err">Name must be at least 3 characters.</span></p>
+                <p style="margin:6px 0;"><span style="font-size:13px;font-weight:600;">Email *</span><br><span class="fld" style="border-color:#dd0031;">not-an-email</span><br><span class="err">That doesn't look like a valid email.</span></p>
+                <p style="margin:6px 0;"><span style="font-size:13px;font-weight:600;">Monthly salary *</span><br><span class="fld" style="border-color:#28c840;">25000</span></p>
+                <p style="margin:10px 0;"><span class="btn" style="background:#c7c7cc;">Save</span> &nbsp; <span class="btn ghost">Reset</span></p>
+                <p style="background:#1e1e2e;color:#a6e22e;padding:8px 12px;border-radius:6px;font-size:12.5px;margin:8px 0 0;">valid: false · touched: true · dirty: true<br><span style="color:#f8f8f2;">{ "name": "An", "email": "not-an-email", "salary": 25000, "designation": "Software Engineer" }</span></p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — test all six</span>
+              <strong>1.</strong> On load, <strong>no error messages</strong> — the form is quiet because nothing is
+              <code>touched</code> yet.<br>
+              <strong>2.</strong> Click into Name, type nothing, click away → <em>"Name is required"</em> appears and the
+              border turns red.<br>
+              <strong>3.</strong> Type <code>An</code> → the message changes to <em>"at least 3 characters"</em>.<br>
+              <strong>4.</strong> Type <code>Anoop</code> → the message vanishes and the border turns <strong>green</strong>.<br>
+              <strong>5.</strong> The <strong>Save button is greyed out</strong> until every field is valid.<br>
+              <strong>6.</strong> The black debug panel updates <strong>on every keystroke</strong>, showing the whole
+              form object and the three state flags.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All six behaviours work</strong> — quiet on load, specific messages, green when valid, Save disabled until valid, live debug panel.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — understand <code>touched</code>, because it's the whole trick</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Remove <code>&amp;&amp; nameField.touched</code> from the Name error condition, leaving just
+                    <code>nameField.invalid</code>. Save and reload. <strong>The form now shouts "Name is required"
+                    before you have typed a single character.</strong> That is the aggressive, amateur version. Put the
+                    <code>touched</code> check back.</li>
+                <li>Watch the flags in the debug panel: click into a field and out again without typing →
+                    <code>touched</code> becomes <code>true</code> but <code>dirty</code> stays <code>false</code>. Now
+                    type one character → <code>dirty</code> becomes <code>true</code> too. <em>Touched = visited.
+                    Dirty = changed.</em></li>
+                <li>Delete the <code>name="email"</code> attribute from the email input. Read the error:
+                    <em>"If ngModel is used within a form tag, either the name attribute must be set…"</em>. Put it back.
+                    <strong>Both</strong> <code>name</code> and <code>ngModel</code> are required for a field to join the
+                    form.</li>
+                <li>Add <code>pattern="[0-9]{10}"</code> and a phone field of your own, with its own error message.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four experiments done</strong> — and I can explain the difference between <code>touched</code> and <code>dirty</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 — REACTIVE ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> The Same Form, Reactive<span class="sync">Theory slides 10–12</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build the <strong>identical form</strong> the other way round — defined in TypeScript, with the template
+              merely connecting to it. Having both on screen at once is the fastest way to understand the trade-off,
+              and you will see immediately where each style puts its complexity.
+            </div>
+
+            <h3>Step 1 — register <code>ReactiveFormsModule</code></h3>
+            <p>Predictable by now: a new capability means a new module in <code>imports</code>.</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.module.ts</span>
+              <span class="fb-tag">Add the two marked parts</span>
+            </div>
+            <div class="codewrap"><pre><code>import { FormsModule, ReactiveFormsModule } from '@angular/forms';   // ← add ReactiveFormsModule
+
+@NgModule({
+  declarations: [ /* ...all your components... */ ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule          // ← and list it here
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Keep <code>FormsModule</code> as well</span>
+              You need both: your Session 2 login form and search box still use <code>[(ngModel)]</code>, and Task 1's
+              form does too. They coexist happily. What you must never do is mix the two styles
+              <strong>on the same input</strong> — <code>[(ngModel)]</code> and <code>formControlName</code> together
+              produces a long, baffling error.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong><code>ReactiveFormsModule</code> is registered</strong> and the app still compiles.</span>
+            </label>
+
+            <h3>Step 2 — generate the component</h3>
+            <div class="codewrap"><pre><code>ng g c employee-form-rx</code></pre></div>
+
+            <h3>Step 3 — the class (this is where the form now lives)</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
+
+@Component({
+  selector: 'app-employee-form-rx',
+  templateUrl: './employee-form-rx.component.html',
+  styleUrls: ['./employee-form-rx.component.css']
+})
+export class EmployeeFormRxComponent {
+
+  designations = ['Software Engineer', 'Team Lead', 'Tester', 'Architect'];
+
+  submitted = false;
+  savedData = '';
+
+  // THE FORM IS AN OBJECT IN THE CLASS.
+  // No validation yet — we add that in Task 3, deliberately.
+  empForm = new FormGroup({
+    name:        new FormControl(''),
+    email:       new FormControl(''),
+    salary:      new FormControl(0),
+    designation: new FormControl('Software Engineer')
+  });
+
+  onSubmit(): void {
+    this.submitted = true;
+    this.savedData = JSON.stringify(this.empForm.value, null, 2);
+    console.log('Reactive form submitted:', this.empForm.value);
+  }
+
+  onReset(): void {
+    this.empForm.reset({ name: '', email: '', salary: 0, designation: 'Software Engineer' });
+    this.submitted = false;
+    this.savedData = '';
+  }
+
+  // Proof that you can drive the form from code — impossible to do this
+  // cleanly in a template-driven form.
+  fillSampleData(): void {
+    this.empForm.patchValue({
+      name: 'Anoop Kumar',
+      email: 'anoop@example.com',
+      salary: 25000,
+      designation: 'Software Engineer'
+    });
+  }
+}</code></pre></div>
+
+            <h3>Step 4 — the template (notice how little there is)</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="form-card"&gt;
+  &lt;h2&gt;Register Employee &lt;span class="badge rx"&gt;reactive&lt;/span&gt;&lt;/h2&gt;
+
+  &lt;!-- [formGroup] connects this form to the object in the class --&gt;
+  &lt;form [formGroup]="empForm" (ngSubmit)="onSubmit()"&gt;
+
+    &lt;label&gt;Name *&lt;/label&gt;
+    &lt;input type="text" formControlName="name" placeholder="e.g. Anoop Kumar"&gt;
+
+    &lt;label&gt;Email *&lt;/label&gt;
+    &lt;input type="email" formControlName="email" placeholder="e.g. anoop@example.com"&gt;
+
+    &lt;label&gt;Monthly salary *&lt;/label&gt;
+    &lt;input type="number" formControlName="salary"&gt;
+
+    &lt;label&gt;Designation&lt;/label&gt;
+    &lt;select formControlName="designation"&gt;
+      &lt;option *ngFor="let d of designations" [value]="d"&gt;{{ d }}&lt;/option&gt;
+    &lt;/select&gt;
+
+    &lt;div class="row"&gt;
+      &lt;button type="submit"&gt;Save&lt;/button&gt;
+      &lt;button type="button" class="ghost" (click)="onReset()"&gt;Reset&lt;/button&gt;
+      &lt;button type="button" class="ghost" (click)="fillSampleData()"&gt;Fill sample&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;
+
+  &lt;div class="debug"&gt;
+    &lt;h4&gt;Form state, live&lt;/h4&gt;
+    &lt;p&gt;valid: &lt;strong&gt;{{ empForm.valid }}&lt;/strong&gt; ·
+       touched: &lt;strong&gt;{{ empForm.touched }}&lt;/strong&gt; ·
+       dirty: &lt;strong&gt;{{ empForm.dirty }}&lt;/strong&gt;&lt;/p&gt;
+    &lt;pre&gt;{{ empForm.value | json }}&lt;/pre&gt;
+  &lt;/div&gt;
+
+  &lt;div *ngIf="submitted" class="ok"&gt;
+    ✅ Saved:
+    &lt;pre&gt;{{ savedData }}&lt;/pre&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.css</span>
+              <span class="fb-tag">Copy the whole CSS file from Task 1</span>
+            </div>
+            <div class="observe">
+              <span class="lbl">Reuse the styling</span>
+              Open <code>employee-form-td.component.css</code>, select all, and paste it into
+              <code>employee-form-rx.component.css</code>. Remember from Session 2 that component styles are scoped —
+              having the same rules in two components is perfectly safe, they cannot interfere.
+            </div>
+
+            <h3>Step 5 — put it on the page, next to the other one</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Add after &lt;app-employee-form-td&gt;</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;app-employee-form-rx&gt;&lt;/app-employee-form-rx&gt;</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              A second, visually identical form with a purple <strong>reactive</strong> badge. It works: typing updates
+              the debug panel, Save shows the submitted object. <strong>There is no validation yet</strong> — Save is
+              always enabled and nothing ever turns red. That is deliberate; Task 3 adds it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The reactive form works</strong> — typing updates the debug panel and Save shows the object.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — this is the experiment that sells reactive forms</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Click <strong>"Fill sample"</strong>. All four fields populate instantly. That is
+                    <code>patchValue()</code> — <strong>one line of code driving the entire form.</strong> Now think about
+                    how you would do that in the template-driven version: you would have to assign every property of
+                    <code>employee</code> by hand, one at a time. <em>In Session 4 you build an edit screen, where this
+                    exact capability is the whole feature.</em></li>
+                <li>Compare the two templates side by side. Template-driven needed <code>name</code>,
+                    <code>[(ngModel)]</code>, <code>#ref="ngModel"</code> and four validation attributes per field.
+                    Reactive needs <code>formControlName="name"</code>. <strong>The complexity moved, it didn't
+                    vanish</strong> — it is now in the class, where you can test it.</li>
+                <li>Break it on purpose: add brackets, making it <code>[formControlName]="name"</code>. Read the error.
+                    <code>formControlName</code> takes a plain <em>string</em>, so it needs no brackets. Remove them.</li>
+                <li>Rename <code>name:</code> to <code>fullName:</code> in the <code>FormGroup</code> but leave the
+                    template saying <code>formControlName="name"</code>. Read that error too — <em>"Cannot find control
+                    with name: 'name'"</em>. <strong>The string must match the key exactly.</strong> Change it back.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four experiments done</strong> — especially "Fill sample", and I understand why that matters for Session 4.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 3 — VALIDATION ===== -->
+      <section class="section">
+        <details class="exp lab3" open>
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> Add Validation — <code>Validators</code> and <code>FormBuilder</code><span class="sync">Theory slides 13–15</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Bring the reactive form up to the same standard as the template-driven one — the same rules, the same
+              polite error messages — but with every rule written in TypeScript. Then rewrite the whole thing using
+              <code>FormBuilder</code>, which is what you will actually meet in real codebases.
+            </div>
+
+            <h3>Step 1 — add the validators</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-employee-form-rx',
+  templateUrl: './employee-form-rx.component.html',
+  styleUrls: ['./employee-form-rx.component.css']
+})
+export class EmployeeFormRxComponent {
+
+  designations = ['Software Engineer', 'Team Lead', 'Tester', 'Architect'];
+
+  submitted = false;
+  savedData = '';
+
+  empForm = new FormGroup({
+    name: new FormControl('', [
+      Validators.required,
+      Validators.minLength(3),
+      Validators.maxLength(30)
+    ]),
+    email: new FormControl('', [
+      Validators.required,
+      Validators.email
+    ]),
+    salary: new FormControl(0, [
+      Validators.required,
+      Validators.min(1000),
+      Validators.max(500000)
+    ]),
+    designation: new FormControl('Software Engineer', [
+      Validators.required
+    ])
+  });
+
+  // ── GETTERS: make the template far easier to read ──
+  get name()   { return this.empForm.get('name'); }
+  get email()  { return this.empForm.get('email'); }
+  get salary() { return this.empForm.get('salary'); }
+
+  onSubmit(): void {
+    if (this.empForm.invalid) {
+      // Mark everything touched so ALL errors appear at once
+      this.empForm.markAllAsTouched();
+      return;
+    }
+    this.submitted = true;
+    this.savedData = JSON.stringify(this.empForm.value, null, 2);
+  }
+
+  onReset(): void {
+    this.empForm.reset({ name: '', email: '', salary: 0, designation: 'Software Engineer' });
+    this.submitted = false;
+    this.savedData = '';
+  }
+
+  fillSampleData(): void {
+    this.empForm.patchValue({
+      name: 'Anoop Kumar',
+      email: 'anoop@example.com',
+      salary: 25000
+    });
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:36%">Line</th><th>Why it's there</th></tr></thead>
+              <tbody>
+                <tr><td>Validators.required</td><td><strong>No brackets</strong> — you are passing the function itself.</td></tr>
+                <tr><td>Validators.minLength(3)</td><td><strong>With brackets</strong> — you are calling it to build a function. Note the capital <code>L</code>, unlike the HTML attribute.</td></tr>
+                <tr><td>get name() { ... }</td><td>A TypeScript getter, so the template can write <code>name?.errors</code> instead of <code>empForm.get('name')?.errors</code>. Purely for readability, and worth it.</td></tr>
+                <tr><td>markAllAsTouched()</td><td>If someone submits an untouched invalid form, this reveals every error at once instead of leaving them guessing what's wrong.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Step 2 — show the errors</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.html</span>
+              <span class="fb-tag">Replace the &lt;form&gt; block</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;form [formGroup]="empForm" (ngSubmit)="onSubmit()"&gt;
+
+    &lt;label&gt;Name *&lt;/label&gt;
+    &lt;input type="text" formControlName="name" placeholder="e.g. Anoop Kumar"&gt;
+    &lt;div *ngIf="name?.invalid &amp;&amp; name?.touched" class="err"&gt;
+      &lt;small *ngIf="name?.errors?.['required']"&gt;Name is required.&lt;/small&gt;
+      &lt;small *ngIf="name?.errors?.['minlength']"&gt;Name must be at least 3 characters.&lt;/small&gt;
+      &lt;small *ngIf="name?.errors?.['maxlength']"&gt;Name cannot exceed 30 characters.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;label&gt;Email *&lt;/label&gt;
+    &lt;input type="email" formControlName="email" placeholder="e.g. anoop@example.com"&gt;
+    &lt;div *ngIf="email?.invalid &amp;&amp; email?.touched" class="err"&gt;
+      &lt;small *ngIf="email?.errors?.['required']"&gt;Email is required.&lt;/small&gt;
+      &lt;small *ngIf="email?.errors?.['email']"&gt;That doesn't look like a valid email.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;label&gt;Monthly salary *&lt;/label&gt;
+    &lt;input type="number" formControlName="salary"&gt;
+    &lt;div *ngIf="salary?.invalid &amp;&amp; salary?.touched" class="err"&gt;
+      &lt;small *ngIf="salary?.errors?.['required']"&gt;Salary is required.&lt;/small&gt;
+      &lt;small *ngIf="salary?.errors?.['min']"&gt;Salary must be at least 1000.&lt;/small&gt;
+      &lt;small *ngIf="salary?.errors?.['max']"&gt;Salary cannot exceed 500000.&lt;/small&gt;
+    &lt;/div&gt;
+
+    &lt;label&gt;Designation&lt;/label&gt;
+    &lt;select formControlName="designation"&gt;
+      &lt;option *ngFor="let d of designations" [value]="d"&gt;{{ d }}&lt;/option&gt;
+    &lt;/select&gt;
+
+    &lt;div class="row"&gt;
+      &lt;button type="submit" [disabled]="empForm.invalid"&gt;Save&lt;/button&gt;
+      &lt;button type="button" class="ghost" (click)="onReset()"&gt;Reset&lt;/button&gt;
+      &lt;button type="button" class="ghost" (click)="fillSampleData()"&gt;Fill sample&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/form&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              The reactive form now behaves <strong>exactly like the template-driven one</strong> — red borders, specific
+              messages, Save disabled until valid — but every rule lives in the class. Click "Fill sample" and watch the
+              form become valid and Save light up.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Both forms now behave identically</strong>, with the rules in completely different places.</span>
+            </label>
+
+            <h3>Step 3 — the same form again, with <code>FormBuilder</code></h3>
+            <p>This is the version you will meet in real projects. Replace <em>only</em> the imports, the
+               <code>empForm</code> declaration and the constructor:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.ts</span>
+              <span class="fb-tag">Swap these parts in</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+// ...inside the class, REPLACE the empForm = new FormGroup({...}) block with:
+
+  empForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.empForm = this.fb.group({
+      name:        ['', [Validators.required, Validators.minLength(3), Validators.maxLength(30)]],
+      email:       ['', [Validators.required, Validators.email]],
+      salary:      [0,  [Validators.required, Validators.min(1000), Validators.max(500000)]],
+      designation: ['Software Engineer', [Validators.required]]
+    });
+  }
+
+// Everything else in the class stays exactly the same.</code></pre></div>
+            <div class="plainbox">
+              <span class="lbl">How to read the shorthand</span>
+              Each field is an <strong>array of two things</strong>:
+              <code>fieldName: [ startingValue, [validators] ]</code>. That is the entire syntax.
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              <strong>Absolutely no change on screen.</strong> Same form, same validation, same behaviour — roughly
+              forty percent less code. That is the whole reason <code>FormBuilder</code> exists.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The <code>FormBuilder</code> version works identically</strong> to the long-hand version.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Look at that constructor — you've now used dependency injection</span>
+              <code>constructor(private fb: FormBuilder) { }</code> is the exact shorthand from Session 1's Drill L. You
+              asked for a <code>FormBuilder</code> and <strong>Angular created one and handed it to you</strong> — you
+              never wrote <code>new FormBuilder()</code>. That is dependency injection, and Task 5 does the same thing
+              with a service you wrote yourself. Note also that the form must be built <em>inside</em> the constructor,
+              because <code>this.fb</code> does not exist until then.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — three things worth proving</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Click Save on a completely empty, untouched form. <strong>Every error appears at once</strong> —
+                    that is <code>markAllAsTouched()</code>. Comment that line out and try again: nothing appears, and the
+                    user has no idea why Save did nothing.</li>
+                <li>Add a validator at runtime — something template-driven forms simply cannot do. In
+                    <code>fillSampleData()</code>, add:
+                    <code>this.empForm.get('salary')?.addValidators(Validators.min(20000));</code> then
+                    <code>this.empForm.get('salary')?.updateValueAndValidity();</code>. The rules changed
+                    <em>while the app was running</em>.</li>
+                <li>Watch a live stream of changes. Add this to the constructor, after building the form, then type in
+                    the Name box and watch the console:
+                    <code>this.empForm.get('name')?.valueChanges.subscribe(v =&gt; console.log('name:', v));</code>
+                    <strong>That's an Observable</strong> — the same mechanism <code>HttpClient</code> uses in Task 6.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — including subscribing to <code>valueChanges</code> and seeing keystrokes in the console.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== PART 2 — SERVICES ===== -->
+      <div class="section-band">Part 2 — Services &amp; dependency injection</div>
+      <section class="section">
+        <details class="exp lab4" open>
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Extract an <code>EmployeeService</code><span class="sync">Theory slides 18–21</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Move the employee array and all the search logic <strong>out</strong> of
+              <code>EmployeeListComponent</code> and into a service. The component becomes purely about display; the
+              service owns the data. This is a pure refactor — when you're done, the app looks <em>exactly</em> the same,
+              which is the whole point.
+            </div>
+
+            <h3>Step 1 — generate the service</h3>
+            <div class="codewrap"><pre><code>ng g s services/employee</code></pre></div>
+            <div class="term-out">$ ng g s services/employee
+CREATE src/app/services/employee.service.spec.ts (367 bytes)
+<span class="ok">CREATE src/app/services/employee.service.ts (137 bytes)</span></div>
+            <div class="expected">
+              <span class="lbl">Notice what's missing from that output</span>
+              There is <strong>no <code>UPDATE app.module.ts</code></strong> line. Unlike a component, a service does not
+              need registering in the module — the <code>@Injectable({ providedIn: 'root' })</code> decorator the CLI
+              wrote <em>is</em> the registration. Open the generated file and look at it.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The service exists</strong> at <code>src/app/services/employee.service.ts</code>, and I noticed <code>app.module.ts</code> was not touched.</span>
+            </label>
+
+            <h3>Step 2 — move the data and logic into it</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/employee.service.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Injectable } from '@angular/core';
+import { Employee } from '../models/employee';
+
+@Injectable({
+  providedIn: 'root'      // ← ONE instance, shared by the whole app
+})
+export class EmployeeService {
+
+  // PRIVATE — the outside world can only reach this through my methods.
+  private employees: Employee[] = [
+    { id: 1001, name: 'anoop kumar',  designation: 'Software Engineer', salary: 25000, status: 'Active',   email: 'anoop@example.com' },
+    { id: 1002, name: 'ajay sharma',  designation: 'Team Lead',         salary: 45000, status: 'Inactive' },
+    { id: 1003, name: 'rekha nair',   designation: 'Tester',            salary: 22000, status: 'Active',   email: 'rekha@example.com' },
+    { id: 1004, name: 'suresh patel', designation: 'Architect',         salary: 65000, status: 'Inactive' }
+  ];
+
+  // ── READ ────────────────────────────────────────────────
+  getEmployees(): Employee[] {
+    return this.employees;
+  }
+
+  getById(id: number): Employee | undefined {
+    return this.employees.find(e =&gt; e.id === id);
+  }
+
+  // ── SEARCH ──────────────────────────────────────────────
+  searchByName(term: string): Employee[] {
+    const t = term.trim().toLowerCase();
+    if (t === '') { return this.employees; }
+    return this.employees.filter(e =&gt;
+      e.name.toLowerCase().includes(t) ||
+      e.designation.toLowerCase().includes(t)
+    );
+  }
+
+  // ── CREATE ──────────────────────────────────────────────
+  addEmployee(emp: Employee): void {
+    this.employees.push(emp);
+  }
+
+  // ── DELETE ──────────────────────────────────────────────
+  deleteEmployee(id: number): void {
+    const i = this.employees.findIndex(e =&gt; e.id === id);
+    if (i !== -1) {
+      this.employees.splice(i, 1);
+    }
+  }
+
+  // ── a couple of derived values, also better here than in a component ──
+  getActiveCount(): number {
+    return this.employees.filter(e =&gt; e.status === 'Active').length;
+  }
+
+  getTotalSalary(): number {
+    let total = 0;
+    for (const e of this.employees) {
+      total = total + e.salary;
+    }
+    return total;
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Decision</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>@Injectable({ providedIn: 'root' })</td><td>Registers the service and makes it a <strong>singleton</strong> — every component that injects it gets the same instance, so they genuinely share data.</td></tr>
+                <tr><td>private employees</td><td>Nothing outside can reassign or corrupt the array. Every access goes through a method you control — the same discipline as a private field with getters in Java.</td></tr>
+                <tr><td>The six array methods</td><td><code>find</code>, <code>filter</code>, <code>push</code>, <code>findIndex</code>, <code>splice</code> — exactly Drill H from Session 1's lab. This is now a complete in-memory CRUD layer.</td></tr>
+                <tr><td>getActiveCount / getTotalSalary</td><td>Derived data belongs with the data, not in a component. Now a dashboard can use them too.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The service holds the data and all six operations</strong>, with the array marked <code>private</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 — INJECT ===== -->
+      <section class="section">
+        <details class="exp lab5" open>
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Inject the Service into the Component<span class="sync">Theory slides 22–25</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Rewrite <code>EmployeeListComponent</code> so it holds <strong>no data at all</strong> — it asks the service
+              for everything. Then confirm the most important thing about this refactor:
+              <strong>the template does not change by a single character.</strong>
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { Employee } from '../models/employee';
+import { EmployeeService } from '../services/employee.service';
+
+@Component({
+  selector: 'app-employee-list',
+  templateUrl: './employee-list.component.html',
+  styleUrls: ['./employee-list.component.css']
+})
+export class EmployeeListComponent implements OnInit {
+
+  heading = 'Employee Directory';
+  showTable = true;
+  searchTerm = '';
+  today = new Date();
+
+  // No hardcoded data any more — these get filled from the service
+  employees: Employee[] = [];
+  allEmployees: Employee[] = [];
+  selectedEmployee: Employee | null = null;
+
+  // ← DEPENDENCY INJECTION. Angular creates the service and hands it to us.
+  //   Note: no 'new EmployeeService()' anywhere.
+  constructor(private employeeService: EmployeeService) { }
+
+  ngOnInit(): void {
+    // Setup work goes HERE, not in the constructor.
+    this.allEmployees = this.employeeService.getEmployees();
+    this.employees = this.allEmployees;
+  }
+
+  onSearch(): void {
+    this.employees = this.employeeService.searchByName(this.searchTerm);
+  }
+
+  onDeleteEmployee(id: number): void {
+    this.employeeService.deleteEmployee(id);      // the service owns the data
+    this.onSearch();                              // re-read so the screen matches
+    if (this.selectedEmployee?.id === id) {
+      this.selectedEmployee = null;
+    }
+  }
+
+  onSelectEmployee(emp: Employee): void {
+    this.selectedEmployee = emp;
+  }
+
+  toggleTable(): void {
+    this.showTable = !this.showTable;
+  }
+
+  // These now just forward to the service
+  getActiveCount(): number { return this.employeeService.getActiveCount(); }
+  getTotalSalary(): number { return this.employeeService.getTotalSalary(); }
+
+  getActiveRatio(): number {
+    if (this.employees.length === 0) { return 0; }
+    return this.employees.filter(e =&gt; e.status === 'Active').length / this.employees.length;
+  }
+
+  trackById(index: number, emp: Employee): number {
+    return emp.id;
+  }
+}</code></pre></div>
+            <div class="dothis">
+              <span class="lbl">Do this — then look carefully</span>
+              <ol>
+                <li>Save the file. Wait for the rebuild.</li>
+                <li>Look at the browser. <strong>Everything still works</strong> — the table, the colours, the pipes, the
+                    search, the cards, the delete buttons.</li>
+                <li>Now open <code>employee-list.component.html</code>. <strong>You have not touched it.</strong> Not one
+                    character.</li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              An app that is <strong>visually identical</strong> to how it ended Session 2 — but the data now lives
+              somewhere completely different. The table still says
+              <code>*ngFor="let emp of employees"</code>, and it neither knows nor cares that <code>employees</code> is
+              now populated from a service.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The app works identically</strong> with the data in a service, and <strong>I did not change the template</strong>.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">This is the most important idea in the session — don't skim it</span>
+              You replaced the entire data layer and the view didn't notice. The template's only contract is <em>"there
+              is an array called <code>employees</code>"</em>; where it came from is somebody else's business.<br><br>
+              In Task 6 the data starts arriving from a <strong>server, over the network, asynchronously</strong> — and
+              this template <em>still</em> won't change. That is what layering buys you, and it is exactly the same
+              reasoning that keeps SQL out of your Spring Boot controllers.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — prove the singleton is real</span>
+              This experiment demonstrates why <code>providedIn: 'root'</code> matters. Add a temporary component that
+              injects the <em>same</em> service and shows a count:
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li>Run <code>ng g c employee-stats</code>.</li>
+                <li>Put this in its class:</li>
+              </ol>
+            </div>
+            <div class="codewrap"><pre><code>import { Component } from '@angular/core';
+import { EmployeeService } from '../services/employee.service';
+
+@Component({
+  selector: 'app-employee-stats',
+  template: `
+    &lt;div class="stats"&gt;
+      📊 &lt;strong&gt;{{ count() }}&lt;/strong&gt; employees ·
+      &lt;strong&gt;{{ active() }}&lt;/strong&gt; active ·
+      total &lt;strong&gt;{{ total() | currency:'INR':'symbol':'1.0-0' }}&lt;/strong&gt;
+    &lt;/div&gt;
+  `,
+  styles: [`
+    .stats {
+      background: #f0f7ff; border: 1px solid #cfe4ff;
+      border-radius: 8px; padding: 10px 16px; margin: 14px 0; font-size: 15px;
+    }
+  `]
+})
+export class EmployeeStatsComponent {
+  // A SECOND component injecting the SAME service
+  constructor(private employeeService: EmployeeService) { }
+
+  count()  { return this.employeeService.getEmployees().length; }
+  active() { return this.employeeService.getActiveCount(); }
+  total()  { return this.employeeService.getTotalSalary(); }
+}</code></pre></div>
+            <div class="codewrap"><pre><code>&lt;!-- add to app.component.html, above &lt;app-employee-list&gt; --&gt;
+  &lt;app-employee-stats&gt;&lt;/app-employee-stats&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">Now the payoff — do this and watch carefully</span>
+              Delete an employee by clicking a card's <strong>✕</strong>. The stats bar at the top
+              <strong>updates immediately</strong>, even though it is a completely separate component with no
+              relationship to the list — no <code>@Input</code>, no <code>@Output</code>, no shared parent code.<br><br>
+              It works because <code>providedIn: 'root'</code> means <strong>both components hold a reference to the very
+              same service object</strong>. That is what "singleton" buys you, and it is how real Angular apps share state.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Two components share one service instance</strong> — deleting from the list updates the stats bar with no code connecting them.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PART 3 — HTTP ===== -->
+      <div class="section-band">Part 3 — Talking to a real API</div>
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> A Live API Call with <code>HttpClient</code><span class="sync">Theory slides 26–33</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Fetch real data over the internet. We use a free public API — <code>jsonplaceholder.typicode.com</code> —
+              which returns fake user data over real HTTP. Everything you learn here applies unchanged to your own Spring
+              Boot API; only the URL differs.
+            </div>
+            <div class="dothis">
+              <span class="lbl">Before you start — open the Network tab</span>
+              <ol>
+                <li>Press <kbd>F12</kbd> in your browser.</li>
+                <li>Click the <strong>Network</strong> tab, and tick the <strong>Fetch/XHR</strong> filter.</li>
+                <li>Leave it open for the rest of this session. It shows you every request your app makes, what it sent,
+                    what came back, and how long it took. <strong>This is the single most useful debugging tool for HTTP
+                    work.</strong></li>
+              </ol>
+            </div>
+
+            <h3>Step 1 — register <code>HttpClientModule</code></h3>
+            <p>Third time today's pattern appears. You should be able to predict this one.</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.module.ts</span>
+              <span class="fb-tag">Add the two marked lines</span>
+            </div>
+            <div class="codewrap"><pre><code>import { HttpClientModule } from '@angular/common/http';   // ← 1. note the package!
+
+@NgModule({
+  declarations: [ /* ...all your components... */ ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    ReactiveFormsModule,
+    HttpClientModule                                        // ← 2. register it
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">The error if you forget — and its family</span>
+              <code>NullInjectorError: No provider for HttpClient!</code><br>
+              That is the same family as <em>"Can't bind to 'ngModel'"</em> from Session 2 and
+              <code>ReactiveFormsModule</code> from Task 2: <strong>a module is missing from <code>imports</code></strong>.
+              Also note the package is <code>@angular/common/http</code> — <em>not</em> <code>@angular/core</code>.
+              That import line catches people out constantly.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong><code>HttpClientModule</code> is registered</strong> and the app still compiles.</span>
+            </label>
+
+            <h3>Step 2 — describe what the API actually returns</h3>
+            <p>Open <code>https://jsonplaceholder.typicode.com/users</code> in a browser tab and look at the JSON.
+               <strong>It does not match our <code>Employee</code> interface</strong> — there is no <code>designation</code>,
+               no <code>salary</code>, no <code>status</code>. Real APIs rarely match your model exactly, and pretending
+               otherwise is how you get runtime surprises. So we describe the truth first:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/models/api-user.ts</span>
+              <span class="fb-tag">Create this new file</span>
+            </div>
+            <div class="codewrap"><pre><code>// This interface describes what the API REALLY sends back.
+// It is not our Employee — we convert between the two in the service.
+export interface ApiUser {
+  id: number;
+  name: string;
+  username: string;
+  email: string;
+  phone: string;
+  website: string;
+  company: {
+    name: string;
+    catchPhrase: string;
+  };
+}</code></pre></div>
+            <div class="concept">
+              <span class="lbl">Why bother with a separate interface?</span>
+              Because your app's model should not be dictated by whatever shape a third party happens to send. Keeping
+              <code>ApiUser</code> separate from <code>Employee</code> means that if the API changes, you fix
+              <strong>one mapping function</strong> — not every component. This is exactly why your Spring Boot code has
+              DTOs sitting between the outside world and your entities.
+            </div>
+
+            <h3>Step 3 — add HTTP to the service</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/employee.service.ts</span>
+              <span class="fb-tag">Add these to the existing file</span>
+            </div>
+            <div class="codewrap"><pre><code>// ── 1. ADD these imports at the top of the file ──
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { ApiUser } from '../models/api-user';
+
+// ── 2. ADD a constructor to the class (or edit the empty one) ──
+  private apiUrl = 'https://jsonplaceholder.typicode.com/users';
+
+  constructor(private http: HttpClient) { }
+
+// ── 3. ADD these methods to the class ──
+
+  /** The raw response, straight from the API — no conversion. */
+  getUsersRaw(): Observable&lt;ApiUser[]&gt; {
+    return this.http.get&lt;ApiUser[]&gt;(this.apiUrl);
+  }
+
+  /** The same call, converted into OUR Employee shape. */
+  getEmployeesFromApi(): Observable&lt;Employee[]&gt; {
+    return this.http.get&lt;ApiUser[]&gt;(this.apiUrl).pipe(
+      map(users =&gt; users.map(u =&gt; this.toEmployee(u)))
+    );
+  }
+
+  /** Turn one ApiUser into one Employee. All the ugliness lives here. */
+  private toEmployee(u: ApiUser): Employee {
+    return {
+      id: u.id,
+      name: u.name.toLowerCase(),
+      designation: u.company.name,              // the API has no job title, so use the company
+      salary: 20000 + (u.id * 2500),            // invented — the API has no salary
+      status: u.id % 2 === 1 ? 'Active' : 'Inactive',
+      email: u.email
+    };
+  }</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Line</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td>constructor(private http: HttpClient)</td><td>Dependency injection again — the third time today. Angular supplies the <code>HttpClient</code>.</td></tr>
+                <tr><td>this.http.get&lt;ApiUser[]&gt;(url)</td><td>Sends a GET. The <code>&lt;ApiUser[]&gt;</code> tells TypeScript the response shape, which gives you autocomplete on server data.</td></tr>
+                <tr><td>Observable&lt;Employee[]&gt;</td><td>The return type. <strong>Not the data</strong> — a promise of future data. The coffee ticket, not the coffee.</td></tr>
+                <tr><td>.pipe(map(...))</td><td>Transforms the data <em>as it flows through</em>. The outer <code>map</code> is an RxJS operator on the stream; the inner <code>users.map</code> is the ordinary array method from Session 1.</td></tr>
+                <tr><td>private toEmployee(u)</td><td>All the awkward conversion in one private place. If the API changes, this is the only method you touch.</td></tr>
+              </tbody>
+            </table>
+            <div class="observe">
+              <span class="lbl">Yes, the salary is invented — and that's the honest thing to do</span>
+              This API has no salary field, so <code>toEmployee</code> makes one up from the id. In a real project you
+              would either change the API or leave the field out. We fabricate it here so the rest of your existing
+              table, pipes and colour coding keep working unchanged.
+            </div>
+
+            <h3>Step 4 — call it from the component</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.ts</span>
+              <span class="fb-tag">Replace ngOnInit and add these members</span>
+            </div>
+            <div class="codewrap"><pre><code>  // ── ADD these fields ──
+  useApi = false;
+  isLoading = false;
+  errorMessage = '';
+
+  // ── REPLACE ngOnInit with this ──
+  ngOnInit(): void {
+    this.loadLocal();
+  }
+
+  /** The old behaviour — instant, from the in-memory array. */
+  loadLocal(): void {
+    this.useApi = false;
+    this.errorMessage = '';
+    this.isLoading = false;
+    this.allEmployees = this.employeeService.getEmployees();
+    this.employees = this.allEmployees;
+  }
+
+  /** The new behaviour — over the network. */
+  loadFromApi(): void {
+    this.useApi = true;
+    this.isLoading = true;          // 1. BEFORE the call
+    this.errorMessage = '';
+
+    this.employeeService.getEmployeesFromApi().subscribe({
+
+      next: (data) =&gt; {
+        // 2. Runs LATER, when the reply arrives
+        this.allEmployees = data;
+        this.employees = data;
+        this.isLoading = false;
+        console.log('Received ' + data.length + ' employees from the API');
+      },
+
+      error: (err) =&gt; {
+        // 3. NEVER skip this one
+        this.errorMessage = 'Could not reach the API. Check your internet connection.';
+        this.isLoading = false;     // easy to forget — and it strands the spinner
+        console.error('Request failed:', err);
+      }
+    });
+  }</code></pre></div>
+
+            <h3>Step 5 — the buttons and the three states</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.html</span>
+              <span class="fb-tag">Add to the toolbar div, and just below it</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;!-- add these two buttons INSIDE the existing &lt;div class="toolbar"&gt; --&gt;
+  &lt;button (click)="loadLocal()"   [disabled]="!useApi"&gt;Local data&lt;/button&gt;
+  &lt;button (click)="loadFromApi()" [disabled]="useApi"&gt;Load from API&lt;/button&gt;
+
+&lt;!-- add these three blocks just AFTER the closing &lt;/div&gt; of the toolbar --&gt;
+&lt;p *ngIf="isLoading" class="loading"&gt;⏳ Loading from the API…&lt;/p&gt;
+
+&lt;div *ngIf="errorMessage" class="api-error"&gt;
+  ⚠️ {{ errorMessage }}
+  &lt;button (click)="loadFromApi()"&gt;Retry&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;p *ngIf="useApi &amp;&amp; !isLoading &amp;&amp; !errorMessage" class="api-badge"&gt;
+  🌐 Showing &lt;strong&gt;live data&lt;/strong&gt; from jsonplaceholder.typicode.com
+&lt;/p&gt;</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-list/employee-list.component.css</span>
+              <span class="fb-tag">Add to the end of the file</span>
+            </div>
+            <div class="codewrap"><pre><code>.loading {
+  padding: 14px 18px; background: #fffdf3;
+  border: 1px solid #f0e3a8; border-radius: 8px; font-size: 16px;
+}
+
+.api-error {
+  padding: 14px 18px; background: #fff0ef;
+  border: 1px solid #ffc9c4; border-radius: 8px;
+  color: #b00027; font-size: 16px;
+}
+.api-error button {
+  margin-left: 10px; padding: 4px 12px; border: none;
+  border-radius: 6px; background: #dd0031; color: white; cursor: pointer;
+}
+
+.api-badge {
+  padding: 8px 14px; background: #f0f7ff;
+  border: 1px solid #cfe4ff; border-radius: 8px; font-size: 14px;
+}</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200</span>
+              </div>
+              <div class="viewport">
+                <p style="margin:0 0 8px;"><span class="btn ghost">Hide table</span> <span class="btn ghost">Local data</span> <span class="btn">Load from API</span></p>
+                <p style="background:#f0f7ff;border:1px solid #cfe4ff;border-radius:6px;padding:6px 12px;font-size:13.5px;margin:0 0 10px;">🌐 Showing <strong>live data</strong> from jsonplaceholder.typicode.com</p>
+                <table>
+                  <thead><tr><th>#</th><th>ID</th><th>Name</th><th>Designation</th><th>Salary</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr class="row-active"><td>1</td><td>1</td><td>Leanne Graham</td><td>ROMAGUERA-CRONA</td><td>₹22,500</td><td>ACTIVE</td></tr>
+                    <tr class="row-inactive"><td>2</td><td>2</td><td>Ervin Howell</td><td>DEckow-Crist</td><td>₹25,000</td><td>INACTIVE</td></tr>
+                    <tr class="row-active"><td>3</td><td>3</td><td>Clementine Bauch</td><td>ROMAGUERA-JACOBSON</td><td>₹27,500</td><td>ACTIVE</td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;color:#6e6e73;margin-top:8px;">Showing 10 of 10 employees · 5 Active</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — and check all five</span>
+              <strong>1.</strong> Click <strong>Load from API</strong> → a brief "⏳ Loading…" then
+              <strong>ten rows</strong> of real names (Leanne Graham, Ervin Howell, …).<br>
+              <strong>2.</strong> Your <strong>existing pipes still work</strong> — titlecase names, ₹ salaries, upper-case
+              designations.<br>
+              <strong>3.</strong> Your <strong>row colouring still works</strong> — green and red alternating by the
+              invented status.<br>
+              <strong>4.</strong> The <strong>search box still works</strong> on the live data.<br>
+              <strong>5.</strong> In the <strong>Network tab</strong>, one request to
+              <code>users</code> with status <code>200</code>. Click it and read the Response tab — that is the raw JSON
+              your app received.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>🌐 Live data from the internet is in my Angular table</strong>, and I found the request in the Network tab.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Stop and notice what you did <em>not</em> change</span>
+              The template. Again. Your table, your <code>*ngFor</code>, your <code>ngClass</code> colouring, your pipes,
+              your cards — all untouched. The data now travels across the internet, arrives asynchronously, and gets
+              reshaped on the way in, and <strong>the view still neither knows nor cares</strong>.<br><br>
+              That is the third time this session you have swapped the data layer with zero view changes: array →
+              service → HTTP. If you understand why that works, you understand the point of the whole session.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — five experiments, and #3 is the essential one</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>See the raw response.</strong> Temporarily show the untransformed data. In the class add
+                    <code>rawUsers: any[] = [];</code> and in <code>loadFromApi</code> also call
+                    <code>this.employeeService.getUsersRaw().subscribe(u =&gt; this.rawUsers = u);</code> then put
+                    <code>&lt;pre&gt;{{ rawUsers[0] | json }}&lt;/pre&gt;</code> in the template. Compare it with the
+                    <code>Employee</code> in your table — that difference is what <code>toEmployee</code> does.</li>
+                <li><strong>Watch it fail properly.</strong> Change <code>apiUrl</code> to
+                    <code>'https://jsonplaceholder.typicode.com/userzzz'</code> and click Load from API. You get a
+                    <strong>404 in the Network tab</strong> and your red error panel with a working Retry button. Fix
+                    the URL.</li>
+                <li><strong>The essential one — prove Observables are lazy.</strong> Comment out the entire
+                    <code>.subscribe({...})</code> so the line reads just
+                    <code>this.employeeService.getEmployeesFromApi();</code>. Save, click Load from API, and watch the
+                    Network tab: <strong>no request is made at all.</strong> No error, no warning, no traffic. Nothing.
+                    <em>No subscribe, no request.</em> Put it back.</li>
+                <li><strong>See the loading state properly.</strong> In the Network tab, set throttling to
+                    <strong>Slow 3G</strong>, then click Load from API. Now the "⏳ Loading…" message is visible for
+                    several seconds — which is exactly what a user on a bad connection experiences, and exactly why you
+                    wrote it.</li>
+                <li><strong>Prove the stranded-spinner bug is real.</strong> Delete <code>this.isLoading = false;</code>
+                    from the <code>error</code> handler, then break the URL again. The spinner now spins
+                    <strong>forever</strong> with no error shown. That is the most common HTTP bug beginners ship. Restore
+                    the line.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five experiments done</strong> — especially proving that no <code>subscribe</code> means no request.</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">If your network blocks the public API</span>
+              Use <code>src/assets/</code> instead: create <code>src/assets/employees.json</code> containing a JSON array
+              of employees, and set <code>apiUrl = 'assets/employees.json'</code>. The CLI serves it over real HTTP from
+              your dev server, so every single thing in this task still applies — <code>subscribe</code>, the Network
+              tab, loading states, error handling. Only the URL differs.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 — ASYNC PIPE ===== -->
+      <section class="section">
+        <details class="exp lab7" open>
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> The <code>async</code> Pipe — the Same Thing, Without <code>subscribe</code><span class="sync">Theory slide 35</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              See the tidier alternative. Instead of subscribing in the class and copying data into a field, hand the
+              <strong>Observable itself</strong> to the template and let the <code>async</code> pipe do the work — and
+              clean up after itself.
+            </div>
+
+            <h3>A small separate component, so you can compare fairly</h3>
+            <div class="codewrap"><pre><code>ng g c employee-async</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-async/employee-async.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Employee } from '../models/employee';
+import { EmployeeService } from '../services/employee.service';
+
+@Component({
+  selector: 'app-employee-async',
+  templateUrl: './employee-async.component.html',
+  styleUrls: ['./employee-async.component.css']
+})
+export class EmployeeAsyncComponent implements OnInit {
+
+  // The trailing $ is a CONVENTION meaning "this holds an Observable".
+  // Not required by Angular — used by every Angular developer.
+  employees$!: Observable&lt;Employee[]&gt;;
+
+  constructor(private employeeService: EmployeeService) { }
+
+  ngOnInit(): void {
+    // Note: NO subscribe. We just store the Observable itself.
+    this.employees$ = this.employeeService.getEmployeesFromApi();
+  }
+}</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-async/employee-async.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="async-card"&gt;
+  &lt;h3&gt;Same data, via the &lt;code&gt;async&lt;/code&gt; pipe&lt;/h3&gt;
+
+  &lt;!-- 'as employees' captures the resolved value into a local name.
+       'else loading' shows a placeholder until it arrives. --&gt;
+  &lt;ng-container *ngIf="employees$ | async as employees; else loading"&gt;
+
+    &lt;p&gt;{{ employees.length }} employees, fetched without a single subscribe.&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li *ngFor="let emp of employees.slice(0, 5)"&gt;
+        {{ emp.name | titlecase }} —
+        {{ emp.designation }} —
+        {{ emp.salary | currency:'INR':'symbol':'1.0-0' }}
+      &lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;p class="muted"&gt;(showing the first 5)&lt;/p&gt;
+
+  &lt;/ng-container&gt;
+
+  &lt;ng-template #loading&gt;
+    &lt;p&gt;⏳ Loading…&lt;/p&gt;
+  &lt;/ng-template&gt;
+&lt;/div&gt;</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/employee-async/employee-async.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.async-card {
+  border: 1px solid #d2d2d7;
+  border-left: 5px solid #00b3a4;
+  border-radius: 10px;
+  padding: 14px 20px;
+  margin: 18px 0;
+  background: #ecfbfa;
+}
+
+h3 { margin: 0 0 8px; font-size: 17px; }
+ul { margin: 8px 0; padding-left: 22px; }
+li { font-size: 15px; margin: 4px 0; }
+.muted { color: #6e6e73; font-size: 13px; margin: 4px 0 0; }</code></pre></div>
+            <div class="codewrap"><pre><code>&lt;!-- add to app.component.html --&gt;
+  &lt;app-employee-async&gt;&lt;/app-employee-async&gt;</code></pre></div>
+
+            <table class="cmp">
+              <thead><tr><th style="width:26%">Part</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>employees$</code></td><td>Holds the Observable, not the data. The <code>$</code> is a naming convention.</td></tr>
+                <tr><td><code>| async</code></td><td>Subscribes, hands the value to the template, and <strong>unsubscribes automatically</strong> when the component is destroyed.</td></tr>
+                <tr><td><code>as employees</code></td><td>Captures the resolved array into a local name, so you subscribe <strong>once</strong> rather than every time you use it.</td></tr>
+                <tr><td><code>else loading</code></td><td>Shows the <code>&lt;ng-template #loading&gt;</code> until the value arrives. Your loading state for free.</td></tr>
+                <tr><td><code>!</code> in <code>employees$!:</code></td><td>Tells strict mode "I'll assign this in <code>ngOnInit</code>". Same <code>!</code> as <code>@Input</code> in Session 2.</td></tr>
+              </tbody>
+            </table>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              A teal panel showing "10 employees, fetched without a single subscribe" and the first five names — briefly
+              preceded by "⏳ Loading…". The Network tab shows a second request to the same URL, since this component
+              makes its own call.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The <code>async</code> pipe version works</strong> with no <code>subscribe</code> anywhere in my code.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — see why <code>as</code> matters</span>
+              Remove the <code>as employees</code> and use <code>employees$ | async</code> directly in both the
+              <code>*ngIf</code> and the <code>*ngFor</code>. Now watch the Network tab: <strong>two requests</strong> for
+              the same data, because each <code>| async</code> is a separate subscription. Put <code>as employees</code>
+              back — <em>one subscription, one request.</em> This is a real performance bug in production code, and now
+              you have seen it happen.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I saw the duplicate-request bug</strong> and understand what <code>as</code> prevents.</span>
+            </label>
+
+            <div class="note">
+              <span class="lbl">So which should you use?</span>
+              <strong><code>subscribe</code></strong> when you need to <em>do</em> something with the reply — show a
+              message, reset a form, navigate away. That is most of Session 4.<br>
+              <strong><code>async</code></strong> when you are only displaying the data. Less code, and it cannot leak
+              subscriptions.<br>
+              Both are entirely correct, and you will use both in real work.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> Send a POST Request<span class="sync">Optional — theory slide 31</span></summary>
+          <div class="exp-body">
+            <p>Only start this once Tasks 1–7 are ticked. Goal: wire your reactive form to actually <strong>send</strong>
+               its data to the API.</p>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/employee.service.ts</span>
+              <span class="fb-tag">Add this method</span>
+            </div>
+            <div class="codewrap"><pre><code>  /** POST a new employee to the API. */
+  createOnApi(emp: Employee): Observable&lt;Employee&gt; {
+    return this.http.post&lt;Employee&gt;(this.apiUrl, emp);
+  }</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/employee-form-rx/employee-form-rx.component.ts</span>
+              <span class="fb-tag">Add the injection and this method</span>
+            </div>
+            <div class="codewrap"><pre><code>// add to the imports
+import { EmployeeService } from '../services/employee.service';
+import { Employee } from '../models/employee';
+
+// add EmployeeService to the constructor, alongside FormBuilder
+  constructor(private fb: FormBuilder,
+              private employeeService: EmployeeService) {
+    this.empForm = this.fb.group({ /* ...unchanged... */ });
+  }
+
+// add these members
+  isSaving = false;
+  serverReply = '';
+
+  saveToApi(): void {
+    if (this.empForm.invalid) {
+      this.empForm.markAllAsTouched();
+      return;
+    }
+
+    const emp: Employee = {
+      id: 0,                                          // the server assigns the real id
+      name: this.empForm.value.name,
+      designation: this.empForm.value.designation,
+      salary: this.empForm.value.salary,
+      status: 'Active',
+      email: this.empForm.value.email
+    };
+
+    this.isSaving = true;
+    this.serverReply = '';
+
+    this.employeeService.createOnApi(emp).subscribe({
+      next: (saved) =&gt; {
+        // Use what the SERVER returned, not your local copy
+        this.serverReply = JSON.stringify(saved, null, 2);
+        this.isSaving = false;
+        this.empForm.reset({ name: '', email: '', salary: 0,
+                             designation: 'Software Engineer' });
+      },
+      error: (err) =&gt; {
+        this.serverReply = 'Save failed: ' + err.message;
+        this.isSaving = false;
+      }
+    });
+  }</code></pre></div>
+            <div class="codewrap"><pre><code>&lt;!-- add a button and a reply panel to the reactive form's template --&gt;
+  &lt;button type="button" class="ghost"
+          (click)="saveToApi()"
+          [disabled]="isSaving"&gt;
+    {{ isSaving ? 'Saving…' : 'Save to API' }}
+  &lt;/button&gt;
+
+  &lt;div *ngIf="serverReply" class="ok"&gt;
+    📡 The server replied:
+    &lt;pre&gt;{{ serverReply }}&lt;/pre&gt;
+  &lt;/div&gt;</code></pre></div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              Fill the form, click <strong>Save to API</strong>, and the server replies with your object <em>plus an
+              <code>id</code> of 11</em>. In the Network tab the request shows as <code>POST</code> with status
+              <code>201 Created</code> — click it and look at the <strong>Request Payload</strong> to see exactly what
+              your app sent.
+            </div>
+            <div class="observe">
+              <span class="lbl">Nothing was actually saved — and that's fine</span>
+              JSONPlaceholder is a <em>fake</em> API: it validates your request, replies correctly, and then discards it.
+              Reload the page and your employee is gone. <strong>The HTTP round-trip is completely real</strong>, which is
+              all we need — the same code against your Spring Boot API genuinely persists. That is Session 4's final
+              stretch task.
+            </div>
+            <div class="keybox">
+              <span class="lbl">Note the <code>id: 0</code>, and why we use the server's reply</span>
+              You send <code>0</code> because the <em>server</em> assigns real ids. The reply comes back with
+              <code>id: 11</code>. Always use the object from <code>next</code> rather than your local one — otherwise
+              you end up holding an employee whose id is <code>0</code>, and every later update or delete on it will fail
+              in a confusing way.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Stretch done</strong> — POST sent, <code>201 Created</code> in the Network tab, and I read the Request Payload.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== CHECKPOINT ===== -->
+      <div class="section-band">Checkpoint</div>
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="chevron">▶</span> Troubleshooting — Session 3<span class="sync">Theory slides 27, 30, 36</span></summary>
+          <div class="exp-body">
+            <div class="observe">
+              <span class="lbl">Two habits that solve most of today's problems</span>
+              <strong>1.</strong> Keep the <strong>Network tab</strong> open. It tells you whether a request was even made,
+              what you sent, what came back, and the status code. Half of today's bugs are visible there in two seconds.<br>
+              <strong>2.</strong> Put <code>{{ myThing | json }}</code> on the page when data looks wrong. It works on
+              form values, API responses, anything.
+            </div>
+            <table class="issues">
+              <thead><tr><th style="width:36%">Message / symptom</th><th>Cause and fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>NullInjectorError: No provider for HttpClient!</code></td>
+                  <td>Add <code>import { HttpClientModule } from '@angular/common/http';</code> and put <code>HttpClientModule</code> in <code>imports</code>. Note the package — it's <code>@angular/common/http</code>, not <code>@angular/core</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Can't bind to 'formGroup' since it isn't a known property of 'form'</code></td>
+                  <td><code>ReactiveFormsModule</code> missing from <code>imports</code>. Same error family as <code>ngModel</code>/<code>FormsModule</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>If ngModel is used within a form tag, either the name attribute must be set…</code></td>
+                  <td>A template-driven field is missing its <code>name="..."</code>. Both <code>name</code> and <code>ngModel</code> are required.</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot find control with name: 'name'</code></td>
+                  <td>The <code>formControlName</code> string doesn't match a key in your <code>FormGroup</code>. Check spelling and capitalisation on both sides.</td>
+                </tr>
+                <tr>
+                  <td><code>Type 'Observable&lt;Employee[]&gt;' is not assignable to type 'Employee[]'</code></td>
+                  <td><strong>The classic.</strong> You wrote <code>this.employees = service.getEmployees();</code>. An HTTP method returns an Observable, not data — you must <code>.subscribe()</code> and assign inside <code>next</code>.</td>
+                </tr>
+                <tr>
+                  <td>Nothing happens. No request in the Network tab. No error.</td>
+                  <td><strong>Missing <code>.subscribe()</code>.</strong> Observables are lazy — without a subscriber, no request is ever sent. This is today's single most common bug.</td>
+                </tr>
+                <tr>
+                  <td>The spinner never stops</td>
+                  <td>You forgot <code>isLoading = false</code> in the <strong>error</strong> handler. Set it in both branches.</td>
+                </tr>
+                <tr>
+                  <td>Blank screen, and an error only in the console</td>
+                  <td>You have no <code>error</code> handler in <code>subscribe</code>, so the failure was reported to a console your user will never open. Always provide one.</td>
+                </tr>
+                <tr>
+                  <td><code>blocked by CORS policy</code></td>
+                  <td>A <strong>browser security rule</strong>, not an Angular bug — the request never reached your server. Fix it on the server: <code>@CrossOrigin(origins = "http://localhost:4200")</code> on your Spring controller. Nothing you change in Angular will help.</td>
+                </tr>
+                <tr>
+                  <td><code>404 Not Found</code> in the Network tab</td>
+                  <td>The URL is wrong. Copy it out of the Network tab and paste it into a browser tab — if it fails there too, the URL is the problem, not your code.</td>
+                </tr>
+                <tr>
+                  <td>Data arrives but the table is empty</td>
+                  <td>The response shape doesn't match what you assumed. Add <code>{{ myData | json }}</code> to the page and compare it with your interface. This is exactly why <code>ApiUser</code> is separate from <code>Employee</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot read properties of undefined</code> right after loading</td>
+                  <td>The template rendered before the reply arrived. Guard it with <code>*ngIf="data"</code> or use <code>?.</code> — <code>{{ emp?.name }}</code>.</td>
+                </tr>
+                <tr>
+                  <td>Two identical requests for the same data</td>
+                  <td>Two separate <code>| async</code> subscriptions. Use <code>*ngIf="data$ | async as data"</code> and refer to <code>data</code> thereafter.</td>
+                </tr>
+                <tr>
+                  <td>Errors appear before the user types anything</td>
+                  <td>Your condition is missing <code>&amp;&amp; field.touched</code>. Always pair <code>invalid</code> with <code>touched</code>.</td>
+                </tr>
+                <tr>
+                  <td>Save does nothing on an empty form, with no explanation</td>
+                  <td>The form is invalid but no errors show, because nothing is <code>touched</code>. Call <code>this.form.markAllAsTouched()</code> before returning.</td>
+                </tr>
+                <tr>
+                  <td>Confusing errors on a single input</td>
+                  <td>You mixed the two form systems — <code>[(ngModel)]</code> and <code>formControlName</code> on the same element. Pick one per form.</td>
+                </tr>
+                <tr>
+                  <td><code>Property 'employees$' has no initializer</code></td>
+                  <td>Strict mode. Write <code>employees$!: Observable&lt;Employee[]&gt;;</code> with the <code>!</code>.</td>
+                </tr>
+                <tr>
+                  <td>Two components show different data</td>
+                  <td>You wrote <code>new EmployeeService()</code> somewhere, creating a second instance. Never use <code>new</code> for a service — inject it.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Glossary — Session 3 terms</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Meaning in one sentence</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Template-driven form</strong></td><td>A form defined by HTML attributes, with Angular building the model behind the scenes. Needs <code>FormsModule</code>.</td></tr>
+                <tr><td><strong>Reactive form</strong></td><td>A form defined as an object in your TypeScript class, which the template then connects to. Needs <code>ReactiveFormsModule</code>.</td></tr>
+                <tr><td><strong><code>ngForm</code></strong></td><td>The directive Angular attaches to every <code>&lt;form&gt;</code>; <code>#f="ngForm"</code> gives you the form's state.</td></tr>
+                <tr><td><strong><code>ngSubmit</code></strong></td><td>Angular's submit event. Use it instead of <code>(submit)</code> — it prevents the page reloading.</td></tr>
+                <tr><td><strong><code>FormGroup</code></strong></td><td>A collection of form controls — the whole form, or a nested section of it.</td></tr>
+                <tr><td><strong><code>FormControl</code></strong></td><td>One field: its value, its validators, and its state.</td></tr>
+                <tr><td><strong><code>FormBuilder</code></strong></td><td>An injected service that builds the same structure with much less code: <code>['', [Validators.required]]</code>.</td></tr>
+                <tr><td><strong><code>Validators</code></strong></td><td>Angular's built-in rules: <code>required</code>, <code>minLength</code>, <code>email</code>, <code>min</code>, <code>max</code>, <code>pattern</code>.</td></tr>
+                <tr><td><strong><code>touched</code></strong></td><td>The user has focused this field and then left it. The flag that makes error messages polite.</td></tr>
+                <tr><td><strong><code>dirty</code></strong></td><td>The value has been changed. Different from <code>touched</code>.</td></tr>
+                <tr><td><strong><code>pristine</code></strong></td><td>Nothing has been changed since the form loaded.</td></tr>
+                <tr><td><strong><code>patchValue</code></strong></td><td>Set some fields from code. Essential for edit screens (Session 4).</td></tr>
+                <tr><td><strong><code>setValue</code></strong></td><td>Set <em>every</em> field from code — all of them must be supplied.</td></tr>
+                <tr><td><strong><code>markAllAsTouched</code></strong></td><td>Reveal every validation error at once, typically on a failed submit.</td></tr>
+                <tr><td><strong>Service</strong></td><td>A plain class holding reusable data and logic, with no template.</td></tr>
+                <tr><td><strong><code>@Injectable</code></strong></td><td>Marks a class as available for injection. Angular's <code>@Service</code>.</td></tr>
+                <tr><td><strong><code>providedIn: 'root'</code></strong></td><td>Registers the service app-wide as a single shared instance.</td></tr>
+                <tr><td><strong>Dependency injection</strong></td><td>Declaring what you need in a constructor and letting Angular supply it. You never write <code>new</code>.</td></tr>
+                <tr><td><strong>Injector</strong></td><td>Angular's registry that builds and caches service instances.</td></tr>
+                <tr><td><strong>Singleton</strong></td><td>One instance shared by everyone — which is how two components see the same data.</td></tr>
+                <tr><td><strong><code>HttpClient</code></strong></td><td>Angular's HTTP tool: <code>get</code>, <code>post</code>, <code>put</code>, <code>delete</code>. Belongs in a service.</td></tr>
+                <tr><td><strong><code>HttpClientModule</code></strong></td><td>The module that must be in <code>imports</code> before <code>HttpClient</code> can be injected.</td></tr>
+                <tr><td><strong>Observable</strong></td><td>A value that will arrive later, possibly many times. The coffee ticket, not the coffee.</td></tr>
+                <tr><td><strong><code>subscribe</code></strong></td><td>Registering your handlers and <strong>starting</strong> the work. No subscribe, no request.</td></tr>
+                <tr><td><strong><code>next</code> / <code>error</code> / <code>complete</code></strong></td><td>The three subscribe handlers: a value arrived / it failed / the stream ended.</td></tr>
+                <tr><td><strong>Lazy</strong></td><td>An Observable does nothing until subscribed to. The cause of most "why isn't it firing" confusion.</td></tr>
+                <tr><td><strong>RxJS</strong></td><td>The library Angular uses for Observables, and the source of operators like <code>map</code>.</td></tr>
+                <tr><td><strong><code>pipe(map(...))</code></strong></td><td>Transforming data as it flows through an Observable.</td></tr>
+                <tr><td><strong><code>async</code> pipe</strong></td><td>Subscribes in the template and unsubscribes automatically. Cannot leak.</td></tr>
+                <tr><td><strong>The <code>$</code> suffix</strong></td><td>A naming convention: <code>employees$</code> holds an Observable, <code>employees</code> holds data.</td></tr>
+                <tr><td><strong>CORS</strong></td><td>A browser rule blocking requests to a different origin unless the server permits it. Fixed on the server.</td></tr>
+                <tr><td><strong>Origin</strong></td><td>Protocol + host + port. <code>localhost:4200</code> and <code>localhost:8080</code> are different origins.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Self-Check — can you answer these without looking?<span class="sync">Theory slide 38</span></summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li>Name the two form systems, the module each needs, and where each keeps its validation rules. <span class="muted">(slides 4, 17)</span></li>
+              <li>Why show errors on <code>invalid &amp;&amp; touched</code> rather than just <code>invalid</code>? <span class="muted">(slide 7)</span></li>
+              <li>What is the difference between <code>touched</code> and <code>dirty</code>? <span class="muted">(slide 7)</span></li>
+              <li>What <strong>two</strong> attributes must a template-driven field have to join the form? <span class="muted">(slide 6)</span></li>
+              <li>Why does <code>formControlName</code> take no square brackets? <span class="muted">(slide 12)</span></li>
+              <li>Write a <code>FormBuilder</code> field with a required, minimum-length-3 validator. <span class="muted">(slide 15)</span></li>
+              <li>Which method fills an existing form with data, and why does Session 4 need it? <span class="muted">(slide 16)</span></li>
+              <li>Give three reasons to move data out of a component and into a service. <span class="muted">(slide 18)</span></li>
+              <li>What are the three steps to use a service, and which one does the CLI do for you? <span class="muted">(slide 19)</span></li>
+              <li>What does <code>providedIn: 'root'</code> mean, and what does it let two components do? <span class="muted">(slide 24)</span></li>
+              <li>Why should you never write <code>new EmployeeService()</code>? <span class="muted">(slide 19)</span></li>
+              <li>You refactored data into a service and then onto HTTP. How many times did the template change? <span class="muted">(slides 25, and your own Task 6)</span></li>
+              <li>Why can't you write <code>this.employees = this.service.getEmployees();</code> with HttpClient? <span class="muted">(slide 28)</span></li>
+              <li>Explain an Observable using the coffee-shop analogy. <span class="muted">(slide 29)</span></li>
+              <li>What happens if you call an HTTP method and never subscribe? <span class="muted">(slides 29, 31)</span></li>
+              <li>Name the three <code>subscribe</code> handlers, and which one must never be omitted. <span class="muted">(slide 30)</span></li>
+              <li>What three states does a real data screen need, and which one do beginners forget to clear? <span class="muted">(slide 34)</span></li>
+              <li>What does the <code>async</code> pipe do that <code>subscribe</code> doesn't? <span class="muted">(slide 35)</span></li>
+              <li>What is a CORS error, and which side of the wire do you fix it on? <span class="muted">(slide 36)</span></li>
+              <li>Map all four HTTP verbs to their Spring Boot annotations. <span class="muted">(slide 33)</span></li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I can answer at least 15 of the 20</strong> without looking anything up.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <div class="expected" style="margin-top:20px;">
+          <span class="lbl">✅ Session 3 checkpoint — you are ready for Session 4 if…</span>
+          <ol style="margin:8px 0 0;padding-left:22px;font-size:16.5px;line-height:1.6;">
+            <li>You have the <strong>same form built twice</strong> — template-driven and reactive — both validating properly and both showing errors only after <code>touched</code>.</li>
+            <li>The reactive form uses <code>FormBuilder</code>, and <strong>"Fill sample"</strong> populates it via <code>patchValue()</code>.</li>
+            <li>Your employee data lives in <code>EmployeeService</code> with <code>@Injectable({ providedIn: 'root' })</code>, and the component injects it via the constructor.</li>
+            <li>A second component (<code>employee-stats</code>) shares that same service instance — deleting from the list updates it with no connecting code.</li>
+            <li><strong>Live data from a real API</strong> renders in your table, and all your Session 2 pipes, colours and search still work on it.</li>
+            <li>You have loading, error and loaded states, with a working <strong>Retry</strong> button.</li>
+            <li>You have proved to yourself that <strong>no <code>subscribe</code> means no request</strong>.</li>
+            <li><code>app.module.ts</code> has all four modules in <code>imports</code>: <code>BrowserModule</code>, <code>FormsModule</code>, <code>ReactiveFormsModule</code>, <code>HttpClientModule</code>.</li>
+          </ol>
+          <p style="margin:12px 0 0;"><strong>Keep this project.</strong> Session 4 adds routing and turns it into a multi-screen CRUD application — and its final task points your app at <em>your own</em> Spring Boot API.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference — Session 3</h2>
+          <div class="grid">
+            <div>
+              <h3>Template-driven forms</h3>
+              <table>
+                <tr><td><code>&lt;form #f="ngForm" (ngSubmit)="save()"&gt;</code></td><td>The form and its submit</td></tr>
+                <tr><td><code>name="x" [(ngModel)]="obj.x"</code></td><td>Both are required</td></tr>
+                <tr><td><code>#xf="ngModel"</code></td><td>A reference to one field's state</td></tr>
+                <tr><td><code>required minlength="3" email</code></td><td>Rules as HTML attributes</td></tr>
+                <tr><td><code>xf.invalid &amp;&amp; xf.touched</code></td><td>When to show an error</td></tr>
+                <tr><td><code>xf.errors?.['required']</code></td><td>Which rule failed</td></tr>
+                <tr><td><code>[disabled]="f.invalid"</code></td><td>Guard the submit button</td></tr>
+                <tr><td><code>{{ f.value | json }}</code></td><td>Live debug view</td></tr>
+              </table>
+              <h3 style="margin-top:16px;">Reactive forms</h3>
+              <table>
+                <tr><td><code>new FormGroup({ x: new FormControl('') })</code></td><td>Long form</td></tr>
+                <tr><td><code>fb.group({ x: ['', [Validators.required]] })</code></td><td><code>FormBuilder</code> shorthand</td></tr>
+                <tr><td><code>[formGroup]="empForm"</code></td><td>On the <code>&lt;form&gt;</code> — brackets</td></tr>
+                <tr><td><code>formControlName="x"</code></td><td>On each input — <strong>no</strong> brackets</td></tr>
+                <tr><td><code>get x() { return this.empForm.get('x'); }</code></td><td>A getter, for readable templates</td></tr>
+                <tr><td><code>patchValue({ ... })</code></td><td>Fill some fields from code</td></tr>
+                <tr><td><code>reset()</code> · <code>markAllAsTouched()</code></td><td>Clear · reveal all errors</td></tr>
+              </table>
+            </div>
+            <div>
+              <h3>Services &amp; DI</h3>
+              <table>
+                <tr><td><code>ng g s services/employee</code></td><td>Create one</td></tr>
+                <tr><td><code>@Injectable({ providedIn: 'root' })</code></td><td>Register it — one shared instance</td></tr>
+                <tr><td><code>constructor(private svc: EmployeeService) { }</code></td><td>Inject it</td></tr>
+                <tr><td><code>private data: T[] = []</code></td><td>Keep the data private</td></tr>
+                <tr><td><s><code>new EmployeeService()</code></s></td><td><strong>Never do this</strong></td></tr>
+                <tr><td><code>ngOnInit()</code></td><td>Where you call the service</td></tr>
+              </table>
+              <h3 style="margin-top:16px;">HttpClient</h3>
+              <table>
+                <tr><td><code>HttpClientModule</code> in <code>imports</code></td><td>From <code>@angular/common/http</code></td></tr>
+                <tr><td><code>http.get&lt;T[]&gt;(url)</code></td><td>Read all</td></tr>
+                <tr><td><code>http.get&lt;T&gt;(url + '/' + id)</code></td><td>Read one</td></tr>
+                <tr><td><code>http.post&lt;T&gt;(url, obj)</code></td><td>Create</td></tr>
+                <tr><td><code>http.put&lt;T&gt;(url + '/' + id, obj)</code></td><td>Update</td></tr>
+                <tr><td><code>http.delete&lt;void&gt;(url + '/' + id)</code></td><td>Delete</td></tr>
+                <tr><td><code>.pipe(map(x =&gt; ...))</code></td><td>Reshape the response</td></tr>
+                <tr><td><code>.subscribe({ next, error })</code></td><td><strong>Required</strong>, or nothing happens</td></tr>
+                <tr><td><code>data$ | async as data</code></td><td>Subscribe in the template, once</td></tr>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:20px;">Your <code>app.module.ts</code> imports should now read</h3>
+          <p style="font-family:var(--mac-mono);font-size:14px;margin:6px 0 0;">
+            BrowserModule &nbsp;·&nbsp; FormsModule &nbsp;·&nbsp; ReactiveFormsModule &nbsp;·&nbsp; HttpClientModule
+          </p>
+        </div>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

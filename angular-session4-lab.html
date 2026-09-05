@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular Session 4 — Hands-on Lab</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    /* Inner padded canvas inside the window so content never touches the chrome edges */
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    h4 { font-size: 16.5px; margin: 16px 0 4px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    .muted { color: var(--mac-text-muted); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(221,0,49,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #dd0031, #9327f0, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #fff5f7, #fbeef4);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+    details.exp > summary .sync {
+      margin-left: auto;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--mac-accent-2);
+      background: rgba(147,39,240,0.09);
+      border: 1px solid rgba(147,39,240,0.3);
+      padding: 4px 11px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: var(--mac-accent-soft); }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: var(--mac-accent-soft);
+      border: 1px solid #ffd0da;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Key-point callout and reference note — shared vocabulary with the theory decks */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* Line-by-line code explanation */
+    table.lines { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.lines th, table.lines td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 13px; text-align: left; vertical-align: top;
+    }
+    table.lines thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.lines td:first-child {
+      font-family: var(--mac-mono); font-size: 14px; color: #b00027;
+      background: #fafafc; white-space: nowrap;
+    }
+
+    /* Comparison table (shared vocabulary with the theory decks) */
+    table.cmp { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px; text-align: left; vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(221,0,49,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #dd0031; }
+    details.exp.lab2 { border-left-color: #9327f0; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #0a84ff; }
+    details.exp.lab6 { border-left-color: #00b3a4; }
+    details.exp.lab7 { border-left-color: #bf5af2; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff5f7,#ffe9ee); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f9f3ff,#f1e8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#ecfbfa,#dff5f3); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#faf2ff,#f3e6ff); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#9327f0; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#0a84ff; }
+    details.exp.lab6 .lab-tag { background:#00b3a4; }
+    details.exp.lab7 .lab-tag { background:#bf5af2; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+      white-space: nowrap;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Mock browser preview — shows exactly what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin: 14px 0; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .btn-link {
+      display: inline-block; border: 1px solid #0a84ff; border-radius: 6px;
+      padding: 2px 9px; color: #0a84ff; font-size: 12.5px; font-weight: 600;
+    }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Terminal-style output block */
+    .term-out {
+      background: #12121c; color: #d7dae0; border-radius: 10px;
+      border: 1px solid var(--mac-border);
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto; white-space: pre;
+    }
+    .term-out .ok { color: #a6e22e; }
+    .term-out .warn { color: #febc2e; }
+    .term-out .bad { color: #ff6b6b; }
+
+    /* Cards (shared vocabulary with the theory decks) */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 14px 0; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fff;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 17px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 24px; margin-bottom: 4px; }
+
+    /* Quick reference card */
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+    .qref p, .qref li { color: #d7dae0; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #ff9db1; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    @media (max-width: 900px) {
+      .qref .grid { grid-template-columns: 1fr; }
+      .cards, .cards.c3 { grid-template-columns: 1fr; }
+      .lab-canvas { padding: 8px 12px 24px; }
+      .exp-body { padding: 14px 14px 20px; }
+      details.exp > summary { flex-wrap: wrap; font-size: 18px; }
+      details.exp > summary .sync { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session4-lab.html — Angular Session 4</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+      <!-- ===== HERO (non-sticky) ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🅰️</div>
+        <div>
+          <h1>Angular — Session 4 Hands-on Lab</h1>
+          <p class="section-intro">Routing, a navigation shell, and a complete Customer Management CRUD application. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== SLIM STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT THIS LAB ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          Your hands-on companion for Angular Session 4 — the finale. Every task carries a
+          <strong>"Theory slides …"</strong> badge. Use the <strong>Copy</strong> button rather than retyping, tick each
+          checkbox as you finish, and read every <strong>"What you should see"</strong> box before moving on.
+        </div>
+        <div class="plainbox">
+          <span class="lbl">What you're building today</span>
+          A <strong>real application</strong>. Four navigable screens with a persistent header and menu, a working 404
+          page, a customer detail screen reached by URL, and a complete <strong>Customer Management</strong> system with
+          list, search, add, edit and delete. Then you rebuild that CRUD twice more — once through a service, once over
+          HTTP — and finally point it at your own Spring Boot API.
+        </div>
+        <div class="observe">
+          <span class="lbl">Today's two golden rules</span>
+          <strong>1. Route order matters.</strong> Angular takes the <em>first</em> matching route, not the best one. The
+          wildcard <code>**</code> goes last, and static paths go above dynamic ones.<br>
+          <strong>2. Route parameters are always strings.</strong> <code>/customers/1002</code> gives you
+          <code>"1002"</code>, so <code>c.id === id</code> is <code>false</code>. Wrap it in <code>Number()</code>.
+          These two account for most of today's confusion, and both fail <em>silently</em>.
+        </div>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check<span class="sync">Theory slide 2</span></summary>
+          <div class="exp-body">
+            <p>Same <code>hello-world</code> project, one last time.</p>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">My <strong>Session 3 project still runs</strong>
+                <span class="verify"><code>cd hello-world</code> then <code>ng serve -o</code>.</span>
+              </span>
+            </label>
+            <div class="codewrap"><pre><code>cd hello-world
+ng serve -o</code></pre></div>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">My <code>app.module.ts</code> has <strong>all four modules</strong> in <code>imports</code>
+                <span class="verify"><code>BrowserModule</code>, <code>FormsModule</code>, <code>ReactiveFormsModule</code>, <code>HttpClientModule</code>. Open the file and check — today needs all of them.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I have a <strong>second terminal</strong> and the <strong>Network tab</strong> open
+                <span class="verify">Second terminal for <code>ng generate</code>; <kbd>F12</kbd> → Network → Fetch/XHR for Task 7 onwards.</span>
+              </span>
+            </label>
+
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext">I am comfortable with <code>.subscribe({ next, error })</code>
+                <span class="verify">Every CRUD operation in Task 7 uses it. If Session 3's Task 6 felt shaky, skim it again now — five minutes here saves twenty later.</span>
+              </span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Lost your project? You can still do all of today</span>
+              Run <code>ng new hello-world</code> (CSS, no SSR, <strong>no routing</strong> — we add it by hand, that's
+              Task 1), then add <code>FormsModule</code>, <code>ReactiveFormsModule</code> and
+              <code>HttpClientModule</code> to <code>imports</code> in <code>app.module.ts</code>. Today's tasks are
+              self-contained from there.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PART 1 — ROUTING ===== -->
+      <div class="section-band">Part 1 — Routing</div>
+      <section class="section">
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">TASK 1</span><span class="chevron">▶</span> Add Routing to the App<span class="sync">Theory slides 5–6, 9–11</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Turn one endless scrolling page into four separate screens with real URLs. By the end of this task, typing
+              <code>localhost:4200/about</code> into the address bar will open the About screen — and the Back button
+              will work.
+            </div>
+
+            <h3>Step 1 — generate the routing module and the page components</h3>
+            <div class="codewrap"><pre><code>ng generate module app-routing --flat --module=app
+
+ng g c pages/home
+ng g c pages/customers
+ng g c pages/about
+ng g c pages/not-found</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Part of the command</th><th>What it means</th></tr></thead>
+              <tbody>
+                <tr><td>--flat</td><td>Put the file directly in <code>src/app/</code> rather than in its own folder.</td></tr>
+                <tr><td>--module=app</td><td><strong>Register it in <code>AppModule</code>'s <code>imports</code> for me.</strong> Saves you the most-forgotten step.</td></tr>
+                <tr><td>pages/home</td><td>Creates the component inside a <code>pages/</code> folder, so screen-level components stay separate from reusable ones like <code>employee-card</code>.</td></tr>
+              </tbody>
+            </table>
+            <div class="dothis">
+              <span class="lbl">Verify before continuing — this takes ten seconds and saves ten minutes</span>
+              <ol>
+                <li>Open <code>src/app/app.module.ts</code>.</li>
+                <li>Confirm <code>AppRoutingModule</code> is in the <code>imports</code> array. <strong>If it isn't,
+                    add it now</strong> — routing will fail in a very confusing way without it.</li>
+                <li>Confirm the four new page components are in <code>declarations</code>.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Routing module and four page components created</strong>, and <code>AppRoutingModule</code> is in <code>AppModule</code>'s <code>imports</code>.</span>
+            </label>
+
+            <h3>Step 2 — define the routes</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app-routing.module.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+import { HomeComponent } from './pages/home/home.component';
+import { CustomersComponent } from './pages/customers/customers.component';
+import { AboutComponent } from './pages/about/about.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+
+const routes: Routes = [
+  // 1. Default — what shows at the bare localhost:4200
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+
+  // 2. The real screens
+  { path: 'home',      component: HomeComponent },
+  { path: 'customers', component: CustomersComponent },
+  { path: 'about',     component: AboutComponent },
+
+  // 3. The wildcard 404 — ALWAYS LAST
+  { path: '**', component: NotFoundComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],   // forRoot: only in the root routing module
+  exports: [RouterModule]                    // ← WITHOUT THIS, routerLink won't work
+})
+export class AppRoutingModule { }</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:36%">Line</th><th>Why it's there</th></tr></thead>
+              <tbody>
+                <tr><td>path: '' with pathMatch: 'full'</td><td><code>pathMatch: 'full'</code> means "only when the <em>whole</em> URL is empty". Leave it out and the empty path matches the start of every URL — an infinite redirect loop.</td></tr>
+                <tr><td>path: 'home' (no leading slash)</td><td>Angular adds the slash. Writing <code>'/home'</code> gives you a route that never matches.</td></tr>
+                <tr><td>path: '**'</td><td>The wildcard. Matches anything, so it must be <strong>last</strong> — Angular takes the first match, not the best.</td></tr>
+                <tr><td>RouterModule.forRoot(routes)</td><td>Sets up the router for the whole app. Used once, here.</td></tr>
+                <tr><td>exports: [RouterModule]</td><td><strong>The most-forgotten line in Angular routing.</strong> Re-exports the router's directives so your components can use <code>routerLink</code> and <code>&lt;router-outlet&gt;</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>Four routes defined</strong>, with the redirect first and the wildcard last.</span>
+            </label>
+
+            <h3>Step 3 — give each page some content</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/home/home.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page-body"&gt;
+  &lt;h2&gt;Welcome to the Employee Portal&lt;/h2&gt;
+  &lt;p&gt;
+    This application was built across four Angular sessions — components and data
+    binding, forms and validation, services and HTTP, and now routing with full CRUD.
+  &lt;/p&gt;
+  &lt;p&gt;
+    Use the menu above to move between screens. Notice that the URL changes,
+    the Back button works, and yet the page never reloads.
+  &lt;/p&gt;
+  &lt;a routerLink="/customers" class="cta"&gt;Manage customers →&lt;/a&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/about/about.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page-body"&gt;
+  &lt;h2&gt;About this app&lt;/h2&gt;
+  &lt;p&gt;Angular training series · Presenter: Purvam Prajapati, Faculty — AHD.&lt;/p&gt;
+
+  &lt;h3&gt;What's inside&lt;/h3&gt;
+  &lt;ul&gt;
+    &lt;li&gt;&lt;strong&gt;Session 1&lt;/strong&gt; — TypeScript, the CLI, project anatomy&lt;/li&gt;
+    &lt;li&gt;&lt;strong&gt;Session 2&lt;/strong&gt; — components, four data bindings, directives, pipes&lt;/li&gt;
+    &lt;li&gt;&lt;strong&gt;Session 3&lt;/strong&gt; — forms, services, dependency injection, HttpClient&lt;/li&gt;
+    &lt;li&gt;&lt;strong&gt;Session 4&lt;/strong&gt; — routing and full CRUD&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/not-found/not-found.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page-body not-found"&gt;
+  &lt;h2&gt;404 — Page not found&lt;/h2&gt;
+  &lt;p&gt;We couldn't find the page you asked for. It may have been moved or the link
+     may be out of date.&lt;/p&gt;
+  &lt;a routerLink="/home" class="cta"&gt;← Back to home&lt;/a&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/styles.css</span>
+              <span class="fb-tag">Add to the end — these are GLOBAL styles</span>
+            </div>
+            <div class="codewrap"><pre><code>/* Shared page styling. This file is global, so every routed
+   component can use .page-body and .cta without repeating the CSS. */
+.page-body {
+  padding: 18px 0;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+}
+
+.page-body h2 { font-size: 24px; margin: 0 0 10px; }
+.page-body h3 { font-size: 18px; margin: 18px 0 6px; }
+.page-body p, .page-body li { font-size: 16.5px; line-height: 1.6; }
+
+.cta {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 9px 18px;
+  background: #dd0031;
+  color: white;
+  text-decoration: none;
+  border-radius: 7px;
+  font-weight: 600;
+}
+
+.not-found { text-align: center; padding: 40px 0; }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Why these go in <code>styles.css</code> and not a component's CSS</span>
+              Session 2 taught you that component CSS is <strong>scoped</strong> — it cannot escape. That's usually what you
+              want, but here four different components all need <code>.page-body</code>. Putting shared rules in
+              <code>src/styles.css</code> makes them global and available everywhere. This is exactly what
+              <code>styles.css</code> is for.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four pages have content</strong>, and the shared styles are in <code>src/styles.css</code>.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 2 — THE SHELL ===== -->
+      <section class="section">
+        <details class="exp lab2" open>
+          <summary><span class="lab-tag">TASK 2</span><span class="chevron">▶</span> Build the Navigation Shell<span class="sync">Theory slides 6–8</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Rebuild the root template as a <strong>shell</strong>: a header and menu that never move, a
+              <code>&lt;router-outlet&gt;</code> where screens appear, and a footer. The current page's menu link
+              highlights itself, with no logic from you.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page"&gt;
+
+  &lt;!-- ── The SHELL: always visible, never reloaded ── --&gt;
+  &lt;app-header&gt;&lt;/app-header&gt;
+
+  &lt;nav class="main-nav"&gt;
+    &lt;a routerLink="/home"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: true }"&gt;Home&lt;/a&gt;
+
+    &lt;a routerLink="/customers" routerLinkActive="active"&gt;Customers&lt;/a&gt;
+    &lt;a routerLink="/about"     routerLinkActive="active"&gt;About&lt;/a&gt;
+
+    &lt;!-- a deliberately broken link, to demo the 404 --&gt;
+    &lt;a routerLink="/nowhere" routerLinkActive="active"&gt;Broken link&lt;/a&gt;
+  &lt;/nav&gt;
+
+  &lt;!-- ── The routed screen appears HERE, and only here ── --&gt;
+  &lt;router-outlet&gt;&lt;/router-outlet&gt;
+
+  &lt;app-footer&gt;&lt;/app-footer&gt;
+
+&lt;/div&gt;</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Your Session 2 and 3 components aren't gone</span>
+              We've removed <code>&lt;app-login&gt;</code>, the forms and the employee list from the root template — they
+              now belong <em>inside</em> a routed page rather than stacked on one endless scroll. Task 3 puts the employee
+              work on the Home page, so nothing is wasted.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/app.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.page {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, "Segoe UI", sans-serif;
+}
+
+.main-nav {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid #d2d2d7;
+  margin: 18px 0 4px;
+}
+
+.main-nav a {
+  padding: 10px 18px;
+  text-decoration: none;
+  color: #6e6e73;
+  font-weight: 600;
+  font-size: 16px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+}
+
+.main-nav a:hover { color: #1d1d1f; background: #fafafc; }
+
+/* routerLinkActive adds this class automatically. You write no logic. */
+.main-nav a.active {
+  color: #dd0031;
+  border-bottom-color: #dd0031;
+}</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200/customers</span>
+              </div>
+              <div class="viewport">
+                <p style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:10px 14px;border-radius:6px;margin:0 0 10px;font-size:14px;"><strong>🏢 Employee Portal</strong></p>
+                <div class="navbar"><span>Home</span><span class="on">Customers</span><span>About</span><span>Broken link</span></div>
+                <p style="border:2px dashed #9327f0;padding:16px;border-radius:8px;text-align:center;margin:0 0 10px;font-size:14px;"><strong>&lt;router-outlet&gt;</strong><br><span class="muted">CustomersComponent renders here</span></p>
+                <p style="border-top:1px solid #d2d2d7;padding-top:8px;text-align:center;color:#6e6e73;font-size:13px;margin:0;">© 2026 Employee Portal</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — check all six</span>
+              <strong>1.</strong> Loading <code>localhost:4200</code> lands you on <strong>/home</strong> (the redirect).<br>
+              <strong>2.</strong> Clicking menu items swaps <strong>only the middle</strong> — header, nav and footer never
+              flicker.<br>
+              <strong>3.</strong> The <strong>URL changes</strong> to match: <code>/home</code>, <code>/customers</code>,
+              <code>/about</code>.<br>
+              <strong>4.</strong> The current page's link is <strong>red with a red underline</strong>, and it moves as you
+              navigate.<br>
+              <strong>5.</strong> Clicking <strong>"Broken link"</strong> shows your <strong>404 page</strong> — that's the
+              wildcard route working.<br>
+              <strong>6.</strong> The browser's <strong>Back button works</strong> and moves you back through the screens.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All six behaviours work</strong> — redirect, no-flicker swapping, URL changes, active highlight, 404, and Back.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — five experiments, each proving one rule from the theory</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Prove URLs are real.</strong> Type <code>localhost:4200/about</code> straight into the address
+                    bar and press Enter. The About screen opens directly. That is why routing matters — the URL is now a
+                    genuine address you can bookmark or send to someone.</li>
+                <li><strong>Prove <code>routerLink</code> is not <code>href</code>.</strong> Change the About link to
+                    <code>&lt;a href="/about"&gt;</code>. Click it and <strong>watch the browser's reload spinner</strong> —
+                    the entire app restarts. Change it back to <code>routerLink</code> and the difference is obvious.</li>
+                <li><strong>Prove the outlet is required.</strong> Comment out
+                    <code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code>. Now the URL still changes when you click, and
+                    <strong>nothing appears at all</strong> — with no error anywhere. Angular has a component and nowhere
+                    to put it. Restore it.</li>
+                <li><strong>Prove route order matters.</strong> Move the <code>{ path: '**' }</code> route to the
+                    <strong>top</strong> of the array. Now <strong>every single page shows the 404</strong>, because every
+                    URL matches the wildcard first. Move it back to the bottom. <em>This is the single most common routing
+                    bug there is.</em></li>
+                <li><strong>Prove <code>exact: true</code> is needed.</strong> Remove
+                    <code>[routerLinkActiveOptions]="{ exact: true }"</code> from the Home link. Nothing obvious happens
+                    yet — now change that link's path from <code>/home</code> to <code>/</code>. It is highlighted on
+                    <em>every</em> page, because prefix matching means <code>/</code> matches everything. Put both back.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five experiments done</strong> — especially the wildcard-first bug and the missing outlet.</span>
+            </label>
+
+            <h3>Step 3 — give your earlier work a home</h3>
+            <p>Your Session 2 and 3 components were removed from the root template. Put them <strong>inside</strong> the
+               Home page, where they now belong — this is exactly what routing is for: each screen owns its own content.</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/home/home.component.html</span>
+              <span class="fb-tag">Add at the end, inside .page-body</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;hr&gt;
+
+  &lt;h3&gt;From earlier sessions&lt;/h3&gt;
+  &lt;app-login&gt;&lt;/app-login&gt;
+  &lt;app-employee-stats&gt;&lt;/app-employee-stats&gt;
+  &lt;app-employee-list&gt;&lt;/app-employee-list&gt;</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Only include the components you actually have</span>
+              If you skipped a stretch task or started fresh today, just leave that line out — an unknown tag gives you
+              <em>"'app-employee-stats' is not a known element"</em>. Include whichever of
+              <code>app-login</code>, <code>app-employee-stats</code>, <code>app-employee-list</code>,
+              <code>app-employee-form-td</code>, <code>app-employee-form-rx</code> and <code>app-employee-async</code> exist
+              in your project.
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see</span>
+              All your Session 2 and 3 work, now living on the <strong>Home</strong> screen only. Navigate to About and
+              back — it reappears. Note that the employee list <strong>re-fetches its data each time</strong>, because
+              leaving the route destroys the component and returning creates a new one, which runs
+              <code>ngOnInit</code> again. That is routing working correctly, and it is worth understanding.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>My earlier components live on the Home screen</strong> and reappear when I navigate back to it.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== PART 2 — CRUD ===== -->
+      <div class="section-band">Part 2 — Customer Management CRUD</div>
+      <section class="section">
+        <details class="exp lab3" open>
+          <summary><span class="lab-tag">TASK 3</span><span class="chevron">▶</span> List, Search, Insert &amp; Delete<span class="sync">Theory slides 15–20, 23</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Build three quarters of a real business screen: a customer table, a search box that filters as you type, a
+              validated form that adds new records, and a delete button with a confirmation step. Update comes in Task 4.
+            </div>
+            <div class="plainbox">
+              <span class="lbl">There is almost no new syntax in this task</span>
+              The six array methods from Session 1. <code>*ngFor</code>, <code>*ngIf</code>, <code>ngClass</code> and pipes
+              from Session 2. Reactive forms with <code>FormBuilder</code> and <code>Validators</code> from Session 3.
+              <strong>This is assembly, not new learning</strong> — which is why we can build a whole screen in one task.
+            </div>
+
+            <h3>Step 1 — the model</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/models/customer.ts</span>
+              <span class="fb-tag">Create this new file</span>
+            </div>
+            <div class="codewrap"><pre><code>export interface Customer {
+  id: number;
+  name: string;
+  city: string;
+  email: string;
+  balance: number;
+}</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The <code>Customer</code> interface exists</strong> with the word <code>export</code> in front of it.</span>
+            </label>
+
+            <h3>Step 2 — the component class</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Customer } from '../../models/customer';
+
+@Component({
+  selector: 'app-customers',
+  templateUrl: './customers.component.html',
+  styleUrls: ['./customers.component.css']
+})
+export class CustomersComponent implements OnInit {
+
+  // ── the data: TWO arrays, and this matters ──────────────
+  allCustomers: Customer[] = [];    // the master list — never filtered
+  customers: Customer[] = [];       // what the table displays
+
+  // ── screen state ────────────────────────────────────────
+  searchTerm = '';
+  message = '';
+
+  // ── edit mode: null = adding, a number = editing that id ─
+  editingId: number | null = null;
+
+  // ── the form (reactive, from Session 3) ─────────────────
+  custForm: FormGroup;
+
+  constructor(private fb: FormBuilder) {
+    this.custForm = this.fb.group({
+      name:    ['', [Validators.required, Validators.minLength(3)]],
+      city:    ['', [Validators.required]],
+      email:   ['', [Validators.required, Validators.email]],
+      balance: [0,  [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  // getters, so the template stays readable
+  get name()    { return this.custForm.get('name'); }
+  get city()    { return this.custForm.get('city'); }
+  get email()   { return this.custForm.get('email'); }
+  get balance() { return this.custForm.get('balance'); }
+
+  ngOnInit(): void {
+    this.allCustomers = [
+      { id: 1001, name: 'Anoop Kumar',  city: 'Ahmedabad', email: 'anoop@example.com',  balance: 15000 },
+      { id: 1002, name: 'Ajay Sharma',  city: 'Pune',      email: 'ajay@example.com',   balance: 0 },
+      { id: 1003, name: 'Rekha Nair',   city: 'Kochi',     email: 'rekha@example.com',  balance: 42500 },
+      { id: 1004, name: 'Suresh Patel', city: 'Surat',     email: 'suresh@example.com', balance: 8200 }
+    ];
+    this.customers = this.allCustomers;
+  }
+
+  // ── R: SEARCH ───────────────────────────────────────────
+  onSearch(): void {
+    const t = this.searchTerm.trim().toLowerCase();
+
+    if (t === '') {
+      this.customers = this.allCustomers;
+      return;
+    }
+
+    // ALWAYS filter the master list, never the displayed one
+    this.customers = this.allCustomers.filter(c =&gt;
+      c.name.toLowerCase().includes(t) ||
+      c.city.toLowerCase().includes(t) ||
+      c.email.toLowerCase().includes(t)
+    );
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.onSearch();
+  }
+
+  // ── C: INSERT (U comes in Task 4) ───────────────────────
+  onSubmit(): void {
+    if (this.custForm.invalid) {
+      this.custForm.markAllAsTouched();   // reveal every error at once
+      return;
+    }
+
+    const newCustomer: Customer = {
+      id: this.getNextId(),
+      name:    this.custForm.value.name,
+      city:    this.custForm.value.city,
+      email:   this.custForm.value.email,
+      balance: this.custForm.value.balance
+    };
+
+    this.allCustomers.push(newCustomer);
+    this.message = '✅ Added ' + newCustomer.name + ' (id ' + newCustomer.id + ').';
+
+    this.resetForm();
+    this.onSearch();      // re-apply the filter, or the new row won't appear
+  }
+
+  // ── D: DELETE ───────────────────────────────────────────
+  onDelete(customer: Customer): void {
+    const ok = confirm('Delete ' + customer.name + '? This cannot be undone.');
+    if (!ok) { return; }
+
+    const i = this.allCustomers.findIndex(c =&gt; c.id === customer.id);
+    if (i !== -1) {
+      this.allCustomers.splice(i, 1);
+    }
+
+    if (this.editingId === customer.id) {
+      this.resetForm();   // don't stay in edit mode on something that's gone
+    }
+
+    this.message = '🗑️ Deleted ' + customer.name + '.';
+    this.onSearch();
+  }
+
+  // ── helpers ─────────────────────────────────────────────
+  private getNextId(): number {
+    if (this.allCustomers.length === 0) { return 1001; }
+    // highest existing id + 1 — NOT length + 1, which duplicates after a delete
+    return Math.max(...this.allCustomers.map(c =&gt; c.id)) + 1;
+  }
+
+  resetForm(): void {
+    this.custForm.reset({ name: '', city: '', email: '', balance: 0 });
+    this.editingId = null;
+  }
+
+  getTotalBalance(): number {
+    let total = 0;
+    for (const c of this.customers) { total = total + c.balance; }
+    return total;
+  }
+
+  trackById(index: number, c: Customer): number {
+    return c.id;
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Decision</th><th>Why it's written that way</th></tr></thead>
+              <tbody>
+                <tr><td>allCustomers + customers</td><td><strong>Two arrays.</strong> Filter the master into the displayed one. If you filter the displayed list, deleting a search character can never bring rows back — you destroyed them.</td></tr>
+                <tr><td>editingId: number | null</td><td>One field carries the whole insert-versus-update distinction. Task 4 uses it; Session 1's Stretch C is where you met <code>| null</code>.</td></tr>
+                <tr><td>markAllAsTouched()</td><td>Without it, clicking Save on an untouched empty form does nothing and shows nothing — the user has no idea why.</td></tr>
+                <tr><td>Math.max(...ids) + 1</td><td>Highest id plus one. <code>length + 1</code> produces duplicate ids the moment anything is deleted.</td></tr>
+                <tr><td>this.onSearch() after add/delete</td><td><strong>Easy to forget.</strong> You changed <code>allCustomers</code>, but the table shows <code>customers</code>. Without this the new row seems to vanish.</td></tr>
+                <tr><td>confirm(...) before delete</td><td>Never destroy data on a single click. The browser dialog is ugly but honest — real projects use a styled modal with identical logic.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Step 3 — the template</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page-body"&gt;
+  &lt;h2&gt;Customer Management&lt;/h2&gt;
+
+  &lt;!-- ── message banner ────────────────────────────────── --&gt;
+  &lt;p *ngIf="message" class="msg"&gt;{{ message }}&lt;/p&gt;
+
+  &lt;!-- ── SEARCH ────────────────────────────────────────── --&gt;
+  &lt;div class="toolbar"&gt;
+    &lt;input [(ngModel)]="searchTerm"
+           (input)="onSearch()"
+           name="searchTerm"
+           placeholder="Search name, city or email…"&gt;
+    &lt;button (click)="clearSearch()" [disabled]="!searchTerm" class="ghost"&gt;
+      Clear
+    &lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;!-- ── TABLE ─────────────────────────────────────────── --&gt;
+  &lt;table *ngIf="customers.length &gt; 0; else noResults"&gt;
+    &lt;thead&gt;
+      &lt;tr&gt;
+        &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;City&lt;/th&gt;
+        &lt;th&gt;Email&lt;/th&gt;&lt;th&gt;Balance&lt;/th&gt;&lt;th&gt;Actions&lt;/th&gt;
+      &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;tr *ngFor="let c of customers; trackBy: trackById"
+          [ngClass]="{ 'editing-row': c.id === editingId }"&gt;
+        &lt;td&gt;{{ c.id }}&lt;/td&gt;
+        &lt;td&gt;{{ c.name }}&lt;/td&gt;
+        &lt;td&gt;{{ c.city }}&lt;/td&gt;
+        &lt;td&gt;{{ c.email }}&lt;/td&gt;
+        &lt;td [ngStyle]="{ 'color': c.balance === 0 ? '#b00027' : '#1a9e34' }"&gt;
+          {{ c.balance | currency:'INR':'symbol':'1.0-0' }}
+        &lt;/td&gt;
+        &lt;td class="actions"&gt;
+          &lt;button (click)="startEdit(c)" class="ghost small"&gt;Edit&lt;/button&gt;
+          &lt;button (click)="onDelete(c)" class="danger small"&gt;Delete&lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+
+  &lt;ng-template #noResults&gt;
+    &lt;p class="empty"&gt;
+      🔍 No customers match “{{ searchTerm }}”.
+      &lt;button (click)="clearSearch()" class="link"&gt;Clear search&lt;/button&gt;
+    &lt;/p&gt;
+  &lt;/ng-template&gt;
+
+  &lt;p class="summary"&gt;
+    Showing {{ customers.length }} of {{ allCustomers.length }} customers ·
+    total balance {{ getTotalBalance() | currency:'INR':'symbol':'1.0-0' }}
+  &lt;/p&gt;
+
+  &lt;!-- ── FORM: adds now, and edits from Task 4 ─────────── --&gt;
+  &lt;div class="form-card"&gt;
+    &lt;h3&gt;{{ editingId === null ? 'Add Customer' : 'Edit Customer #' + editingId }}&lt;/h3&gt;
+
+    &lt;form [formGroup]="custForm" (ngSubmit)="onSubmit()"&gt;
+
+      &lt;label&gt;Name *&lt;/label&gt;
+      &lt;input formControlName="name" placeholder="e.g. Priya Menon"&gt;
+      &lt;div *ngIf="name?.invalid &amp;&amp; name?.touched" class="err"&gt;
+        &lt;small *ngIf="name?.errors?.['required']"&gt;Name is required.&lt;/small&gt;
+        &lt;small *ngIf="name?.errors?.['minlength']"&gt;At least 3 characters.&lt;/small&gt;
+      &lt;/div&gt;
+
+      &lt;label&gt;City *&lt;/label&gt;
+      &lt;input formControlName="city" placeholder="e.g. Ahmedabad"&gt;
+      &lt;div *ngIf="city?.invalid &amp;&amp; city?.touched" class="err"&gt;
+        &lt;small&gt;City is required.&lt;/small&gt;
+      &lt;/div&gt;
+
+      &lt;label&gt;Email *&lt;/label&gt;
+      &lt;input formControlName="email" type="email" placeholder="e.g. priya@example.com"&gt;
+      &lt;div *ngIf="email?.invalid &amp;&amp; email?.touched" class="err"&gt;
+        &lt;small *ngIf="email?.errors?.['required']"&gt;Email is required.&lt;/small&gt;
+        &lt;small *ngIf="email?.errors?.['email']"&gt;That doesn't look like a valid email.&lt;/small&gt;
+      &lt;/div&gt;
+
+      &lt;label&gt;Balance *&lt;/label&gt;
+      &lt;input formControlName="balance" type="number"&gt;
+      &lt;div *ngIf="balance?.invalid &amp;&amp; balance?.touched" class="err"&gt;
+        &lt;small&gt;Balance must be 0 or more.&lt;/small&gt;
+      &lt;/div&gt;
+
+      &lt;div class="row"&gt;
+        &lt;button type="submit" [disabled]="custForm.invalid"&gt;
+          {{ editingId === null ? 'Add customer' : 'Save changes' }}
+        &lt;/button&gt;
+        &lt;button type="button" class="ghost" (click)="cancelEdit()"
+                *ngIf="editingId !== null"&gt;Cancel&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/form&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</code></pre></div>
+            <div class="observe">
+              <span class="lbl">The template already calls <code>startEdit()</code> and <code>cancelEdit()</code></span>
+              Those don't exist yet, so your build will fail with <em>"Property 'startEdit' does not exist"</em>. That's
+              expected — <strong>Task 4 adds them</strong>. If you'd rather see the screen working right now, comment out
+              the Edit button and the Cancel button, then uncomment them in Task 4.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>h2 { font-size: 24px; margin: 0 0 12px; }
+h3 { font-size: 18px; margin: 0 0 12px; }
+
+.msg {
+  background: #f0f7ff; border: 1px solid #cfe4ff;
+  border-radius: 8px; padding: 9px 14px; font-size: 15px;
+}
+
+.toolbar { display: flex; gap: 10px; margin: 14px 0; flex-wrap: wrap; }
+.toolbar input {
+  flex: 1 1 260px; padding: 8px 10px;
+  border: 1px solid #d2d2d7; border-radius: 6px; font-size: 15px;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { border: 1px solid #d2d2d7; padding: 8px 12px; text-align: left; }
+thead th { background: #e8e8ea; font-weight: 700; }
+
+/* the row currently loaded into the form */
+.editing-row { background: #fff4f6; outline: 2px solid #dd0031; }
+
+.actions { white-space: nowrap; }
+
+button {
+  padding: 8px 16px; border: none; border-radius: 7px;
+  background: #dd0031; color: white;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}
+button:disabled { background: #c7c7cc; cursor: not-allowed; }
+button.ghost  { background: white; color: #dd0031; border: 1px solid #dd0031; }
+button.danger { background: #b00027; }
+button.small  { padding: 4px 11px; font-size: 13px; }
+button.link {
+  background: none; border: none; color: #dd0031;
+  text-decoration: underline; font-size: 15px;
+}
+
+.empty {
+  padding: 22px; background: #fffdf3;
+  border: 1px solid #f0e3a8; border-radius: 8px; text-align: center;
+}
+
+.summary { color: #6e6e73; font-size: 14px; }
+
+.form-card {
+  border: 1px solid #d2d2d7; border-radius: 10px;
+  padding: 18px 22px; margin: 20px 0; background: #fafafc; max-width: 480px;
+}
+
+label { display: block; font-size: 14px; font-weight: 600; margin: 12px 0 4px; }
+input {
+  width: 100%; padding: 8px 10px;
+  border: 1px solid #d2d2d7; border-radius: 6px; font-size: 15px;
+}
+input.ng-invalid.ng-touched { border-color: #dd0031; background: #fff8f9; }
+input.ng-valid.ng-touched   { border-color: #28c840; }
+
+.err small { display: block; color: #b00027; font-size: 13px; margin-top: 3px; }
+.row { display: flex; gap: 10px; margin-top: 18px; }</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200/customers</span>
+              </div>
+              <div class="viewport">
+                <div class="navbar"><span>Home</span><span class="on">Customers</span><span>About</span><span>Broken link</span></div>
+                <p style="font-weight:700;font-size:19px;margin:0 0 8px;">Customer Management</p>
+                <p style="margin:0 0 8px;"><span class="fld">Search name, city or email…</span> <span class="btn ghost">Clear</span></p>
+                <table>
+                  <thead><tr><th>ID</th><th>Name</th><th>City</th><th>Balance</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td>1001</td><td>Anoop Kumar</td><td>Ahmedabad</td><td style="color:#1a9e34;">₹15,000</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr><td>1002</td><td>Ajay Sharma</td><td>Pune</td><td style="color:#b00027;">₹0</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr><td>1003</td><td>Rekha Nair</td><td>Kochi</td><td style="color:#1a9e34;">₹42,500</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr><td>1004</td><td>Suresh Patel</td><td>Surat</td><td style="color:#1a9e34;">₹8,200</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;color:#6e6e73;margin:8px 0;">Showing 4 of 4 customers · total balance ₹65,700</p>
+                <p style="font-weight:700;font-size:16px;margin:8px 0 4px;">Add Customer</p>
+                <p style="margin:4px 0;"><span class="fld">Name</span> <span class="fld">City</span> <span class="btn" style="background:#c7c7cc;">Add customer</span></p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — test all seven</span>
+              <strong>1.</strong> Four customers listed, with Ajay's ₹0 balance in <strong>red</strong> and the others green.<br>
+              <strong>2.</strong> Typing <code>pune</code> narrows it to Ajay, and the summary reads
+              <em>Showing 1 of 4</em>.<br>
+              <strong>3.</strong> Typing <code>zzz</code> shows the yellow <strong>"No customers match"</strong> panel.<br>
+              <strong>4.</strong> <em>Clear</em> restores all four, and is greyed out when the box is empty.<br>
+              <strong>5.</strong> <strong>Add customer</strong> is disabled until the form is valid; errors appear only
+              after you have visited a field.<br>
+              <strong>6.</strong> A valid submit adds a row with <strong>id 1005</strong>, shows a blue confirmation, and
+              clears the form.<br>
+              <strong>7.</strong> <em>Delete</em> asks for confirmation, and Cancel really does cancel.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All seven behaviours work</strong> — list, colour-coded balances, search, empty state, validation, add, and confirmed delete.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — four bugs, caused deliberately</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>The vanishing new row.</strong> Comment out <code>this.onSearch();</code> at the end of
+                    <code>onSubmit()</code>. Add a customer — the form clears, the confirmation appears, and
+                    <strong>no row shows up</strong>. It <em>is</em> in <code>allCustomers</code>; the table displays
+                    <code>customers</code>. Restore the line.</li>
+                <li><strong>The irreversible search.</strong> Change <code>onSearch()</code> to filter
+                    <code>this.customers</code> instead of <code>this.allCustomers</code>. Type <code>an</code>, then
+                    delete a character — <strong>the rows never come back</strong>, because each keystroke narrowed an
+                    already-narrowed list. Restore it. <em>This is why there are two arrays.</em></li>
+                <li><strong>The duplicate id.</strong> Change <code>getNextId()</code> to
+                    <code>return this.allCustomers.length + 1001;</code>. Delete a customer, then add one — you now have
+                    <strong>two customers with the same id</strong>, and Task 4's edit will update the wrong one. Restore
+                    <code>Math.max</code>.</li>
+                <li><strong>The silent Save.</strong> Comment out <code>markAllAsTouched()</code>, then remove
+                    <code>[disabled]="custForm.invalid"</code> from the button. Click Save on an empty form:
+                    <strong>nothing happens, and nothing explains why.</strong> Restore both.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four bugs caused and fixed</strong> — and I can explain why there are two arrays.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 4 — UPDATE ===== -->
+      <section class="section">
+        <details class="exp lab4" open>
+          <summary><span class="lab-tag">TASK 4</span><span class="chevron">▶</span> Update — One Form Doing Both Jobs<span class="sync">Theory slides 21–22</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Complete the CRUD. Clicking <strong>Edit</strong> loads a row into the <em>same</em> form, the heading and
+              button label change themselves, and Save overwrites the original instead of adding a new record. No second
+              form, no second page.
+            </div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Add these two methods to the class</span>
+            </div>
+            <div class="codewrap"><pre><code>  // ── U: load a row INTO the form ─────────────────────────
+  startEdit(customer: Customer): void {
+    this.editingId = customer.id;         // remember WHICH one we're editing
+
+    // ONE line fills the whole form. This is why Session 3 taught reactive forms.
+    this.custForm.patchValue({
+      name:    customer.name,
+      city:    customer.city,
+      email:   customer.email,
+      balance: customer.balance
+    });
+
+    this.message = '✏️ Editing ' + customer.name + '. Change the fields and press Save.';
+  }
+
+  cancelEdit(): void {
+    this.resetForm();                     // sets editingId back to null
+    this.message = 'Edit cancelled.';
+  }</code></pre></div>
+
+            <p>Now replace <code>onSubmit()</code> so it handles <strong>both</strong> modes:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Replace the existing onSubmit method</span>
+            </div>
+            <div class="codewrap"><pre><code>  onSubmit(): void {
+    if (this.custForm.invalid) {
+      this.custForm.markAllAsTouched();
+      return;
+    }
+
+    if (this.editingId === null) {
+      // ══ ADD MODE ═══════════════════════════════════════
+      const newCustomer: Customer = {
+        id: this.getNextId(),
+        name:    this.custForm.value.name,
+        city:    this.custForm.value.city,
+        email:   this.custForm.value.email,
+        balance: this.custForm.value.balance
+      };
+      this.allCustomers.push(newCustomer);
+      this.message = '✅ Added ' + newCustomer.name + ' (id ' + newCustomer.id + ').';
+
+    } else {
+      // ══ EDIT MODE ══════════════════════════════════════
+      const i = this.allCustomers.findIndex(c =&gt; c.id === this.editingId);
+
+      if (i !== -1) {
+        this.allCustomers[i] = {
+          id: this.editingId,            // ← KEEP the original id!
+          name:    this.custForm.value.name,
+          city:    this.custForm.value.city,
+          email:   this.custForm.value.email,
+          balance: this.custForm.value.balance
+        };
+        this.message = '✅ Updated ' + this.allCustomers[i].name + '.';
+      } else {
+        this.message = '⚠️ That customer no longer exists.';
+      }
+    }
+
+    this.resetForm();
+    this.onSearch();
+  }</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">Line</th><th>Why it matters</th></tr></thead>
+              <tbody>
+                <tr><td>this.editingId = customer.id</td><td>The single field that switches the whole screen between add mode and edit mode.</td></tr>
+                <tr><td>patchValue({ ... })</td><td><strong>One call fills the entire form.</strong> A template-driven form would need one assignment per field — and another every time someone adds a field.</td></tr>
+                <tr><td>id: this.editingId</td><td><strong>Critical.</strong> The form has no id field, so you must reuse the original. Omit it and you silently create a duplicate instead of updating.</td></tr>
+                <tr><td>if (i !== -1) ... else</td><td>Defensive: the row could have been deleted since you clicked Edit. Never assume it's still there.</td></tr>
+                <tr><td>resetForm() at the end</td><td>Clears the form <em>and</em> sets <code>editingId</code> back to <code>null</code>, so the screen returns to add mode.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200/customers</span>
+              </div>
+              <div class="viewport">
+                <p style="background:#f0f7ff;border:1px solid #cfe4ff;border-radius:6px;padding:6px 12px;font-size:14px;margin:0 0 8px;">✏️ Editing Ajay Sharma. Change the fields and press Save.</p>
+                <table>
+                  <thead><tr><th>ID</th><th>Name</th><th>City</th><th>Balance</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td>1001</td><td>Anoop Kumar</td><td>Ahmedabad</td><td style="color:#1a9e34;">₹15,000</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr style="background:#fff4f6;outline:2px solid #dd0031;"><td>1002</td><td>Ajay Sharma</td><td>Pune</td><td style="color:#b00027;">₹0</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                  </tbody>
+                </table>
+                <p style="font-weight:700;font-size:16px;margin:10px 0 4px;">Edit Customer #1002</p>
+                <p style="margin:4px 0;"><span class="fld">Ajay Sharma</span> <span class="fld">Pune</span></p>
+                <p style="margin:4px 0;"><span class="btn">Save changes</span> <span class="btn ghost">Cancel</span></p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — test all six</span>
+              <strong>1.</strong> Clicking <strong>Edit</strong> on Ajay fills the form with his details.<br>
+              <strong>2.</strong> The heading changes to <strong>"Edit Customer #1002"</strong>.<br>
+              <strong>3.</strong> The button label changes to <strong>"Save changes"</strong>.<br>
+              <strong>4.</strong> A <strong>Cancel</strong> button appears, and the edited row is
+              <strong>highlighted pink with a red outline</strong>.<br>
+              <strong>5.</strong> Changing the city and saving <strong>updates that row</strong> — no new row is added, and
+              the id stays <code>1002</code>.<br>
+              <strong>6.</strong> After saving, everything returns to <strong>"Add Customer"</strong> mode.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>🎉 Full CRUD works</strong> — list, search, add, edit and delete, all on one screen.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Look back at Session 1, slide 12 — right now</span>
+              That slide showed five separate JSP pages: <code>list.jsp</code>, <code>search.jsp</code>,
+              <code>insert.jsp</code>, <code>update.jsp</code>, <code>delete.jsp</code>. Five files, five full page reloads,
+              duplicated table markup in each.<br><br>
+              <strong>You have just replaced all five with one component and one form</strong>, with no reload anywhere and
+              the table markup written once. That is the promise Session 1 made, and you have now built it yourself.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — three experiments, and the first is essential</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Prove why the id must be kept.</strong> In the edit branch, change
+                    <code>id: this.editingId</code> to <code>id: this.getNextId()</code>. Now edit Ajay and save — you get
+                    <strong>a duplicate customer</strong> rather than an update, and the old row is still there. Restore it.
+                    <em>This is a genuinely common production bug.</em></li>
+                <li><strong>Prove <code>patchValue</code> is doing real work.</strong> Comment out the whole
+                    <code>patchValue({...})</code> call. Click Edit — the heading changes to edit mode but
+                    <strong>the form stays empty</strong>, so saving wipes the customer's details. Restore it.</li>
+                <li><strong>Find the edge case.</strong> Click Edit on Anoop, then <em>without saving</em> click Delete on
+                    Anoop. Confirm the delete. Because of the <code>if (this.editingId === customer.id)</code> check in
+                    <code>onDelete</code>, the form resets cleanly. Now comment that check out and try again — you are left
+                    editing a customer who no longer exists, and Save shows the "no longer exists" warning. Restore it.
+                    <em>Handling cases like this is most of what separates a demo from a product.</em></li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — including creating the duplicate-on-edit bug deliberately.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 5 — ROUTE PARAMETERS ===== -->
+      <section class="section">
+        <details class="exp lab5" open>
+          <summary><span class="lab-tag">TASK 5</span><span class="chevron">▶</span> Route Parameters — a Detail Screen by URL<span class="sync">Theory slides 12–14</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Make <code>localhost:4200/customers/1002</code> open a detail screen for that specific customer. One route
+              serves every customer, the id travels in the URL, and the page can be bookmarked and shared. You will also
+              meet the string-versus-number trap first-hand.
+            </div>
+
+            <h3>Step 1 — a shared service, so both screens see the same data</h3>
+            <p>The detail screen needs the customer list, and it is a different component. This is exactly what a
+               singleton service is for — so we do the Task 6 refactor's <em>first half</em> now.</p>
+            <div class="codewrap"><pre><code>ng g s services/customer</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/customer.service.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Injectable } from '@angular/core';
+import { Customer } from '../models/customer';
+
+@Injectable({ providedIn: 'root' })     // ONE instance, shared by every screen
+export class CustomerService {
+
+  private customers: Customer[] = [
+    { id: 1001, name: 'Anoop Kumar',  city: 'Ahmedabad', email: 'anoop@example.com',  balance: 15000 },
+    { id: 1002, name: 'Ajay Sharma',  city: 'Pune',      email: 'ajay@example.com',   balance: 0 },
+    { id: 1003, name: 'Rekha Nair',   city: 'Kochi',     email: 'rekha@example.com',  balance: 42500 },
+    { id: 1004, name: 'Suresh Patel', city: 'Surat',     email: 'suresh@example.com', balance: 8200 }
+  ];
+
+  getAll(): Customer[] {
+    return this.customers;
+  }
+
+  getById(id: number): Customer | undefined {
+    return this.customers.find(c =&gt; c.id === id);
+  }
+}</code></pre></div>
+            <p>Then have the customers screen read from it — change just <code>ngOnInit</code> and the constructor:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Change these two parts</span>
+            </div>
+            <div class="codewrap"><pre><code>// add to the imports
+import { CustomerService } from '../../services/customer.service';
+
+// add CustomerService to the constructor
+  constructor(private fb: FormBuilder,
+              private customerService: CustomerService) {
+    this.custForm = this.fb.group({ /* ...unchanged... */ });
+  }
+
+// replace the hardcoded array in ngOnInit
+  ngOnInit(): void {
+    this.allCustomers = this.customerService.getAll();
+    this.customers = this.allCustomers;
+  }</code></pre></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The customers screen reads from the service</strong> and still works exactly as before.</span>
+            </label>
+
+            <h3>Step 2 — the detail component</h3>
+            <div class="codewrap"><pre><code>ng g c pages/customer-detail</code></pre></div>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customer-detail/customer-detail.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Customer } from '../../models/customer';
+import { CustomerService } from '../../services/customer.service';
+
+@Component({
+  selector: 'app-customer-detail',
+  templateUrl: './customer-detail.component.html',
+  styleUrls: ['./customer-detail.component.css']
+})
+export class CustomerDetailComponent implements OnInit {
+
+  customer: Customer | undefined;
+  requestedId = 0;
+  notFound = false;
+
+  constructor(private route: ActivatedRoute,             // reads the URL
+              private router: Router,                    // navigates from code
+              private customerService: CustomerService) { }
+
+  ngOnInit(): void {
+    // 1. read the raw parameter — it is a STRING, always
+    const raw = this.route.snapshot.paramMap.get('id');
+
+    // 2. convert it to a number.  1002 === "1002" is FALSE without this.
+    this.requestedId = Number(raw);
+
+    // 3. look it up
+    this.customer = this.customerService.getById(this.requestedId);
+
+    // 4. handle "not found" — someone WILL type /customers/9999
+    if (!this.customer) {
+      this.notFound = true;
+    }
+  }
+
+  goBack(): void {
+    this.router.navigate(['/customers']);      // navigating from code
+  }
+}</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customer-detail/customer-detail.component.html</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>&lt;div class="page-body"&gt;
+
+  &lt;!-- FOUND --&gt;
+  &lt;div *ngIf="customer; else missing"&gt;
+    &lt;h2&gt;{{ customer.name }}&lt;/h2&gt;
+    &lt;p class="sub"&gt;Customer #{{ customer.id }}&lt;/p&gt;
+
+    &lt;table class="detail"&gt;
+      &lt;tr&gt;&lt;th&gt;City&lt;/th&gt;   &lt;td&gt;{{ customer.city }}&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;th&gt;Email&lt;/th&gt;  &lt;td&gt;{{ customer.email }}&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;th&gt;Balance&lt;/th&gt;&lt;td&gt;{{ customer.balance | currency:'INR':'symbol':'1.0-0' }}&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+
+    &lt;p&gt;&lt;button (click)="goBack()" class="ghost"&gt;← Back to the list&lt;/button&gt;&lt;/p&gt;
+  &lt;/div&gt;
+
+  &lt;!-- NOT FOUND --&gt;
+  &lt;ng-template #missing&gt;
+    &lt;h2&gt;Customer not found&lt;/h2&gt;
+    &lt;p&gt;There is no customer with id &lt;strong&gt;{{ requestedId }}&lt;/strong&gt;.&lt;/p&gt;
+    &lt;p&gt;&lt;a routerLink="/customers" class="cta"&gt;← Back to the list&lt;/a&gt;&lt;/p&gt;
+  &lt;/ng-template&gt;
+&lt;/div&gt;</code></pre></div>
+
+            <div class="filebar">
+              <span class="fb-icon">🎨</span>
+              <span class="fb-name">src/app/pages/customer-detail/customer-detail.component.css</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>.sub { color: #6e6e73; font-size: 15px; margin: 0 0 14px; }
+
+table.detail { border-collapse: collapse; font-size: 16px; }
+table.detail th, table.detail td {
+  border: 1px solid #d2d2d7; padding: 9px 16px; text-align: left;
+}
+table.detail th { background: #e8e8ea; width: 130px; }
+
+button.ghost {
+  padding: 8px 16px; border: 1px solid #dd0031; border-radius: 7px;
+  background: white; color: #dd0031;
+  font-size: 15px; font-weight: 600; cursor: pointer;
+}</code></pre></div>
+
+            <h3>Step 3 — add the route, in the right place</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/app-routing.module.ts</span>
+              <span class="fb-tag">Add the import and the route</span>
+            </div>
+            <div class="codewrap"><pre><code>import { CustomerDetailComponent } from './pages/customer-detail/customer-detail.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home',           component: HomeComponent },
+  { path: 'customers',      component: CustomersComponent },
+  { path: 'customers/:id',  component: CustomerDetailComponent },   // ← the new one
+  { path: 'about',          component: AboutComponent },
+  { path: '**',             component: NotFoundComponent }
+];</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Position matters — and here's the rule</span>
+              <code>customers/:id</code> sits <strong>after</strong> <code>customers</code>, and if you later add a static
+              route like <code>customers/add</code> it must go <strong>above</strong> <code>customers/:id</code>. Otherwise
+              <code>/customers/add</code> is read as "the customer whose id is the string <code>add</code>", and you get a
+              baffling "not found" screen. <strong>Static before dynamic.</strong>
+            </div>
+
+            <h3>Step 4 — link to it from the table</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.html</span>
+              <span class="fb-tag">Add to the actions cell</span>
+            </div>
+            <div class="codewrap"><pre><code>        &lt;td class="actions"&gt;
+          &lt;!-- the ARRAY form: Angular joins the segments and encodes them --&gt;
+          &lt;a [routerLink]="['/customers', c.id]" class="btn-link"&gt;View&lt;/a&gt;
+          &lt;button (click)="startEdit(c)" class="ghost small"&gt;Edit&lt;/button&gt;
+          &lt;button (click)="onDelete(c)" class="danger small"&gt;Delete&lt;/button&gt;
+        &lt;/td&gt;</code></pre></div>
+            <div class="codewrap"><pre><code>/* add to customers.component.css */
+.btn-link {
+  display: inline-block; padding: 4px 11px;
+  border: 1px solid #0a84ff; border-radius: 7px;
+  color: #0a84ff; text-decoration: none;
+  font-size: 13px; font-weight: 600;
+}</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200/customers/1002</span>
+              </div>
+              <div class="viewport">
+                <div class="navbar"><span>Home</span><span>Customers</span><span>About</span><span>Broken link</span></div>
+                <p style="font-weight:700;font-size:21px;margin:0;">Ajay Sharma</p>
+                <p style="color:#6e6e73;font-size:14px;margin:2px 0 10px;">Customer #1002</p>
+                <table style="width:auto;">
+                  <tr><th>City</th><td>Pune</td></tr>
+                  <tr><th>Email</th><td>ajay@example.com</td></tr>
+                  <tr><th>Balance</th><td>₹0</td></tr>
+                </table>
+                <p style="margin:10px 0 0;"><span class="btn ghost">← Back to the list</span></p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — test all five</span>
+              <strong>1.</strong> Clicking <strong>View</strong> on Ajay opens <code>/customers/1002</code> showing his
+              details.<br>
+              <strong>2.</strong> The URL in the address bar really is <code>/customers/1002</code> — copy it into a new
+              tab and it works.<br>
+              <strong>3.</strong> The nav bar and header <strong>stay exactly where they were</strong>; only the outlet
+              changed.<br>
+              <strong>4.</strong> <strong>Back to the list</strong> returns you to <code>/customers</code> — that's
+              <code>router.navigate()</code>.<br>
+              <strong>5.</strong> Typing <code>localhost:4200/customers/9999</code> shows your
+              <strong>"Customer not found"</strong> message — not a crash, not a blank page.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All five behaviours work</strong> — including a shareable URL and a graceful not-found message.</span>
+            </label>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — experiment 1 is the trap everybody falls into</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>The string-versus-number trap.</strong> Remove the <code>Number()</code> conversion:
+                    <code>this.requestedId = raw as any;</code>. Save, then click View on any customer.
+                    <strong>Every customer now shows "not found"</strong>, because <code>getById</code> compares
+                    <code>1002 === "1002"</code>, which is <code>false</code>. Nothing errors; the lookup just silently
+                    finds nothing. Restore <code>Number(raw)</code>. <em>This is the number one route-parameter bug and now
+                    you have felt it.</em></li>
+                <li><strong>Prove static-before-dynamic.</strong> Move <code>customers/:id</code> <em>above</em>
+                    <code>customers</code> in the routes array. Now clicking "Customers" in the menu opens the
+                    <strong>detail</strong> screen looking for a customer with no id at all. Move it back.</li>
+                <li><strong>See why <code>snapshot</code> has a limit.</strong> Add a "Next customer" button to the detail
+                    screen: <code>&lt;button (click)="router.navigate(['/customers', customer.id + 1])"&gt;</code> — you'll
+                    need to make <code>router</code> public. Click it. <strong>The URL changes but the details don't</strong>,
+                    because Angular reuses the component and <code>ngOnInit</code> doesn't run again. The fix is to subscribe
+                    instead of using <code>snapshot</code>:
+                    <code>this.route.paramMap.subscribe(p =&gt; { ... });</code> — another Observable, same
+                    <code>subscribe</code> as Session 3.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All three experiments done</strong> — especially the string-versus-number trap.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== PART 3 — REFACTOR ONTO A SERVICE ===== -->
+      <div class="section-band">Part 3 — Refactor onto a service, then onto HTTP</div>
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="lab-tag">TASK 6</span><span class="chevron">▶</span> Move All CRUD onto the Service<span class="sync">Theory slides 24–25</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Task 3 put data logic inside a component — exactly what Session 3 taught you not to do. Move all five
+              operations into <code>CustomerService</code>, so the component only handles the <em>screen</em>. When you're
+              done the app behaves identically and the component is noticeably shorter.
+            </div>
+
+            <h3>Step 1 — complete the service</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/customer.service.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Injectable } from '@angular/core';
+import { Customer } from '../models/customer';
+
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+
+  private customers: Customer[] = [
+    { id: 1001, name: 'Anoop Kumar',  city: 'Ahmedabad', email: 'anoop@example.com',  balance: 15000 },
+    { id: 1002, name: 'Ajay Sharma',  city: 'Pune',      email: 'ajay@example.com',   balance: 0 },
+    { id: 1003, name: 'Rekha Nair',   city: 'Kochi',     email: 'rekha@example.com',  balance: 42500 },
+    { id: 1004, name: 'Suresh Patel', city: 'Surat',     email: 'suresh@example.com', balance: 8200 }
+  ];
+
+  // ── R ───────────────────────────────────────────────────
+  getAll(): Customer[] {
+    return this.customers;
+  }
+
+  getById(id: number): Customer | undefined {
+    return this.customers.find(c =&gt; c.id === id);
+  }
+
+  search(term: string): Customer[] {
+    const t = term.trim().toLowerCase();
+    if (t === '') { return this.customers; }
+    return this.customers.filter(c =&gt;
+      c.name.toLowerCase().includes(t) ||
+      c.city.toLowerCase().includes(t) ||
+      c.email.toLowerCase().includes(t)
+    );
+  }
+
+  // ── C ───────────────────────────────────────────────────
+  add(customer: Customer): Customer {
+    customer.id = this.getNextId();
+    this.customers.push(customer);
+    return customer;
+  }
+
+  // ── U ───────────────────────────────────────────────────
+  update(customer: Customer): boolean {
+    const i = this.customers.findIndex(c =&gt; c.id === customer.id);
+    if (i === -1) { return false; }
+    this.customers[i] = customer;
+    return true;
+  }
+
+  // ── D ───────────────────────────────────────────────────
+  delete(id: number): boolean {
+    const i = this.customers.findIndex(c =&gt; c.id === id);
+    if (i === -1) { return false; }
+    this.customers.splice(i, 1);
+    return true;
+  }
+
+  // ── helpers ─────────────────────────────────────────────
+  getTotalBalance(): number {
+    let total = 0;
+    for (const c of this.customers) { total = total + c.balance; }
+    return total;
+  }
+
+  private getNextId(): number {
+    if (this.customers.length === 0) { return 1001; }
+    return Math.max(...this.customers.map(c =&gt; c.id)) + 1;
+  }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Look at those method names — they were chosen deliberately</span>
+              <code>getAll</code>, <code>getById</code>, <code>search</code>, <code>add</code>, <code>update</code>,
+              <code>delete</code>. That is the shape of a <strong>repository</strong>, and it is why Task 7 can swap the
+              array for HTTP calls without renaming a single thing. Notice too that <code>update</code> and
+              <code>delete</code> return a <code>boolean</code> — "did I find it?" — so the caller can react honestly
+              instead of assuming.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>The service holds all six operations</strong>, with the array still <code>private</code>.</span>
+            </label>
+
+            <h3>Step 2 — slim the component down</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Customer } from '../../models/customer';
+import { CustomerService } from '../../services/customer.service';
+
+@Component({
+  selector: 'app-customers',
+  templateUrl: './customers.component.html',
+  styleUrls: ['./customers.component.css']
+})
+export class CustomersComponent implements OnInit {
+
+  allCustomers: Customer[] = [];
+  customers: Customer[] = [];
+  searchTerm = '';
+  message = '';
+  editingId: number | null = null;
+  custForm: FormGroup;
+
+  constructor(private fb: FormBuilder,
+              private customerService: CustomerService) {
+    this.custForm = this.fb.group({
+      name:    ['', [Validators.required, Validators.minLength(3)]],
+      city:    ['', [Validators.required]],
+      email:   ['', [Validators.required, Validators.email]],
+      balance: [0,  [Validators.required, Validators.min(0)]]
+    });
+  }
+
+  get name()    { return this.custForm.get('name'); }
+  get city()    { return this.custForm.get('city'); }
+  get email()   { return this.custForm.get('email'); }
+  get balance() { return this.custForm.get('balance'); }
+
+  ngOnInit(): void {
+    this.refresh();
+  }
+
+  /** Re-read everything from the service. One place, called after every change. */
+  refresh(): void {
+    this.allCustomers = this.customerService.getAll();
+    this.customers = this.customerService.search(this.searchTerm);
+  }
+
+  // ── R ───────────────────────────────────────────────────
+  onSearch(): void {
+    this.customers = this.customerService.search(this.searchTerm);
+  }
+
+  clearSearch(): void {
+    this.searchTerm = '';
+    this.onSearch();
+  }
+
+  // ── C and U ─────────────────────────────────────────────
+  onSubmit(): void {
+    if (this.custForm.invalid) {
+      this.custForm.markAllAsTouched();
+      return;
+    }
+
+    const customer: Customer = {
+      id: this.editingId ?? 0,          // 0 for a new one; the service assigns it
+      name:    this.custForm.value.name,
+      city:    this.custForm.value.city,
+      email:   this.custForm.value.email,
+      balance: this.custForm.value.balance
+    };
+
+    if (this.editingId === null) {
+      const added = this.customerService.add(customer);
+      this.message = '✅ Added ' + added.name + ' (id ' + added.id + ').';
+    } else {
+      const ok = this.customerService.update(customer);
+      this.message = ok
+        ? '✅ Updated ' + customer.name + '.'
+        : '⚠️ That customer no longer exists.';
+    }
+
+    this.resetForm();
+    this.refresh();
+  }
+
+  // ── U: load into the form ───────────────────────────────
+  startEdit(customer: Customer): void {
+    this.editingId = customer.id;
+    this.custForm.patchValue({
+      name: customer.name, city: customer.city,
+      email: customer.email, balance: customer.balance
+    });
+    this.message = '✏️ Editing ' + customer.name + '.';
+  }
+
+  cancelEdit(): void {
+    this.resetForm();
+    this.message = 'Edit cancelled.';
+  }
+
+  // ── D ───────────────────────────────────────────────────
+  onDelete(customer: Customer): void {
+    if (!confirm('Delete ' + customer.name + '? This cannot be undone.')) { return; }
+
+    const ok = this.customerService.delete(customer.id);
+    this.message = ok
+      ? '🗑️ Deleted ' + customer.name + '.'
+      : '⚠️ Nothing was deleted.';
+
+    if (this.editingId === customer.id) { this.resetForm(); }
+    this.refresh();
+  }
+
+  // ── helpers ─────────────────────────────────────────────
+  resetForm(): void {
+    this.custForm.reset({ name: '', city: '', email: '', balance: 0 });
+    this.editingId = null;
+  }
+
+  getTotalBalance(): number {
+    return this.customerService.getTotalBalance();
+  }
+
+  trackById(index: number, c: Customer): number {
+    return c.id;
+  }
+}</code></pre></div>
+            <div class="expected">
+              <span class="lbl">What you should see — and what you should <em>not</em></span>
+              <strong>The app behaves exactly as it did at the end of Task 5.</strong> Everything works: list, search,
+              add, edit, delete, the detail screen. And you did not change
+              <code>customers.component.html</code> <strong>at all</strong>.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>CRUD now runs through the service</strong>, the app is unchanged, and I did not touch the template.</span>
+            </label>
+
+            <div class="analogy">
+              <span class="lbl">Count how many times the template has survived a rewrite</span>
+              Session 2: hardcoded array in the component. Session 3: moved to a service. Session 3: swapped for HTTP.
+              Session 4: CRUD moved to a service. <strong>Four complete changes to the data layer, and the templates never
+              needed touching.</strong><br><br>
+              That is not luck. It is because each layer only knows about the one beneath it — the same reason SQL doesn't
+              belong in a Spring Boot controller. If you take one architectural idea away from these four sessions, take
+              this one.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — prove the singleton is doing real work</span>
+              Open the customers screen, delete <strong>Rekha Nair</strong>, then navigate to
+              <code>/customers/1003</code> directly in the address bar. You get <strong>"Customer not found"</strong> —
+              because the detail screen reads the <em>same service instance</em> the list just modified.<br><br>
+              Now reload the whole page (<kbd>F5</kbd>). Rekha is <strong>back</strong>, because the service is recreated
+              from its hardcoded array on every full page load. That's the point of Task 7: real persistence needs a real
+              server.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I proved the two screens share one service instance</strong>, and that a reload resets everything.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TASK 7 — HTTP CRUD ===== -->
+      <section class="section">
+        <details class="exp lab7" open>
+          <summary><span class="lab-tag">TASK 7</span><span class="chevron">▶</span> CRUD over HTTP<span class="sync">Theory slides 26–27</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Replace the service's array with real HTTP calls. The <strong>method names stay identical</strong> — only
+              the bodies change, and every method now returns an <code>Observable</code>, so every caller needs
+              <code>.subscribe()</code>. We use JSONPlaceholder's <code>/users</code> endpoint, which accepts all four
+              verbs over real HTTP.
+            </div>
+            <div class="observe">
+              <span class="lbl">Before you start — two things</span>
+              <strong>1.</strong> Open the <strong>Network tab</strong> (<kbd>F12</kbd> → Network → Fetch/XHR). You will
+              watch every request.<br>
+              <strong>2.</strong> <strong>Keep a copy of your Task 6 service.</strong> Rename the file to
+              <code>customer.service.local.ts.bak</code> or just copy its contents into a scratch file — if the network
+              blocks you, you can put it back and still finish the session.
+            </div>
+
+            <h3>Step 1 — the HTTP service</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/customer.service.ts</span>
+              <span class="fb-tag">Replace the whole file</span>
+            </div>
+            <div class="codewrap"><pre><code>import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { Customer } from '../models/customer';
+
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+
+  // ONE line to change when you switch to your own backend.
+  private baseUrl = 'https://jsonplaceholder.typicode.com/users';
+
+  constructor(private http: HttpClient) { }
+
+  // ── R: all ──────────────────────────────────────────────
+  getAll(): Observable&lt;Customer[]&gt; {
+    return this.http.get&lt;any[]&gt;(this.baseUrl).pipe(
+      map(users =&gt; users.map(u =&gt; this.toCustomer(u)))
+    );
+  }
+
+  // ── R: one ──────────────────────────────────────────────
+  getById(id: number): Observable&lt;Customer&gt; {
+    return this.http.get&lt;any&gt;(this.baseUrl + '/' + id).pipe(
+      map(u =&gt; this.toCustomer(u))
+    );
+  }
+
+  // ── C ───────────────────────────────────────────────────
+  add(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.post&lt;Customer&gt;(this.baseUrl, customer);
+  }
+
+  // ── U ───────────────────────────────────────────────────
+  update(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.put&lt;Customer&gt;(this.baseUrl + '/' + customer.id, customer);
+  }
+
+  // ── D ───────────────────────────────────────────────────
+  delete(id: number): Observable&lt;void&gt; {
+    return this.http.delete&lt;void&gt;(this.baseUrl + '/' + id);
+  }
+
+  /** The API's shape is not our shape. All the conversion lives here. */
+  private toCustomer(u: any): Customer {
+    return {
+      id: u.id,
+      name: u.name,
+      city: u.address?.city ?? 'Unknown',
+      email: u.email,
+      balance: u.id * 1000
+    };
+  }
+}</code></pre></div>
+            <table class="lines">
+              <thead><tr><th style="width:34%">What changed</th><th>Why</th></tr></thead>
+              <tbody>
+                <tr><td>The method names</td><td><strong>Nothing changed.</strong> <code>getAll</code>, <code>getById</code>, <code>add</code>, <code>update</code>, <code>delete</code> — that's why this refactor is manageable.</td></tr>
+                <tr><td>Return types</td><td>All now <code>Observable&lt;...&gt;</code> instead of plain values. This is the one structural change, and it's why every caller needs <code>subscribe</code>.</td></tr>
+                <tr><td>constructor(private http: HttpClient)</td><td>Dependency injection. <code>HttpClientModule</code> must be in <code>app.module.ts</code>'s <code>imports</code> — you added it in Session 3.</td></tr>
+                <tr><td>.pipe(map(...))</td><td>Reshapes the API's response into our <code>Customer</code> as it flows through.</td></tr>
+                <tr><td>u.address?.city ?? 'Unknown'</td><td>Optional chaining plus a fallback — Session 1's <code>?.</code> and <code>??</code>, protecting you from a missing nested field.</td></tr>
+                <tr><td><code>search()</code> is gone</td><td>With a real backend, searching is either done locally on already-fetched data (what we do next) or handed to the database with <code>?search=term</code>. Never download 50,000 rows to filter 3.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Step 2 — the component, with <code>subscribe</code></h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.ts</span>
+              <span class="fb-tag">Replace these methods; keep the rest of the class</span>
+            </div>
+            <div class="codewrap"><pre><code>  // ── ADD these fields ──
+  isLoading = false;
+  errorMessage = '';
+
+  ngOnInit(): void {
+    this.loadCustomers();
+  }
+
+  /** Fetch everything from the server. Called after every change. */
+  loadCustomers(): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.customerService.getAll().subscribe({
+      next: (data) =&gt; {
+        this.allCustomers = data;
+        this.onSearch();              // re-apply any active filter
+        this.isLoading = false;
+      },
+      error: (err) =&gt; {
+        this.errorMessage = 'Could not load customers. Is the API reachable?';
+        this.isLoading = false;       // set it in BOTH branches
+        console.error(err);
+      }
+    });
+  }
+
+  /** Searching happens locally, on the data we already fetched. */
+  onSearch(): void {
+    const t = this.searchTerm.trim().toLowerCase();
+    if (t === '') {
+      this.customers = this.allCustomers;
+      return;
+    }
+    this.customers = this.allCustomers.filter(c =&gt;
+      c.name.toLowerCase().includes(t) ||
+      c.city.toLowerCase().includes(t) ||
+      c.email.toLowerCase().includes(t)
+    );
+  }
+
+  // ── C and U, over HTTP ──────────────────────────────────
+  onSubmit(): void {
+    if (this.custForm.invalid) {
+      this.custForm.markAllAsTouched();
+      return;
+    }
+
+    const customer: Customer = {
+      id: this.editingId ?? 0,        // 0 for a new one; the SERVER assigns the id
+      name:    this.custForm.value.name,
+      city:    this.custForm.value.city,
+      email:   this.custForm.value.email,
+      balance: this.custForm.value.balance
+    };
+
+    // Build the right call, then subscribe ONCE.
+    // Safe because Observables are lazy — nothing is sent until subscribe.
+    const call = this.editingId === null
+      ? this.customerService.add(customer)
+      : this.customerService.update(customer);
+
+    call.subscribe({
+      next: (saved) =&gt; {
+        this.message = this.editingId === null
+          ? '✅ Created on the server with id ' + saved.id + '.'
+          : '✅ Updated on the server.';
+        this.resetForm();
+        this.loadCustomers();         // reload so the screen matches the server
+      },
+      error: (err) =&gt; {
+        this.message = '❌ Save failed — nothing was changed on the server.';
+        console.error(err);
+      }
+    });
+  }
+
+  // ── D, over HTTP ────────────────────────────────────────
+  onDelete(customer: Customer): void {
+    if (!confirm('Delete ' + customer.name + '? This cannot be undone.')) { return; }
+
+    this.customerService.delete(customer.id).subscribe({
+      next: () =&gt; {
+        // Only NOW, once the server has confirmed it
+        this.message = '🗑️ Deleted ' + customer.name + ' on the server.';
+        if (this.editingId === customer.id) { this.resetForm(); }
+        this.loadCustomers();
+      },
+      error: (err) =&gt; {
+        this.message = '❌ Delete failed — the customer is still there.';
+        console.error(err);
+      }
+    });
+  }
+
+  getTotalBalance(): number {
+    let total = 0;
+    for (const c of this.customers) { total = total + c.balance; }
+    return total;
+  }</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Delete the old <code>refresh()</code> method</span>
+              It called <code>customerService.search(...)</code>, which no longer exists.
+              <code>loadCustomers()</code> replaces it.
+            </div>
+
+            <h3>Step 3 — show the loading and error states</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customers/customers.component.html</span>
+              <span class="fb-tag">Add just after the &lt;h2&gt;</span>
+            </div>
+            <div class="codewrap"><pre><code>  &lt;p *ngIf="isLoading" class="loading"&gt;⏳ Loading customers from the server…&lt;/p&gt;
+
+  &lt;div *ngIf="errorMessage" class="api-error"&gt;
+    ⚠️ {{ errorMessage }}
+    &lt;button (click)="loadCustomers()"&gt;Retry&lt;/button&gt;
+  &lt;/div&gt;</code></pre></div>
+            <div class="codewrap"><pre><code>/* add to customers.component.css */
+.loading {
+  padding: 12px 16px; background: #fffdf3;
+  border: 1px solid #f0e3a8; border-radius: 8px; font-size: 15px;
+}
+.api-error {
+  padding: 12px 16px; background: #fff0ef;
+  border: 1px solid #ffc9c4; border-radius: 8px;
+  color: #b00027; font-size: 15px;
+}</code></pre></div>
+
+            <p>And point the detail screen at the new async service:</p>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/pages/customer-detail/customer-detail.component.ts</span>
+              <span class="fb-tag">Replace ngOnInit</span>
+            </div>
+            <div class="codewrap"><pre><code>  ngOnInit(): void {
+    this.requestedId = Number(this.route.snapshot.paramMap.get('id'));
+
+    // getById now returns an Observable, so we subscribe
+    this.customerService.getById(this.requestedId).subscribe({
+      next: (c) =&gt; { this.customer = c; },
+      error: () =&gt; { this.notFound = true; }    // a 404 from the API lands here
+    });
+  }</code></pre></div>
+
+            <div class="browser">
+              <div class="bar">
+                <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+                <span class="url">http://localhost:4200/customers</span>
+              </div>
+              <div class="viewport">
+                <div class="navbar"><span>Home</span><span class="on">Customers</span><span>About</span></div>
+                <p style="font-weight:700;font-size:19px;margin:0 0 8px;">Customer Management</p>
+                <p style="background:#f0f7ff;border:1px solid #cfe4ff;border-radius:6px;padding:6px 12px;font-size:14px;margin:0 0 8px;">✅ Created on the server with id 11.</p>
+                <table>
+                  <thead><tr><th>ID</th><th>Name</th><th>City</th><th>Balance</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>Leanne Graham</td><td>Gwenborough</td><td style="color:#1a9e34;">₹1,000</td><td><span class="btn-link">View</span> <span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr><td>2</td><td>Ervin Howell</td><td>Wisokyburgh</td><td style="color:#1a9e34;">₹2,000</td><td><span class="btn-link">View</span> <span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                    <tr><td>3</td><td>Clementine Bauch</td><td>McKenziehaven</td><td style="color:#1a9e34;">₹3,000</td><td><span class="btn-link">View</span> <span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                  </tbody>
+                </table>
+                <p style="font-size:14px;color:#6e6e73;margin-top:8px;">Showing 10 of 10 customers · total balance ₹55,000</p>
+              </div>
+            </div>
+            <div class="expected">
+              <span class="lbl">What you should see — check all six</span>
+              <strong>1.</strong> A brief "⏳ Loading…" then <strong>ten customers</strong> with real names and cities from
+              the API.<br>
+              <strong>2.</strong> <strong>Search still works</strong> — try <code>gwen</code>, it filters locally on the
+              fetched data.<br>
+              <strong>3.</strong> Adding a customer gives <strong>"Created on the server with id 11"</strong>, and the
+              Network tab shows a <code>POST</code> with status <code>201</code>.<br>
+              <strong>4.</strong> Editing gives a <code>PUT</code> with status <code>200</code>.<br>
+              <strong>5.</strong> Deleting gives a <code>DELETE</code> with status <code>200</code>.<br>
+              <strong>6.</strong> Clicking <strong>View</strong> makes a separate <code>GET</code> to
+              <code>/users/2</code> — watch it appear in the Network tab.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>🌐 All four HTTP verbs work</strong> — GET, POST, PUT and DELETE, each visible in the Network tab with the right status code.</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Why the new customer disappears when you reload — and why that's fine</span>
+              JSONPlaceholder is a <strong>fake</strong> API: it validates your request, replies correctly with the right
+              status code, and then throws it away. Reload and you're back to the original ten.<br><br>
+              <strong>The HTTP round-trip is completely real</strong> — the request, the JSON body, the status code, the
+              response. That is everything we need to prove. Against your own Spring Boot API the identical code genuinely
+              persists, which is the stretch task below.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — four experiments</span>
+              <ol style="margin:6px 0 0;padding-left:22px;">
+                <li><strong>Read what you actually sent.</strong> Add a customer, then in the Network tab click the
+                    <code>POST</code> request and open <strong>Request Payload</strong>. That is your <code>Customer</code>
+                    object as JSON. Then open <strong>Response</strong> and find the <code>id: 11</code> the server assigned.
+                    <em>This is why you use the object from <code>next</code> rather than your local copy.</em></li>
+                <li><strong>See the failure path properly.</strong> Change <code>baseUrl</code> to
+                    <code>'https://jsonplaceholder.typicode.com/userzzz'</code>. You get a red error panel with a working
+                    <strong>Retry</strong> button, and a <code>404</code> in the Network tab. Fix the URL and click Retry.</li>
+                <li><strong>Prove the lazy rule one last time.</strong> In <code>onDelete</code>, remove the
+                    <code>.subscribe({...})</code> so the line is just
+                    <code>this.customerService.delete(customer.id);</code>. Click Delete and confirm —
+                    <strong>no request appears in the Network tab</strong> and nothing happens. Restore it.</li>
+                <li><strong>Prove why you reload after a change.</strong> In <code>onDelete</code>'s <code>next</code>,
+                    replace <code>this.loadCustomers()</code> with a local filter:
+                    <code>this.allCustomers = this.allCustomers.filter(c =&gt; c.id !== customer.id); this.onSearch();</code>
+                    That works and is faster — but it trusts your local copy over the server's. With a real backend, a
+                    reload also picks up anything a colleague changed a moment ago. Both approaches are valid; know which
+                    trade-off you're making.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>All four experiments done</strong> — including reading the Request Payload and proving the lazy rule again.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">STRETCH</span><span class="chevron">▶</span> Point It at Your Own Spring Boot API<span class="sync">Optional — theory slide 28</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">The full-stack moment</span>
+              This is the payoff for the entire eight-session programme: your Angular front end talking to your Spring Boot
+              back end, with data that genuinely persists. On the Angular side it is <strong>one line</strong>.
+            </div>
+
+            <h3>Step 1 — the Spring Boot side</h3>
+            <p>Everything here is Spring Boot Session 2 and 3 material. The only Angular-specific addition is
+               <code>@CrossOrigin</code>.</p>
+            <div class="filebar">
+              <span class="fb-icon">☕</span>
+              <span class="fb-name">CustomerController.java</span>
+              <span class="fb-tag">In your Spring Boot project</span>
+            </div>
+            <div class="codewrap"><pre><code>@CrossOrigin(origins = "http://localhost:4200")   // ← REQUIRED, or CORS blocks you
+@RestController
+@RequestMapping("/api/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerRepository repo;
+
+    @GetMapping
+    public List&lt;Customer&gt; getAll() {
+        return repo.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public Customer getById(@PathVariable Long id) {
+        return repo.findById(id).orElseThrow();
+    }
+
+    @PostMapping
+    public Customer create(@RequestBody Customer c) {
+        c.setId(null);                 // let the database assign it
+        return repo.save(c);
+    }
+
+    @PutMapping("/{id}")
+    public Customer update(@PathVariable Long id, @RequestBody Customer c) {
+        c.setId(id);
+        return repo.save(c);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) {
+        repo.deleteById(id);
+    }
+}</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Your Java entity's field names must match the TypeScript interface</span>
+              Our <code>Customer</code> is <code>{ id, name, city, email, balance }</code>. Your Java class must use the
+              <strong>same names</strong> — a Java field called <code>customerName</code> arrives as
+              <code>customerName</code>, and a TypeScript interface expecting <code>name</code> will show
+              <code>undefined</code>. Check with <code>{{ customers | json }}</code> in the template.
+            </div>
+
+            <h3>Step 2 — the Angular side: one line</h3>
+            <div class="filebar">
+              <span class="fb-icon">📄</span>
+              <span class="fb-name">src/app/services/customer.service.ts</span>
+              <span class="fb-tag">Change one line, and remove the mapping</span>
+            </div>
+            <div class="codewrap"><pre><code>  private baseUrl = 'http://localhost:8080/api/customers';
+
+  // Your API returns the right shape already, so the mapping goes away:
+  getAll(): Observable&lt;Customer[]&gt; {
+    return this.http.get&lt;Customer[]&gt;(this.baseUrl);
+  }
+
+  getById(id: number): Observable&lt;Customer&gt; {
+    return this.http.get&lt;Customer&gt;(this.baseUrl + '/' + id);
+  }
+
+  // add, update and delete are already correct — no changes needed.
+  // You can also delete the private toCustomer() helper entirely.</code></pre></div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — in order, and check each one</span>
+              <ol>
+                <li>Start your Spring Boot app. Confirm it's on port <strong>8080</strong>.</li>
+                <li>Open <code>http://localhost:8080/api/customers</code> <strong>directly in a browser tab</strong>. You
+                    should see JSON. <em>If this fails, the problem is not in Angular</em> — fix it here first.</li>
+                <li>Change <code>baseUrl</code> in your Angular service and save.</li>
+                <li>Open <code>localhost:4200/customers</code> with the Network tab visible.</li>
+                <li>Add a customer. Then <strong>reload the page</strong> — it is <em>still there</em>. That is real
+                    persistence, in a real database.</li>
+              </ol>
+            </div>
+            <div class="expected">
+              <span class="lbl">The moment worth pausing on</span>
+              You add a customer in the browser, press <kbd>F5</kbd>, and it survives. <strong>Angular → HttpClient →
+              Spring Boot → JPA → the database, and all the way back.</strong> Both halves written by you.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>🎉 Full-stack.</strong> My Angular app performs real CRUD against my own Spring Boot API, and the data survives a reload.</span>
+            </label>
+
+            <div class="observe">
+              <span class="lbl">Hit a CORS error? That is expected, and it is not an Angular problem</span>
+              <code>blocked by CORS policy: No 'Access-Control-Allow-Origin' header</code> means the browser refused to
+              let port 4200 talk to port 8080. <strong>The request never reached your server.</strong> Nothing you change
+              in Angular will help.<br><br>
+              <strong>Fix 1 (quick):</strong> <code>@CrossOrigin(origins = "http://localhost:4200")</code> on the
+              controller — and <em>restart</em> Spring Boot.<br>
+              <strong>Fix 2 (better):</strong> a <code>WebMvcConfigurer</code> with
+              <code>addCorsMappings</code>, applied application-wide.<br>
+              <strong>Fix 3 (no CORS at all):</strong> run <code>ng build</code> and copy
+              <code>dist/hello-world/browser/*</code> into Spring Boot's
+              <code>src/main/resources/static/</code>. Both are then served from port 8080 — <em>same origin, so CORS
+              never applies</em>. This is how many teams actually deploy.
+            </div>
+            <div class="keybox">
+              <span class="lbl">Compare the two files side by side before you finish</span>
+              <code>http.get(baseUrl)</code> ↔ <code>@GetMapping</code> ·
+              <code>http.post(baseUrl, c)</code> ↔ <code>@PostMapping</code> + <code>@RequestBody</code> ·
+              <code>http.put(baseUrl + '/' + id, c)</code> ↔ <code>@PutMapping("/{id}")</code> ·
+              <code>http.delete(baseUrl + '/' + id)</code> ↔ <code>@DeleteMapping("/{id}")</code>.<br><br>
+              <strong>Five methods on each side, matching one for one.</strong> You now know both ends of the wire — which
+              is exactly what the whole programme was for.
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== FINAL CHECKPOINT ===== -->
+      <div class="section-band">Final checkpoint</div>
+      <section class="section">
+        <details class="exp lab6" open>
+          <summary><span class="chevron">▶</span> Troubleshooting — routing &amp; CRUD<span class="sync">Theory slide 31</span></summary>
+          <div class="exp-body">
+            <div class="observe">
+              <span class="lbl">Today's bugs cluster into three families</span>
+              <strong>Route order</strong> problems, <strong>string-versus-number</strong> problems, and
+              <strong>forgot-to-refresh-the-view</strong> problems. Almost all of them fail <em>silently</em>. Check those
+              three before you start rewriting anything.
+            </div>
+            <table class="issues">
+              <thead><tr><th style="width:36%">Message / symptom</th><th>Cause and fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>The URL changes but <strong>nothing appears</strong></td>
+                  <td>Missing <code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code> in <code>app.component.html</code>. Angular has a component and nowhere to put it. <strong>No error is reported.</strong></td>
+                </tr>
+                <tr>
+                  <td><code>'router-outlet' is not a known element</code><br><code>Can't bind to 'routerLink'</code></td>
+                  <td>Either <code>AppRoutingModule</code> is not in <code>AppModule</code>'s <code>imports</code>, or your routing module is missing <code>exports: [RouterModule]</code>. Check both.</td>
+                </tr>
+                <tr>
+                  <td><strong>Every</strong> page shows the 404</td>
+                  <td>The <code>**</code> wildcard is not last. Angular takes the <em>first</em> match, so a wildcard above your real routes swallows everything.</td>
+                </tr>
+                <tr>
+                  <td>Clicking a menu link reloads the whole app</td>
+                  <td>You used <code>href</code> instead of <code>routerLink</code>.</td>
+                </tr>
+                <tr>
+                  <td>Infinite redirect at startup, or a frozen tab</td>
+                  <td><code>{ path: '', redirectTo: '/home' }</code> is missing <code>pathMatch: 'full'</code>.</td>
+                </tr>
+                <tr>
+                  <td>Clicking "Customers" opens the <em>detail</em> screen</td>
+                  <td><code>customers/:id</code> is listed above <code>customers</code>. Static routes before dynamic ones.</td>
+                </tr>
+                <tr>
+                  <td>The Home link is highlighted on every page</td>
+                  <td><code>routerLinkActive</code> matches by prefix. Add <code>[routerLinkActiveOptions]="{ exact: true }"</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>Every</strong> customer shows "not found" on the detail screen</td>
+                  <td><strong>Route parameters are strings.</strong> <code>1002 === "1002"</code> is <code>false</code>. Wrap it: <code>Number(route.snapshot.paramMap.get('id'))</code>. Fails silently — nothing errors, the lookup just finds nothing.</td>
+                </tr>
+                <tr>
+                  <td>The URL changes but the detail screen shows the old customer</td>
+                  <td>You navigated within the same component, so Angular reused the instance and <code>ngOnInit</code> didn't re-run. Use <code>this.route.paramMap.subscribe(...)</code> instead of <code>snapshot</code>.</td>
+                </tr>
+                <tr>
+                  <td>A new row is added but doesn't appear</td>
+                  <td>You changed <code>allCustomers</code> but the table shows <code>customers</code>. Call <code>onSearch()</code> or <code>loadCustomers()</code> afterwards.</td>
+                </tr>
+                <tr>
+                  <td>Deleting a search character doesn't restore rows</td>
+                  <td>You filtered <code>customers</code> instead of <code>allCustomers</code>. Always filter the master list into the displayed one.</td>
+                </tr>
+                <tr>
+                  <td>Saving an edit creates a duplicate</td>
+                  <td>You lost the original id. Use <code>id: this.editingId</code> when building the replacement object.</td>
+                </tr>
+                <tr>
+                  <td>The edit form opens empty</td>
+                  <td><code>patchValue()</code> is missing or its keys don't match the <code>FormGroup</code>'s keys exactly.</td>
+                </tr>
+                <tr>
+                  <td>Two customers share an id</td>
+                  <td><code>getNextId()</code> uses <code>length + 1</code>. Use <code>Math.max(...ids) + 1</code>.</td>
+                </tr>
+                <tr>
+                  <td>Nothing happens on save or delete, no request sent</td>
+                  <td><strong>Missing <code>.subscribe()</code>.</strong> Observables are lazy. Session 3's golden rule, still true.</td>
+                </tr>
+                <tr>
+                  <td>The spinner never stops</td>
+                  <td><code>isLoading = false</code> is missing from the <code>error</code> handler. Set it in both branches.</td>
+                </tr>
+                <tr>
+                  <td><code>blocked by CORS policy</code></td>
+                  <td>A browser security rule; the request never reached your server. Add <code>@CrossOrigin(origins = "http://localhost:4200")</code> and <strong>restart Spring Boot</strong>. Nothing in Angular can fix this.</td>
+                </tr>
+                <tr>
+                  <td>Data arrives but the columns are blank</td>
+                  <td>Field names don't match between your API and your interface. Put <code>{{ customers | json }}</code> on the page and compare.</td>
+                </tr>
+                <tr>
+                  <td><code>Property 'startEdit' does not exist</code></td>
+                  <td>The template calls a method you haven't written yet. Expected between Tasks 3 and 4.</td>
+                </tr>
+                <tr>
+                  <td>A bookmarked URL 404s after deployment</td>
+                  <td>Your web server must send unknown URLs to <code>index.html</code>. On Nginx: <code>try_files $uri /index.html;</code>. Angular's router only runs once <code>index.html</code> has loaded.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Glossary — Session 4 terms</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th style="width:28%">Term</th><th>Meaning in one sentence</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Router</strong></td><td>Angular's service that matches URLs to components and changes the address bar without reloading the page.</td></tr>
+                <tr><td><strong>Route</strong></td><td>One pairing of a URL path with a component.</td></tr>
+                <tr><td><strong><code>Routes</code></strong></td><td>Angular's type for the array of route objects.</td></tr>
+                <tr><td><strong><code>RouterModule.forRoot()</code></strong></td><td>Sets up the router for the whole application. Used once, in the root routing module.</td></tr>
+                <tr><td><strong><code>exports: [RouterModule]</code></strong></td><td>Re-exports the router directives so your components can use <code>routerLink</code>. The most-forgotten line in Angular routing.</td></tr>
+                <tr><td><strong><code>&lt;router-outlet&gt;</code></strong></td><td>The placeholder marking <em>where</em> the routed component is rendered.</td></tr>
+                <tr><td><strong><code>routerLink</code></strong></td><td>Navigates via the router — no page reload. Never use <code>href</code> for internal links.</td></tr>
+                <tr><td><strong><code>routerLinkActive</code></strong></td><td>Adds a CSS class automatically when that link's route is active.</td></tr>
+                <tr><td><strong><code>routerLinkActiveOptions</code></strong></td><td><code>{ exact: true }</code> — match the whole path, not just its beginning.</td></tr>
+                <tr><td><strong><code>redirectTo</code></strong></td><td>Send this path somewhere else. Needs <code>pathMatch: 'full'</code> on the empty path.</td></tr>
+                <tr><td><strong><code>pathMatch: 'full'</code></strong></td><td>"Only match when the entire URL is this." Prevents the empty-path redirect loop.</td></tr>
+                <tr><td><strong>Wildcard route (<code>**</code>)</strong></td><td>Matches anything. Your 404 page. Must be listed <strong>last</strong>.</td></tr>
+                <tr><td><strong>Route parameter</strong></td><td>A placeholder in a path, written <code>:id</code>. <strong>Always arrives as a string.</strong></td></tr>
+                <tr><td><strong><code>ActivatedRoute</code></strong></td><td>The injected service describing the current route, including its parameters.</td></tr>
+                <tr><td><strong><code>snapshot.paramMap.get('id')</code></strong></td><td>Read a route parameter once, as it is now.</td></tr>
+                <tr><td><strong><code>paramMap.subscribe(...)</code></strong></td><td>React to parameter changes while staying in the same component.</td></tr>
+                <tr><td><strong>Query parameter</strong></td><td>The <code>?search=anoop</code> part. For optional extras; route parameters are for "which record".</td></tr>
+                <tr><td><strong><code>router.navigate([...])</code></strong></td><td>Navigate from code. Put it inside <code>next</code> so it only runs on success.</td></tr>
+                <tr><td><strong>CRUD</strong></td><td>Create, Read, Update, Delete — the four operations of every business screen.</td></tr>
+                <tr><td><strong>The shell</strong></td><td>The header, nav and footer that sit outside the outlet and never reload.</td></tr>
+                <tr><td><strong>Master vs displayed list</strong></td><td>Two arrays: one untouched, one filtered. What makes search reversible.</td></tr>
+                <tr><td><strong><code>editingId</code></strong></td><td>The single field that switches one form between add mode and edit mode.</td></tr>
+                <tr><td><strong><code>patchValue()</code></strong></td><td>Fill a form from an object in one call. The reason Session 3 taught reactive forms.</td></tr>
+                <tr><td><strong><code>markAllAsTouched()</code></strong></td><td>Reveal every validation error at once, on a failed submit.</td></tr>
+                <tr><td><strong><code>ng build</code></strong></td><td>Produces optimised static files in <code>dist/</code>, ready to deploy anywhere.</td></tr>
+                <tr><td><strong>Tree-shaking</strong></td><td>The build removing code nothing uses, so the download is smaller.</td></tr>
+                <tr><td><strong>Same origin</strong></td><td>Same protocol, host <em>and</em> port. Serving Angular from Spring Boot makes them one origin, so CORS never applies.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="chevron">▶</span> Final Self-Check — the whole series<span class="sync">All four sessions</span></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">This one covers everything</span>
+              Twenty-five questions spanning all four sessions. If you can answer twenty, you have genuinely learned
+              Angular rather than merely followed along — and you are ready for an interview on it.
+            </div>
+
+            <h4>Session 1 — TypeScript &amp; foundations</h4>
+            <ol class="steps">
+              <li>What is a single-page application, and what does your Spring Boot app return instead of HTML?</li>
+              <li>Why is "AngularJS" not simply an older Angular?</li>
+              <li>TypeScript's types vanish at compile time. So what are they <em>for</em>?</li>
+              <li>Why is <code>status: 'Active' | 'Inactive'</code> better than <code>status: string</code>?</li>
+              <li>What does <code>constructor(private http: HttpClient) { }</code> actually do?</li>
+              <li>Recite the boot chain from <code>index.html</code> to your component.</li>
+            </ol>
+
+            <h4>Session 2 — components &amp; binding</h4>
+            <ol class="steps" start="7">
+              <li>Name the four bindings, their punctuation, and the direction each flows.</li>
+              <li>What is the difference between <code>src="url"</code> and <code>[src]="url"</code>?</li>
+              <li>What does the asterisk in <code>*ngIf</code> signify, and what happens without it?</li>
+              <li>How is <code>*ngIf</code> different from CSS <code>display: none</code>?</li>
+              <li>Does <code>{{ name | uppercase }}</code> change the stored value? How would you prove it?</li>
+              <li>Explain <em>data down, events up</em> using <code>@Input</code> and <code>@Output</code>.</li>
+              <li>Why must you read an <code>@Input</code> in <code>ngOnInit</code> and not the constructor?</li>
+            </ol>
+
+            <h4>Session 3 — forms, services &amp; HTTP</h4>
+            <ol class="steps" start="14">
+              <li>Name the two form systems and where each keeps its validation rules.</li>
+              <li>Why show errors on <code>invalid &amp;&amp; touched</code> rather than just <code>invalid</code>?</li>
+              <li>Give three reasons to move data out of a component and into a service.</li>
+              <li>What does <code>providedIn: 'root'</code> mean, and what does it let two components do?</li>
+              <li>Why can't you write <code>this.list = this.service.getAll();</code> with <code>HttpClient</code>?</li>
+              <li>Explain an Observable using the coffee-shop analogy. What happens if you never subscribe?</li>
+              <li>Which <code>subscribe</code> handler must never be omitted, and what does a user see if you omit it?</li>
+              <li>What is a CORS error, and which side of the wire do you fix it on?</li>
+            </ol>
+
+            <h4>Session 4 — routing &amp; CRUD</h4>
+            <ol class="steps" start="22">
+              <li>Why must the <code>**</code> route be last, and what happens if it isn't?</li>
+              <li>Route parameters are always strings. What bug does forgetting that cause, and how do you fix it?</li>
+              <li>How does one form handle both insert and update? Which field drives it?</li>
+              <li><strong>The big one:</strong> you swapped the data layer four times across this series — hardcoded array, service, HTTP, service-based CRUD. How many times did the template change, and <em>why</em>?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>I can answer at least 20 of the 25</strong> without looking anything up.</span>
+            </label>
+            <div class="expected">
+              <span class="lbl">The answer to question 25</span>
+              <strong>Zero.</strong> Because each layer only knows about the one beneath it: the template's contract is
+              "there is an array called <code>customers</code>", and how it got there is nobody else's business. That is
+              the single most valuable idea in these four sessions, and it is the same reason SQL doesn't belong in a
+              Spring Boot controller.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section class="section">
+        <div class="expected" style="margin-top:20px;">
+          <span class="lbl">🎓 Series complete — you have finished if…</span>
+          <ol style="margin:8px 0 0;padding-left:22px;font-size:16.5px;line-height:1.6;">
+            <li>Your app has <strong>five routed screens</strong> — Home, Customers, Customer detail, About, and a 404 — inside a persistent header/nav/footer shell.</li>
+            <li>The nav bar highlights the current page by itself, and the browser's <strong>Back button works</strong>.</li>
+            <li><code>localhost:4200/customers/1002</code> typed straight into the address bar opens that customer's detail screen.</li>
+            <li>An unknown URL shows your <strong>404 page</strong>, and an unknown id shows a graceful "not found" message.</li>
+            <li>The Customers screen does <strong>full CRUD</strong> — list, search, add, edit and delete — with validation and a confirmation on delete.</li>
+            <li>One form handles both insert and update, driven by <code>editingId</code> and <code>patchValue()</code>.</li>
+            <li>All CRUD runs through <code>CustomerService</code>, and the component contains no data logic.</li>
+            <li>All four HTTP verbs work against a live API, each visible in the <strong>Network tab</strong> with the right status code.</li>
+            <li>You have loading, error and empty states, with a working <strong>Retry</strong>.</li>
+            <li><em>(Stretch)</em> It talks to <strong>your own Spring Boot API</strong> and the data survives a reload.</li>
+          </ol>
+          <p style="margin:14px 0 0;font-size:17px;"><strong>Four sessions ago the question was "what even is a framework?"</strong>
+             You now have a routed, validated, service-backed, API-connected single-page application — and you understand
+             <em>why</em> each layer exists, not just how to type it. That understanding is the part that transfers to
+             React, to Vue, and to whatever comes next.</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference — Session 4, and the whole series</h2>
+          <div class="grid">
+            <div>
+              <h3>Routing</h3>
+              <table>
+                <tr><td><code>ng g m app-routing --flat --module=app</code></td><td>Create + register the routing module</td></tr>
+                <tr><td><code>{ path: 'home', component: HomeComponent }</code></td><td>A basic route. No leading slash.</td></tr>
+                <tr><td><code>{ path: '', redirectTo: '/home', pathMatch: 'full' }</code></td><td>The default screen</td></tr>
+                <tr><td><code>{ path: 'customers/:id', component: DetailComponent }</code></td><td>A route parameter</td></tr>
+                <tr><td><code>{ path: '**', component: NotFoundComponent }</code></td><td>404 — <strong>always last</strong></td></tr>
+                <tr><td><code>RouterModule.forRoot(routes)</code></td><td>In <code>imports</code></td></tr>
+                <tr><td><code>exports: [RouterModule]</code></td><td><strong>Don't forget this</strong></td></tr>
+                <tr><td><code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code></td><td>Where screens render</td></tr>
+                <tr><td><code>routerLink="/home"</code></td><td>Static link</td></tr>
+                <tr><td><code>[routerLink]="['/customers', id]"</code></td><td>Dynamic link</td></tr>
+                <tr><td><code>routerLinkActive="active"</code></td><td>Auto-highlight</td></tr>
+                <tr><td><code>[routerLinkActiveOptions]="{ exact: true }"</code></td><td>Exact match only</td></tr>
+                <tr><td><code>Number(route.snapshot.paramMap.get('id'))</code></td><td>Read a param — <strong>convert it</strong></td></tr>
+                <tr><td><code>router.navigate(['/customers', id])</code></td><td>Navigate from code</td></tr>
+              </table>
+            </div>
+            <div>
+              <h3>CRUD patterns</h3>
+              <table>
+                <tr><td><code>allItems</code> + <code>items</code></td><td>Master list + displayed list</td></tr>
+                <tr><td><code>editingId: number | null</code></td><td><code>null</code> = add, number = edit</td></tr>
+                <tr><td><code>allItems.filter(...)</code></td><td>Search — filter the <strong>master</strong></td></tr>
+                <tr><td><code>Math.max(...ids) + 1</code></td><td>Next id — never <code>length + 1</code></td></tr>
+                <tr><td><code>items.push(x)</code></td><td>Insert</td></tr>
+                <tr><td><code>findIndex</code> then <code>splice(i, 1)</code></td><td>Delete</td></tr>
+                <tr><td><code>items[i] = { id: editingId, ... }</code></td><td>Update — <strong>keep the id</strong></td></tr>
+                <tr><td><code>form.patchValue(item)</code></td><td>Load a row into the form</td></tr>
+                <tr><td><code>confirm('Delete?')</code></td><td>Before anything destructive</td></tr>
+                <tr><td><code>markAllAsTouched()</code></td><td>On a failed submit</td></tr>
+              </table>
+              <h3 style="margin-top:16px;">HTTP ↔ Spring Boot</h3>
+              <table>
+                <tr><td><code>http.get&lt;T[]&gt;(url)</code></td><td><code>@GetMapping</code></td></tr>
+                <tr><td><code>http.get&lt;T&gt;(url + '/' + id)</code></td><td><code>@GetMapping("/{id}")</code></td></tr>
+                <tr><td><code>http.post&lt;T&gt;(url, obj)</code></td><td><code>@PostMapping</code> + <code>@RequestBody</code></td></tr>
+                <tr><td><code>http.put&lt;T&gt;(url + '/' + id, obj)</code></td><td><code>@PutMapping("/{id}")</code></td></tr>
+                <tr><td><code>http.delete&lt;void&gt;(url + '/' + id)</code></td><td><code>@DeleteMapping("/{id}")</code></td></tr>
+                <tr><td><code>.subscribe({ next, error })</code></td><td><strong>Required</strong> — or nothing is sent</td></tr>
+                <tr><td><code>@CrossOrigin(origins = "...")</code></td><td>Fixes CORS — on the <strong>server</strong></td></tr>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:20px;">Your <code>app.module.ts</code> imports, complete</h3>
+          <p style="font-family:var(--mac-mono);font-size:14px;margin:6px 0 0;">
+            BrowserModule &nbsp;·&nbsp; FormsModule &nbsp;·&nbsp; ReactiveFormsModule &nbsp;·&nbsp; HttpClientModule &nbsp;·&nbsp; AppRoutingModule
+          </p>
+          <h3 style="margin-top:18px;">The three things to remember forever</h3>
+          <p style="font-size:15px;margin:6px 0 0;">
+            <strong>1.</strong> Data flows down, events flow up. &nbsp;
+            <strong>2.</strong> Components display; services fetch. &nbsp;
+            <strong>3.</strong> Change the data and let Angular update the screen — never touch the DOM yourself.
+          </p>
+        </div>
+      </section>
+
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + prerequisite readiness badge.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons on every code block.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
