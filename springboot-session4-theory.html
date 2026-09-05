@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session4-lab.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -120,7 +121,7 @@
     }
     .slide-footer .who { font-weight: 600; color: var(--mac-text); }
 
-    /* Transition animation. Reduced-motion fallback below. */
+    /* Transition animation, with reduced-motion fallback below. */
     .slide.animating { animation: slideIn var(--slide-anim) ease both; }
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(28px); }
@@ -132,6 +133,7 @@
 
     .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
     .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; }
     .slide .eyebrow {
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -146,8 +148,16 @@
     .slide .muted { color: var(--mac-text-muted); }
     .slide strong { font-weight: 700; }
     .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
 
-    /* Callout / key-point box */
+    /* Callout / key-point boxes */
     .keybox {
       border-left: 4px solid var(--mac-accent);
       background: rgba(10,132,255,0.06);
@@ -180,6 +190,17 @@
     .slide .deep { font-size: 16.5px; line-height: 1.62; }
     .term { font-weight: 700; color: var(--mac-accent); }
 
+    /* Plain-English analogy box */
+    .analogy {
+      border-left: 4px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f5ebff);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #8e2fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+
     /* Cover slide */
     .cover {
       display: flex;
@@ -208,8 +229,6 @@
     /* Cards */
     .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
     .cards.c3 { grid-template-columns: repeat(3, 1fr); }
-    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
-    .cards.c5 { grid-template-columns: repeat(5, 1fr); }
     .card {
       border: 1px solid var(--mac-border);
       border-radius: 12px;
@@ -219,11 +238,6 @@
     .card h3 { margin: 0 0 6px; font-size: 18px; }
     .card p { font-size: 15.5px; margin: 0; }
     .card .ic { font-size: 26px; margin-bottom: 6px; }
-    .card.tight { padding: 13px 14px; }
-    .card.tight h3 { font-size: 15.5px; }
-    .card.tight p { font-size: 13.5px; }
-    .card .prob { color: var(--tl-red); font-weight: 600; display:block; font-size: 13.5px; margin-top: 4px; }
-    .card .sol { color: #1a9e34; font-weight: 600; display:block; font-size: 13.5px; margin-top: 4px; }
 
     /* Agenda tracker */
     .agenda { list-style: none; padding: 0; margin-top: 10px; }
@@ -259,9 +273,27 @@
     table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
     table.cmp td.good { background: rgba(40,200,64,0.10); }
     table.cmp td.bad { background: rgba(255,95,87,0.08); }
-    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
-    table.cmp td.hl { background: rgba(10,132,255,0.07); }
     table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    /* Highlighted row — draws the eye to the one field that matters */
+    table.cmp tr.keyrow td { background: rgba(255,159,10,0.16); font-weight: 600; }
+    table.cmp tr.keyrow td:first-child { font-weight: 700; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #f3f8ff;
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
 
     /* Generic flow diagram */
     .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
@@ -278,23 +310,44 @@
     .flow-box.alt { border-color: #5e5ce6; background: #f3f1ff; }
     .flow-box.green { border-color: #28c840; background: #eefcf1; }
     .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
-    .flow-box.amber { border-color: #ff9f0a; background: #fff6ea; }
     .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
     .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
     .flow.vert { flex-direction: column; align-items: stretch; }
     .flow.vert .flow-arrow { text-align: center; }
 
-    /* Two-column diagram comparison */
-    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
-    .twocol .colbox {
-      border: 1px solid var(--mac-border);
-      border-radius: 12px;
-      padding: 16px 18px 20px;
-      background: #fafafc;
+    /* IoC container visual */
+    .ioc {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 22px;
+      background: #f6faff;
+      position: relative;
     }
-    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
-    .twocol .colbox.a h3 { color: #b8860b; }
-    .twocol .colbox.b h3 { color: #1a9e34; }
+    .ioc::before {
+      content: "Spring IoC Container";
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .ioc-beans { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .bean {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 13px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .bean .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .bean .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .ioc-inject { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
 
     /* Before / after split */
     .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
@@ -308,11 +361,41 @@
     .ba-col li { font-size: 14.5px; margin: 5px 0; }
     .ba-mid { font-size: 30px; color: var(--mac-accent); }
 
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 150px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #0a84ff; }
+    .stack-row.l2 { border-left-color: #5e5ce6; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
     /* Two-panel code comparison */
     .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
     .panel h3 { margin: 0 0 6px; font-size: 16px; }
     .panel.bad h3 { color: var(--tl-red); }
     .panel.good h3 { color: #1a9e34; }
+
+    /* Two-column diagram comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
 
     /* Annotation unpack */
     .anno-map { display: grid; gap: 10px; margin-top: 14px; }
@@ -326,7 +409,6 @@
       border-radius: 8px;
       text-align: center;
     }
-
     /* Annotation grid (preview + recap) */
     .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
     .anno-cell {
@@ -343,12 +425,31 @@
     .anno-grid.preview { grid-template-columns: repeat(2, 1fr); }
     .anno-grid.preview .anno-cell { text-align: center; align-items: center; }
 
-    /* JSON / log color coding */
+    /* Status code badges */
+    .status-list { display: grid; gap: 12px; margin-top: 16px; }
+    .status-row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; align-items: center; }
+    .status-badge {
+      font-family: var(--mac-mono);
+      font-weight: 700;
+      font-size: 17px;
+      padding: 10px 8px;
+      border-radius: 8px;
+      text-align: center;
+      color: #fff;
+    }
+    .status-badge.s2 { background: #28c840; }
+    .status-badge.s4 { background: #ff9f0a; }
+    .status-badge.s5 { background: var(--tl-red); }
+    .status-row .sd { font-size: 16px; }
+    .status-row .sd strong { color: var(--mac-text); }
+
+    /* JSON color coding */
     .json-key { color: #8fd3ff; }
     .json-str { color: #a6e22e; }
     .json-num { color: #fd9353; }
     .json-bool { color: #ff6188; }
     .json-punc { color: #f8f8f2; }
+    .code-comment { color: #6b7089; }
 
     /* Flash cards (recap) */
     .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
@@ -375,6 +476,55 @@
     }
     .flash.revealed .a { display: block; }
     .flash.revealed .tap { display: none; }
+
+    /* Swagger UI mockup */
+    .swagger-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .swagger-mock .sm-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .swagger-mock .sm-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-bottom: 1px solid var(--mac-border);
+    }
+    .swagger-mock .verb {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px; min-width: 64px; text-align: center;
+    }
+    .verb.get { background: #61affe; }
+    .verb.post { background: #49cc90; }
+    .verb.put { background: #fca130; }
+    .verb.del { background: #f93e3e; }
+    .swagger-mock .path { font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Error-response mockup */
+    .err-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .err-mock .em-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .err-mock .em-status { font-family: var(--mac-mono); }
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s5 { background: #f93e3e; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s2 { background: #49cc90; }
 
     /* Step chips (numbered horizontal steps) */
     .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
@@ -433,6 +583,32 @@
     .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
     .dash-mock td.up { color: #1a9e34; font-weight: 600; }
     .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+    .port {
+      display: inline-block;
+      background: rgba(94,92,230,0.12);
+      color: #5e5ce6;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+    .tree .hl { color: #1a9e34; font-weight: 700; }
 
     /* Code blocks */
     .slide pre {
@@ -450,8 +626,9 @@
       line-height: 1.5;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
-    .code-comment { color: #6b7089; }
 
     .checklist { list-style: none; padding: 0; margin-top: 12px; }
     .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
@@ -473,16 +650,6 @@
       padding: 2px 8px;
       font-family: var(--mac-mono);
       font-size: 14px;
-    }
-    .port {
-      display: inline-block;
-      background: rgba(94,92,230,0.12);
-      color: #5e5ce6;
-      border-radius: 6px;
-      padding: 2px 8px;
-      font-family: var(--mac-mono);
-      font-size: 13px;
-      font-weight: 700;
     }
 
     /* Navigation controls */
@@ -551,10 +718,10 @@
         <!-- 1. COVER -->
         <section class="slide active">
           <div class="cover">
-            <span class="badge">Session 4 of the Spring Boot Series · Final Session</span>
-            <h1>Spring Boot</h1>
-            <div class="sub">Microservices with Spring Cloud — Service Registry, API Gateway &amp; Load Balancing, built live.</div>
-            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+            <span class="badge">Session 4 of 4 · Spring Boot Series</span>
+            <h1>Microservices</h1>
+            <div class="sub">Many small services, finding each other automatically, behind one front door — with Spring Cloud.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
           </div>
         </section>
 
@@ -562,553 +729,804 @@
         <section class="slide">
           <p class="eyebrow">What we'll cover today</p>
           <h2>Agenda</h2>
-          <p class="lead">Session 3 ended with the <em>idea</em> of microservices. Today we build the <strong>infrastructure that runs them</strong>. By the end you'll have four Spring Boot apps running at once — a registry, two microservices, and a gateway — talking to each other and load-balancing traffic. This is the most infrastructure-heavy session, so the theory is front-loaded and every concept maps to something you'll build in the next 45 minutes.</p>
+          <p class="lead">Sessions 1–3 taught you to build <em>one</em> good service. Today: what changes when you have several, and the tools that keep it manageable.</p>
           <ul class="agenda">
-            <li><span class="num">1</span> Monolith vs Microservices — a 60-second anchor</li>
-            <li><span class="num">2</span> The 5 microservices design patterns</li>
-            <li><span class="num">3</span> Spring Cloud — the toolbox that implements them</li>
-            <li><span class="num">4</span> The full architecture flow — the mental model for today</li>
-            <li><span class="num">5</span> Eureka Server + Client — the service registry</li>
-            <li><span class="num">6</span> API Gateway — routing &amp; round-robin load balancing</li>
+            <li><span class="num">1</span> Recap, and why one big application eventually hurts</li>
+            <li><span class="num">2</span> Monolith vs microservices — and the honest trade-off</li>
+            <li><span class="num">3</span> The new problems you inherit by splitting up</li>
+            <li><span class="num">4</span> The five core microservices patterns</li>
+            <li><span class="num">5</span> Service registry (Eureka) — how services find each other</li>
+            <li><span class="num">6</span> API Gateway — one front door for everything</li>
+            <li><span class="num">7</span> Load balancing, live: three copies of one service</li>
+            <li><span class="num">8</span> Resilience: circuit breakers, tracing, config server</li>
+            <li><span class="num">9</span> The full journey, and where to go next</li>
           </ul>
           <div class="note">
-            <span class="lbl">How to use these slides</span>
-            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic. Keep <strong>slide 14 — the architecture flow</strong> in mind throughout the lab; it's the map for everything we build. By the end you'll be able to explain how a request travels from a client, through a gateway, to the right service instance — and build that path yourself.
+            <span class="lbl">Today's lab is different — plan for it</span>
+            Instead of one project you'll run <strong>four Spring Boot applications at once</strong>, then six. Each one is small — smaller than what you built in Session 3 — but you'll be managing several terminals or IDE run configurations. Make sure you have a few gigabytes of RAM free.
           </div>
         </section>
 
-        <!-- 3. SESSION 3 RECAP (flash cards) -->
+        <!-- 3. SESSION 3 RECAP -->
         <section class="slide">
-          <p class="eyebrow">Before we start something new</p>
+          <p class="eyebrow">Before we move on</p>
           <h2>Session 3 recap</h2>
-          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
-          <div class="flashwrap">
-            <div class="flash">
-              <div class="q">Q1 · What is a DTO and why use it? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">A <strong>Data Transfer Object</strong> — a plain Java class that carries only the data the client needs. We use it to <strong>hide sensitive fields</strong> (security), <strong>shape responses</strong> (flexibility), and <strong>decouple</strong> the API contract from the database schema. The Entity maps to the DB; the DTO travels over the wire.</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q2 · What does <code>@ResponseStatus</code> do on a custom exception? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">It tells Spring which <strong>HTTP status code</strong> to return when that exception is thrown. Putting <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> on <code>ResourceNotFoundException</code> makes Spring respond with a clean <strong>404</strong> automatically — no try/catch needed.</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q3 · What does Spring Security do the moment its dependency is added? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">It <strong>locks down every endpoint</strong> with sensible defaults: a login page appears, a random password is printed in the console, and the default username is <code>user</code> — all before you write a single line of security code.</div>
-            </div>
-          </div>
-        </section>
-
-        <!-- 4. MONOLITH vs MICROSERVICES REVISIT -->
-        <section class="slide">
-          <p class="eyebrow">A 60-second anchor</p>
-          <h2>Monolith vs Microservices — revisited</h2>
-          <p class="deep">Last session we discussed <em>why</em> microservices exist. Today we build the infrastructure <strong>that runs them</strong>. Quick reminder of the contrast before we dive in:</p>
-          <div class="twocol">
-            <div class="colbox a">
-              <h3>🧱 Monolith</h3>
-              <ul>
-                <li><strong>One deployable unit</strong> — everything ships together.</li>
-                <li><strong>One shared database.</strong></li>
-                <li><strong>One failure = full outage</strong> — no isolation.</li>
-                <li>Scale it = duplicate the <em>whole</em> app.</li>
-              </ul>
-            </div>
-            <div class="colbox b">
-              <h3>🧩 Microservices</h3>
-              <ul>
-                <li><strong>Independent services</strong>, deployed separately.</li>
-                <li><strong>A database per service.</strong></li>
-                <li><strong>Failure isolation</strong> — one down, others up.</li>
-                <li>Scale only the service that needs it.</li>
-              </ul>
-            </div>
+          <div class="cards">
+            <div class="card"><div class="ic">🗄️</div><h3>Real persistence</h3><p><code>@Entity</code> maps a class to a table; <code>JpaRepository</code> gives full CRUD from an empty interface.</p></div>
+            <div class="card"><div class="ic">🏗️</div><h3>Four clean layers</h3><p>Controller → Service → Repository → Database, each with one responsibility.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>DTOs at the boundary</h3><p>Entities never leave the service layer; DTOs define the public contract.</p></div>
+            <div class="card"><div class="ic">🚨</div><h3>Global error handling</h3><p><code>@RestControllerAdvice</code> turns exceptions into clean status codes, once, for every controller.</p></div>
           </div>
           <div class="keybox">
-            <span class="lbl">Today's framing</span>
-            Microservices give you independence and scalability — but they introduce a new question: <strong>how do all these separate, independently-deployed services find and talk to each other?</strong> That's the problem the rest of this session solves.
+            <span class="lbl">The two ideas from Session 3 that today depends on</span>
+            <strong>One: shared state lives in a database, not in memory.</strong> That's what lets several copies of a service agree with each other. <strong>Two: services are stateless.</strong> That's what lets a load balancer send any request to any copy. Today we finally cash in on both.
           </div>
         </section>
 
-        <!-- 5. SCALING REVISIT -->
+        <!-- 4. WHY MONOLITH HURTS -->
         <section class="slide">
-          <p class="eyebrow">Why the next patterns exist</p>
-          <h2>Horizontal vs vertical scaling — revisited</h2>
-          <div class="twocol">
-            <div class="colbox a">
-              <h3>⬆️ Vertical (scale up)</h3>
-              <p style="font-size:15px; text-align:center;">One machine, more RAM/CPU. Simple, but has a hard ceiling and gets expensive.</p>
-            </div>
-            <div class="colbox b">
-              <h3>➡️ Horizontal (scale out)</h3>
-              <p style="font-size:15px; text-align:center;">More machines running the same service. No real ceiling, cost-effective, fault-tolerant.</p>
-            </div>
-          </div>
-          <div class="warnbox">
-            <span class="lbl">Here's the catch — and it sets up the whole session</span>
-            <strong>Horizontal scaling means you'll have MULTIPLE INSTANCES of the same service</strong> (e.g. Student MS on ports 8080, 8082, 8083). That creates two brand-new problems:
-            <ul style="margin:8px 0 0;">
-              <li><strong>How does the client know all the addresses?</strong> Instances come and go on dynamic ports.</li>
-              <li><strong>How does traffic get distributed evenly</strong> across them?</li>
-            </ul>
-            These two problems are solved by the next two patterns: a <span class="term">Service Registry</span> and an <span class="term">API Gateway</span>.
-          </div>
-        </section>
-
-        <!-- 6. THE 5 DESIGN PATTERNS -->
-        <section class="slide">
-          <p class="eyebrow">The vocabulary of microservices</p>
-          <h2>The 5 microservices design patterns</h2>
-          <p class="deep">Five patterns come up in every real microservices system. Each solves one specific pain. We'll <strong>build the first two today</strong> (Registry + Gateway) and cover the other three conceptually — you'll meet all of them in industry projects.</p>
-          <div class="cards c5">
-            <div class="card tight">
-              <div class="ic">⚙️</div>
-              <h3>Config Server</h3>
-              <span class="prob">✗ 10 services, 10 properties files</span>
-              <span class="sol">✓ one central Git-backed config</span>
-            </div>
-            <div class="card tight">
-              <div class="ic">📇</div>
-              <h3>Service Registry</h3>
-              <span class="prob">✗ dynamic ports, can't hardcode</span>
-              <span class="sol">✓ a live catalog of what's running</span>
-            </div>
-            <div class="card tight">
-              <div class="ic">🚪</div>
-              <h3>API Gateway</h3>
-              <span class="prob">✗ clients shouldn't know internal URLs</span>
-              <span class="sol">✓ one single entry point</span>
-            </div>
-            <div class="card tight">
-              <div class="ic">🔍</div>
-              <h3>Distributed Tracing</h3>
-              <span class="prob">✗ request spans 5 services, what's slow?</span>
-              <span class="sol">✓ end-to-end request tracking</span>
-            </div>
-            <div class="card tight">
-              <div class="ic">🔌</div>
-              <h3>Circuit Breaker</h3>
-              <span class="prob">✗ Service B down, A keeps calling</span>
-              <span class="sol">✓ detect, stop, return fallback</span>
-            </div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">Today's scope</span>
-            <strong>Build:</strong> Service Registry (Eureka) + API Gateway (Spring Cloud Gateway). <strong>Concept-only:</strong> Config Server, Distributed Tracing, Circuit Breaker. Knowing they exist — and what problem each solves — is what matters today.
-          </div>
-        </section>
-
-        <!-- 7. CONFIG SERVER -->
-        <section class="slide">
-          <p class="eyebrow">Pattern 1 of 5 — concept only</p>
-          <h2>Config Server</h2>
-          <p class="deep">Imagine 10 microservices, each with its own <code>application.properties</code>. You need to change the database URL — now you're editing 10 files and redeploying 10 services. The <strong>Config Server</strong> fixes this: every service pulls its configuration from one <strong>central, Git-backed</strong> source at startup.</p>
-          <div class="flow vert" style="max-width:560px; margin:18px auto;">
-            <div class="flow-box amber" style="min-width:300px;">Git Repository <span class="sm">all config files, version-controlled</span></div>
-            <span class="flow-arrow">▼ served by</span>
-            <div class="flow-box alt" style="min-width:300px;">Spring Cloud Config Server</div>
-            <span class="flow-arrow">▼ services read from it at startup</span>
-            <div class="flow" style="justify-content:center; margin-top:0;">
-              <div class="flow-box green">Service A</div>
-              <div class="flow-box green">Service B</div>
-              <div class="flow-box green">Service C</div>
-            </div>
-          </div>
-          <div class="note">
-            <span class="lbl">When you'll use it</span>
-            When you have <strong>environment-specific configs</strong> (dev / test / prod) across many services, and want a single, audited place to manage them. Change one property in Git, and services can refresh without a redeploy. <strong>Not building this today</strong> — but you'll encounter it in real projects.
-          </div>
-        </section>
-
-        <!-- 8. SERVICE REGISTRY (EUREKA) -->
-        <section class="slide">
-          <p class="eyebrow">Pattern 2 of 5 — building this today</p>
-          <h2>Service Registry (Eureka) — how it works</h2>
-          <p class="deep">A <strong>Service Registry</strong> is a live phonebook of every running service: its name, address, and port. <strong>Netflix Eureka</strong> is the registry we'll use. Services register themselves on startup and prove they're alive with a <strong>heartbeat</strong>. Here's the flow:</p>
-          <div class="steps4">
-            <div class="step-chip">
-              <div class="stepnum">1</div>
-              <h3>Eureka starts</h3>
-              <p>The registry boots on port <span class="port">8761</span> — the phonebook itself, empty at first.</p>
-            </div>
-            <div class="step-chip">
-              <div class="stepnum">2</div>
-              <h3>Student MS registers</h3>
-              <p>On startup it tells Eureka "I'm <code>STUDENT-MS</code> at port 8080" and sends a heartbeat every ~30s.</p>
-            </div>
-            <div class="step-chip">
-              <div class="stepnum">3</div>
-              <h3>Customer MS registers</h3>
-              <p>Same thing — <code>CUSTOMER-MS</code> joins the registry. Now Eureka knows both.</p>
-            </div>
-            <div class="step-chip">
-              <div class="stepnum">4</div>
-              <h3>Gateway asks Eureka</h3>
-              <p>"Where is <code>STUDENT-MS</code>?" → Eureka returns the live list of instances.</p>
-            </div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">The heartbeat — self-healing built in</span>
-            Registered services <strong>ping Eureka regularly</strong>. If a service crashes and the heartbeats stop, Eureka <strong>removes it from the registry</strong> after a grace period — so the gateway stops routing traffic to a dead instance, automatically. No manual cleanup, no config change.
-          </div>
-        </section>
-
-        <!-- 9. API GATEWAY -->
-        <section class="slide">
-          <p class="eyebrow">Pattern 3 of 5 — building this today</p>
-          <h2>API Gateway — what it does</h2>
-          <p class="deep">The <strong>API Gateway</strong> is the single front door to your whole system. Clients talk to one URL; the gateway figures out the rest. It has three core jobs:</p>
-          <div class="cards c3">
-            <div class="card"><div class="ic">🧭</div><h3>Routing</h3><p>Forward <code>/students-api/**</code> to Student MS and <code>/customers-api/**</code> to Customer MS, based on the URL.</p></div>
-            <div class="card"><div class="ic">⚖️</div><h3>Load Balancing</h3><p>Spread traffic across multiple instances of a service (8080, 8082, 8083) so none is overwhelmed.</p></div>
-            <div class="card"><div class="ic">🚪</div><h3>Single Entry Point</h3><p>Clients only ever know <strong>one</strong> URL — the gateway (port <span class="port">9393</span>). Internal services stay hidden.</p></div>
-          </div>
-          <p class="deep" style="margin-top:14px;">A gateway route in <code>application.properties</code> looks like this:</p>
-          <pre><code>spring.cloud.gateway.routes[0].id=student-ms-route
-spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS          <span class="code-comment"># lb = load-balanced via Eureka</span>
-spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**</code></pre>
-          <p class="muted">Secondary capabilities (mention-only today): authentication, rate limiting, request logging — all natural to centralise at the gateway.</p>
-        </section>
-
-        <!-- 10. ROUND ROBIN LOAD BALANCING -->
-        <section class="slide">
-          <p class="eyebrow">How traffic gets spread</p>
-          <h2>Load balancing — Round Robin</h2>
-          <p class="deep">When several instances of a service are running, the gateway needs a rule to pick one per request. The simplest and default rule is <strong>Round Robin</strong>: just cycle through the instances in order, one after another, then loop back to the start.</p>
-          <div style="margin-top:8px;">
-            <div class="rr">
-              <div class="req">Request 1 →</div>
-              <div class="target"><div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div>
-            </div>
-            <div class="rr">
-              <div class="req">Request 2 →</div>
-              <div class="target"><div class="rr-inst">:8080</div><div class="rr-inst hit">:8082 ✓</div><div class="rr-inst">:8083</div></div>
-            </div>
-            <div class="rr">
-              <div class="req">Request 3 →</div>
-              <div class="target"><div class="rr-inst">:8080</div><div class="rr-inst">:8082</div><div class="rr-inst hit">:8083 ✓</div></div>
-            </div>
-            <div class="rr">
-              <div class="req">Request 4 →</div>
-              <div class="target"><div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div>
-            </div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">The magic word: <code>lb://</code></span>
-            The <code>lb://</code> prefix in your gateway route (<code>uri=lb://STUDENT-MS</code>) is what switches this on. <strong>lb</strong> = load balancer. It tells Spring Cloud: don't use a hardcoded address — ask Eureka for all live instances of <code>STUDENT-MS</code> and round-robin across them automatically. You'll watch this happen live in the lab.
-          </div>
-        </section>
-
-        <!-- 11. DISTRIBUTED TRACING -->
-        <section class="slide">
-          <p class="eyebrow">Pattern 4 of 5 — concept only</p>
-          <h2>Distributed Tracing</h2>
-          <p class="deep">When one request hops through five services and the whole thing is slow, <em>which</em> service caused it? <strong>Distributed tracing</strong> answers that. Every request gets a unique <strong>trace ID</strong> that's passed along the chain; each service logs with that ID, and a tool like <strong>Zipkin</strong> stitches them into one timeline.</p>
-          <div class="flow">
-            <div class="flow-box">Client</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">API Gateway</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">Order MS</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">Inventory MS</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">Payment MS</div>
-          </div>
-          <p class="deep" style="margin-top:14px;">Each box adds the <strong>same trace ID</strong> to its logs. Zipkin collects them and shows the full journey with timings:</p>
-          <pre><code><span class="code-comment"># All share traceId=4f9a... Zipkin shows where time went:</span>
-Gateway      ▏ 4ms
-Order MS     ▏▏▏ 40ms
-Inventory MS ▏▏▏▏▏▏▏▏▏▏▏▏ <span class="json-bool">2600ms  &lt;-- the slow one!</span>
-Payment MS   ▏▏ 25ms</code></pre>
-          <div class="note">
-            <span class="lbl">Tooling &amp; scope</span>
-            In the Spring world this is done with <strong>Micrometer Tracing + Zipkin</strong>. Use case: "the request takes 3 seconds — who's responsible?" <strong>Conceptual overview only today</strong>, but it's invaluable the moment you have more than two services.
-          </div>
-        </section>
-
-        <!-- 12. CIRCUIT BREAKER -->
-        <section class="slide">
-          <p class="eyebrow">Pattern 5 of 5 — concept only</p>
-          <h2>Circuit Breaker</h2>
-          <p class="deep">If Service B is down, Service A shouldn't keep hammering it — that wastes resources and can cascade into a system-wide failure. A <strong>circuit breaker</strong> wraps the call and watches for failures, just like an electrical breaker that trips to prevent damage. It has three states:</p>
-          <div class="cb">
-            <div class="cb-state closed">
-              <h3>CLOSED</h3>
-              <p>Normal operation. Requests flow through to Service B. Failures are counted.</p>
-            </div>
-            <div class="cb-state open">
-              <h3>OPEN</h3>
-              <p>Too many failures — the breaker trips. Requests are <strong>rejected instantly</strong> and a fallback is returned. No more hammering.</p>
-            </div>
-            <div class="cb-state half">
-              <h3>HALF-OPEN</h3>
-              <p>After a timeout, let <strong>one</strong> trial request through. If it succeeds → back to CLOSED. If it fails → back to OPEN.</p>
-            </div>
-          </div>
-          <div class="flow" style="justify-content:center;">
-            <div class="flow-box green">CLOSED</div>
-            <span class="flow-arrow">— failures →</span>
-            <div class="flow-box warn">OPEN</div>
-            <span class="flow-arrow">— timeout →</span>
-            <div class="flow-box amber">HALF-OPEN</div>
-            <span class="flow-arrow">— success →</span>
-            <div class="flow-box green">CLOSED</div>
-          </div>
-          <div class="note">
-            <span class="lbl">Analogy &amp; tooling</span>
-            Like a household circuit breaker: it trips to prevent damage, then lets you check if it's safe to resume. In Spring, this is implemented with <strong>Resilience4j</strong>. The fallback might return cached data or a friendly "try again later" instead of an error cascade. <strong>Not building today.</strong>
-          </div>
-        </section>
-
-        <!-- 13. SPRING CLOUD TOOLBOX -->
-        <section class="slide">
-          <p class="eyebrow">From patterns to tools</p>
-          <h2>Spring Cloud — the toolbox</h2>
-          <p class="deep"><strong>Spring Cloud</strong> isn't one library — it's a <em>collection</em> of tools that implement these patterns on top of Spring Boot. You pick the pieces you need. Here's how each pattern maps to its Spring Cloud implementation:</p>
+          <p class="eyebrow">Motivation</p>
+          <h2>Where one big application starts hurting</h2>
+          <p class="deep">Everything you've built is a <span class="term">monolith</span>: one application, one deployable JAR, one database. For most projects that is genuinely the right choice. But picture a shopping site three years in, with 40 developers and one codebase:</p>
           <table class="cmp">
-            <thead>
-              <tr><th>Design Pattern</th><th class="hl">Spring Cloud Tool</th><th>Today?</th></tr>
-            </thead>
+            <thead><tr><th>Situation</th><th>What actually happens</th></tr></thead>
             <tbody>
-              <tr><td>Service Registry</td><td class="hl"><strong>Netflix Eureka</strong></td><td class="good">✓ building</td></tr>
-              <tr><td>API Gateway</td><td class="hl"><strong>Spring Cloud Gateway</strong></td><td class="good">✓ building</td></tr>
-              <tr><td>Load Balancing</td><td class="hl">Spring Cloud LoadBalancer</td><td class="good">✓ (via <code>lb://</code>)</td></tr>
-              <tr><td>Config Server</td><td class="hl">Spring Cloud Config</td><td>concept</td></tr>
-              <tr><td>Circuit Breaker</td><td class="hl">Resilience4j</td><td>concept</td></tr>
-              <tr><td>Distributed Tracing</td><td class="hl">Micrometer + Zipkin</td><td>concept</td></tr>
+              <tr><td>A one-line typo fix in Invoicing</td><td class="bad">Rebuild, retest and redeploy the <strong>entire application</strong> — including Search, Payments and Login.</td></tr>
+              <tr><td>A memory leak in the PDF-report module</td><td class="bad">The whole process runs out of memory. <strong>Customers can't even browse products.</strong></td></tr>
+              <tr><td>Search takes 1000 requests/sec, Invoicing takes 10/day</td><td class="bad">To scale Search you must run more copies of <em>everything</em> — paying for idle Invoicing modules.</td></tr>
+              <tr><td>The team wants Python for a recommendation engine</td><td class="bad">Impossible. It's one Java codebase, on one framework version.</td></tr>
+              <tr><td>40 developers, one repository</td><td class="bad">Constant merge conflicts, and a release train everyone must wait for.</td></tr>
             </tbody>
           </table>
           <div class="keybox">
-            <span class="lbl">The point</span>
-            You don't use every tool in every project — you assemble the toolbox your system needs. <strong>Today: Eureka + Gateway + LoadBalancer.</strong> That trio alone is a genuine, production-shaped microservices skeleton.
+            <span class="lbl">Notice the common thread</span>
+            None of these are problems with the <em>code</em>. They're problems with <strong>everything being welded together</strong>: one deployment unit, one process, one language, one release schedule. Microservices attack the welding — not the code.
           </div>
         </section>
 
-        <!-- 14. FULL ARCHITECTURE FLOW -->
+        <!-- 5. MONOLITH VS MICROSERVICES -->
         <section class="slide">
-          <p class="eyebrow">The mental model for the whole session — keep this in mind</p>
-          <h2>Full architecture flow</h2>
-          <p class="deep">This is the centrepiece. Trace a single request through the system, top to bottom. We'll refer back to this diagram throughout the hands-on labs.</p>
-          <div class="flow vert" style="max-width:680px; margin:14px auto;">
-            <div class="flow-box">① React Client / Postman <span class="sm">knows only ONE URL</span></div>
-            <span class="flow-arrow">▼ &nbsp; request to <code>:9393/students-api/...</code></span>
-            <div class="flow-box alt" style="min-width:340px;">② API Gateway <span class="port">:9393</span> <span class="sm">Spring Cloud Gateway — the single entry point</span></div>
-            <span class="flow-arrow">▼ &nbsp; "where is STUDENT-MS?" &nbsp; ▲ list of instances</span>
-            <div class="flow-box amber" style="min-width:340px;">③ Eureka Server <span class="port">:8761</span> <span class="sm">the registry — gateway queries it to find live services</span></div>
-            <span class="flow-arrow">▼ &nbsp; gateway routes via Round Robin</span>
-            <div class="flow" style="justify-content:center; margin-top:0;">
-              <div class="flow-box green">Student MS <span class="port">:8080</span></div>
-              <div class="flow-box green">Student MS <span class="port">:8082</span></div>
-              <div class="flow-box green">Student MS <span class="port">:8083</span></div>
-              <div class="flow-box">Customer MS <span class="port">:8081</span></div>
+          <p class="eyebrow">The two architectures</p>
+          <h2>Monolith vs microservices</h2>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Monolith — one unit</h3>
+              <ul>
+                <li>One JAR with everything inside</li>
+                <li>Users + Products + Orders + Payments</li>
+                <li>One shared database</li>
+                <li>Deploy all of it, or none of it</li>
+                <li>Scale all of it, or none of it</li>
+                <li>One language, one framework version</li>
+                <li>One crash takes everything down</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>Microservices — many units</h3>
+              <ul>
+                <li>User Service · own DB · own deploy</li>
+                <li>Product Service · own DB · own deploy</li>
+                <li>Order Service · own DB · own deploy</li>
+                <li>Payment Service · own DB · own deploy</li>
+                <li>Release and scale each independently</li>
+                <li>Each may pick its own stack</li>
+                <li>One crash affects one capability</li>
+              </ul>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th></th><th>Monolith</th><th>Microservices</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Deployment</strong></td><td>One unit — simple</td><td class="good">Independent per service</td></tr>
+              <tr><td><strong>Scaling</strong></td><td class="bad">All-or-nothing</td><td class="good">Targeted where it's needed</td></tr>
+              <tr><td><strong>Fault isolation</strong></td><td class="bad">One failure can sink everything</td><td class="good">Failures stay contained</td></tr>
+              <tr><td><strong>Technology choice</strong></td><td class="bad">Locked in</td><td class="good">Free per service</td></tr>
+              <tr><td><strong>Local development</strong></td><td class="good">Run one app — easy</td><td class="bad">Run many apps — harder</td></tr>
+              <tr><td><strong>Debugging a request</strong></td><td class="good">One stack trace</td><td class="bad">Spans several services</td></tr>
+              <tr><td><strong>Transactions</strong></td><td class="good">Straightforward</td><td class="bad">Genuinely hard (distributed)</td></tr>
+              <tr><td><strong>Operational overhead</strong></td><td class="good">Low</td><td class="bad">Substantial</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 6. THE HONEST TRADEOFF -->
+        <section class="slide">
+          <p class="eyebrow">⚠️ Read this before you fall in love with microservices</p>
+          <h2>What splitting up actually costs you</h2>
+          <p class="deep">Look at that table again. Microservices win the top four rows and <strong>lose the bottom four</strong>. That is not an accident — it's the fundamental trade:</p>
+          <div class="keybox" style="font-size:19px;">
+            <span class="lbl">The trade-off, in one sentence</span>
+            Microservices don't <em>remove</em> complexity. They <strong>move</strong> it out of your code and into the <em>spaces between</em> your services.
+          </div>
+          <p class="deep">Here is what appears in those spaces — every one of them a problem you simply did not have last week:</p>
+          <table class="cmp">
+            <thead><tr><th>New problem</th><th>In a monolith it was…</th><th>Now it is…</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Finding another component</strong></td><td>A method call. Guaranteed to work.</td><td class="bad">A network call to an address that may have changed.</td></tr>
+              <tr><td><strong>Failure</strong></td><td>An exception you catch.</td><td class="bad">A timeout, a retry storm, or a cascading outage.</td></tr>
+              <tr><td><strong>Debugging one request</strong></td><td>One stack trace.</td><td class="bad">Five services, five log files, no shared thread.</td></tr>
+              <tr><td><strong>A multi-step operation</strong></td><td>One <code>@Transactional</code> method.</td><td class="bad">A distributed saga with compensating actions.</td></tr>
+              <tr><td><strong>Configuration</strong></td><td>One properties file.</td><td class="bad">Twelve services × three environments.</td></tr>
+              <tr><td><strong>Running it locally</strong></td><td>Click Run.</td><td class="bad">Start eight applications in the right order.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The advice every experienced engineer gives</span>
+            <strong>Start with a monolith. Split it when the pain is real</strong> — when deployments genuinely block each other, or one component genuinely needs different scaling. Teams that begin with microservices because they sound modern usually end up with a "distributed monolith": all the operational cost, none of the independence. <strong>Everything in today's session exists to manage costs you should only take on deliberately.</strong>
+          </div>
+        </section>
+
+        <!-- 7. SCALING REVISITED -->
+        <section class="slide">
+          <p class="eyebrow">The pay-off · 1 of 2</p>
+          <h2>Horizontal vs vertical scaling</h2>
+          <p class="deep">The main reason to accept those costs is <strong>scaling</strong>. There are two ways to handle more load:</p>
+          <div class="twocol">
+            <div class="colbox a">
+              <h3>⬆️ Vertical — a bigger machine</h3>
+              <p>More CPU and RAM in the <em>one</em> server. 4 cores → 32 cores.</p>
+              <ul style="text-align:left; font-size:15px;">
+                <li>✅ No code changes at all</li>
+                <li>❌ There's always a physical ceiling</li>
+                <li>❌ Cost rises steeply, not linearly</li>
+                <li>❌ Usually needs downtime to resize</li>
+                <li>❌ Still a <strong>single point of failure</strong></li>
+              </ul>
+            </div>
+            <div class="colbox b">
+              <h3>➡️ Horizontal — more machines</h3>
+              <p>More <em>copies</em> of the app behind a load balancer. 1 → 10 instances.</p>
+              <ul style="text-align:left; font-size:15px;">
+                <li>✅ Effectively unlimited</li>
+                <li>✅ Cost scales linearly</li>
+                <li>✅ Add or remove copies with no downtime</li>
+                <li>✅ <strong>No single point of failure</strong></li>
+                <li>⚠️ Requires the app to be <strong>stateless</strong></li>
+              </ul>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">Read it as a sentence</span>
-            The client hits the <strong>gateway</strong> → the gateway asks <strong>Eureka</strong> which instances of the service are alive → Eureka returns the list → the gateway picks one via <strong>round robin</strong> and forwards the request → the response travels back to the client. The client never knew there were three Student MS instances.
+            <span class="lbl">Why that warning is the thread running through this whole course</span>
+            Horizontal scaling only works if <strong>any copy can serve any request</strong> — the REST <em>stateless</em> constraint from Session 2. And the copies must all see the same data, which is why Session 3 moved storage into a <strong>shared database</strong>. In today's lab you'll run <strong>three instances of one service</strong> and watch requests distributed between them. That's only possible because of those two earlier decisions.
           </div>
         </section>
 
-        <!-- 15. WHAT WE'RE BUILDING — PROJECT MAP -->
+        <!-- 8. LOAD BALANCING -->
         <section class="slide">
-          <p class="eyebrow">Your build checklist, visualised</p>
-          <h2>What we're building today</h2>
-          <p class="deep">Four independent Spring Boot projects, each with one key dependency and (where needed) one key annotation. This is the map for the entire lab:</p>
-          <div class="cards c4">
-            <div class="card">
-              <div class="ic">📇</div>
-              <h3>Eureka Server</h3>
-              <p><span class="port">:8761</span></p>
-              <p style="margin-top:6px;"><strong>Dep:</strong> Eureka Server<br><strong>Annotation:</strong> <code>@EnableEurekaServer</code></p>
-            </div>
-            <div class="card">
-              <div class="ic">🎓</div>
-              <h3>Student MS</h3>
-              <p><span class="port">:8080 / :8082 / :8083</span></p>
-              <p style="margin-top:6px;"><strong>Dep:</strong> Web + Eureka Client<br><strong>Name:</strong> <code>STUDENT-MS</code></p>
-            </div>
-            <div class="card">
-              <div class="ic">🛍️</div>
-              <h3>Customer MS</h3>
-              <p><span class="port">:8081</span></p>
-              <p style="margin-top:6px;"><strong>Dep:</strong> Web + Eureka Client<br><strong>Name:</strong> <code>CUSTOMER-MS</code></p>
-            </div>
-            <div class="card">
-              <div class="ic">🚪</div>
-              <h3>API Gateway</h3>
-              <p><span class="port">:9393</span></p>
-              <p style="margin-top:6px;"><strong>Dep:</strong> Gateway + Eureka Client<br><strong>Config:</strong> routes only</p>
+          <p class="eyebrow">The pay-off · 2 of 2</p>
+          <h2>Load balancing &amp; high availability</h2>
+          <p class="deep">Ten copies of a service raise an obvious question: <strong>which copy gets each request?</strong> A <span class="term">load balancer</span> decides.</p>
+          <div class="flow">
+            <div class="flow-box green">Clients</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Load Balancer</div>
+            <span class="flow-arrow">→</span>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="flow-box">Instance 1 <span class="sm">:8080</span></div>
+              <div class="flow-box">Instance 2 <span class="sm">:8082</span></div>
+              <div class="flow-box">Instance 3 <span class="sm">:8083</span></div>
             </div>
           </div>
-          <div class="warnbox">
-            <span class="lbl">Heads-up before we code</span>
-            You'll run <strong>four (then six) JVMs at once</strong>. That needs a bit of RAM — if your machine struggles, it's fine to stop the extra Student MS instances after you've seen them register. The lab sheet has the exact ports and steps.
+          <p class="deep" style="margin-top:18px;">It does two jobs simultaneously:</p>
+          <table class="cmp">
+            <thead><tr><th>Job</th><th>How</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Distribute load</strong></td><td>Spread requests so no instance is overwhelmed. The simplest strategy is <strong>round robin</strong>: take each in turn, then start again.</td></tr>
+              <tr><td><strong>Provide high availability</strong></td><td><strong>Health checks.</strong> It asks each instance "are you alive?" — this is exactly what <code>/actuator/health</code> from Session 1 is for. An instance that stops answering is removed from rotation, and users never notice.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">High availability, defined</span>
+            <span class="term">High availability</span> means <strong>no single failure takes the system down</strong>. One instance = one crash is a total outage. Three instances plus health checks = one crash means reduced capacity, but the service stays up. In the lab you'll kill an instance mid-test and watch traffic carry on.
           </div>
         </section>
 
-        <!-- 16. EUREKA SERVER SETUP -->
+        <!-- 9. ROUND ROBIN -->
         <section class="slide">
-          <p class="eyebrow">Config that matters — the registry</p>
-          <h2>Eureka Server setup — key config</h2>
-          <p class="deep">The Eureka Server is almost all configuration. One annotation on the main class, four lines of properties:</p>
-          <pre><code>@SpringBootApplication
-@EnableEurekaServer                 <span class="code-comment">// &lt;-- turns this app INTO the registry</span>
-public class EurekaServerApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(EurekaServerApplication.class, args);
+          <p class="eyebrow">How balancing works</p>
+          <h2>Round robin, step by step</h2>
+          <p class="deep">The default strategy in Spring Cloud, and the one you'll observe live. Six identical requests, distributed in turn:</p>
+          <div class="rr"><div class="req">Request 1 →</div><div class="target">
+            <div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div></div>
+          <div class="rr"><div class="req">Request 2 →</div><div class="target">
+            <div class="rr-inst">:8080</div><div class="rr-inst hit">:8082 ✓</div><div class="rr-inst">:8083</div></div></div>
+          <div class="rr"><div class="req">Request 3 →</div><div class="target">
+            <div class="rr-inst">:8080</div><div class="rr-inst">:8082</div><div class="rr-inst hit">:8083 ✓</div></div></div>
+          <div class="rr"><div class="req">Request 4 →</div><div class="target">
+            <div class="rr-inst hit">:8080 ✓</div><div class="rr-inst">:8082</div><div class="rr-inst">:8083</div></div></div>
+          <div class="rr"><div class="req">Request 5 →</div><div class="target">
+            <div class="rr-inst">:8080</div><div class="rr-inst hit">:8082 ✓</div><div class="rr-inst">:8083</div></div></div>
+          <div class="rr"><div class="req">Request 6 →</div><div class="target">
+            <div class="rr-inst">:8080</div><div class="rr-inst">:8082</div><div class="rr-inst hit">:8083 ✓</div></div></div>
+          <div class="keybox">
+            <span class="lbl">How you'll actually see this in the lab</span>
+            Each instance will return the port it's running on. Call the same gateway URL six times and the response cycles <code>8080 → 8082 → 8083 → 8080 …</code>. That visible cycle <em>is</em> load balancing, and it's the most satisfying moment of the session.
+          </div>
+          <div class="note">
+            <span class="lbl">Other strategies exist</span>
+            <strong>Least connections</strong> (send to the least busy), <strong>weighted</strong> (bigger machines get more), <strong>IP hash</strong> (the same client always reaches the same instance). Round robin is the default because it's simple and works well when instances are identical and the service is stateless.
+          </div>
+        </section>
+
+        <!-- 10. THE FIVE PATTERNS -->
+        <section class="slide">
+          <p class="eyebrow">The toolbox</p>
+          <h2>The five core microservices patterns</h2>
+          <p class="deep">Every one of these exists to solve a problem from the "new problems" table. They aren't optional extras — they're what makes a distributed system workable.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">📖</div><h3>1 · Service Registry</h3><p><strong>Problem:</strong> addresses change constantly. <strong>Solution:</strong> a live phone book services register with. <span class="muted">Eureka</span></p></div>
+            <div class="card"><div class="ic">🚪</div><h3>2 · API Gateway</h3><p><strong>Problem:</strong> clients shouldn't know about ten services. <strong>Solution:</strong> one front door that routes. <span class="muted">Spring Cloud Gateway</span></p></div>
+            <div class="card"><div class="ic">⚙️</div><h3>3 · Config Server</h3><p><strong>Problem:</strong> settings scattered across services. <strong>Solution:</strong> one central, versioned source. <span class="muted">Spring Cloud Config</span></p></div>
+            <div class="card"><div class="ic">🔌</div><h3>4 · Circuit Breaker</h3><p><strong>Problem:</strong> one slow service freezes the rest. <strong>Solution:</strong> fail fast and recover. <span class="muted">Resilience4j</span></p></div>
+            <div class="card"><div class="ic">🔍</div><h3>5 · Distributed Tracing</h3><p><strong>Problem:</strong> one request crosses five services. <strong>Solution:</strong> a shared id through all of them. <span class="muted">Micrometer + Zipkin</span></p></div>
+            <div class="card"><div class="ic">⚖️</div><h3>+ Load Balancing</h3><p><strong>Problem:</strong> which of three copies? <strong>Solution:</strong> distribute, and skip unhealthy ones. <span class="muted">Spring Cloud LoadBalancer</span></p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">What you'll build today</span>
+            In the lab: <strong>Service Registry</strong>, <strong>API Gateway</strong> and <strong>Load Balancing</strong> — the three you cannot manage without. Config Server, Circuit Breaker and Tracing we cover in theory so you recognise them and know what to reach for.
+          </div>
+        </section>
+
+        <!-- 11. THE DISCOVERY PROBLEM -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 1 · the problem</p>
+          <h2>Why hardcoded addresses fail</h2>
+          <p class="deep">Order Service needs data from Product Service. The obvious approach:</p>
+          <pre><code>@Service
+public class OrderService {
+
+    private final RestTemplate restTemplate;
+
+    public Product getProduct(Long id) {
+        <span class="code-comment">// Hardcoded address. Looks fine on your laptop...</span>
+        return restTemplate.getForObject(
+                "http://localhost:8081/api/products/" + id, Product.class);
     }
 }</code></pre>
-          <pre><code>server.port=8761                              <span class="code-comment"># the standard Eureka port — clients expect it</span>
-spring.application.name=eureka-server
-eureka.client.register-with-eureka=false      <span class="code-comment"># the server shouldn't register with itself</span>
-eureka.client.fetch-registry=false            <span class="code-comment"># it doesn't fetch a registry — it IS the registry</span></code></pre>
-          <div class="note">
-            <span class="lbl">Why those two <code>false</code> lines?</span>
-            Eureka components are clients by default. For the <strong>server</strong> we switch both off: it has no reason to register itself in its own phonebook, and no reason to download a registry from elsewhere. Leave these out and you'll see noisy startup errors as it tries to talk to a registry that doesn't exist.
-          </div>
-        </section>
-
-        <!-- 17. EUREKA CLIENT SETUP -->
-        <section class="slide">
-          <p class="eyebrow">Config that matters — a microservice</p>
-          <h2>Eureka Client setup — key config</h2>
-          <p class="deep">Any microservice that wants to join the registry just needs the Eureka Client dependency and three properties. No annotation is required in modern Spring Cloud — it auto-detects the client from the classpath (older versions used <code>@EnableEurekaClient</code>).</p>
-          <pre><code>server.port=8080                                                  <span class="code-comment"># override at runtime for more instances</span>
-spring.application.name=STUDENT-MS                                <span class="code-comment"># the service ID — Gateway routes to THIS name</span>
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/   <span class="code-comment"># where to register</span></code></pre>
+          <p class="deep">It works perfectly — until it doesn't:</p>
+          <table class="cmp">
+            <thead><tr><th>What happens in reality</th><th>Result</th></tr></thead>
+            <tbody>
+              <tr><td>Deployed to a server, so it isn't <code>localhost</code> any more</td><td class="bad">Broken. Edit and redeploy.</td></tr>
+              <tr><td>You scale Product Service to <strong>three</strong> instances</td><td class="bad">Two are ignored entirely. No balancing.</td></tr>
+              <tr><td>An instance crashes and restarts on a different port</td><td class="bad">Broken until someone notices.</td></tr>
+              <tr><td>A cloud platform assigns IPs dynamically</td><td class="bad">You can't know the address in advance.</td></tr>
+              <tr><td>Twelve services all reference each other this way</td><td class="bad">Change one address, redeploy several services.</td></tr>
+            </tbody>
+          </table>
           <div class="keybox">
-            <span class="lbl">The single most important line</span>
-            <code>spring.application.name=STUDENT-MS</code> is <strong>critical</strong>. This exact name is what Eureka lists the service under, and what the Gateway uses to route (<code>lb://STUDENT-MS</code>). Get it wrong or mismatched and the gateway route silently fails to resolve. Convention here: uppercase service IDs.
-          </div>
-          <div class="note">
-            <span class="lbl">Running more instances</span>
-            <code>server.port=8080</code> is just a default. At runtime you override it with a VM argument — <code>-Dserver.port=8082</code> — to start the <em>same</em> service on another port. Each one registers under <code>STUDENT-MS</code>, and Eureka groups them as multiple instances of one service.
+            <span class="lbl">The insight</span>
+            The caller shouldn't ask <em>"what is Product Service's address?"</em> — that answer keeps changing. It should ask <strong>"where is <code>PRODUCT-SERVICE</code> right now?"</strong> and let something else keep track. That something is a <span class="term">service registry</span>.
           </div>
         </section>
 
-        <!-- 18. MANUAL vs DISCOVERY LOCATOR -->
+        <!-- 12. EUREKA -->
         <section class="slide">
-          <p class="eyebrow">Two ways to configure the gateway</p>
-          <h2>API Gateway — manual routes vs discovery locator</h2>
-          <p class="deep">There are two ways to tell the gateway how to route. You'll try both in the lab.</p>
-          <div class="panels">
-            <div class="panel good">
-              <h3>Manual routing</h3>
-              <pre><code>spring.cloud.gateway.routes[0]
-  .id=student-ms-route
-spring.cloud.gateway.routes[0]
-  .uri=lb://STUDENT-MS
-spring.cloud.gateway.routes[0]
-  .predicates[0]=Path=/students-api/**</code></pre>
-              <ul style="font-size:14px; margin-top:8px;">
-                <li>Clean, custom URLs (<code>/students-api/...</code>)</li>
-                <li>More control (filters, rewrites)</li>
-                <li>More config to write per service</li>
-              </ul>
-            </div>
-            <div class="panel good">
-              <h3>Discovery locator</h3>
-              <pre><code>spring.cloud.gateway.discovery
-  .locator.enabled=true
-spring.cloud.gateway.discovery
-  .locator.lower-case-service-id=true</code></pre>
-              <ul style="font-size:14px; margin-top:8px;">
-                <li>One block, auto-routes <em>all</em> Eureka services</li>
-                <li>Zero per-service config</li>
-                <li>Service name appears in URL (<code>/student-ms/...</code>)</li>
-              </ul>
-            </div>
+          <p class="eyebrow">Pattern 1 · the solution</p>
+          <h2>Service Registry — Eureka</h2>
+          <p class="deep"><strong>Eureka</strong> is a service registry: a small Spring Boot application whose entire job is to keep a live list of <em>which services exist</em> and <em>where they currently are</em>.</p>
+          <div class="steps4">
+            <div class="step-chip"><div class="stepnum">1</div><h3>Register</h3><p>On startup each service tells Eureka: "I'm <code>STUDENT-MS</code>, at host X port 8080."</p></div>
+            <div class="step-chip"><div class="stepnum">2</div><h3>Heartbeat</h3><p>Every 30 seconds it says "still alive". Silence for ~90 seconds and Eureka removes it.</p></div>
+            <div class="step-chip"><div class="stepnum">3</div><h3>Discover</h3><p>A caller asks Eureka "where is <code>STUDENT-MS</code>?" and gets back <em>all</em> live addresses.</p></div>
+            <div class="step-chip"><div class="stepnum">4</div><h3>Balance</h3><p>With several addresses returned, the client round-robins between them.</p></div>
           </div>
-          <div class="keybox">
-            <span class="lbl">Which to use</span>
-            <strong>Manual routes</strong> for production-grade, clean public APIs where you control the URL shape. <strong>Discovery locator</strong> for quick prototyping and exploration — zero config, but it exposes internal service names in the URL. The trade-off is <em>URL cleanliness vs zero configuration</em>.
-          </div>
-        </section>
-
-        <!-- 19. RUNNING MULTIPLE INSTANCES -->
-        <section class="slide">
-          <p class="eyebrow">Simulating horizontal scaling locally</p>
-          <h2>Running multiple instances</h2>
-          <p class="deep">To see load balancing, you need more than one instance of Student MS. You don't create new projects — you run the <em>same</em> project again on a different port using a VM argument.</p>
-          <div class="twocol">
-            <div class="colbox">
-              <h3 style="color:var(--mac-accent);">IntelliJ IDEA</h3>
-              <ol style="margin:0; padding-left:18px; font-size:15px;">
-                <li>Run → <strong>Edit Configurations…</strong></li>
-                <li>Copy the Student MS config, rename it "Student MS · 8082"</li>
-                <li>Add VM option: <code>-Dserver.port=8082</code></li>
-                <li>Repeat for 8083, then run both</li>
-              </ol>
-            </div>
-            <div class="colbox">
-              <h3 style="color:var(--mac-accent);">Eclipse / STS</h3>
-              <ol style="margin:0; padding-left:18px; font-size:15px;">
-                <li>Right-click project → Run As → <strong>Maven build…</strong></li>
-                <li>Goals: <code>spring-boot:run</code></li>
-                <li>VM args: <code>-Dserver.port=8082</code></li>
-                <li>Apply → Run; repeat for 8083</li>
-              </ol>
-            </div>
-          </div>
+          <p class="deep" style="margin-top:20px;">The Eureka dashboard is a web page showing exactly this — and you'll have it open all lab:</p>
           <div class="dash-mock">
-            <div class="dm-top">📇 Eureka — localhost:8761 · Instances currently registered</div>
+            <div class="dm-top">🖥️ Eureka &nbsp;·&nbsp; http://localhost:8761</div>
             <table>
-              <thead><tr><th>Application</th><th>Status</th><th>Instances</th></tr></thead>
+              <thead><tr><th>Application</th><th>Availability Zones</th><th>Status</th></tr></thead>
               <tbody>
-                <tr><td class="app">STUDENT-MS</td><td class="up">UP (3)</td><td><code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
-                <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
+                <tr><td class="app">STUDENT-MS</td><td>3</td><td class="up">UP (3) — <code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
+                <tr><td class="app">CUSTOMER-MS</td><td>1</td><td class="up">UP (1) — <code>:8081</code></td></tr>
+                <tr><td class="app">API-GATEWAY</td><td>1</td><td class="up">UP (1) — <code>:9393</code></td></tr>
               </tbody>
             </table>
           </div>
           <div class="keybox">
-            <span class="lbl">What you just did</span>
-            You're <strong>simulating horizontal scaling on one laptop</strong>. In production these would be separate machines or containers — but to Eureka and the gateway, three instances on three ports look exactly like three instances on three servers.
+            <span class="lbl">The name in that first column</span>
+            <code>STUDENT-MS</code> comes from <code>spring.application.name=student-ms</code>, upper-cased by Eureka. That <strong>name</strong> is what callers use instead of an address — <code>lb://STUDENT-MS</code> rather than <code>http://localhost:8080</code>. Nobody ever writes a port again.
           </div>
         </section>
 
-        <!-- 20. THE FULL JOURNEY — SESSIONS 1-4 -->
+        <!-- 13. EUREKA CONFIG -->
         <section class="slide">
-          <p class="eyebrow">Where you started, where you are</p>
-          <h2>The full journey — Sessions 1 to 4</h2>
-          <p class="deep">Look how far this has come. Four sessions, one continuous evolution:</p>
-          <div class="flow vert">
-            <div class="flow-box"><strong>Session 1</strong> — a single Spring Boot app with one controller <span class="sm">"Hello World" endpoint, the basics of the framework</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box"><strong>Session 2</strong> — a full REST API <span class="sm">CRUD endpoints, JSON, HTTP methods &amp; status codes</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box alt"><strong>Session 3</strong> — layered &amp; production-shaped <span class="sm">DTOs, Service/Repository layers, custom exceptions, H2 database</span></div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box green"><strong>Session 4</strong> — a microservices architecture <span class="sm">registry, gateway, multiple instances, load balancing</span></div>
+          <p class="eyebrow">Pattern 1 · the code</p>
+          <h2>Eureka setup — server and client</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>The server — the registry itself</h3>
+              <pre><code>@SpringBootApplication
+@EnableEurekaServer     <span class="code-comment">// ← that's it</span>
+public class EurekaServerApplication {
+    public static void main(String[] a) {
+        SpringApplication.run(
+            EurekaServerApplication.class, a);
+    }
+}</code></pre>
+              <pre><code>server.port=8761
+spring.application.name=eureka-server
+
+<span class="code-comment"># A registry doesn't register with itself</span>
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false</code></pre>
+            </div>
+            <div class="panel">
+              <h3>A client — any normal service</h3>
+              <pre><code>@SpringBootApplication
+<span class="code-comment">// No annotation needed at all!
+// The dependency is enough — Boot
+// auto-configures registration.</span>
+public class StudentMsApplication {
+    public static void main(String[] a) {
+        SpringApplication.run(
+            StudentMsApplication.class, a);
+    }
+}</code></pre>
+              <pre><code>server.port=8080
+spring.application.name=student-ms   <span class="code-comment"># ← the registry name</span>
+
+eureka.client.service-url.defaultZone=\
+  http://localhost:8761/eureka/</code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two things people get wrong</span>
+            <strong>One:</strong> <code>register-with-eureka=false</code> on the <em>server</em> is essential — without it the registry tries to register with itself and floods the log with connection errors. <strong>Two:</strong> <code>spring.application.name</code> is not cosmetic here. It <em>is</em> the identity other services use to find you. Leave it out and your service appears as <code>UNKNOWN</code>.
           </div>
           <div class="keybox">
-            <span class="lbl">The takeaway</span>
-            <strong>You've gone from a Hello World endpoint to a microservices architecture in four sessions.</strong> Every concept built on the last — and what you can build now is a genuine, production-grade microservices skeleton.
+            <span class="lbl">Startup order matters</span>
+            Start <strong>Eureka first</strong>, then the services. A client that starts first will log connection failures — harmless, since it retries, but confusing. Give the registry 20–30 seconds before starting anything else.
           </div>
         </section>
 
-        <!-- 21. WHAT'S NEXT — INDUSTRY ROADMAP -->
+        <!-- 14. API GATEWAY -->
         <section class="slide">
-          <p class="eyebrow">Beyond this course</p>
-          <h2>What's next — the industry roadmap</h2>
-          <p class="deep">What you built today is the skeleton. A real production microservices project layers more on top. Here's where to go next — framed as context, not pressure:</p>
-          <div class="cards c3">
-            <div class="card"><div class="ic">⚙️</div><h3>Config Server</h3><p>Centralised, Git-backed configuration across all services and environments.</p></div>
-            <div class="card"><div class="ic">🔐</div><h3>JWT security</h3><p>Token-based authentication enforced at the gateway and shared across services.</p></div>
-            <div class="card"><div class="ic">🐳</div><h3>Docker</h3><p>Package each service into a container so it runs the same everywhere.</p></div>
-            <div class="card"><div class="ic">☸️</div><h3>Kubernetes</h3><p>Orchestrate, scale and self-heal those containers across a cluster.</p></div>
-            <div class="card"><div class="ic">🔁</div><h3>CI/CD pipelines</h3><p>Automated build, test and deploy for each service independently.</p></div>
-            <div class="card"><div class="ic">🔍</div><h3>Tracing with Zipkin</h3><p>End-to-end visibility into requests crossing many services.</p></div>
+          <p class="eyebrow">Pattern 2</p>
+          <h2>API Gateway — one front door</h2>
+          <p class="deep">With ten services on ten ports, should a mobile app know all ten addresses? Obviously not. An <span class="term">API Gateway</span> is a single entry point that routes each request to the right service behind it.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>❌ Without a gateway</h3>
+              <ul>
+                <li>Client must know 10 addresses</li>
+                <li>Authentication implemented 10 times</li>
+                <li>Rate limiting implemented 10 times</li>
+                <li>CORS configured 10 times</li>
+                <li>Every internal port exposed publicly</li>
+                <li>Move a service → update every client</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✅ With a gateway</h3>
+              <ul>
+                <li>Client knows <strong>one</strong> address</li>
+                <li>Authentication in one place</li>
+                <li>Rate limiting in one place</li>
+                <li>CORS in one place</li>
+                <li>Services stay private</li>
+                <li>Move a service → change one route</li>
+              </ul>
+            </div>
           </div>
-          <p class="muted" style="margin-top:14px;">You now have the foundation every one of these builds on. That's the real win of these four sessions.</p>
+          <p class="deep" style="margin-top:16px;">One public port, several private services:</p>
+          <div class="flow">
+            <div class="flow-box green">Client <span class="sm">knows only :9393</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">API Gateway <span class="sm">:9393</span></div>
+            <span class="flow-arrow">→</span>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="flow-box">Student MS <span class="sm">/api/students/**</span></div>
+              <div class="flow-box">Customer MS <span class="sm">/api/customers/**</span></div>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Gateway responsibility</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Routing</strong></td><td>Match the path, forward to the right service.</td></tr>
+              <tr><td><strong>Load balancing</strong></td><td>Pick one instance when several exist.</td></tr>
+              <tr><td><strong>Cross-cutting concerns</strong></td><td>Auth, rate limits, CORS, request logging — written once.</td></tr>
+              <tr><td><strong>Request shaping</strong></td><td>Add or strip headers and path prefixes on the way through.</td></tr>
+            </tbody>
+          </table>
         </section>
 
-        <!-- 22. CLOSING (cover-style) -->
+        <!-- 15. GATEWAY ROUTES -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 2 · the code</p>
+          <h2>Two ways to configure routes</h2>
+          <p class="deep">You'll do both in the lab, because the contrast makes the value of the registry obvious.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>A · Manual routes — explicit</h3>
+              <pre><code>spring.cloud.gateway.server.webflux
+  .routes[0].id=student-service
+spring.cloud.gateway.server.webflux
+  .routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.server.webflux
+  .routes[0].predicates[0]=Path=/api/students/**</code></pre>
+              <p style="font-size:15px;">✅ Full control — you can rewrite paths, add filters, set order.<br>
+              ❌ A new service means a new block of config.</p>
+            </div>
+            <div class="panel">
+              <h3>B · Discovery locator — automatic</h3>
+              <pre><code>spring.cloud.gateway.server.webflux
+  .discovery.locator.enabled=true
+spring.cloud.gateway.server.webflux
+  .discovery.locator.lower-case-service-id=true</code></pre>
+              <p style="font-size:15px;">✅ <strong>Every</strong> registered service is routable instantly at <code>/{service-name}/**</code>. Zero config per service.<br>
+              ❌ Less control, and it exposes everything by default.</p>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:14px;">The crucial part in option A is <code>lb://STUDENT-MS</code>. The <code>lb://</code> scheme means <em>"ask the registry for this name, then <strong>l</strong>oad <strong>b</strong>alance across whatever instances come back."</em> No host. No port. That one line is where discovery and load balancing meet.</p>
+          <div class="warnbox">
+            <span class="lbl">⚠️ These property names changed recently — check your version</span>
+            In <strong>Spring Cloud 2025.0 and later</strong> the prefix is <code>spring.cloud.gateway.<strong>server.webflux</strong>.*</code> (shown above). In <strong>2024.0 and earlier</strong> it was simply <code>spring.cloud.gateway.*</code>. Both are given side by side in the lab sheet — if your routes are silently ignored, this is almost certainly why.
+          </div>
+        </section>
+
+        <!-- 16. INTER-SERVICE CALLS -->
+        <section class="slide">
+          <p class="eyebrow">Services talking to each other</p>
+          <h2>Calling another service <em>by name</em></h2>
+          <p class="deep">The gateway handles traffic coming <em>in</em>. But services often need to call each other directly — and thanks to the registry, they can do it by name instead of address.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>Option 1 · <code>@LoadBalanced RestTemplate</code></h3>
+              <pre><code>@Configuration
+public class AppConfig {
+    @Bean
+    @LoadBalanced          <span class="code-comment">// ← the magic</span>
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}</code></pre>
+              <pre><code><span class="code-comment">// "STUDENT-MS" is a REGISTRY NAME,
+// not a hostname. Spring resolves it
+// and balances across instances.</span>
+Student s = restTemplate.getForObject(
+    "http://STUDENT-MS/api/students/" + id,
+    Student.class);</code></pre>
+            </div>
+            <div class="panel">
+              <h3>Option 2 · OpenFeign — declarative</h3>
+              <pre><code>@FeignClient(name = "STUDENT-MS")
+public interface StudentClient {
+
+    @GetMapping("/api/students/{id}")
+    Student getStudent(@PathVariable Long id);
+}
+<span class="code-comment">// No implementation — Spring generates
+// it, exactly like a JpaRepository.
+// Then just inject and call it.</span></code></pre>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice the pattern you've now seen three times</span>
+            <code>JpaRepository</code> in Session 3, and <code>@FeignClient</code> here: <strong>you declare an interface and Spring generates the implementation.</strong> Feign turns a remote HTTP call into what looks like an ordinary method call — which is elegant, but also a little dangerous, because it hides the fact that a network is involved. That's precisely why circuit breakers exist.
+          </div>
+        </section>
+
+        <!-- 17. CIRCUIT BREAKER -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 4</p>
+          <h2>Circuit Breaker — failing fast on purpose</h2>
+          <p class="deep">Payment Service becomes slow — every call takes 30 seconds before timing out. Order Service calls it on every request, so Order's threads all sit waiting. Order Service becomes unresponsive too. Then everything calling Order stalls. <strong>One slow service has taken down the whole system.</strong> That's a <span class="term">cascading failure</span>.</p>
+          <p class="deep">A <span class="term">circuit breaker</span> — named after the electrical kind — watches the failure rate and, past a threshold, <strong>stops even trying</strong>:</p>
+          <div class="cb">
+            <div class="cb-state closed">
+              <h3>CLOSED</h3>
+              <p><strong>Normal.</strong> Calls pass through and the breaker counts failures.</p>
+            </div>
+            <div class="cb-state open">
+              <h3>OPEN</h3>
+              <p><strong>Tripped.</strong> Too many failures, so calls fail <em>instantly</em> without touching the network. Returns a fallback.</p>
+            </div>
+            <div class="cb-state half">
+              <h3>HALF_OPEN</h3>
+              <p><strong>Testing.</strong> After a wait, a few trial calls go through. Succeed → CLOSED. Fail → OPEN again.</p>
+            </div>
+          </div>
+          <pre><code>@CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+public String processPayment(Order order) {
+    return paymentClient.charge(order);     <span class="code-comment">// the risky remote call</span>
+}
+
+<span class="code-comment">// Called instead, when the breaker is OPEN. Same signature + the exception.</span>
+public String paymentFallback(Order order, Throwable t) {
+    return "Payment queued — we'll process it shortly";
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Why "fail fast" beats "wait and hope"</span>
+            Failing in 1 millisecond with a sensible fallback is <strong>far better</strong> than blocking a thread for 30 seconds. Your service stays responsive, the struggling service gets breathing room to recover instead of being hammered, and users see graceful degradation rather than a dead site. The library is <strong>Resilience4j</strong>.
+          </div>
+        </section>
+
+        <!-- 18. CONFIG SERVER -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 3</p>
+          <h2>Config Server — settings in one place</h2>
+          <p class="deep">Twelve services × three environments (dev, test, prod) = 36 properties files. Change a shared database password and you must edit, rebuild and redeploy many services. A <span class="term">Config Server</span> centralises this.</p>
+          <div class="flow">
+            <div class="flow-box warn">Git repository <span class="sm">all config, version controlled</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Config Server <span class="sm">:8888</span></div>
+            <span class="flow-arrow">→</span>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="flow-box">Service A <span class="sm">fetches at startup</span></div>
+              <div class="flow-box">Service B</div>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Benefit</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td><strong>One source of truth</strong></td><td>Change a shared setting once, not in twelve places.</td></tr>
+              <tr><td><strong>Version controlled</strong></td><td>Config lives in Git — full history, reviews, and rollback.</td></tr>
+              <tr><td><strong>No rebuild to change config</strong></td><td>Update the file, refresh the service. No redeployment.</td></tr>
+              <tr><td><strong>Environment separation</strong></td><td><code>service-dev.properties</code> vs <code>service-prod.properties</code>, same code.</td></tr>
+              <tr><td><strong>Secrets handling</strong></td><td>Encrypted values, so passwords never sit in a service's repo.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Not in today's lab — and here's why</span>
+            A Config Server needs a Git repository to read from, which is a lot of setup for the payoff in a single session. We're spending that time on discovery, gateway and load balancing instead — the three you genuinely cannot manage without. Recognise the pattern, and reach for <code>spring-cloud-config-server</code> when you have more than a couple of services.
+          </div>
+        </section>
+
+        <!-- 19. TRACING -->
+        <section class="slide">
+          <p class="eyebrow">Pattern 5</p>
+          <h2>Distributed Tracing — following one request</h2>
+          <p class="deep">A user reports "checkout was slow." That request went Gateway → Order → Product → Payment → Notification. Five services, five separate log files, and <strong>no way to tell which lines belong to that one request</strong>. This is the single most-underestimated cost of microservices.</p>
+          <p class="deep"><span class="term">Distributed tracing</span> fixes it by attaching a <strong>trace id</strong> at the entry point and passing it along every hop:</p>
+          <pre><code><span class="code-comment"># Gateway         [traceId=a1b2c3d4, spanId=001]</span>
+2026-09-05 10:32:14 [a1b2c3d4,001] INFO  Gateway     : routing POST /api/orders
+2026-09-05 10:32:14 [a1b2c3d4,002] INFO  OrderMS     : creating order 5512
+2026-09-05 10:32:14 [a1b2c3d4,003] INFO  ProductMS   : reserving stock for SKU-88
+2026-09-05 10:32:16 [a1b2c3d4,004] WARN  PaymentMS   : gateway slow — 2100ms  ← 🚨
+2026-09-05 10:32:16 [a1b2c3d4,005] INFO  NotifyMS    : queued confirmation email</code></pre>
+          <p class="deep">Search your aggregated logs for <code>a1b2c3d4</code> and you get the <em>complete</em> story across all five services — in order, with timings. The <code>WARN</code> line answers the question immediately.</p>
+          <table class="cmp">
+            <thead><tr><th>Term</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Trace</strong></td><td>The whole journey of one request. One trace id, shared by every hop.</td></tr>
+              <tr><td><strong>Span</strong></td><td>One unit of work within the trace — usually one service's part.</td></tr>
+              <tr><td><strong>Trace id</strong></td><td>The shared identifier propagated in HTTP headers between services.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The modern tooling</span>
+            <strong>Micrometer Tracing</strong> generates and propagates the ids (it replaced Spring Cloud Sleuth), and <strong>Zipkin</strong> or <strong>Jaeger</strong> collects them and draws a waterfall diagram of where the time went. Add the dependency and the ids appear in your logs automatically — you write nothing.
+          </div>
+        </section>
+
+        <!-- 20. SPRING CLOUD TOOLBOX -->
+        <section class="slide">
+          <p class="eyebrow">The libraries</p>
+          <h2>Spring Cloud — the toolbox</h2>
+          <p class="deep"><strong>Spring Cloud</strong> is a family of projects implementing these patterns for Spring Boot. It is <em>not</em> a single dependency — you pick the pieces you need.</p>
+          <table class="cmp">
+            <thead><tr><th>Pattern</th><th>Spring Cloud project</th><th>Initializr dependency</th></tr></thead>
+            <tbody>
+              <tr><td>Service Registry (server)</td><td>Netflix Eureka Server</td><td class="good"><strong>Eureka Server</strong></td></tr>
+              <tr><td>Service Registry (client)</td><td>Netflix Eureka Client</td><td class="good"><strong>Eureka Discovery Client</strong></td></tr>
+              <tr><td>API Gateway</td><td>Spring Cloud Gateway</td><td class="good"><strong>Gateway</strong> / <strong>Reactive Gateway</strong></td></tr>
+              <tr><td>Load Balancing</td><td>Spring Cloud LoadBalancer</td><td>arrives with Eureka Client</td></tr>
+              <tr><td>Config Server</td><td>Spring Cloud Config</td><td>Config Server / Config Client</td></tr>
+              <tr><td>Circuit Breaker</td><td>Resilience4j</td><td>Resilience4j</td></tr>
+              <tr><td>Declarative REST client</td><td>OpenFeign</td><td>OpenFeign</td></tr>
+              <tr><td>Tracing</td><td>Micrometer Tracing</td><td>Zipkin / Distributed Tracing</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">⚠️ Version alignment is not optional here</span>
+            Spring Cloud ships as a <strong>release train</strong> that is tied to specific Spring Boot versions — for example <strong>Spring Cloud 2025.0.x pairs with Spring Boot 3.5.x</strong>. Mismatch them and you get baffling <code>NoSuchMethodError</code> or <code>ClassNotFoundException</code> failures at startup. <strong>Always let Spring Initializr choose the version</strong> by picking the dependencies there, and never hand-edit the <code>spring-cloud.version</code> property.
+          </div>
+        </section>
+
+        <!-- 21. FULL ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">Putting it together</p>
+          <h2>The full picture</h2>
+          <p class="deep">Every piece from this session, and where a request goes:</p>
+          <div class="flow">
+            <div class="flow-box green">Client</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">API Gateway <span class="sm">:9393</span></div>
+            <span class="flow-arrow">⇄</span>
+            <div class="flow-box warn">Eureka <span class="sm">:8761</span></div>
+            <span class="flow-arrow">→</span>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="flow-box">Student MS <span class="sm">:8080 · :8082 · :8083</span></div>
+              <div class="flow-box">Customer MS <span class="sm">:8081</span></div>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:20px;">Trace <code>GET /api/students/1</code> through it, step by step:</p>
+          <ol>
+            <li>The client sends the request to the <strong>gateway</strong> — the only address it knows.</li>
+            <li>The gateway matches the path <code>/api/students/**</code> to the route <code>lb://STUDENT-MS</code>.</li>
+            <li>It asks <strong>Eureka</strong>: "where is <code>STUDENT-MS</code>?"</li>
+            <li>Eureka returns <strong>all three</strong> live instances.</li>
+            <li>The load balancer picks one by <strong>round robin</strong>.</li>
+            <li>The request is forwarded; the service reads its database and replies.</li>
+            <li>The response travels back through the gateway to the client.</li>
+          </ol>
+          <div class="keybox">
+            <span class="lbl">What's remarkable about that list</span>
+            <strong>No component ever needed a hardcoded address.</strong> The client knows only the gateway; the gateway knows only a service <em>name</em>; the addresses come from the registry, live. Add a fourth instance and it starts receiving traffic within seconds — nothing to reconfigure, nothing to redeploy.
+          </div>
+        </section>
+
+        <!-- 22. WHAT WE'RE BUILDING -->
+        <section class="slide">
+          <p class="eyebrow">Your turn</p>
+          <h2>What you'll build in the lab</h2>
+          <p class="deep">Four separate Spring Boot projects, becoming six running processes. Each one is small.</p>
+          <table class="cmp">
+            <thead><tr><th>#</th><th>Project</th><th>Port</th><th>Base package</th><th>Role</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td><code>eureka-server</code></td><td><span class="port">8761</span></td><td><code>…training.eurekaserver</code></td><td>The registry</td></tr>
+              <tr><td>2</td><td><code>student-ms</code></td><td><span class="port">8080</span> <span class="port">8082</span> <span class="port">8083</span></td><td><code>…training.studentms</code></td><td>A service, run 3× to show balancing</td></tr>
+              <tr><td>3</td><td><code>customer-ms</code></td><td><span class="port">8081</span></td><td><code>…training.customerms</code></td><td>A second service</td></tr>
+              <tr><td>4</td><td><code>api-gateway</code></td><td><span class="port">9393</span></td><td><code>…training.apigateway</code></td><td>The single front door</td></tr>
+            </tbody>
+          </table>
+          <div class="steps4">
+            <div class="step-chip"><div class="stepnum">1</div><h3>Registry up</h3><p>Eureka running, dashboard visible at 8761.</p></div>
+            <div class="step-chip"><div class="stepnum">2</div><h3>Services register</h3><p>Both appear in the dashboard automatically.</p></div>
+            <div class="step-chip"><div class="stepnum">3</div><h3>Scale &amp; gateway</h3><p>Three Student instances, plus the gateway routing to them.</p></div>
+            <div class="step-chip"><div class="stepnum">4</div><h3>Watch it balance</h3><p>Call one URL repeatedly; the responding port cycles.</p></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two pieces of practical advice</span>
+            <strong>Start Eureka first</strong> and give it half a minute — the other services need something to register with. And <strong>keep the Eureka dashboard open in a browser tab</strong> the whole session: it's your live picture of what's actually running, and your first stop whenever something doesn't work.
+          </div>
+        </section>
+
+        <!-- 23. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Save yourself some pain</p>
+          <h2>Common microservices mistakes</h2>
+          <table class="cmp">
+            <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Starting services before Eureka</td><td class="bad">Connection-refused errors in the log</td><td class="good">Harmless — they retry. But start Eureka first to keep the output clean.</td></tr>
+              <tr><td>Missing <code>spring.application.name</code></td><td class="bad">Service shows as <code>UNKNOWN</code>; <code>lb://</code> routes fail</td><td class="good">Always set it — it <em>is</em> the registry identity.</td></tr>
+              <tr><td>Forgetting <code>register-with-eureka=false</code> on the server</td><td class="bad">Eureka spams its own log trying to register with itself</td><td class="good">Set both that and <code>fetch-registry=false</code>.</td></tr>
+              <tr><td>Adding <strong>Spring Web</strong> to the gateway project</td><td class="bad">Gateway fails to start, or routing silently breaks</td><td class="good">Spring Cloud Gateway is reactive (WebFlux). <strong>Do not add Spring Web.</strong></td></tr>
+              <tr><td>Using the wrong gateway property prefix</td><td class="bad">Routes silently ignored → 404 through the gateway</td><td class="good"><code>spring.cloud.gateway.server.webflux.*</code> on 2025.0+; <code>spring.cloud.gateway.*</code> on 2024.0 and earlier.</td></tr>
+              <tr><td><code>http://</code> instead of <code>lb://</code> in a route</td><td class="bad">No load balancing; name can't resolve</td><td class="good"><code>lb://STUDENT-MS</code> — <code>lb</code> is what triggers discovery.</td></tr>
+              <tr><td>Two services on the same port</td><td class="bad"><code>Port 8080 was already in use</code></td><td class="good">Give every process a distinct port; use <code>--server.port=</code> to run extra instances.</td></tr>
+              <tr><td>Mismatched Spring Boot / Spring Cloud versions</td><td class="bad"><code>NoSuchMethodError</code> at startup</td><td class="good">Let Initializr pick versions. Never hand-edit <code>spring-cloud.version</code>.</td></tr>
+              <tr><td>Expecting instances instantly in the dashboard</td><td>Dashboard looks incomplete</td><td class="good">Registration takes up to ~30 seconds. Wait, then refresh.</td></tr>
+              <tr><td>Splitting into microservices too early</td><td class="bad">All the operational cost, none of the benefit</td><td class="good">Start with a monolith. Split when the pain is real.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 24. RECAP FLASHCARDS -->
+        <section class="slide">
+          <p class="eyebrow">Check yourself</p>
+          <h2>Quick recap — tap each card to reveal</h2>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q · What's the real trade-off with microservices? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">They don't remove complexity — they <strong>move it out of your code and into the spaces between services</strong>. You gain independent deployment and targeted scaling; you inherit network failures, service discovery, distributed transactions and much harder debugging.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why can't you just hardcode another service's URL? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Because addresses change — deployments, crashes, restarts on new ports, dynamic cloud IPs — and a single hardcoded address ignores every other instance, so there's no load balancing. A registry answers "where is it <em>now</em>?" instead.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What are Eureka's four steps? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>Register</strong> (services announce themselves at startup) → <strong>Heartbeat</strong> (every 30s, or they're evicted) → <strong>Discover</strong> (callers ask by name and get all live addresses) → <strong>Balance</strong> (the caller round-robins between them).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What does <code>lb://STUDENT-MS</code> mean? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">"Ask the registry for the service named <code>STUDENT-MS</code>, then <strong>l</strong>oad <strong>b</strong>alance across whatever instances it returns." No host, no port — that one line is where discovery and load balancing meet.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Name three things a gateway does that you'd otherwise repeat per service. <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>Authentication</strong>, <strong>rate limiting</strong> and <strong>CORS</strong> — plus request logging and header manipulation. Written once at the front door instead of ten times behind it.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What are the three circuit breaker states? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>CLOSED</strong> — normal, calls pass and failures are counted. <strong>OPEN</strong> — tripped, calls fail instantly with a fallback. <strong>HALF_OPEN</strong> — after a wait, a few trial calls: success returns to CLOSED, failure back to OPEN.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why is failing fast better than waiting? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Because blocking threads on a slow dependency makes <em>your</em> service unresponsive too — a cascading failure. Failing in 1ms with a fallback keeps you responsive and gives the struggling service room to recover instead of being hammered.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What does a trace id solve? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">It tags one request with a shared id passed to every service it touches, so you can search five separate log files and reconstruct the complete, ordered journey — with timings — for that one request.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why must a service be stateless to scale horizontally? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Because the load balancer sends each request to <em>any</em> instance. If one instance held your data in its own memory, a request routed elsewhere would find it missing. Shared state must live in a database — which is what Session 3 set up.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 25. THE FULL JOURNEY -->
+        <section class="slide">
+          <p class="eyebrow">Looking back</p>
+          <h2>The full journey — Sessions 1 to 4</h2>
+          <p class="deep">Look at how much ground you've covered, and notice how each session made the next one possible.</p>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">Session 1</span><span class="desc"><strong>Foundations.</strong> Auto-configuration, embedded Tomcat, starters. Beans, dependency injection, the IoC container. The golden rule of packages, and your first REST endpoint.</span></div>
+            <div class="stack-row l2"><span class="layer">Session 2</span><span class="desc"><strong>REST APIs.</strong> Web services and JSON, the CRUD verbs, status codes that mean something, <code>@RequestBody</code>, <code>ResponseEntity</code>, and testing with Postman &amp; Swagger. <em>Statelessness</em> — which Session 4 needed.</span></div>
+            <div class="stack-row l3"><span class="layer">Session 3</span><span class="desc"><strong>Data &amp; structure.</strong> JPA, Hibernate and H2. Entities, repositories, DTOs, a service interface, custom exceptions and a global handler. <em>Shared database</em> — which Session 4 needed.</span></div>
+            <div class="stack-row l4"><span class="layer">Session 4</span><span class="desc"><strong>Microservices.</strong> Service registry, API gateway, load balancing across live instances, plus config server, circuit breaker and tracing.</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The thread through all four</span>
+            Session 2's <strong>stateless</strong> design and Session 3's <strong>shared database</strong> are exactly what made today's three-instance load balancing work. None of it was arbitrary — each session removed a constraint the next one relied on. That's what a well-designed system feels like from the inside.
+          </div>
+        </section>
+
+        <!-- 26. WHAT'S NEXT -->
+        <section class="slide">
+          <p class="eyebrow">Where to go from here</p>
+          <h2>Your roadmap beyond this course</h2>
+          <p class="deep">You now have a genuinely solid foundation. Here's the path most Spring backend developers take next, roughly in order of value:</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🧪</div><h3>Testing</h3><p>JUnit 5, Mockito, <code>@SpringBootTest</code>, <code>@WebMvcTest</code>, Testcontainers. <strong>Start here</strong> — it's what employers notice first.</p></div>
+            <div class="card"><div class="ic">🔐</div><h3>Spring Security in depth</h3><p>JWT tokens, OAuth2, role-based access, method-level security. You saw the door today; learn the locks.</p></div>
+            <div class="card"><div class="ic">🐳</div><h3>Docker &amp; Kubernetes</h3><p>Containerise each service, then orchestrate them. The natural home for a microservices system.</p></div>
+            <div class="card"><div class="ic">📨</div><h3>Kafka / RabbitMQ</h3><p>Asynchronous messaging, so services communicate through events instead of blocking HTTP calls.</p></div>
+            <div class="card"><div class="ic">📊</div><h3>Observability</h3><p>Actuator + Prometheus + Grafana + Zipkin. You cannot operate what you cannot see.</p></div>
+            <div class="card"><div class="ic">🗃️</div><h3>Database migrations</h3><p>Flyway or Liquibase — the professional replacement for <code>ddl-auto</code>.</p></div>
+            <div class="card"><div class="ic">⚡</div><h3>Caching</h3><p>Spring Cache with Redis. Often the cheapest large performance win available.</p></div>
+            <div class="card"><div class="ic">🔄</div><h3>CI/CD</h3><p>GitHub Actions or Jenkins — build, test and deploy automatically on every push.</p></div>
+            <div class="card"><div class="ic">📐</div><h3>Design &amp; architecture</h3><p>Domain-Driven Design, event sourcing, the saga pattern. How to decide <em>where</em> the boundaries go.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">If you only do one thing</span>
+            <strong>Learn to write tests.</strong> Everything else on this list is easier, safer and more enjoyable once you can change code with confidence. It's also the clearest signal to any team that you're ready for real work.
+          </div>
+        </section>
+
+        <!-- 27. CHEATSHEET -->
+        <section class="slide">
+          <p class="eyebrow">Take this away</p>
+          <h2>Session 4 cheat sheet</h2>
+          <div class="anno-grid">
+            <div class="anno-cell"><span class="ac-tag">@EnableEurekaServer</span><span class="ac-def">Turns an app into the Eureka registry.</span></div>
+            <div class="anno-cell"><span class="ac-tag">(no annotation)</span><span class="ac-def">Eureka <em>clients</em> need only the dependency + properties.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@LoadBalanced</span><span class="ac-def">On a <code>RestTemplate</code> bean: resolve service names and balance.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@FeignClient(name=)</span><span class="ac-def">Declarative HTTP client — Spring writes the implementation.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@CircuitBreaker(name=, fallbackMethod=)</span><span class="ac-def">Fail fast and degrade gracefully.</span></div>
+            <div class="anno-cell"><span class="ac-tag">lb://SERVICE-NAME</span><span class="ac-def">Route via the registry, load balanced.</span></div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Property</th><th>Where</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>spring.application.name</code></td><td>every service</td><td>Its identity in the registry — <strong>never omit this</strong></td></tr>
+              <tr><td><code>eureka.client.register-with-eureka=false</code></td><td>Eureka server</td><td>Don't register with yourself</td></tr>
+              <tr><td><code>eureka.client.fetch-registry=false</code></td><td>Eureka server</td><td>Don't fetch your own registry</td></tr>
+              <tr><td><code>eureka.client.service-url.defaultZone</code></td><td>every client</td><td>Where the registry lives</td></tr>
+              <tr><td><code>spring.cloud.gateway.server.webflux.routes[n].*</code></td><td>gateway (2025.0+)</td><td>Manual route definitions</td></tr>
+              <tr><td><code>spring.cloud.gateway.routes[n].*</code></td><td>gateway (≤2024.0)</td><td>The same, older prefix</td></tr>
+              <tr><td><code>…discovery.locator.enabled=true</code></td><td>gateway</td><td>Auto-route every registered service</td></tr>
+              <tr><td><code>--server.port=8082</code></td><td>command line</td><td>Run another instance on a different port</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Ports for today</span>
+            Eureka <span class="port">8761</span> &nbsp;·&nbsp; Student MS <span class="port">8080</span> <span class="port">8082</span> <span class="port">8083</span> &nbsp;·&nbsp; Customer MS <span class="port">8081</span> &nbsp;·&nbsp; API Gateway <span class="port">9393</span>
+          </div>
+        </section>
+
+        <!-- 28. CLOSING -->
         <section class="slide">
           <div class="cover">
-            <span class="badge">End of Session 4 Theory · End of the Series</span>
+            <span class="badge">End of Session 4 — Theory</span>
             <h1>Let's build it.</h1>
-            <div class="sub">Open the lab sheet — we'll stand up Eureka, register two microservices, scale one to three instances, and route everything through a gateway with live load balancing.</div>
-            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Thank you for completing the Spring Boot series.</div>
+            <div class="sub">Four applications, one registry, one gateway — and load balancing you can watch happen.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Thank you for four great sessions.</div>
           </div>
         </section>
 
@@ -1122,8 +1540,8 @@ spring.cloud.gateway.discovery
           <span>Spring Boot · Session 4</span>
         </div>
 
-        <!-- Slide counter -->
-        <div class="slide-counter" id="slideCounter">1 of 22</div>
+        <!-- Slide counter (JavaScript keeps this in sync) -->
+        <div class="slide-counter" id="slideCounter">1 of 28</div>
       </div>
     </div>
   </div>
@@ -1168,6 +1586,7 @@ spring.cloud.gateway.discovery
       state.index = next;
       render();
       var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
       if (activeSlide && !reduceMotion) {
         state.isTransitioning = true;
         activeSlide.classList.remove('animating');
@@ -1184,9 +1603,7 @@ spring.cloud.gateway.discovery
     function next() { goTo(state.index + 1); }
     function prev() { goTo(state.index - 1); }
 
-    /* ============================================================
-       Flash cards (Session 3 recap) — click to reveal the answer.
-       ============================================================ */
+    /* Flash cards: click to reveal the answer. */
     function initFlashCards() {
       var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
       cards.forEach(function (card) {
@@ -1211,11 +1628,24 @@ spring.cloud.gateway.discovery
       navNext.addEventListener('click', next);
       navPrev.addEventListener('click', prev);
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight') { next(); }
-        else if (e.key === 'ArrowLeft') { prev(); }
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
       });
 
       initFlashCards();
+
+      // Architecture diagram resilience: only reveal the text fallback if the
+      // diagram element is genuinely absent (never measure width — slides are
+      // hidden at init and would report zero width, falsely triggering it).
+      try {
+        var container = document.getElementById('archContainer');
+        if (container && !container.querySelector('.arch')) {
+          container.classList.add('arch-failed');
+        }
+      } catch (e) { /* leave the CSS diagram in place */ }
+
       render();
     }
 

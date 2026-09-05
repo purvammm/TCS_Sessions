@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session4-theory.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -92,7 +93,6 @@
 
     h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
     h2 { font-size: 26px; margin: 0; }
-    h3 { font-size: 19px; }
     p, li { line-height: 1.65; font-size: 17.5px; }
     a { color: var(--mac-accent); }
     code:not(pre code) {
@@ -184,25 +184,6 @@
     .section { padding: 0; margin-bottom: 4px; }
     .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
 
-    /* === Architecture reminder box (pinned visual) === */
-    .arch-box {
-      border: 1px solid #cfe0f5;
-      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
-      border-radius: 12px;
-      padding: 18px 20px;
-      margin: 16px 0;
-    }
-    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
-    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-    .arch-node {
-      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
-      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
-    }
-    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
-    .arch-node.reg { border-color: #ff9f0a; }
-    .arch-node.svc { border-color: #28c840; }
-    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
-
     /* === Expandable sections === */
     details.exp {
       border: 1px solid var(--mac-border);
@@ -242,12 +223,8 @@
       font-weight: 700;
       letter-spacing: 0.03em;
     }
-    details.exp > summary .port-tag {
-      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
-      background: rgba(94,92,230,0.12); color: #5e5ce6;
-      padding: 3px 9px; border-radius: 8px;
-    }
     .exp-body { padding: 14px 24px 24px; }
+    .exp-body h3 { font-size: 19px; }
 
     /* === Checklist items === */
     .check {
@@ -317,6 +294,45 @@
       font-size: 16.5px;
     }
     .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .muted { color: var(--mac-text-muted); }
+
+    /* Status-code badge, used in expected-output headings */
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s2 { background: #49cc90; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s5 { background: #f93e3e; }
+
+    /* === THE GOLDEN RULE box — the single most important lab callout === */
+    .golden {
+      border: 2px solid #ff9f0a;
+      background: linear-gradient(135deg,#fffaf0,#fff3dc);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 16.5px;
+      box-shadow: 0 3px 14px rgba(255,159,10,0.18);
+    }
+    .golden .lbl {
+      font-weight: 800; color: #b8860b; display: block; margin-bottom: 8px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .golden code { background: rgba(184,134,11,0.12) !important; color: #8a6100 !important; }
+    .golden .rule {
+      background: #fff; border: 1px dashed #e4c48a; border-radius: 8px;
+      padding: 10px 14px; margin: 10px 0; font-weight: 600;
+    }
 
     /* Code blocks with copy button */
     .codewrap { position: relative; margin: 14px 0; }
@@ -335,8 +351,9 @@
       line-height: 1.6;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
-    .code-comment { color: #6b7089; }
     .copy-btn {
       position: absolute;
       top: 8px; right: 8px;
@@ -353,7 +370,55 @@
     .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
     .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
 
-    /* === File banner: tells the beginner EXACTLY which file to create/edit === */
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors for visual variety */
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.lab8 { border-left-color: #30b0c7; }
+    details.exp.bonus { border-left-color: #ff375f; }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#eaf8fb,#d9f1f6); }
+    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.lab8 .lab-tag { background:#30b0c7; }
+    details.exp.bonus .lab-tag { background:#ff375f; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
     .filebar {
       display: flex; align-items: center; gap: 10px;
       background: #1e1e2e; color: #f8f8f2;
@@ -371,7 +436,7 @@
     }
     .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
 
-    /* === "Now run / test it" purple callout === */
+    /* === "Now run it" box — explicit run instructions === */
     .runbox {
       border: 1px solid #d8b4fe;
       border-left: 5px solid #bf5af2;
@@ -382,13 +447,13 @@
     .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
     .runbox ol { margin: 6px 0 0; padding-left: 22px; }
     .runbox ol li { margin: 6px 0; }
-    .runbox .kbd {
+    .kbd, .runbox .kbd {
       font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
       border: 1px solid var(--mac-border); border-bottom-width: 2px;
       border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
     }
 
-    /* "Do this — step by step" yellow callout */
+    /* "Do this — step by step" yellow callout used inside labs */
     .dothis {
       background: #fffdf3; border: 1px solid #f0e3a8;
       border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
@@ -397,7 +462,7 @@
     .dothis ol { margin: 0; padding-left: 22px; }
     .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
 
-    /* "New project" blue card showing exact Initializr inputs */
+    /* Spring Initializr recipe card */
     .newproj {
       border: 1px solid #cfe0f5;
       background: linear-gradient(135deg,#f3f8ff,#eef3fb);
@@ -413,6 +478,7 @@
     .newproj table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 15.5px; }
     .newproj th, .newproj td { border: 1px solid var(--mac-border); padding: 7px 12px; text-align: left; vertical-align: top; }
     .newproj th { background: rgba(10,132,255,0.08); width: 32%; font-weight: 700; }
+    .newproj tr.keyrow td, .newproj tr.keyrow th { background: rgba(255,159,10,0.14); font-weight: 700; }
 
     /* Property annotation list */
     .prop-list { display: grid; gap: 8px; margin: 14px 0; }
@@ -424,16 +490,7 @@
     .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
     .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
 
-    /* Common issues */
-    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
-    table.issues th, table.issues td {
-      border: 1px solid var(--mac-border);
-      padding: 12px 14px; text-align: left; vertical-align: top;
-    }
-    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
-    table.issues tbody tr:nth-child(even) { background: #fafafc; }
-
-    /* Version compatibility table (highlighted) */
+    /* Version compatibility warning box */
     .vercompat {
       border: 2px solid var(--tl-yellow);
       background: rgba(254,188,46,0.08);
@@ -447,47 +504,26 @@
     .vercompat th { background: rgba(254,188,46,0.18); }
     .vercompat code { font-family: var(--mac-mono); }
 
-    .section-band {
-      font-size: 15px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--mac-accent);
-      margin: 30px 4px 6px;
-      padding-bottom: 6px;
-      border-bottom: 2px solid rgba(10,132,255,0.2);
+    /* Architecture reminder box */
+    .arch-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 16px 0;
     }
+    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
+    }
+    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
+    .arch-node.reg { border-color: #ff9f0a; }
+    .arch-node.svc { border-color: #28c840; }
+    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
 
-    /* Per-lab accent colors for visual variety */
-    details.exp.lab1 { border-left-color: #ff9f0a; }
-    details.exp.lab2 { border-left-color: #28c840; }
-    details.exp.lab3 { border-left-color: #00c7be; }
-    details.exp.lab4 { border-left-color: #5e5ce6; }
-    details.exp.lab5 { border-left-color: #0a84ff; }
-    details.exp.lab6 { border-left-color: #bf5af2; }
-    details.exp.lab7 { border-left-color: #ff6482; }
-    details.exp.lab8 { border-left-color: #34c759; }
-    details.exp.bonus { border-left-color: #ff375f; }
-    details.exp.lab1 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
-    details.exp.lab2 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
-    details.exp.lab3 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
-    details.exp.lab4 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
-    details.exp.lab5 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
-    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
-    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
-    details.exp.lab8 > summary { background: linear-gradient(135deg,#eafaef,#dcf5e3); }
-    details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
-    details.exp.lab1 .lab-tag { background:#ff9f0a; }
-    details.exp.lab2 .lab-tag { background:#28c840; }
-    details.exp.lab3 .lab-tag { background:#00c7be; }
-    details.exp.lab4 .lab-tag { background:#5e5ce6; }
-    details.exp.lab5 .lab-tag { background:#0a84ff; }
-    details.exp.lab6 .lab-tag { background:#bf5af2; }
-    details.exp.lab7 .lab-tag { background:#ff6482; }
-    details.exp.lab8 .lab-tag { background:#34c759; }
-    details.exp.bonus .lab-tag { background:#ff375f; }
-
-    /* HTTP verb badge in summaries */
+    /* HTTP verb badges */
     .verb-badge {
       font-family: var(--mac-mono);
       font-size: 12px;
@@ -498,8 +534,11 @@
       letter-spacing: 0.04em;
     }
     .verb-badge.get { background: #61affe; }
+    .verb-badge.post { background: #49cc90; }
+    .verb-badge.put { background: #fca130; }
+    .verb-badge.del { background: #f93e3e; }
 
-    /* Reference + Quick reference card */
+    /* Reference block (green) */
     .ref-block {
       border: 1px solid var(--mac-border);
       border-left: 5px solid #28c840;
@@ -524,6 +563,7 @@
     .ref-block[open] > summary .chevron { transform: rotate(90deg); }
     .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
 
+    /* Quick reference card */
     .qref {
       background: linear-gradient(135deg, #1e1e2e, #2a2a40);
       color: #f8f8f2;
@@ -539,8 +579,25 @@
     }
     .qref th { background: rgba(255,255,255,0.08); }
     .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
 
-    /* Eureka dashboard mock */
+    /* Test part / H2 console mockups */
+    .testpart { border: 1px solid var(--mac-border); border-radius: 10px; margin: 14px 0; overflow: hidden; }
+    .testpart .tp-head {
+      background: var(--mac-titlebar); padding: 10px 16px; font-weight: 700; font-size: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .testpart .tp-body { padding: 8px 16px 16px; }
+    .h2-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin-top: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px;
+    }
+    .h2-mock .h2-top { background:#0a3d62; color:#fff; padding:6px 12px; font-weight:700; }
+    .h2-mock .h2-row { padding: 6px 12px; border-bottom: 1px solid var(--mac-border); background:#fff; }
+    .h2-mock .h2-row:last-child { border-bottom: none; }
+
+    /* Eureka dashboard mockup */
     .dash-mock {
       border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin: 12px 0;
       background: #fff; font-size: 13.5px;
@@ -563,6 +620,7 @@
     }
     .logmock .hit { color: #a6e22e; }
     .logmock .port { color: #fd9353; }
+    .logmock .dim { color: #6b7089; }
   </style>
 </head>
 <body>
@@ -581,7 +639,7 @@
         <div class="hero-icon">🌐</div>
         <div>
           <h1>Spring Boot — Session 4 Hands-on Lab</h1>
-          <p class="section-intro">Stand up a microservices skeleton: Eureka registry, two microservices, multiple instances, and an API Gateway with live load balancing. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+          <p class="section-intro">Stand up a microservices system: Eureka registry, two services, multiple instances, and an API Gateway that load balances between them. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
 
@@ -601,18 +659,19 @@
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">How to use this sheet</span>
-          This is your hands-on companion for Spring Boot Session 4 — the theory's architecture diagram stays on the
-          main screen while you build here. Today is different from previous sessions: instead of one project, you'll
-          run <strong>four separate Spring Boot apps at once</strong> (then six, once we scale Student MS). Work through
-          the labs top to bottom, use the <strong>Copy</strong> button on every snippet, and tick each checkbox as you
-          go. Keep the <strong>architecture reminder</strong> below in view — it's the map. If you fall behind, the
-          <strong>Complete Configuration Reference</strong> at the bottom has every file ready to paste.
+          Today is different. Instead of one project you'll create <strong>four separate Spring Boot
+          applications</strong> and run them <strong>all at the same time</strong> (six processes, once we scale one of
+          them). Each app is <em>small</em> — smaller than Session 3's — but you'll be juggling several run
+          configurations, so work strictly <strong>top to bottom</strong> and don't stop an app once it's running.
+          Every project's exact <strong>base package</strong> and <strong>port</strong> is printed in its setup box, and
+          every file shows its full path on a banner. The <strong>Complete Configuration Reference</strong> at the
+          bottom has every file for all four projects.
         </div>
       </section>
 
-      <!-- ===== ARCHITECTURE REMINDER (pinned visual) ===== -->
+      <!-- ===== ARCHITECTURE MAP ===== -->
       <div class="arch-box">
-        <h3>📌 Architecture map — keep this in view</h3>
+        <h3>📌 Architecture map — keep this in view all session</h3>
         <div class="arch-flow">
           <div class="arch-node">Client<span class="p">Postman</span></div>
           <span class="arch-arrow">→</span>
@@ -620,16 +679,17 @@
           <span class="arch-arrow">⇄</span>
           <div class="arch-node reg">Eureka<span class="p">:8761</span></div>
           <span class="arch-arrow">→</span>
-          <div class="arch-node svc">Student MS<span class="p">:8080/82/83</span></div>
+          <div class="arch-node svc">Student MS<span class="p">:8080 :8082 :8083</span></div>
           <div class="arch-node svc">Customer MS<span class="p">:8081</span></div>
         </div>
         <p style="margin:12px 0 0; font-size:14.5px; color:var(--mac-text-muted);">
-          Client hits the gateway → gateway asks Eureka where the service lives → Eureka returns live instances →
-          gateway round-robins the request to one of them → response returns to the client.
+          The client hits the gateway → the gateway asks Eureka where the service lives → Eureka returns every live
+          instance → the gateway round-robins the request to one of them → the response returns to the client.
+          <strong>Nothing anywhere hardcodes an address.</strong>
         </p>
       </div>
 
-      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <!-- ===== PROGRESS TRACKER ===== -->
       <div class="section-band">Today's checklist</div>
       <section class="section">
         <details class="exp" open>
@@ -637,128 +697,173 @@
           <div class="exp-body">
             <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all nine are done.</p>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>1 · Eureka Server running</strong> — dashboard loads at <code>localhost:8761</code>.</span></label>
+              <span class="ctext"><strong>1 · Eureka Server running</strong> — the dashboard loads at <code>localhost:8761</code>.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>2 · Student MS registered</strong> — STUDENT-MS appears in the Eureka dashboard.</span></label>
+              <span class="ctext"><strong>2 · Student MS registered</strong> — <code>STUDENT-MS</code> appears in the dashboard.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>3 · Customer MS registered</strong> — CUSTOMER-MS appears in the dashboard.</span></label>
+              <span class="ctext"><strong>3 · Customer MS registered</strong> — <code>CUSTOMER-MS</code> appears too.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>4 · Multiple Student MS instances running</strong> — 8082 and 8083 started.</span></label>
+              <span class="ctext"><strong>4 · Extra Student instances running</strong> — ports 8082 and 8083 started.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>5 · All instances visible</strong> — STUDENT-MS shows 3 instances in Eureka.</span></label>
+              <span class="ctext"><strong>5 · All instances visible</strong> — <code>STUDENT-MS</code> shows 3 instances in Eureka.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>6 · API Gateway created</strong> — running on 9393 and registered in Eureka.</span></label>
+              <span class="ctext"><strong>6 · API Gateway running</strong> — on 9393 and registered in Eureka.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>7 · Manual route for Student MS works</strong> — request flows through the gateway.</span></label>
+              <span class="ctext"><strong>7 · Both routes work</strong> — students and customers reachable through the gateway.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>8 · Manual route for Customer MS works</strong> — both services reachable via 9393.</span></label>
+              <span class="ctext"><strong>8 · Load balancing observed</strong> — the responding port cycles between the three instances.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>9 · Discovery Locator tested</strong> — auto-routing by service name works.</span></label>
+              <span class="ctext"><strong>9 · Discovery locator tested</strong> — automatic routing by service name works.</span></label>
           </div>
         </details>
       </section>
 
-      <!-- ===== PRE-REQUISITES ===== -->
+      <!-- ===== PREREQS AND PORTS ===== -->
       <div class="section-band">Before you start</div>
       <section class="section">
         <details class="exp" open>
-          <summary><span class="chevron">▶</span> Pre-requisites &amp; ports</summary>
+          <summary><span class="chevron">▶</span> Pre-requisites, Ports &amp; Startup Order</summary>
           <div class="exp-body">
-            <p>Verify each item before starting. The "ready" badge at the top lights up when all four are green.</p>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Java 17+ and an IDE</strong> (IntelliJ or Eclipse/STS)
-                <span class="verify">All four projects are independent Spring Boot apps — using four IDE windows/tabs keeps them organised.</span>
+              <span class="ctext"><strong>JDK 17+ and your IDE</strong> working
+                <span class="verify">Same setup as the previous three sessions.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman installed</strong> (or browser for GET requests)
-                <span class="verify">All endpoints today are GETs, so a browser works too — but Postman makes repeat-hitting easier.</span>
+              <span class="ctext"><strong>A few GB of free RAM</strong> — you'll run up to six Java processes
+                <span class="verify">Each Spring Boot app uses roughly 200–400&nbsp;MB. Close anything heavy (extra IDE windows, Docker, browser tabs) before you begin.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>At least 8 GB RAM free</strong> — you'll run up to six JVMs at once
-                <span class="verify">If your machine slows down, stop the extra Student MS instances after you've confirmed they register.</span>
+              <span class="ctext"><strong>Ports 8080, 8081, 8082, 8083, 8761 and 9393 free</strong>
+                <span class="verify">Stop any Spring Boot app left running from Sessions 1–3 — they almost certainly hold port 8080.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>These ports are free:</strong> 8761, 8080, 8081, 8082, 8083, 9393
-                <span class="verify">Eureka 8761 · Student MS 8080/8082/8083 · Customer MS 8081 · Gateway 9393.</span>
+              <span class="ctext"><strong>Postman ready</strong>, plus a browser
+                <span class="verify">All of today's testing is <code>GET</code> requests, so a browser is enough — but Postman makes repeated calls easier.</span>
               </span>
             </label>
+
+            <h3>Port map — write this down</h3>
+            <table class="issues">
+              <thead><tr><th>Port</th><th>Application</th><th>What it's for</th></tr></thead>
+              <tbody>
+                <tr><td><span class="port">8761</span></td><td><code>eureka-server</code></td><td>The registry + its dashboard</td></tr>
+                <tr><td><span class="port">8080</span></td><td><code>student-ms</code> (instance 1)</td><td>Student service</td></tr>
+                <tr><td><span class="port">8082</span></td><td><code>student-ms</code> (instance 2)</td><td>Same code, second copy</td></tr>
+                <tr><td><span class="port">8083</span></td><td><code>student-ms</code> (instance 3)</td><td>Same code, third copy</td></tr>
+                <tr><td><span class="port">8081</span></td><td><code>customer-ms</code></td><td>Customer service</td></tr>
+                <tr><td><span class="port">9393</span></td><td><code>api-gateway</code></td><td>The single public front door</td></tr>
+              </tbody>
+            </table>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Startup order matters — always Eureka first</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Eureka Server</strong> — wait ~30 seconds for it to be fully up.</li>
+                <li><strong>Student MS</strong> and <strong>Customer MS</strong> — they register themselves.</li>
+                <li><strong>API Gateway</strong> — last, so it can already see the registry.</li>
+              </ol>
+              Start a client before Eureka and you'll see <code>Connection refused</code> in its log. It's
+              <em>harmless</em> — the client retries every 30 seconds and eventually registers — but the noise is
+              confusing while you're learning, so avoid it.
+            </div>
+
             <div class="observe">
-              <span class="lbl">Trainer tip — have a safety net</span>
-              Pre-create and run the Eureka Server on your machine <strong>before</strong> the session. Walk associates
-              through building it step by step, but keep your working copy running so the live demo never breaks while
-              they catch up.
+              <span class="lbl">How to run several apps at once</span>
+              <strong>IntelliJ:</strong> each project opens in its own window, or add them as modules — the Run panel
+              shows a tab per app, and you can leave them all running.
+              <strong>Eclipse:</strong> the Console view has a dropdown listing every running process.
+              <strong>Terminal:</strong> open one terminal tab per project and run
+              <code>./mvnw spring-boot:run</code> in each. Whichever you pick, <strong>don't stop an app once it's
+              running</strong> — later labs depend on the earlier ones still being alive.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SPRING CLOUD VERSION COMPAT (prominent) ===== -->
+      <!-- ===== GOLDEN RULE ===== -->
+      <div class="section-band">Read this once — it applies to all four projects</div>
       <section class="section">
-        <div class="vercompat">
-          <h3>⚠️ Spring Cloud ↔ Spring Boot version compatibility — read this first</h3>
-          <p style="font-size:15.5px; margin:0;">This is the <strong>#1 cause of failure</strong> in this session. Spring Cloud releases are tied to specific Spring Boot versions. On <code>start.spring.io</code> the versions are matched for you automatically — but if you set them manually, use this guide:</p>
-          <table>
-            <thead><tr><th>Spring Boot</th><th>Spring Cloud release train</th></tr></thead>
-            <tbody>
-              <tr><td><code>3.3.x</code></td><td><code>2023.0.x</code> (Leyton)</td></tr>
-              <tr><td><code>3.2.x</code></td><td><code>2023.0.x</code> (Leyton)</td></tr>
-              <tr><td><code>3.1.x</code></td><td><code>2022.0.x</code> (Kilburn)</td></tr>
-              <tr><td><code>2.7.x</code></td><td><code>2021.0.x</code> (Jubilee)</td></tr>
-            </tbody>
-          </table>
-          <p style="font-size:14.5px; margin:10px 0 0; color:#7a5b08;">Symptom of a mismatch: the app fails to start, or <code>@EnableEurekaServer</code>/the gateway classes won't resolve. Fix: align the versions per this table, or just regenerate from Spring Initializr which always picks a compatible pair.</p>
+        <div class="golden">
+          <span class="lbl">⚠️ The Golden Rule, four times over</span>
+          <p style="margin-top:0;">Each project has its <strong>own</strong> base package, and each one is derived by
+          Spring Initializr from Group + Artifact with the hyphen removed. Every class you create must sit in that
+          package or below it.</p>
+          <div class="rule">
+            <table style="width:100%; border-collapse:collapse; font-size:15px;">
+              <tr><td style="padding:4px 8px;">Artifact <code>eureka-server</code></td><td style="padding:4px 8px;">→ base package <code>com.tcs.training.eurekaserver</code></td></tr>
+              <tr><td style="padding:4px 8px;">Artifact <code>student-ms</code></td><td style="padding:4px 8px;">→ base package <code>com.tcs.training.studentms</code></td></tr>
+              <tr><td style="padding:4px 8px;">Artifact <code>customer-ms</code></td><td style="padding:4px 8px;">→ base package <code>com.tcs.training.customerms</code></td></tr>
+              <tr><td style="padding:4px 8px;">Artifact <code>api-gateway</code></td><td style="padding:4px 8px;">→ base package <code>com.tcs.training.apigateway</code></td></tr>
+            </table>
+          </div>
+          <p>Notice the <strong>hyphen disappears</strong>: <code>student-ms</code> becomes
+          <code>studentms</code>, because a Java package name can't contain a hyphen. Initializr strips it
+          automatically. <strong>In every project, open the main class and read its <code>package</code> line before
+          you write anything</strong> — that's your five-second check, and it's the difference between a working lab
+          and an afternoon of silent 404s.</p>
         </div>
       </section>
 
-      <!-- ===== THE LABS ===== -->
-      <div class="section-band">The labs — build the microservices system</div>
-
       <!-- ===== LAB 1: EUREKA SERVER ===== -->
+      <div class="section-band">The labs</div>
       <section class="section">
         <details class="exp lab1" open>
-          <summary><span class="lab-tag">LAB 1</span><span class="port-tag">:8761</span><span class="chevron">▶</span> Create the Eureka Server</summary>
+          <summary><span class="lab-tag">LAB 1</span><span class="port">:8761</span><span class="chevron">▶</span> Project 1 — The Eureka Server</summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Concept</span>
-              The Eureka Server is the <strong>service registry</strong> — the phonebook every other service registers
-              with. It's almost pure config: one annotation and four properties.
+              The registry is itself just a Spring Boot app. Its whole job is to hold a live list of which services
+              exist and where they are. You'll write <strong>one annotation</strong> and <strong>four properties</strong>
+              — no other code at all.
             </div>
 
             <div class="newproj">
-              <span class="lbl">📦 Generate this project on Spring Initializr</span>
-              <p style="margin:0 0 6px;">Open <code>https://start.spring.io</code> in your browser and fill in the form <strong>exactly</strong> like this:</p>
+              <span class="lbl">📦 Generate project 1 of 4 on Spring Initializr</span>
+              Open <code>https://start.spring.io</code>:
               <table>
-                <tr><th>Project</th><td>Maven</td></tr>
-                <tr><th>Language</th><td>Java</td></tr>
-                <tr><th>Java</th><td>17</td></tr>
+                <tr><th>Project</th><td><code>Maven</code> &nbsp;·&nbsp; Language <code>Java</code></td></tr>
+                <tr><th>Spring Boot</th><td>the default <strong>3.x</strong> release (avoid SNAPSHOT / M / RC)</td></tr>
                 <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
                 <tr><th>Artifact</th><td><code>eureka-server</code></td></tr>
-                <tr><th>Packaging</th><td>Jar</td></tr>
-                <tr><th>Dependencies</th><td><code>Eureka Server</code> (<code>spring-cloud-starter-netflix-eureka-server</code>) — that's the <strong>only</strong> one</td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.eurekaserver</code> &nbsp;← <strong>check it; the hyphen is dropped</strong></td></tr>
+                <tr><th>Packaging</th><td><code>Jar</code> &nbsp;·&nbsp; Java <code>17</code></td></tr>
+                <tr><th>Dependencies</th><td><strong>Eureka Server</strong> — search "Eureka", pick <em>Eureka Server</em>. That is the <strong>only</strong> dependency.</td></tr>
               </table>
-              <p style="margin:8px 0 0;">Click <strong>Generate</strong> → unzip → import into your IDE
-                (IntelliJ: File → Open → pick <code>pom.xml</code>; Eclipse: File → Import → Maven → Existing Maven Projects).</p>
+              Click <strong>Generate</strong>, unzip into a folder you'll remember, and import into your IDE.
+            </div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Do not add Spring Web to this project</span>
+              Eureka Server brings its own web layer and dashboard. Adding Spring Web as well can cause startup
+              conflicts. <strong>One dependency only.</strong>
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Open the generated main class
-                    <code>EurekaServerApplication.java</code> (under <code>src/main/java/com/tcs/training/eurekaserver</code>).</li>
-                <li>Replace its contents with file ① below — the only change is adding
-                    <code>@EnableEurekaServer</code>.</li>
-                <li>Open <code>src/main/resources/application.properties</code> and replace its contents with the four lines in file ②.</li>
+                <li>Open <code>EurekaServerApplication.java</code> and <strong>read the first line</strong> — it should
+                    say <code>package com.tcs.training.eurekaserver;</code>.</li>
+                <li>Replace the whole file with the code below — it adds one annotation and one import.</li>
+                <li>Replace <code>application.properties</code> with the configuration below.</li>
+                <li>Run it, then open <code>http://localhost:8761</code> in a browser.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/eurekaserver/EurekaServerApplication.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>First line of <code>EurekaServerApplication.java</code> reads
+              <code>package com.tcs.training.eurekaserver;</code></strong>
+                <span class="verify">If it differs, use your own value throughout — or re-generate with Artifact <code>eureka-server</code>.</span>
+              </span>
+            </label>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">eureka-server/src/main/java/com/tcs/training/eurekaserver/EurekaServerApplication.java</span><span class="fb-tag">replace the whole file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.eurekaserver;
 
 import org.springframework.boot.SpringApplication;
@@ -766,7 +871,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
 @SpringBootApplication
-@EnableEurekaServer                  <span class="code-comment">// turns this app INTO the registry</span>
+@EnableEurekaServer      // ← the one line that turns this app into the registry
 public class EurekaServerApplication {
 
     public static void main(String[] args) {
@@ -774,53 +879,62 @@ public class EurekaServerApplication {
     }
 }</code></pre></div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
-            <div class="codewrap"><pre><code>server.port=8761
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">eureka-server/src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code># The conventional port for a Eureka registry
+server.port=8761
 spring.application.name=eureka-server
+
+# A registry does not register with itself, and does not fetch its own list.
+# Leave these out and the log fills with connection errors.
 eureka.client.register-with-eureka=false
 eureka.client.fetch-registry=false</code></pre></div>
 
             <div class="prop-list">
-              <div class="prop-row"><code>server.port=8761</code><span class="pd">The standard Eureka port — clients are configured to expect it here.</span></div>
-              <div class="prop-row"><code>spring.application.name=eureka-server</code><span class="pd">A friendly name for this app.</span></div>
-              <div class="prop-row"><code>eureka.client.register-with-eureka=false</code><span class="pd">The server shouldn't register itself in its own registry.</span></div>
-              <div class="prop-row"><code>eureka.client.fetch-registry=false</code><span class="pd">It doesn't pull a registry from elsewhere — it IS the registry.</span></div>
+              <div class="prop-row"><code>server.port=8761</code><span class="pd">The standard Eureka port. Every client will point here.</span></div>
+              <div class="prop-row"><code>eureka.client.register-with-eureka=false</code><span class="pd">"Don't announce myself to a registry" — I <em>am</em> the registry.</span></div>
+              <div class="prop-row"><code>eureka.client.fetch-registry=false</code><span class="pd">"Don't download the service list from anyone" — I own it.</span></div>
             </div>
 
             <div class="runbox">
-              <span class="lbl">▶ Run this project (eureka-server)</span>
+              <span class="lbl">Now run it</span>
               <ol>
-                <li>Right-click <code>EurekaServerApplication.java</code> → <strong>Run As → Java Application</strong>
-                    (Eclipse), or click the green ▶ next to <code>main</code> (IntelliJ).</li>
-                <li>Wait until you see <code>Started EurekaServerApplication in ...</code> in the console.</li>
-                <li>Open <code>http://localhost:8761</code> in your browser — the Eureka dashboard loads.</li>
-                <li><strong>Leave this app running</strong> for the rest of the session — Labs 2–8 connect to it.</li>
+                <li>Run <code>EurekaServerApplication</code>.</li>
+                <li>Wait for <strong>"Tomcat started on port 8761"</strong>.</li>
+                <li>Open <code>http://localhost:8761</code> in a browser.</li>
+                <li><strong>Leave this app running for the rest of the session.</strong></li>
               </ol>
             </div>
 
-            <div class="dash-mock">
-              <div class="dm-top">📇 Spring Eureka — System Status · localhost:8761</div>
-              <table>
-                <thead><tr><th>Application</th><th>AMIs</th><th>Status</th></tr></thead>
-                <tbody>
-                  <tr><td colspan="3" style="text-align:center; color:var(--mac-text-muted);">No instances available</td></tr>
-                </tbody>
-              </table>
-            </div>
             <div class="expected">
-              <span class="lbl">Expected</span>
-              The Eureka dashboard loads. Under "Instances currently registered with Eureka" it says
-              <strong>"No instances available"</strong> — correct, because nothing has registered yet.
+              <span class="lbl">Expected — the Eureka dashboard</span>
+              <p>A page headed "Spring Eureka" with a <strong>System Status</strong> panel and, crucially, an
+              <strong>"Instances currently registered with Eureka"</strong> table that is <strong>empty</strong>:</p>
+              <div class="dash-mock">
+                <div class="dm-top">🖥️ Spring Eureka &nbsp;·&nbsp; http://localhost:8761</div>
+                <table>
+                  <thead><tr><th>Application</th><th>AMIs</th><th>Availability Zones</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td colspan="4" style="text-align:center; color:var(--mac-text-muted);">No instances available</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <strong>"No instances available" is the correct result</strong> — nothing has registered yet, because we
+              haven't built any services. You'll watch this table fill up over the next two labs.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Eureka dashboard loads at <code>localhost:8761</code> and shows "No instances available".</span>
+              </label>
             </div>
+
+            <h3>Common issues</h3>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
-                <tr><td>Port 8761 already in use</td><td>Another process (or an old run) is on it.</td><td>Find &amp; stop it: <code>lsof -i:8761</code> (Mac/Linux) or <code>netstat -ano | findstr 8761</code> (Windows), then kill the PID.</td></tr>
-                <tr><td><code>@EnableEurekaServer</code> not found</td><td>Spring Cloud version mismatch or missing dependency.</td><td>Check the version compatibility box above; confirm the Eureka Server starter is in <code>pom.xml</code>.</td></tr>
+                <tr><td>Log flooded with <code>Cannot execute request on any known server</code></td><td>You missed the two <code>eureka.client.*=false</code> properties.</td><td>Add both. The registry was trying to register with itself.</td></tr>
+                <tr><td><code>Port 8761 was already in use</code></td><td>Another Eureka is still running.</td><td>Stop it, or change <code>server.port</code> (and every client's <code>defaultZone</code> to match).</td></tr>
+                <tr><td>Blank page or 404 at <code>localhost:8761</code></td><td><code>@EnableEurekaServer</code> is missing.</td><td>Add the annotation and the import, then restart.</td></tr>
+                <tr><td><code>Cannot resolve @EnableEurekaServer</code></td><td>The Eureka Server dependency wasn't added.</td><td>Add <code>spring-cloud-starter-netflix-eureka-server</code> to <code>pom.xml</code> and refresh Maven — or regenerate the project.</td></tr>
               </tbody>
             </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Eureka dashboard loads at <code>localhost:8761</code> with "No instances available".</span></label>
           </div>
         </details>
       </section>
@@ -828,105 +942,171 @@ eureka.client.fetch-registry=false</code></pre></div>
       <!-- ===== LAB 2: STUDENT MS ===== -->
       <section class="section">
         <details class="exp lab2">
-          <summary><span class="lab-tag">LAB 2</span><span class="port-tag">:8080</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Create the Student Microservice</summary>
+          <summary><span class="lab-tag">LAB 2</span><span class="port">:8080</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Project 2 — The Student Microservice</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              A normal Spring Boot REST app that <strong>registers itself with Eureka</strong>. The only new ingredient
-              is the Eureka Client dependency plus the <code>defaultZone</code> property pointing at the registry.
+              <span class="lbl">Concept — a client needs no annotation at all</span>
+              Unlike the server, a Eureka <em>client</em> needs <strong>no special annotation</strong>. Having the
+              discovery-client dependency on the classpath is enough — auto-configuration (Session 1!) spots it and
+              registers the app automatically. All you provide is <code>spring.application.name</code> and the
+              registry's address.
+              <br><br>
+              The endpoint deliberately <strong>returns its own port</strong>. That's how you'll <em>see</em> load
+              balancing later: identical requests will come back with different ports.
             </div>
 
             <div class="newproj">
-              <span class="lbl">📦 Generate a SECOND project on Spring Initializr</span>
-              <p style="margin:0 0 6px;">This is a <strong>brand new project</strong> — go back to <code>https://start.spring.io</code> and generate it separately:</p>
+              <span class="lbl">📦 Generate project 2 of 4 — a brand new project</span>
+              Go back to <code>https://start.spring.io</code> and generate this separately:
               <table>
                 <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
                 <tr><th>Artifact</th><td><code>student-ms</code></td></tr>
-                <tr><th>Java</th><td>17</td></tr>
-                <tr><th>Dependencies</th><td><code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.studentms</code> &nbsp;← <strong>hyphen dropped</strong></td></tr>
+                <tr><th>Java</th><td><code>17</code> &nbsp;·&nbsp; Packaging <code>Jar</code></td></tr>
+                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong> &nbsp;<span class="muted">(search "Eureka" and pick the <em>Client</em>, not the Server)</span></td></tr>
               </table>
-              <p style="margin:8px 0 0;">Generate → unzip into a <strong>different folder</strong> from <code>eureka-server</code> → import into the IDE
-                  alongside the Eureka project.</p>
+              Generate → unzip into a <strong>different folder</strong> from eureka-server → import alongside it.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>In the new <code>student-ms</code> project, right-click the package
-                    <code>com.tcs.training.studentms</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.studentms.controller</code>.</li>
-                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
-                    name <code>StudentController</code> → Finish. Replace the file with code ① below.</li>
-                <li>Open <code>src/main/resources/application.properties</code> and replace its contents with file ②.</li>
+                <li>Open <code>StudentMsApplication.java</code> and read line 1 — expect
+                    <code>package com.tcs.training.studentms;</code>.</li>
+                <li>Replace <code>application.properties</code> with the config below.</li>
+                <li>Create the package <code>com.tcs.training.studentms.controller</code>
+                    <em>(right-click the base package → New → Package)</em>.</li>
+                <li>In it, create the class <code>StudentController</code> and paste the file below.</li>
+                <li>Run it — <strong>with Eureka still running</strong> — and refresh the Eureka dashboard.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/studentms/controller/StudentController.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>First line of <code>StudentMsApplication.java</code> reads
+              <code>package com.tcs.training.studentms;</code></strong></span>
+            </label>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">student-ms/src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>server.port=8080
+
+# This name IS the service's identity in the registry.
+# Eureka upper-cases it, so it appears as STUDENT-MS.
+# Other services will refer to it as lb://STUDENT-MS — never by port.
+spring.application.name=student-ms
+
+# Where the registry lives
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+
+# Prefer the IP address over the hostname — avoids DNS oddities on laptops
+eureka.instance.prefer-ip-address=true</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/src/main/java/com/tcs/training/studentms/controller/StudentController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.studentms.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/students")
+@RequestMapping("/api/students")
 public class StudentController {
 
-    @Autowired
-    private Environment environment;     <span class="code-comment">// lets us read the actual running port</span>
+    // @Value injects a property at startup. We inject our OWN port so every
+    // response can announce which instance answered — that is how you will
+    // SEE load balancing working in Lab 7.
+    @Value("${server.port}")
+    private String port;
 
+    // GET /api/students
     @GetMapping
-    public String getStudents() {
-        return "Student Service - Port: "
-                + environment.getProperty("local.server.port");
+    public Map&lt;String, Object&gt; getAllStudents() {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "STUDENT-MS");
+        response.put("servedByPort", port);          // ← watch this value change
+        response.put("students", List.of("Amit Shah", "Neha Patel", "Ravi Kumar"));
+        return response;
+    }
+
+    // GET /api/students/1
+    @GetMapping("/{id}")
+    public Map&lt;String, Object&gt; getStudentById(@PathVariable int id) {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "STUDENT-MS");
+        response.put("servedByPort", port);
+        response.put("id", id);
+        response.put("name", "Student number " + id);
+        return response;
     }
 }</code></pre></div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
-            <div class="codewrap"><pre><code>server.port=8080
-spring.application.name=STUDENT-MS
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Critical — the service name</span>
-              <code>spring.application.name=STUDENT-MS</code> must be <strong>exactly this</strong> (uppercase by
-              convention). The Gateway will route to this precise name with <code>lb://STUDENT-MS</code>. A typo here
-              means the gateway route silently fails to resolve.
-            </div>
+
             <div class="runbox">
-              <span class="lbl">▶ Run this project (student-ms)</span>
+              <span class="lbl">Now run it</span>
               <ol>
-                <li>Make sure <strong>eureka-server is still running</strong> on port 8761 — open <code>http://localhost:8761</code> to confirm.</li>
-                <li>Right-click <code>StudentMsApplication.java</code> (the main class in the <code>student-ms</code> project) → <strong>Run As → Java Application</strong>.</li>
-                <li>Wait for "Started StudentMsApplication" in the console.</li>
-                <li>Refresh <code>http://localhost:8761</code> — STUDENT-MS should now appear under "Instances currently registered".</li>
-                <li>Hit <code>http://localhost:8080/students</code> directly to confirm the service responds.</li>
-                <li><strong>Leave this app running</strong> — you'll keep it up for the rest of the session.</li>
+                <li>Confirm <strong>Eureka is still running</strong> on 8761.</li>
+                <li>Run <code>StudentMsApplication</code>. Wait for "Tomcat started on port 8080".</li>
+                <li>Test it <strong>directly</strong>: <code>http://localhost:8080/api/students</code></li>
+                <li><strong>Wait ~30 seconds</strong>, then refresh <code>http://localhost:8761</code>.</li>
+                <li>Leave this running too.</li>
               </ol>
             </div>
-            <div class="dash-mock">
-              <div class="dm-top">📇 Eureka — Instances currently registered</div>
-              <table>
-                <thead><tr><th>Application</th><th>Status</th><th>Instance</th></tr></thead>
-                <tbody>
-                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (1)</td><td><code>localhost:STUDENT-MS:8080</code></td></tr>
-                </tbody>
-              </table>
-            </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              STUDENT-MS appears in the Eureka instances table with port 8080. Hitting
-              <code>localhost:8080/students</code> directly returns <code>Student Service - Port: 8080</code>.
+              <span class="lbl">Expected 1 — the direct call</span>
+              <div class="codewrap"><pre><code>{
+  "service": "STUDENT-MS",
+  "servedByPort": "8080",
+  "students": ["Amit Shah", "Neha Patel", "Ravi Kumar"]
+}</code></pre></div>
             </div>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr><td>Registers then immediately disappears</td><td>Eureka server isn't actually running, or wrong <code>defaultZone</code>.</td><td>Confirm 8761 is up and the URL is exactly <code>http://localhost:8761/eureka/</code> (trailing slash).</td></tr>
-                <tr><td>App won't start — bean/version errors</td><td>Spring Boot ↔ Spring Cloud mismatch.</td><td>See the version compatibility box above.</td></tr>
-              </tbody>
-            </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">STUDENT-MS registered in Eureka; <code>localhost:8080/students</code> returns the port string.</span></label>
+
+            <div class="expected">
+              <span class="lbl">Expected 2 — it has registered itself</span>
+              <div class="dash-mock">
+                <div class="dm-top">🖥️ Spring Eureka &nbsp;·&nbsp; Instances currently registered with Eureka</div>
+                <table>
+                  <thead><tr><th>Application</th><th>Availability Zones</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">STUDENT-MS</td><td>n/a (1)</td><td class="up">UP (1) — <code>192.168.x.x:student-ms:8080</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <strong>You wrote no registration code.</strong> The dependency plus two properties was enough — the
+              service announced itself and Eureka listed it.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>STUDENT-MS</code> appears in the Eureka dashboard with status <code>UP (1)</code>.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Direct call to <code>localhost:8080/api/students</code> returns JSON showing <code>"servedByPort": "8080"</code>.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Watch the registration in the log</span>
+              <div class="logmock"><span class="dim">INFO</span> DiscoveryClient_STUDENT-MS/...:8080 - registration status: <span class="hit">204</span><br>
+                <span class="dim">INFO</span> Tomcat started on port <span class="port">8080</span> (http)<br>
+                <span class="dim">INFO</span> DiscoveryClient_STUDENT-MS/...:8080 - <span class="hit">registration succeeded</span>
+              </div>
+              A status of <code>204</code> means Eureka accepted it. From now on this service sends a heartbeat every
+              30 seconds; go quiet for ~90 seconds and Eureka removes it from the list.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">If <code>STUDENT-MS</code> doesn't appear</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Wait longer</strong> — registration can take up to 30 seconds. Refresh the page.</li>
+                <li>Check <code>eureka.client.service-url.defaultZone</code> ends with <code>/eureka/</code>
+                    <em>(including the trailing slash)</em>.</li>
+                <li>Check <code>spring.application.name</code> is set. Without it the service registers as
+                    <code>UNKNOWN</code>.</li>
+                <li>Confirm Eureka is actually up at <code>localhost:8761</code>.</li>
+              </ol>
+            </div>
           </div>
         </details>
       </section>
@@ -934,371 +1114,592 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre>
       <!-- ===== LAB 3: CUSTOMER MS ===== -->
       <section class="section">
         <details class="exp lab3">
-          <summary><span class="lab-tag">LAB 3</span><span class="port-tag">:8081</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Create the Customer Microservice</summary>
+          <summary><span class="lab-tag">LAB 3</span><span class="port">:8081</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Project 3 — The Customer Microservice</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              Exactly the same pattern as Lab 2 — go fast. Different name (<code>CUSTOMER-MS</code>), different port
-              (<code>8081</code>), different endpoint (<code>/customers</code>).
+              <span class="lbl">Concept — proving the pattern repeats</span>
+              This is the same recipe as Lab 2 with a different name and port. That's the point: <strong>registering a
+              new service costs two properties and one dependency</strong>. Having two services also gives the gateway
+              something real to route <em>between</em>.
             </div>
 
             <div class="newproj">
-              <span class="lbl">📦 Generate a THIRD project on Spring Initializr</span>
-              <p style="margin:0 0 6px;">Same recipe as Lab 2, just a different artifact name:</p>
+              <span class="lbl">📦 Generate project 3 of 4</span>
+              Same recipe as Lab 2, different artifact:
               <table>
                 <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
                 <tr><th>Artifact</th><td><code>customer-ms</code></td></tr>
-                <tr><th>Java</th><td>17</td></tr>
-                <tr><th>Dependencies</th><td><code>Spring Web</code> + <code>Eureka Discovery Client</code> + <code>Spring Boot DevTools</code></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.customerms</code></td></tr>
+                <tr><th>Java</th><td><code>17</code> &nbsp;·&nbsp; Packaging <code>Jar</code></td></tr>
+                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong></td></tr>
               </table>
-              <p style="margin:8px 0 0;">Generate → unzip into a separate folder → import.</p>
+              Generate → unzip into its own folder → import.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>In the <code>customer-ms</code> project, create the package
-                    <code>com.tcs.training.customerms.controller</code>.</li>
-                <li>Inside it, create class <code>CustomerController</code> and replace its contents with file ①.</li>
-                <li>Replace <code>application.properties</code> with file ②.</li>
+                <li>Check line 1 of <code>CustomerMsApplication.java</code> reads
+                    <code>package com.tcs.training.customerms;</code>.</li>
+                <li>Replace <code>application.properties</code> with the config below — note the port is
+                    <strong>8081</strong>.</li>
+                <li>Create the package <code>com.tcs.training.customerms.controller</code>.</li>
+                <li>In it, create <code>CustomerController</code> and paste the file below.</li>
+                <li>Run it, test it directly, then refresh the Eureka dashboard.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/customerms/controller/CustomerController.java</span><span class="fb-tag">file ① — paste the WHOLE file</span></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>First line of <code>CustomerMsApplication.java</code> reads
+              <code>package com.tcs.training.customerms;</code></strong></span>
+            </label>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">customer-ms/src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>server.port=8081
+
+spring.application.name=customer-ms
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/src/main/java/com/tcs/training/customerms/controller/CustomerController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.customerms.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
-@RequestMapping("/customers")
+@RequestMapping("/api/customers")
 public class CustomerController {
 
-    @Autowired
-    private Environment environment;
+    @Value("${server.port}")
+    private String port;
 
+    // GET /api/customers
     @GetMapping
-    public String getCustomers() {
-        return "Customer Service - Port: "
-                + environment.getProperty("local.server.port");
+    public Map&lt;String, Object&gt; getAllCustomers() {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("customers", List.of("Tata Motors", "Infosys", "Reliance"));
+        return response;
+    }
+
+    // GET /api/customers/1
+    @GetMapping("/{id}")
+    public Map&lt;String, Object&gt; getCustomerById(@PathVariable int id) {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("id", id);
+        response.put("name", "Customer number " + id);
+        return response;
     }
 }</code></pre></div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/src/main/resources/application.properties</span><span class="fb-tag">file ② — REPLACE</span></div>
-            <div class="codewrap"><pre><code>server.port=8081
-spring.application.name=CUSTOMER-MS
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+
             <div class="runbox">
-              <span class="lbl">▶ Run this project (customer-ms)</span>
+              <span class="lbl">Now run it</span>
               <ol>
-                <li>Eureka Server still running on 8761? Student MS still running on 8080? Good.</li>
-                <li>Right-click <code>CustomerMsApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
-                <li>Refresh <code>http://localhost:8761</code> — both STUDENT-MS and CUSTOMER-MS should now be listed.</li>
-                <li>Hit <code>http://localhost:8081/customers</code> directly to confirm.</li>
-                <li><strong>Leave it running</strong> — you'll need it for Labs 5–8.</li>
+                <li>Keep Eureka and Student MS running. Run <code>CustomerMsApplication</code>.</li>
+                <li>Test directly: <code>http://localhost:8081/api/customers</code></li>
+                <li>Wait ~30 seconds, then refresh <code>http://localhost:8761</code>.</li>
               </ol>
             </div>
-            <div class="dash-mock">
-              <div class="dm-top">📇 Eureka — Instances currently registered</div>
-              <table>
-                <thead><tr><th>Application</th><th>Status</th><th>Instance</th></tr></thead>
-                <tbody>
-                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (1)</td><td><code>:8080</code></td></tr>
-                  <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
-                </tbody>
-              </table>
-            </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              Both STUDENT-MS and CUSTOMER-MS show as UP in the Eureka dashboard.
-              <code>localhost:8081/customers</code> returns <code>Customer Service - Port: 8081</code>.
+              <span class="lbl">Expected — two services registered</span>
+              <div class="dash-mock">
+                <div class="dm-top">🖥️ Spring Eureka &nbsp;·&nbsp; Instances currently registered</div>
+                <table>
+                  <thead><tr><th>Application</th><th>Availability Zones</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">CUSTOMER-MS</td><td>n/a (1)</td><td class="up">UP (1) — <code>:8081</code></td></tr>
+                    <tr><td class="app">STUDENT-MS</td><td>n/a (1)</td><td class="up">UP (1) — <code>:8080</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Both <code>STUDENT-MS</code> and <code>CUSTOMER-MS</code> are listed as <code>UP</code> in Eureka.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">CUSTOMER-MS registered; both services visible in Eureka.</span></label>
+
+            <div class="concept">
+              <span class="lbl">You now have a service registry doing its job</span>
+              Two independent applications, on different ports, both discoverable <strong>by name</strong> rather than
+              by address. Nothing knows anyone else's port. The next two labs exploit that: first by running the same
+              service three times, then by putting a gateway in front of everything.
+            </div>
           </div>
         </details>
       </section>
+
 
       <!-- ===== LAB 4: MULTIPLE INSTANCES ===== -->
       <section class="section">
         <details class="exp lab4">
-          <summary><span class="lab-tag">LAB 4</span><span class="port-tag">:8082 / :8083</span><span class="chevron">▶</span> Run Multiple Instances of Student MS</summary>
+          <summary><span class="lab-tag">LAB 4</span><span class="port">:8082</span><span class="port">:8083</span><span class="chevron">▶</span> Scale Student MS to Three Instances</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              Right now Student MS runs on 8080. We'll start two <strong>more</strong> instances of the <em>same</em>
-              project on 8082 and 8083 to simulate <strong>horizontal scaling</strong> — without creating new projects.
-              We override the port at runtime with a VM argument.
+              <span class="lbl">Concept — horizontal scaling, for real</span>
+              This is <strong>horizontal scaling</strong> from the theory deck: instead of one bigger machine, run
+              <em>more copies</em> of the same application. <strong>Same code, same JAR, different port.</strong> Each
+              copy registers itself under the <em>same</em> name <code>STUDENT-MS</code>, so Eureka ends up listing one
+              service with three instances — and any caller asking for <code>STUDENT-MS</code> gets all three back.
+              <br><br>
+              This only works because the service is <strong>stateless</strong> (Session 2). If it kept per-user data
+              in memory, three copies would disagree with each other.
             </div>
 
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this — pick whichever method suits your setup</span>
+              <p style="margin:6px 0;"><strong>Do NOT edit <code>application.properties</code>.</strong> We override
+              the port at launch time, so all three instances run the identical build.</p>
               <ol>
-                <li><strong>Don't stop</strong> the original 8080 instance — leave it running.</li>
-                <li>Make a <em>copy</em> of its run configuration (see your IDE's instructions in the two cards below)
-                    and add a VM argument <code>-Dserver.port=8082</code> to the copy.</li>
-                <li>Run that copy → confirm a second <code>StudentMsApplication</code> log appears, this time saying port 8082.</li>
-                <li>Repeat: copy the config again, change to <code>-Dserver.port=8083</code>, run.</li>
-                <li>You should now have <strong>three</strong> Student MS instances running side-by-side. Refresh
-                    <code>http://localhost:8761</code>.</li>
+                <li><strong>Method A — terminal (simplest).</strong> Open two <em>new</em> terminal tabs in the
+                    <code>student-ms</code> folder and run one command in each.</li>
+                <li><strong>Method B — IntelliJ.</strong> Run → Edit Configurations → select
+                    <code>StudentMsApplication</code> → click <strong>Copy Configuration</strong> (the duplicate icon)
+                    → name it <code>StudentMs-8082</code> → in <strong>Program arguments</strong> put
+                    <code>--server.port=8082</code>. Repeat for 8083. Then run both.
+                    <em>(If you don't see "Program arguments", enable Modify options → Program arguments.)</em></li>
+                <li><strong>Method C — Eclipse.</strong> Run → Run Configurations → select the app → duplicate it →
+                    <strong>Arguments</strong> tab → Program arguments: <code>--server.port=8082</code>. Repeat for 8083.</li>
               </ol>
             </div>
 
-            <div class="twocol" style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
-              <div class="concept" style="margin:0;">
-                <span class="lbl">IntelliJ IDEA</span>
-                <ol style="margin:6px 0 0; padding-left:18px; font-size:15.5px;">
-                  <li>Run → <strong>Edit Configurations…</strong></li>
-                  <li>Select the Student MS config → <strong>Copy</strong> it (the duplicate icon)</li>
-                  <li>Rename to "Student MS · 8082"</li>
-                  <li>In <strong>VM options</strong> add: <code>-Dserver.port=8082</code><br><span style="font-size:13px; color:var(--mac-text-muted);">(if VM options is hidden: Modify options → Add VM options)</span></li>
-                  <li>Apply → Run. Repeat for <code>-Dserver.port=8083</code></li>
-                </ol>
-              </div>
-              <div class="concept" style="margin:0;">
-                <span class="lbl">Eclipse / STS</span>
-                <ol style="margin:6px 0 0; padding-left:18px; font-size:15.5px;">
-                  <li>Right-click project → Run As → <strong>Run Configurations…</strong></li>
-                  <li>New <strong>Maven Build</strong></li>
-                  <li>Goals: <code>spring-boot:run</code></li>
-                  <li>VM Arguments: <code>-Dserver.port=8082</code></li>
-                  <li>Apply → Run. Repeat for <code>8083</code></li>
-                </ol>
-              </div>
-            </div>
+            <div class="filebar"><span class="fb-icon">💻</span><span class="fb-name">Method A — run these in the student-ms project folder</span><span class="fb-tag">two NEW terminal tabs</span></div>
+            <div class="codewrap"><pre><code># Terminal tab 2 — Mac / Linux
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8082
+
+# Terminal tab 3 — Mac / Linux
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8083</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">💻</span><span class="fb-name">Method A — the same thing on Windows</span><span class="fb-tag">two NEW terminal tabs</span></div>
+            <div class="codewrap"><pre><code>mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--server.port=8082
+
+mvnw.cmd spring-boot:run -Dspring-boot.run.arguments=--server.port=8083</code></pre></div>
+
             <div class="observe">
-              <span class="lbl">Command-line alternative (any IDE)</span>
-              From the <code>student-ms</code> folder you can also run:
-              <div class="codewrap"><pre><code>mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Dserver.port=8082"</code></pre></div>
-              Open a second terminal and repeat with <code>8083</code>.
+              <span class="lbl">Alternative: build once, run three times</span>
+              Closer to how it works in production — one artifact, many processes:
+              <div class="codewrap"><pre><code>./mvnw clean package -DskipTests
+java -jar target/student-ms-0.0.1-SNAPSHOT.jar --server.port=8082
+java -jar target/student-ms-0.0.1-SNAPSHOT.jar --server.port=8083</code></pre></div>
+              Notice the <code>--server.port=</code> argument <strong>overrides</strong> the value in
+              <code>application.properties</code>. Command-line arguments beat property files — that's the
+              configuration precedence rule from Session 1, and it's exactly how deployment platforms inject
+              environment-specific settings.
             </div>
-            <ol class="steps">
-              <li><strong>Refresh</strong> the Eureka dashboard at <code>localhost:8761</code>.</li>
-            </ol>
-            <div class="dash-mock">
-              <div class="dm-top">📇 Eureka — STUDENT-MS now has 3 instances</div>
-              <table>
-                <thead><tr><th>Application</th><th>Status</th><th>Instances</th></tr></thead>
-                <tbody>
-                  <tr><td class="app">STUDENT-MS</td><td class="up">UP (3)</td><td><code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
-                  <tr><td class="app">CUSTOMER-MS</td><td class="up">UP (1)</td><td><code>:8081</code></td></tr>
-                </tbody>
-              </table>
+
+            <div class="runbox">
+              <span class="lbl">Now check the result</span>
+              <ol>
+                <li>You should now have <strong>five</strong> processes running: Eureka, Student MS ×3, Customer MS.</li>
+                <li>Test each instance directly — they should each report their own port:
+                    <br><code>localhost:8080/api/students</code> · <code>localhost:8082/api/students</code> ·
+                    <code>localhost:8083/api/students</code></li>
+                <li><strong>Wait ~30 seconds</strong>, then refresh <code>http://localhost:8761</code>.</li>
+              </ol>
             </div>
+
             <div class="expected">
-              <span class="lbl">Expected — the visual payoff</span>
-              The STUDENT-MS row now lists <strong>three instances</strong> on ports 8080, 8082 and 8083. You've
-              simulated horizontal scaling on one machine.
+              <span class="lbl">Expected — one service, three instances</span>
+              <div class="dash-mock">
+                <div class="dm-top">🖥️ Spring Eureka &nbsp;·&nbsp; Instances currently registered</div>
+                <table>
+                  <thead><tr><th>Application</th><th>Availability Zones</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">CUSTOMER-MS</td><td>n/a (1)</td><td class="up">UP (1) — <code>:8081</code></td></tr>
+                    <tr><td class="app">STUDENT-MS</td><td>n/a <strong>(3)</strong></td><td class="up">UP <strong>(3)</strong> — <code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <strong>One row, three instances.</strong> That's the key observation: Eureka groups them by
+              <code>spring.application.name</code>, so anything asking for <code>STUDENT-MS</code> now receives three
+              addresses and can choose between them.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>STUDENT-MS</code> shows <strong>UP (3)</strong> with ports 8080, 8082 and 8083.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Each instance answers directly and reports its own <code>servedByPort</code>.</span>
+              </label>
             </div>
+
+            <div class="concept">
+              <span class="lbl">Why <code>servedByPort</code> matters from here on</span>
+              Right now you have to type three different URLs to reach three instances — which isn't useful yet. In
+              Lab 7 you'll call <strong>one</strong> gateway URL repeatedly and watch <code>servedByPort</code> cycle
+              <code>8080 → 8082 → 8083 → 8080</code>. That visible rotation is load balancing, and it's why we built
+              the endpoint this way.
+            </div>
+
+            <h3>Common issues</h3>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
-                <tr><td>All three instances show the same port</td><td>The VM argument wasn't applied.</td><td>Double-check it's in <strong>VM options</strong> (not Program arguments) and starts with <code>-D</code>.</td></tr>
-                <tr><td>Second instance fails: "port already in use"</td><td>That port is taken by something else.</td><td>Pick another free port, e.g. <code>8084</code>.</td></tr>
+                <tr><td><code>Port 8082 was already in use</code></td><td>Something else holds it.</td><td>Pick another free port (8084, 8085…) and use it consistently.</td></tr>
+                <tr><td>Only 1 instance shows in Eureka</td><td>Not waited long enough, or an instance failed to start.</td><td>Wait 30s and refresh. Check each terminal actually says "Tomcat started".</td></tr>
+                <tr><td>All three report <code>servedByPort: 8080</code></td><td>The port override didn't apply — usually a typo in the argument.</td><td>It must be <code>--server.port=8082</code> with two leading dashes, as a <em>program</em> argument (not a VM option).</td></tr>
+                <tr><td>Extra instances appear then vanish</td><td>The process stopped, so heartbeats ceased.</td><td>Keep every terminal tab open. Eureka evicts an instance after ~90 seconds of silence.</td></tr>
               </tbody>
             </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Started 8082 and 8083 instances of Student MS.</span></label>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Eureka shows STUDENT-MS with all 3 instances (8080, 8082, 8083).</span></label>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 5: API GATEWAY ===== -->
+      <!-- ===== LAB 5: GATEWAY ===== -->
       <section class="section">
         <details class="exp lab5">
-          <summary><span class="lab-tag">LAB 5</span><span class="port-tag">:9393</span><span class="chevron">▶</span> Create the API Gateway</summary>
+          <summary><span class="lab-tag">LAB 5</span><span class="port">:9393</span><span class="chevron">▶</span> Project 4 — The API Gateway</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              The Gateway is the single entry point. It has <strong>no controller</strong> — it's configuration only.
-              It registers with Eureka (so it can discover services) and we'll add routing in the next lab.
+              <span class="lbl">Concept — the single front door</span>
+              Clients currently need to know four different ports. The gateway fixes that: <strong>one public
+              address</strong> that routes each path to the right service, asks Eureka for its live addresses, and load
+              balances between them. Cross-cutting concerns — auth, rate limiting, CORS — would also live here, written
+              once instead of per service.
             </div>
 
             <div class="newproj">
-              <span class="lbl">📦 Generate the FOURTH project on Spring Initializr</span>
-              <p style="margin:0 0 6px;">One more brand new project — same Spring Initializr, different deps:</p>
+              <span class="lbl">📦 Generate project 4 of 4</span>
               <table>
                 <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
                 <tr><th>Artifact</th><td><code>api-gateway</code></td></tr>
-                <tr><th>Java</th><td>17</td></tr>
-                <tr><th>Dependencies</th><td><strong>Gateway</strong> (<code>spring-cloud-starter-gateway</code>) + <strong>Eureka Discovery Client</strong> &nbsp;<em>— do NOT add Spring Web</em></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.apigateway</code></td></tr>
+                <tr><th>Java</th><td><code>17</code> &nbsp;·&nbsp; Packaging <code>Jar</code></td></tr>
+                <tr><th>Dependencies</th><td><strong>Gateway</strong> <span class="muted">(may be listed as "Reactive Gateway" in newer Initializr versions)</span> + <strong>Eureka Discovery Client</strong></td></tr>
               </table>
-              <p style="margin:8px 0 0;">Generate → unzip → import.</p>
+              Generate → unzip → import.
+            </div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Do NOT add Spring Web to the gateway</span>
+              Spring Cloud Gateway is built on <strong>WebFlux</strong> (reactive), and Spring Web (servlet-based) is
+              its incompatible sibling. Add both and the gateway either fails at startup or silently stops routing.
+              <strong>Two dependencies only: Gateway + Eureka Discovery Client.</strong> If you added Spring Web by
+              mistake, remove it from <code>pom.xml</code> and refresh Maven.
+            </div>
+
+            <div class="vercompat">
+              <h3>⚠️ Version check — this one property prefix changed recently</h3>
+              <p style="margin:6px 0 0; font-size:16px;">Spring Cloud <strong>renamed the gateway properties</strong>
+              in the 2025.0 release train. Both forms are shown below; <strong>use the row that matches your
+              version</strong>. Find your version in the gateway's <code>pom.xml</code>, in the
+              <code>&lt;spring-cloud.version&gt;</code> property.</p>
+              <table>
+                <thead><tr><th>Spring Cloud version</th><th>Property prefix to use</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>2025.0.x and later</strong><br><span class="muted">(Spring Boot 3.5+)</span></td><td><code>spring.cloud.gateway.<strong>server.webflux</strong>.routes[0]…</code></td></tr>
+                  <tr><td><strong>2024.0.x and earlier</strong><br><span class="muted">(Spring Boot 3.4 and below)</span></td><td><code>spring.cloud.gateway.routes[0]…</code></td></tr>
+                </tbody>
+              </table>
+              <p style="margin:10px 0 0; font-size:15.5px;"><strong>How you'll know you picked wrong:</strong> the
+              gateway starts perfectly with no error, but every request through it returns
+              <strong>404</strong> — because your route block was simply ignored as an unknown property.
+              <strong>If that happens, switch to the other prefix.</strong> The old names still work in 2025.0 but log
+              a deprecation warning.</p>
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Open <code>application.properties</code> in the new <code>api-gateway</code> project and replace its contents with the file below.</li>
-                <li>Don't write any controller code — the gateway is configuration-only.</li>
+                <li>Check line 1 of <code>ApiGatewayApplication.java</code> reads
+                    <code>package com.tcs.training.apigateway;</code>.</li>
+                <li><strong>No Java code needed at all</strong> — the generated main class is left exactly as is.</li>
+                <li>Replace <code>application.properties</code> with the config below (using the prefix that matches
+                    your version).</li>
+                <li>Run it, wait for port 9393, then check Eureka.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">REPLACE — base config</span></div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>First line of <code>ApiGatewayApplication.java</code> reads
+              <code>package com.tcs.training.apigateway;</code></strong></span>
+            </label>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/src/main/resources/application.properties — Spring Cloud 2025.0+</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>server.port=9393
 spring.application.name=api-gateway
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+
+# The gateway is a Eureka client too — that is how it learns
+# where STUDENT-MS and CUSTOMER-MS actually are.
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true
+
+# ---------- ROUTE 1: Student Service ----------
+spring.cloud.gateway.server.webflux.routes[0].id=student-service
+spring.cloud.gateway.server.webflux.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.server.webflux.routes[0].predicates[0]=Path=/api/students/**
+
+# ---------- ROUTE 2: Customer Service ----------
+spring.cloud.gateway.server.webflux.routes[1].id=customer-service
+spring.cloud.gateway.server.webflux.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.server.webflux.routes[1].predicates[0]=Path=/api/customers/**
+
+# Log what the gateway is doing — very helpful while learning
+logging.level.org.springframework.cloud.gateway=DEBUG</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/src/main/resources/application.properties — Spring Cloud 2024.0 and earlier</span><span class="fb-tag">use THIS one if your version is older</span></div>
+            <div class="codewrap"><pre><code>server.port=9393
+spring.application.name=api-gateway
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true
+
+# ---------- ROUTE 1: Student Service ----------
+spring.cloud.gateway.routes[0].id=student-service
+spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/students/**
+
+# ---------- ROUTE 2: Customer Service ----------
+spring.cloud.gateway.routes[1].id=customer-service
+spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/customers/**
+
+logging.level.org.springframework.cloud.gateway=DEBUG</code></pre></div>
+
+            <div class="prop-list">
+              <div class="prop-row"><code>routes[0].id=student-service</code><span class="pd">A label for this route. Any unique name; used only in logs.</span></div>
+              <div class="prop-row"><code>routes[0].uri=lb://STUDENT-MS</code><span class="pd"><strong>The important line.</strong> <code>lb://</code> means "ask the registry for this name, then <strong>l</strong>oad <strong>b</strong>alance across the instances it returns." No host, no port — this is where discovery and balancing meet.</span></div>
+              <div class="prop-row"><code>routes[0].predicates[0]=Path=/api/students/**</code><span class="pd">The condition. Any incoming path matching <code>/api/students/…</code> uses this route. <code>**</code> matches everything after it.</span></div>
+            </div>
 
             <div class="runbox">
-              <span class="lbl">▶ Run this project (api-gateway)</span>
+              <span class="lbl">Now run it</span>
               <ol>
-                <li>With Eureka, Student MS (×3) and Customer MS all still running, right-click
-                    <code>ApiGatewayApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
-                <li>Wait for <code>Started ApiGatewayApplication</code> in the console.</li>
-                <li>Refresh <code>http://localhost:8761</code> — API-GATEWAY should now appear in the list.</li>
-                <li>There's nothing to call yet — routes come in Lab 6.</li>
+                <li>Keep all five existing processes running. Run <code>ApiGatewayApplication</code>.</li>
+                <li>Wait for <strong>"Netty started on port 9393"</strong> — note it says <em>Netty</em>, not Tomcat,
+                    because the gateway is reactive.</li>
+                <li>Wait ~30 seconds, then refresh <code>http://localhost:8761</code>.</li>
               </ol>
             </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              The gateway starts on 9393 and appears in the Eureka dashboard alongside STUDENT-MS and CUSTOMER-MS.
-              There's nothing to call yet — routes come next.
+              <span class="lbl">Expected — three applications registered</span>
+              <div class="dash-mock">
+                <div class="dm-top">🖥️ Spring Eureka &nbsp;·&nbsp; Instances currently registered</div>
+                <table>
+                  <thead><tr><th>Application</th><th>Availability Zones</th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">API-GATEWAY</td><td>n/a (1)</td><td class="up">UP (1) — <code>:9393</code></td></tr>
+                    <tr><td class="app">CUSTOMER-MS</td><td>n/a (1)</td><td class="up">UP (1) — <code>:8081</code></td></tr>
+                    <tr><td class="app">STUDENT-MS</td><td>n/a (3)</td><td class="up">UP (3) — <code>:8080</code>, <code>:8082</code>, <code>:8083</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>API-GATEWAY</code> is registered in Eureka, and all six processes are running.</span>
+              </label>
             </div>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr><td>Startup warning / failure about web application type</td><td>Spring Cloud Gateway is built on the reactive (WebFlux) stack — a Web MVC dependency can clash.</td><td>Add <code>spring.main.web-application-type=reactive</code> to <code>application.properties</code>, and make sure <code>spring-boot-starter-web</code> is NOT also included.</td></tr>
-              </tbody>
-            </table>
+
             <div class="observe">
-              <span class="lbl">Why no <code>spring-boot-starter-web</code>?</span>
-              Spring Cloud Gateway uses the <strong>reactive</strong> Netty server, not Tomcat. If you accidentally
-              add the regular Web starter too, they conflict. The Gateway starter brings everything the gateway needs.
+              <span class="lbl">"Netty started" — why not Tomcat?</span>
+              Spring Cloud Gateway runs on <strong>Netty</strong>, a non-blocking server, because a gateway spends
+              almost all its time waiting on <em>other</em> services. A blocking server would tie up one thread per
+              waiting request; Netty handles thousands of concurrent waits on a handful of threads. That's also exactly
+              why adding Spring Web here breaks things — it would try to start Tomcat instead.
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">API Gateway runs on 9393 and is registered in Eureka.</span></label>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 6: MANUAL ROUTES ===== -->
+      <!-- ===== LAB 6: TEST ROUTING ===== -->
       <section class="section">
         <details class="exp lab6">
-          <summary><span class="lab-tag">LAB 6</span><span class="chevron">▶</span> Manual Route Configuration</summary>
+          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Route Everything Through the Gateway</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept — what a route is</span>
-              A <strong>route</strong> maps an incoming URL pattern on the gateway to a backend service. It has three
-              parts: an <strong>id</strong> (any name), a <strong>uri</strong> (which service to forward to), and one or
-              more <strong>predicates</strong> (which incoming URLs trigger it).
+              <span class="lbl">Concept — one address instead of four</span>
+              Every request now goes to <strong>port 9393 only</strong>. The gateway inspects the path, matches a
+              route, resolves the service name via Eureka, and forwards. The client never learns that Student MS lives
+              on 8080, or that there are three of them.
             </div>
 
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this — compare direct calls with gateway calls</span>
               <ol>
-                <li>Open <code>application.properties</code> in the <code>api-gateway</code> project (the one from Lab 5).</li>
-                <li><strong>Append</strong> the six lines below to whatever is already there — keep <code>server.port</code>, <code>spring.application.name</code> and the Eureka <code>defaultZone</code> from Lab 5; just add the routing block underneath.</li>
-                <li>Stop the api-gateway app (red square) and run it again so it picks up the new config.</li>
+                <li>Call each service <strong>directly</strong> (the old way) and note the port in the URL.</li>
+                <li>Call the same endpoints <strong>through the gateway</strong> on 9393.</li>
+                <li>Notice that the responses are <em>identical</em>, but the client only used one port.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">APPEND — manual routes</span></div>
-            <div class="codewrap"><pre><code>spring.cloud.gateway.routes[0].id=student-ms-route
-spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
-spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**
+            <table class="issues">
+              <thead><tr><th>What you're testing</th><th>URL</th><th>Expected</th></tr></thead>
+              <tbody>
+                <tr><td>Student MS — direct</td><td><code>http://localhost:8080/api/students</code></td><td><code>200</code> + <code>servedByPort: 8080</code></td></tr>
+                <tr><td>Customer MS — direct</td><td><code>http://localhost:8081/api/customers</code></td><td><code>200</code> + <code>servedByPort: 8081</code></td></tr>
+                <tr><td><strong>Student MS — via gateway</strong></td><td><code>http://localhost:9393/api/students</code></td><td><code>200</code> + one of 8080/8082/8083</td></tr>
+                <tr><td><strong>Customer MS — via gateway</strong></td><td><code>http://localhost:9393/api/customers</code></td><td><code>200</code> + <code>servedByPort: 8081</code></td></tr>
+                <tr><td>One student — via gateway</td><td><code>http://localhost:9393/api/students/7</code></td><td><code>200</code> + <code>"id": 7</code></td></tr>
+                <tr><td>An unrouted path</td><td><code>http://localhost:9393/api/orders</code></td><td><code>404</code> — no route matches, correctly</td></tr>
+              </tbody>
+            </table>
 
-spring.cloud.gateway.routes[1].id=customer-ms-route
-spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
-spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**</code></pre></div>
-            <div class="concept">
-              <span class="lbl">What <code>lb://</code> means</span>
-              <strong>lb</strong> = Load Balancer. <code>uri=lb://STUDENT-MS</code> tells the gateway: don't use a
-              hardcoded address — ask Eureka for the live instances of <code>STUDENT-MS</code> and load-balance across
-              them. This is what makes round robin work in the next lab.
+            <div class="expected">
+              <span class="lbl">Expected — <code>GET http://localhost:9393/api/students</code></span>
+              <div class="codewrap"><pre><code>{
+  "service": "STUDENT-MS",
+  "servedByPort": "8082",
+  "students": ["Amit Shah", "Neha Patel", "Ravi Kumar"]
+}</code></pre></div>
+              The port might be 8080, 8082 or 8083 — <strong>whichever the load balancer chose</strong>. That's the
+              first hint of Lab 7.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>localhost:9393/api/students</code> works — the gateway routed to Student MS.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>localhost:9393/api/customers</code> works — both routes are functioning.</span>
+              </label>
             </div>
-            <div class="concept">
-              <span class="lbl">What the predicate means</span>
-              <code>Path=/students-api/**</code> means: "any request to the gateway whose path starts with
-              <code>/students-api/</code> gets forwarded to this route's service." The part after is passed along — so
-              <code>:9393/students-api/students</code> → <code>STUDENT-MS</code> + <code>/students</code>.
-            </div>
-            <ol class="steps" start="2">
-              <li><strong>Restart the Gateway</strong> if you haven't already — the new routes only load on startup.</li>
-            </ol>
+
             <div class="observe">
-              <span class="lbl">Path mapping in plain terms</span>
-              Request <code>GET :9393/students-api/students</code> → predicate matches <code>/students-api/**</code> →
-              gateway strips nothing by default and forwards the full path to <code>STUDENT-MS</code>, which serves
-              <code>/students</code>. So your controller's <code>@RequestMapping("/students")</code> lines up with the
-              part after <code>/students-api</code>.
+              <span class="lbl">Watch the gateway make the decision</span>
+              With <code>logging.level.org.springframework.cloud.gateway=DEBUG</code> set, the gateway's console shows
+              its reasoning for each request:
+              <div class="logmock"><span class="dim">DEBUG</span> Pattern "/api/students/**" matches against value "/api/students"<br>
+                <span class="dim">DEBUG</span> Route matched: <span class="hit">student-service</span><br>
+                <span class="dim">DEBUG</span> Mapping [Exchange: GET http://localhost:9393/api/students] to Route{id='student-service', uri=<span class="hit">lb://STUDENT-MS</span>}<br>
+                <span class="dim">DEBUG</span> LoadBalancer selected instance: <span class="port">192.168.x.x:8082</span>
+              </div>
+              Read those four lines in order — path matched → route chosen → service name resolved → <strong>instance
+              selected</strong>. That last line is the load balancer doing its job, in the open.
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Manual routes added for STUDENT-MS and CUSTOMER-MS; gateway restarted.</span></label>
+
+            <div class="observe">
+              <span class="lbl">🚨 Getting 404 through the gateway when direct calls work?</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Wrong property prefix.</strong> By far the most likely cause — see the version box in
+                    Lab 5. Try the other form.</li>
+                <li><strong>Wrong service name.</strong> The name in <code>lb://STUDENT-MS</code> must match the Eureka
+                    dashboard exactly, <strong>upper-case</strong>.</li>
+                <li><strong>Gateway not registered.</strong> Check <code>API-GATEWAY</code> appears in Eureka — without
+                    that it can't resolve <code>lb://</code> names.</li>
+                <li><strong>Path predicate typo.</strong> <code>Path=/api/students/**</code> — the <code>**</code> is
+                    required to match sub-paths.</li>
+                <li><strong>Spring Web on the classpath.</strong> Check <code>pom.xml</code> and remove
+                    <code>spring-boot-starter-web</code> if it's there.</li>
+              </ol>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Inspect the gateway's own routes</span>
+              Add these two lines to the gateway's properties, restart, then open
+              <code>http://localhost:9393/actuator/gateway/routes</code>:
+              <div class="codewrap"><pre><code>management.endpoints.web.exposure.include=health,info,gateway
+management.endpoint.gateway.access=unrestricted</code></pre></div>
+              You get JSON listing every route the gateway actually loaded. If your route isn't in that list, it was
+              never parsed — which points straight back at the property prefix.
+              <span class="muted">(On older Spring Boot versions the second property is
+              <code>management.endpoint.gateway.enabled=true</code>.)</span>
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 7: TEST LOAD BALANCING ===== -->
+      <!-- ===== LAB 7: LOAD BALANCING ===== -->
       <section class="section">
         <details class="exp lab7">
-          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Test Load Balancing <em>(the payoff)</em></summary>
+          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Watch Load Balancing Happen — The Payoff</summary>
           <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — the moment it all comes together</span>
+              You have three identical instances of Student MS. The gateway asks Eureka for
+              <code>STUDENT-MS</code>, receives all three addresses, and picks one per request using
+              <strong>round robin</strong>. Because each instance reports its own port, you can <em>watch</em> the
+              rotation.
+            </div>
+
             <div class="dothis">
-              <span class="lbl">Sanity check before testing</span>
+              <span class="lbl">Do this — send the SAME request six times</span>
               <ol>
-                <li>Eureka Server running on <strong>8761</strong> ✓</li>
-                <li>Three Student MS instances running on <strong>8080, 8082, 8083</strong> ✓ (Eureka shows STUDENT-MS with 3 instances)</li>
-                <li>Customer MS running on <strong>8081</strong> ✓</li>
-                <li>API Gateway running on <strong>9393</strong> ✓ (with the routes from Lab 6)</li>
-              </ol>
-              <p style="margin:8px 0 0;font-size:15px;">Five JVMs in total. If anything's missing, start it before you proceed.</p>
-            </div>
-
-            <div class="runbox">
-              <span class="lbl">▶ Watch round-robin in Postman</span>
-              <ol>
-                <li>Open Postman → click <strong>+</strong> for a new request.</li>
-                <li>Method: <strong><code>GET</code></strong>. URL: <code>http://localhost:9393/students-api/students</code></li>
-                <li>Click <strong>Send</strong> three or four times in quick succession.</li>
-                <li>Watch the response body — the port number cycles 8080 → 8082 → 8083 → 8080 → ...</li>
+                <li>Open <code>http://localhost:9393/api/students</code>.</li>
+                <li><strong>Reload it six times</strong>, reading <code>servedByPort</code> each time. In Postman just
+                    click <strong>Send</strong> repeatedly.</li>
+                <li><strong>Important:</strong> if your browser caches the response and the port never changes, do a
+                    hard reload (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>)
+                    or use Postman / curl instead.</li>
               </ol>
             </div>
 
-            <ol class="steps">
-              <li><strong>In Postman</strong> (or browser): <code>GET http://localhost:9393/students-api/students</code></li>
-              <li><strong>Hit it 3–4 times rapidly.</strong> Watch the port in the response string change each time.</li>
-            </ol>
+            <div class="filebar"><span class="fb-icon">💻</span><span class="fb-name">Or automate it from a terminal — much more convincing</span><span class="fb-tag">Mac / Linux</span></div>
+            <div class="codewrap"><pre><code>for i in 1 2 3 4 5 6; do
+  curl -s http://localhost:9393/api/students | grep -o '"servedByPort":"[0-9]*"'
+done</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">💻</span><span class="fb-name">Windows PowerShell</span><span class="fb-tag">Windows</span></div>
+            <div class="codewrap"><pre><code>1..6 | ForEach-Object {
+  (Invoke-RestMethod http://localhost:9393/api/students).servedByPort
+}</code></pre></div>
+
             <div class="expected">
-              <span class="lbl">Expected — Round Robin in action</span>
-              The response cycles through the instances:
-              <div class="logmock">
-Request 1 → <span class="hit">Student Service - Port: <span class="port">8080</span></span>
-Request 2 → <span class="hit">Student Service - Port: <span class="port">8082</span></span>
-Request 3 → <span class="hit">Student Service - Port: <span class="port">8083</span></span>
-Request 4 → <span class="hit">Student Service - Port: <span class="port">8080</span></span>  (loops back)
+              <span class="lbl">Expected — the port cycles</span>
+              <div class="logmock"><span class="dim">request 1 →</span> "servedByPort":<span class="hit">"8080"</span><br>
+                <span class="dim">request 2 →</span> "servedByPort":<span class="hit">"8082"</span><br>
+                <span class="dim">request 3 →</span> "servedByPort":<span class="hit">"8083"</span><br>
+                <span class="dim">request 4 →</span> "servedByPort":<span class="hit">"8080"</span><br>
+                <span class="dim">request 5 →</span> "servedByPort":<span class="hit">"8082"</span><br>
+                <span class="dim">request 6 →</span> "servedByPort":<span class="hit">"8083"</span>
               </div>
+              <strong>That rotation is round-robin load balancing.</strong> Same URL, same client, three different
+              servers answering in turn — and the client has no idea it's happening.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I called the gateway repeatedly and saw <code>servedByPort</code> cycle between 8080, 8082 and 8083.</span>
+              </label>
             </div>
+
             <div class="observe">
-              <span class="lbl">Watch the consoles too</span>
-              Tile the IDE consoles for all three Student MS instances. As you hit the endpoint, watch which console
-              logs the incoming request — it rotates 8080 → 8082 → 8083. <strong>This is the visual payoff of the whole
-              session:</strong> one URL, traffic spread automatically across three instances by the gateway.
+              <span class="lbl">If the port never changes</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Browser caching</strong> — the most common cause. Use curl or Postman instead.</li>
+                <li><strong>Only one instance is actually registered.</strong> Check Eureka shows
+                    <code>UP (3)</code>.</li>
+                <li><strong>Not enough requests.</strong> Send at least six.</li>
+                <li>The exact starting point of the cycle is arbitrary — <code>8082, 8083, 8080…</code> is equally
+                    correct. What matters is that it <em>rotates</em>.</li>
+              </ol>
             </div>
-            <ol class="steps" start="3">
-              <li><strong>Test Customer MS too:</strong> <code>GET http://localhost:9393/customers-api/customers</code></li>
-            </ol>
-            <div class="expected">
-              <span class="lbl">Expected — Customer MS via gateway</span>
-              <div class="logmock">Student Service - Port: 8080 / 8082 / 8083  (rotating)
-Customer Service - Port: 8081               (only one instance)</div>
-              Both services are now reachable through the <strong>single</strong> gateway port 9393.
+
+            <div class="tryit">
+              <span class="lbl">Try it — high availability, for real (do this one, it's the best part)</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Kill the instance on port 8082</strong> — stop that terminal tab or run configuration.</li>
+                <li>Immediately hit the gateway several times. You may see one or two <strong>failures or delays</strong>
+                    while the system still believes 8082 is alive — that's the real cost of distributed systems, and
+                    exactly why circuit breakers exist.</li>
+                <li><strong>Wait about 60–90 seconds</strong> (Eureka needs missed heartbeats to evict it), refresh the
+                    dashboard, and confirm <code>STUDENT-MS</code> now shows <strong>UP (2)</strong>.</li>
+                <li>Call the gateway again: traffic now cycles only between <strong>8080 and 8083</strong>. The service
+                    <strong>never went down</strong> — it just lost a third of its capacity.</li>
+                <li><strong>Restart the 8082 instance.</strong> Within ~30 seconds it re-registers and rejoins the
+                    rotation, with nothing to reconfigure.</li>
+              </ol>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I killed an instance, watched Eureka drop to <code>UP (2)</code>, and saw traffic continue on the survivors.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I restarted it and watched it rejoin the load-balancing rotation automatically.</span>
+              </label>
             </div>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr><td>503 Service Unavailable</td><td>Gateway can't find the service in Eureka.</td><td>Confirm the service name in <code>lb://NAME</code> exactly matches the registered name, and the service is UP in Eureka.</td></tr>
-                <tr><td>404 Not Found</td><td>Path predicate didn't match, or wrong endpoint path.</td><td>Verify the URL prefix matches the predicate and the service actually serves that sub-path.</td></tr>
-                <tr><td>Always same port — no rotation</td><td>Only one instance is actually running.</td><td>Re-check the Eureka dashboard shows 3 STUDENT-MS instances.</td></tr>
-              </tbody>
-            </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Student MS via gateway rotates across 8080/8082/8083 (Round Robin observed).</span></label>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Customer MS reachable through the same gateway port 9393.</span></label>
+
+            <div class="concept">
+              <span class="lbl">🎉 What you have just demonstrated</span>
+              <ul style="margin:8px 0 0;">
+                <li><strong>Service discovery</strong> — nothing anywhere hardcodes an address.</li>
+                <li><strong>Horizontal scaling</strong> — three copies of one stateless service.</li>
+                <li><strong>Load balancing</strong> — requests distributed round-robin, visibly.</li>
+                <li><strong>High availability</strong> — an instance died and the service kept serving.</li>
+                <li><strong>Self-healing</strong> — it rejoined by itself with zero configuration.</li>
+              </ul>
+              This is the core of every large-scale system you use daily. You built it in one session.
+            </div>
           </div>
         </details>
       </section>
@@ -1306,182 +1707,670 @@ Customer Service - Port: 8081               (only one instance)</div>
       <!-- ===== LAB 8: DISCOVERY LOCATOR ===== -->
       <section class="section">
         <details class="exp lab8">
-          <summary><span class="lab-tag">LAB 8</span><span class="chevron">▶</span> Discovery Locator Approach</summary>
+          <summary><span class="lab-tag">LAB 8</span><span class="chevron">▶</span> Discovery Locator — Routing With No Route Config</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              Instead of defining each route by hand, <strong>Discovery Locator</strong> tells the gateway to
-              auto-create routes for <em>every</em> service registered in Eureka, keyed by service name. Zero route
-              config — but the service name appears in the URL.
+              <span class="lbl">Concept — the automatic alternative</span>
+              In Lab 5 you wrote a route block per service. That's explicit and controllable, but every new service
+              means new config. <strong>Discovery locator</strong> is the other approach: switch it on and
+              <em>every</em> service registered in Eureka becomes routable immediately at
+              <code>/{service-name}/**</code>. Zero config per service.
             </div>
 
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this — swap the gateway config</span>
               <ol>
-                <li>Open <code>application.properties</code> in the <code>api-gateway</code> project.</li>
-                <li><strong>Comment out</strong> the six manual-route lines from Lab 6 (put a <code>#</code> at the start of each).</li>
-                <li><strong>Append</strong> the two lines below underneath them.</li>
-                <li>Stop the api-gateway app and run it again.</li>
+                <li>In the gateway's <code>application.properties</code>, <strong>comment out</strong> both
+                    <code>routes[...]</code> blocks (put <code>#</code> in front of each line).</li>
+                <li>Add the two discovery-locator lines below — matching your Spring Cloud version.</li>
+                <li>Restart <strong>only the gateway</strong>. Leave everything else running.</li>
+                <li>Test the new URL shape.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">api-gateway/src/main/resources/application.properties</span><span class="fb-tag">EDIT — comment routes, add locator</span></div>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/application.properties — Spring Cloud 2025.0+</span><span class="fb-tag">add these; comment out the routes</span></div>
+            <div class="codewrap"><pre><code># Comment out the manual routes first, then add:
+spring.cloud.gateway.server.webflux.discovery.locator.enabled=true
+spring.cloud.gateway.server.webflux.discovery.locator.lower-case-service-id=true</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/application.properties — Spring Cloud 2024.0 and earlier</span><span class="fb-tag">use THIS if your version is older</span></div>
             <div class="codewrap"><pre><code>spring.cloud.gateway.discovery.locator.enabled=true
 spring.cloud.gateway.discovery.locator.lower-case-service-id=true</code></pre></div>
 
-            <ol class="steps">
-              <li><strong>Restart</strong> the api-gateway app.</li>
-              <li><strong>Test</strong> with the service name in the path:
-                <ul>
-                  <li><code>GET http://localhost:9393/student-ms/students</code></li>
-                  <li><code>GET http://localhost:9393/customer-ms/customers</code></li>
-                </ul>
-              </li>
-            </ol>
+            <div class="prop-list">
+              <div class="prop-row"><code>discovery.locator.enabled=true</code><span class="pd">Create a route automatically for every service in the registry.</span></div>
+              <div class="prop-row"><code>discovery.locator.lower-case-service-id=true</code><span class="pd">Eureka upper-cases names, so without this you'd need <code>/STUDENT-MS/…</code> in the URL. This lets you use lower case.</span></div>
+            </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              Both work with <strong>no manual route configuration</strong>. Student MS still round-robins across its
-              three instances — load balancing is automatic here too. Note the URL now uses
-              <code>/student-ms/</code> (lower-cased service id) instead of <code>/students-api/</code>.
+              <span class="lbl">Expected — the URL shape changes</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>Result</th></tr></thead>
+                <tbody>
+                  <tr><td><code>http://localhost:9393/student-ms/api/students</code></td><td><code>200</code> — still load balanced across all three instances</td></tr>
+                  <tr><td><code>http://localhost:9393/customer-ms/api/customers</code></td><td><code>200</code> — routed automatically</td></tr>
+                  <tr><td><code>http://localhost:9393/api/students</code></td><td><code>404</code> — the manual route is gone now</td></tr>
+                </tbody>
+              </table>
+              The service name is now <strong>part of the path</strong>: <code>/student-ms/</code> before the
+              endpoint. You wrote no route for it — the gateway generated one from the registry.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Discovery locator works — <code>/student-ms/api/students</code> routes correctly with no route config.</span>
+              </label>
             </div>
-            <div class="concept">
-              <span class="lbl">Manual routes vs Discovery Locator — the trade-off</span>
-              <strong>Manual routes</strong> → clean, custom URLs (<code>/students-api/...</code>), full control, more
-              config; better for <strong>production</strong>. <strong>Discovery Locator</strong> → automatic, zero
-              config, but service names leak into URLs (<code>/student-ms/...</code>); better for
-              <strong>development &amp; exploration</strong>. The trade-off is URL cleanliness vs zero configuration.
+
+            <div class="observe">
+              <span class="lbl">Which approach should you actually use?</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th></th><th>Manual routes</th><th>Discovery locator</th></tr></thead>
+                <tbody>
+                  <tr><td>Config per new service</td><td>A block each time</td><td class="app">None</td></tr>
+                  <tr><td>Clean public URLs</td><td class="app">Yes — you choose them</td><td>Service name leaks into the path</td></tr>
+                  <tr><td>Filters &amp; path rewriting</td><td class="app">Full control</td><td>Limited</td></tr>
+                  <tr><td>Exposes services you didn't intend</td><td class="app">No — opt-in</td><td>Yes — everything, by default</td></tr>
+                  <tr><td>Best for</td><td class="app"><strong>Production</strong></td><td>Local development &amp; demos</td></tr>
+                </tbody>
+              </table>
+              <strong>Production systems overwhelmingly use manual routes</strong>, because URLs are a public contract
+              you want to design, and because "route everything automatically" quietly exposes internal services.
+              Discovery locator is excellent for local development and for seeing the registry in action — which is
+              exactly what we used it for.
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Discovery Locator enabled; both services auto-route by name without manual config.</span></label>
+
+            <div class="tryit">
+              <span class="lbl">Restore the manual routes before you finish</span>
+              Uncomment the two <code>routes[...]</code> blocks and comment out the locator lines. You can have both
+              active at once, but keeping them separate makes it far clearer which one handled a request.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 9: BONUS — HEARTBEAT ===== -->
+
+      <!-- ===== BONUS: HEARTBEAT ===== -->
+      <div class="section-band">If you finish early</div>
       <section class="section">
         <details class="exp bonus">
-          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Observe the Eureka Heartbeat — do this if you finish early</summary>
+          <summary><span class="lab-tag">BONUS 1</span><span class="chevron">▶</span> Observe the Eureka Heartbeat &amp; Registry API</summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Concept</span>
-              Eureka relies on <strong>heartbeats</strong>. If a service stops sending them, Eureka eventually removes
-              it — and the gateway stops routing to it. Let's watch that self-healing happen.
+              Eureka isn't magic — it's a service keeping a list, refreshed by heartbeats. This lab makes that
+              mechanism visible, so "the registry" stops being an abstraction.
             </div>
-            <ol class="steps">
-              <li><strong>Stop</strong> one Student MS instance — e.g. the one on port 8082.</li>
-              <li><strong>Wait 30–60 seconds</strong> (Eureka has a grace period before it evicts a missing instance).</li>
-              <li><strong>Refresh</strong> the Eureka dashboard. STUDENT-MS drops from 3 instances to 2.</li>
-              <li><strong>Hit the gateway endpoint</strong> repeatedly again.</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Part 1 — watch the heartbeats</span>
+              <ol>
+                <li>Pick any service's console (say Student MS on 8080).</li>
+                <li>Add this line to its <code>application.properties</code> and restart it:
+                    <div class="codewrap"><pre><code>logging.level.com.netflix.discovery=DEBUG</code></pre></div></li>
+                <li>Watch the console for about two minutes, doing nothing.</li>
+              </ol>
+            </div>
             <div class="expected">
-              <span class="lbl">Expected — self-healing routing</span>
-              <div class="logmock">Before: 8080 → 8082 → 8083 → 8080 ...
-After  : <span class="hit">8080 → 8083 → 8080 → 8083 ...</span>  (8082 gone, no errors)</div>
-              Traffic now only cycles between 8080 and 8083. <strong>No config change was needed</strong> — Eureka
-              detected the missing heartbeat and the gateway adjusted automatically.
+              <span class="lbl">Expected — a heartbeat every 30 seconds</span>
+              <div class="logmock"><span class="dim">DEBUG</span> DiscoveryClient_STUDENT-MS/...:8080 - <span class="hit">sending heartbeat</span><br>
+                <span class="dim">DEBUG</span> Heartbeat status: <span class="hit">200</span><br>
+                <span class="dim">... 30 seconds later ...</span><br>
+                <span class="dim">DEBUG</span> DiscoveryClient_STUDENT-MS/...:8080 - <span class="hit">sending heartbeat</span><br>
+                <span class="dim">DEBUG</span> Heartbeat status: <span class="hit">200</span>
+              </div>
+              A <code>200</code> means "yes, I still have you on the list." Stop sending these for ~90 seconds and
+              Eureka evicts the instance — which is precisely what you triggered by killing an instance in Lab 7.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I watched heartbeats being sent every 30 seconds.</span>
+              </label>
             </div>
-            <div class="observe">
-              <span class="lbl">Why this matters</span>
-              In production, instances crash, get redeployed, or scale down all the time. This heartbeat-driven
-              eviction is what keeps traffic flowing to <em>healthy</em> instances only — the foundation of high
-              availability, with zero manual intervention.
+
+            <div class="dothis">
+              <span class="lbl">Part 2 — read the registry as data</span>
+              <p style="margin:6px 0;">The dashboard is just a web page over an API. Query it yourself:</p>
+              <div class="codewrap"><pre><code># Everything Eureka knows, as JSON
+curl -s -H "Accept: application/json" http://localhost:8761/eureka/apps
+
+# Just one service — note the name must be UPPER CASE
+curl -s -H "Accept: application/json" http://localhost:8761/eureka/apps/STUDENT-MS</code></pre></div>
+              <p style="margin:8px 0 0;">Look for the <code>instance</code> array: three entries, each with
+              <code>hostName</code>, <code>port</code>, <code>status: "UP"</code> and
+              <code>lastDirtyTimestamp</code>. <strong>This JSON is exactly what the gateway fetches</strong> to resolve
+              <code>lb://STUDENT-MS</code>.</p>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I queried the Eureka REST API and found all three <code>STUDENT-MS</code> instances in the JSON.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Bonus: stopped an instance, watched Eureka evict it, and saw the gateway reroute automatically.</span></label>
+
+            <div class="tryit">
+              <span class="lbl">Faster eviction, for impatient experiments</span>
+              90 seconds is a long wait during a lab. On the <strong>Eureka server</strong>, these settings make
+              failures visible much sooner:
+              <div class="codewrap"><pre><code># Eureka server — DEVELOPMENT ONLY
+eureka.server.enable-self-preservation=false
+eureka.server.eviction-interval-timer-in-ms=5000</code></pre></div>
+              And on a <strong>client</strong>, to heartbeat more often:
+              <div class="codewrap"><pre><code>eureka.instance.lease-renewal-interval-in-seconds=5
+eureka.instance.lease-expiration-duration-in-seconds=10</code></pre></div>
+              <strong>Never do this in production.</strong> Self-preservation exists to stop Eureka de-registering
+              healthy services during a brief network blip — turning it off makes a momentary glitch look like a mass
+              outage.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== COMPLETE CONFIG REFERENCE ===== -->
-      <div class="section-band">Catch-up safety net</div>
+      <!-- ===== BONUS 2: SERVICE TO SERVICE ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS 2</span><span class="chevron">▶</span> Service-to-Service Calls by Name</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              So far the <em>gateway</em> resolves service names. But services often need to call each other directly.
+              Here Customer MS will fetch data from Student MS <strong>by name</strong>, with no address anywhere —
+              and it gets load balancing across all three instances for free.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — two files in the customer-ms project</span>
+              <ol>
+                <li>Create the package <code>com.tcs.training.customerms.config</code> and, in it, the class
+                    <code>AppConfig</code>. Paste file 1.</li>
+                <li>Replace <code>CustomerController.java</code> with file 2 — it adds one endpoint.</li>
+                <li>Restart <strong>only</strong> Customer MS.</li>
+                <li>Call the new endpoint several times and watch the nested port change.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/src/main/java/com/tcs/training/customerms/config/AppConfig.java</span><span class="fb-tag">file 1 of 2 — create this</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.customerms.config;
+
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.client.RestTemplate;
+
+@Configuration
+public class AppConfig {
+
+    // @LoadBalanced is the whole trick. It teaches this RestTemplate to
+    // treat the "host" in a URL as a EUREKA SERVICE NAME, look it up in the
+    // registry, and round-robin across the instances it finds.
+    @Bean
+    @LoadBalanced
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/src/main/java/com/tcs/training/customerms/controller/CustomerController.java</span><span class="fb-tag">file 2 of 2 — replace the whole file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.customerms.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/customers")
+public class CustomerController {
+
+    @Value("${server.port}")
+    private String port;
+
+    private final RestTemplate restTemplate;
+
+    // The @LoadBalanced RestTemplate bean from AppConfig is injected here.
+    public CustomerController(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    @GetMapping
+    public Map&lt;String, Object&gt; getAllCustomers() {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("customers", List.of("Tata Motors", "Infosys", "Reliance"));
+        return response;
+    }
+
+    @GetMapping("/{id}")
+    public Map&lt;String, Object&gt; getCustomerById(@PathVariable int id) {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("id", id);
+        response.put("name", "Customer number " + id);
+        return response;
+    }
+
+    // ---- NEW: this service calls ANOTHER service, by name ----
+    // GET /api/customers/with-students
+    @GetMapping("/with-students")
+    public Map&lt;String, Object&gt; getCustomersWithStudents() {
+
+        // "STUDENT-MS" is a REGISTRY NAME, not a hostname.
+        // No port anywhere. Spring resolves it and load balances.
+        Object studentData = restTemplate.getForObject(
+                "http://STUDENT-MS/api/students", Object.class);
+
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("customers", List.of("Tata Motors", "Infosys", "Reliance"));
+        response.put("studentServiceSaid", studentData);   // ← nested response
+        return response;
+    }
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — <code>GET http://localhost:9393/api/customers/with-students</code></span>
+              <div class="codewrap"><pre><code>{
+  "service": "CUSTOMER-MS",
+  "servedByPort": "8081",
+  "customers": ["Tata Motors", "Infosys", "Reliance"],
+  "studentServiceSaid": {
+    "service": "STUDENT-MS",
+    "servedByPort": "8083",
+    "students": ["Amit Shah", "Neha Patel", "Ravi Kumar"]
+  }
+}</code></pre></div>
+              <strong>Call it several times</strong> and watch the <em>nested</em> <code>servedByPort</code> cycle
+              through 8080, 8082 and 8083 — while the outer one stays 8081. Customer MS is load balancing across
+              Student MS instances, and there is <strong>no port number anywhere in the code</strong>.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Customer MS successfully called Student MS by name, and the nested port cycles between instances.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">The alternative: OpenFeign</span>
+              The same call, written declaratively — add the <strong>OpenFeign</strong> dependency and
+              <code>@EnableFeignClients</code> on the main class:
+              <div class="codewrap"><pre><code>@FeignClient(name = "STUDENT-MS")
+public interface StudentClient {
+
+    @GetMapping("/api/students")
+    Object getAllStudents();
+}</code></pre></div>
+              No implementation — Spring generates it, <strong>exactly like a <code>JpaRepository</code></strong> in
+              Session 3. Inject <code>StudentClient</code> and call <code>getAllStudents()</code> as if it were local.
+              Elegant — but be aware it hides the fact that a network call is happening, which is precisely why
+              circuit breakers matter.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE REFERENCE ===== -->
+      <div class="section-band">Reference</div>
       <section class="section">
         <details class="ref-block">
-          <summary><span class="chevron">▶</span> ✅ Complete Configuration Reference (all four projects)</summary>
+          <summary><span class="chevron">▶</span> ✅ Complete Configuration Reference — all four projects</summary>
           <div class="exp-body">
-            <p>Every <code>application.properties</code> and the two key main-class snippets. If you fell behind, paste
-            these, run in order (Eureka first), and you're caught up.</p>
+            <p>Everything you need for all four projects, in one place.</p>
 
-            <h3>1 · eureka-server / application.properties</h3>
-            <div class="codewrap"><pre><code>server.port=8761
-spring.application.name=eureka-server
-eureka.client.register-with-eureka=false
-eureka.client.fetch-registry=false</code></pre></div>
+            <h3>Project summary</h3>
+            <table class="issues">
+              <thead><tr><th>Project</th><th>Port</th><th>Base package</th><th>Dependencies</th></tr></thead>
+              <tbody>
+                <tr><td><code>eureka-server</code></td><td><span class="port">8761</span></td><td><code>com.tcs.training.eurekaserver</code></td><td>Eureka Server</td></tr>
+                <tr><td><code>student-ms</code></td><td><span class="port">8080</span> <span class="port">8082</span> <span class="port">8083</span></td><td><code>com.tcs.training.studentms</code></td><td>Spring Web + Eureka Discovery Client</td></tr>
+                <tr><td><code>customer-ms</code></td><td><span class="port">8081</span></td><td><code>com.tcs.training.customerms</code></td><td>Spring Web + Eureka Discovery Client</td></tr>
+                <tr><td><code>api-gateway</code></td><td><span class="port">9393</span></td><td><code>com.tcs.training.apigateway</code></td><td>Gateway + Eureka Discovery Client &nbsp;<strong>(no Spring Web!)</strong></td></tr>
+              </tbody>
+            </table>
 
-            <h3>2 · student-ms / application.properties</h3>
-            <div class="codewrap"><pre><code>server.port=8080
-spring.application.name=STUDENT-MS
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+            <h3 style="margin-top:22px;">1 · eureka-server</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">EurekaServerApplication.java</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.eurekaserver;
 
-            <h3>3 · customer-ms / application.properties</h3>
-            <div class="codewrap"><pre><code>server.port=8081
-spring.application.name=CUSTOMER-MS
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/</code></pre></div>
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
 
-            <h3>4 · api-gateway / application.properties <span class="muted" style="font-size:14px;">(use EITHER manual routes OR discovery locator)</span></h3>
-            <div class="codewrap"><pre><code>server.port=9393
-spring.application.name=api-gateway
-eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
-
-<span class="code-comment"># ---- OPTION A: Manual routes (clean URLs, production-friendly) ----</span>
-spring.cloud.gateway.routes[0].id=student-ms-route
-spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
-spring.cloud.gateway.routes[0].predicates[0]=Path=/students-api/**
-
-spring.cloud.gateway.routes[1].id=customer-ms-route
-spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
-spring.cloud.gateway.routes[1].predicates[0]=Path=/customers-api/**
-
-<span class="code-comment"># ---- OPTION B: Discovery Locator (zero config, dev-friendly) ----</span>
-<span class="code-comment"># Comment out OPTION A above if you enable this.</span>
-#spring.cloud.gateway.discovery.locator.enabled=true
-#spring.cloud.gateway.discovery.locator.lower-case-service-id=true
-
-<span class="code-comment"># If you hit a web-application-type conflict on startup:</span>
-#spring.main.web-application-type=reactive</code></pre></div>
-
-            <h3>5 · Eureka Server main class</h3>
-            <div class="codewrap"><pre><code>@SpringBootApplication
+@SpringBootApplication
 @EnableEurekaServer
 public class EurekaServerApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(EurekaServerApplication.class, args);
     }
 }</code></pre></div>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">eureka-server/application.properties</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>server.port=8761
+spring.application.name=eureka-server
 
-            <h3>6 · Microservice main class</h3>
-            <div class="codewrap"><pre><code>@SpringBootApplication
-<span class="code-comment">// @EnableEurekaClient is OPTIONAL in modern Spring Cloud —</span>
-<span class="code-comment">// the client is auto-detected from the classpath. Older versions</span>
-<span class="code-comment">// required it explicitly.</span>
-public class StudentMsApplication {
-    public static void main(String[] args) {
-        SpringApplication.run(StudentMsApplication.class, args);
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false</code></pre></div>
+
+            <h3 style="margin-top:22px;">2 · student-ms</h3>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">student-ms/application.properties</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>server.port=8080
+spring.application.name=student-ms
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">studentms/controller/StudentController.java</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.studentms.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    @Value("${server.port}")
+    private String port;
+
+    @GetMapping
+    public Map&lt;String, Object&gt; getAllStudents() {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "STUDENT-MS");
+        response.put("servedByPort", port);
+        response.put("students", List.of("Amit Shah", "Neha Patel", "Ravi Kumar"));
+        return response;
+    }
+
+    @GetMapping("/{id}")
+    public Map&lt;String, Object&gt; getStudentById(@PathVariable int id) {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "STUDENT-MS");
+        response.put("servedByPort", port);
+        response.put("id", id);
+        response.put("name", "Student number " + id);
+        return response;
     }
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Start order matters</span>
-              Always start <strong>Eureka Server first</strong>, give it a few seconds, then start the microservices,
-              then the gateway. If a service starts before Eureka is ready it'll log a couple of retries — harmless,
-              it connects once Eureka is up.
+
+            <h3 style="margin-top:22px;">3 · customer-ms</h3>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">customer-ms/application.properties</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>server.port=8081
+spring.application.name=customer-ms
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customerms/controller/CustomerController.java</span><span class="fb-tag">complete (base version, without Bonus 2)</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.customerms.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/customers")
+public class CustomerController {
+
+    @Value("${server.port}")
+    private String port;
+
+    @GetMapping
+    public Map&lt;String, Object&gt; getAllCustomers() {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("customers", List.of("Tata Motors", "Infosys", "Reliance"));
+        return response;
+    }
+
+    @GetMapping("/{id}")
+    public Map&lt;String, Object&gt; getCustomerById(@PathVariable int id) {
+        Map&lt;String, Object&gt; response = new LinkedHashMap&lt;&gt;();
+        response.put("service", "CUSTOMER-MS");
+        response.put("servedByPort", port);
+        response.put("id", id);
+        response.put("name", "Customer number " + id);
+        return response;
+    }
+}</code></pre></div>
+
+            <h3 style="margin-top:22px;">4 · api-gateway</h3>
+            <p>No Java changes at all — the generated main class is used as is.</p>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/application.properties — Spring Cloud 2025.0+</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>server.port=9393
+spring.application.name=api-gateway
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true
+
+spring.cloud.gateway.server.webflux.routes[0].id=student-service
+spring.cloud.gateway.server.webflux.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.server.webflux.routes[0].predicates[0]=Path=/api/students/**
+
+spring.cloud.gateway.server.webflux.routes[1].id=customer-service
+spring.cloud.gateway.server.webflux.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.server.webflux.routes[1].predicates[0]=Path=/api/customers/**
+
+logging.level.org.springframework.cloud.gateway=DEBUG</code></pre></div>
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">api-gateway/application.properties — Spring Cloud 2024.0 and earlier</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>server.port=9393
+spring.application.name=api-gateway
+
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+eureka.instance.prefer-ip-address=true
+
+spring.cloud.gateway.routes[0].id=student-service
+spring.cloud.gateway.routes[0].uri=lb://STUDENT-MS
+spring.cloud.gateway.routes[0].predicates[0]=Path=/api/students/**
+
+spring.cloud.gateway.routes[1].id=customer-service
+spring.cloud.gateway.routes[1].uri=lb://CUSTOMER-MS
+spring.cloud.gateway.routes[1].predicates[0]=Path=/api/customers/**
+
+logging.level.org.springframework.cloud.gateway=DEBUG</code></pre></div>
+
+            <h3 style="margin-top:22px;">Every URL from today</h3>
+            <table class="issues">
+              <thead><tr><th>URL</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><code>http://localhost:8761</code></td><td>Eureka dashboard — your live map</td></tr>
+                <tr><td><code>http://localhost:8761/eureka/apps</code></td><td>The registry as JSON (send <code>Accept: application/json</code>)</td></tr>
+                <tr><td><code>http://localhost:8080/api/students</code></td><td>Student MS — direct, instance 1</td></tr>
+                <tr><td><code>http://localhost:8082/api/students</code></td><td>Student MS — direct, instance 2</td></tr>
+                <tr><td><code>http://localhost:8083/api/students</code></td><td>Student MS — direct, instance 3</td></tr>
+                <tr><td><code>http://localhost:8081/api/customers</code></td><td>Customer MS — direct</td></tr>
+                <tr><td><strong><code>http://localhost:9393/api/students</code></strong></td><td><strong>Via the gateway — load balanced</strong></td></tr>
+                <tr><td><strong><code>http://localhost:9393/api/customers</code></strong></td><td><strong>Via the gateway</strong></td></tr>
+                <tr><td><code>http://localhost:9393/student-ms/api/students</code></td><td>Via discovery locator (Lab 8)</td></tr>
+                <tr><td><code>http://localhost:9393/actuator/gateway/routes</code></td><td>Which routes the gateway actually loaded</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TROUBLESHOOTING ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> 🔧 Troubleshooting Guide</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>404 through the gateway</strong>, but direct calls work</td>
+                  <td><strong>The #1 issue today.</strong> Wrong gateway property prefix for your Spring Cloud version — the route block was silently ignored.</td>
+                  <td>Switch between <code>spring.cloud.gateway.server.webflux.routes…</code> (2025.0+) and <code>spring.cloud.gateway.routes…</code> (≤2024.0). Confirm with <code>/actuator/gateway/routes</code>.</td>
+                </tr>
+                <tr>
+                  <td>Gateway won't start, or routing does nothing</td>
+                  <td><code>spring-boot-starter-web</code> is on the gateway's classpath.</td>
+                  <td>Remove it. Spring Cloud Gateway is reactive (Netty) and conflicts with the servlet stack.</td>
+                </tr>
+                <tr>
+                  <td>Service shows as <code>UNKNOWN</code> in Eureka</td>
+                  <td><code>spring.application.name</code> is missing.</td>
+                  <td>Set it. It <em>is</em> the registry identity, and what <code>lb://</code> resolves.</td>
+                </tr>
+                <tr>
+                  <td>Service never appears in the dashboard</td>
+                  <td>Wrong <code>defaultZone</code>, Eureka not running, or you haven't waited.</td>
+                  <td>URL must end <code>/eureka/</code> (trailing slash). Wait 30s and refresh.</td>
+                </tr>
+                <tr>
+                  <td>Eureka's own log full of <code>Cannot execute request on any known server</code></td>
+                  <td>Missing the two <code>eureka.client.*=false</code> properties on the server.</td>
+                  <td>Add <code>register-with-eureka=false</code> and <code>fetch-registry=false</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Port 8080 was already in use</code></td>
+                  <td>An app from Sessions 1–3 is still running.</td>
+                  <td>Stop it. <code>lsof -i :8080</code> (Mac/Linux) or <code>netstat -ano | findstr :8080</code> (Windows) finds the owner.</td>
+                </tr>
+                <tr>
+                  <td>All three instances report the same port</td>
+                  <td>The <code>--server.port=</code> override didn't take effect.</td>
+                  <td>It must be a <strong>program</strong> argument (not a VM option) with two leading dashes.</td>
+                </tr>
+                <tr>
+                  <td><code>servedByPort</code> never changes through the gateway</td>
+                  <td>Browser caching, or only one instance registered.</td>
+                  <td>Use curl or Postman. Check Eureka shows <code>UP (3)</code>. Send at least six requests.</td>
+                </tr>
+                <tr>
+                  <td><code>503 Service Unavailable</code> from the gateway</td>
+                  <td>The route resolved but no healthy instance was found.</td>
+                  <td>Check the service is <code>UP</code> in Eureka, and that the name in <code>lb://</code> matches exactly (upper case).</td>
+                </tr>
+                <tr>
+                  <td><code>NoSuchMethodError</code> / <code>ClassNotFoundException</code> at startup</td>
+                  <td>Spring Boot and Spring Cloud versions don't match.</td>
+                  <td>Regenerate from Initializr and never hand-edit <code>&lt;spring-cloud.version&gt;</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot resolve @EnableEurekaServer</code></td>
+                  <td>Wrong dependency — Eureka <em>Client</em> instead of <em>Server</em>.</td>
+                  <td>The server project needs <code>spring-cloud-starter-netflix-eureka-server</code>.</td>
+                </tr>
+                <tr>
+                  <td>Everything is slow or the machine is thrashing</td>
+                  <td>Six JVMs is a lot of RAM.</td>
+                  <td>Drop to two Student instances instead of three — the load balancing lesson still works fine.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="golden">
+              <span class="lbl">⚠️ The Session 4 debugging order</span>
+              <div class="rule">
+                1 · Is it in the <strong>Eureka dashboard</strong>? (if not, it's a registration problem, not a routing one) &nbsp;→&nbsp;
+                2 · Does the <strong>direct call</strong> work? (if not, it's the service, not the gateway) &nbsp;→&nbsp;
+                3 · Does <code>/actuator/gateway/routes</code> list my route? (if not → <strong>property prefix</strong>) &nbsp;→&nbsp;
+                4 · Does the <code>lb://</code> name match Eureka <strong>exactly</strong>, in upper case?
+              </div>
+              Always work outside-in: registry → service → gateway. It isolates the problem in three checks.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <!-- ===== SELF CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> ✅ Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li>What is the real trade-off of microservices — what do you gain, and what do you inherit?</li>
+              <li>Why can't you just hardcode <code>http://localhost:8081</code> for another service?</li>
+              <li>What are Eureka's four steps, and how long until a dead instance is evicted?</li>
+              <li>What does <code>lb://STUDENT-MS</code> mean, and why does it have no port?</li>
+              <li>Which annotation makes an app a Eureka <em>server</em>? Which makes it a <em>client</em>?</li>
+              <li>Why must you set <code>register-with-eureka=false</code> on the Eureka server?</li>
+              <li>Name three things a gateway does that you'd otherwise repeat in every service.</li>
+              <li>Why must you <em>not</em> add Spring Web to the gateway project?</li>
+              <li>You started three copies of one service. How did each get a different port, and why didn't you edit <code>application.properties</code>?</li>
+              <li>How exactly did you <em>see</em> load balancing happening?</li>
+              <li>You killed one instance and the service kept working. What is that property called?</li>
+              <li>Manual routes vs discovery locator — which for production, and why?</li>
+              <li>Why must a service be stateless for any of this to work?</li>
+              <li>Your gateway returns 404 but direct calls work. What's the first thing you check?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all fourteen self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
       <section class="section">
         <div class="qref">
-          <h2>Quick reference card</h2>
+          <h2>Quick Reference Card — Session 4</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Annotations</h3>
+              <table>
+                <thead><tr><th>Annotation</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td><code>@EnableEurekaServer</code></td><td>Makes an app the registry</td></tr>
+                  <tr><td><em>(none needed)</em></td><td>Clients: dependency + properties only</td></tr>
+                  <tr><td><code>@LoadBalanced</code></td><td>On a <code>RestTemplate</code> bean: resolve service names</td></tr>
+                  <tr><td><code>@FeignClient(name=)</code></td><td>Declarative HTTP client</td></tr>
+                  <tr><td><code>@EnableFeignClients</code></td><td>On the main class, to activate Feign</td></tr>
+                  <tr><td><code>@CircuitBreaker</code></td><td>Fail fast with a fallback</td></tr>
+                  <tr><td><code>@Value("${server.port}")</code></td><td>Inject a property value</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Ports</h3>
+              <table>
+                <tbody>
+                  <tr><td>Eureka</td><td><code>8761</code></td></tr>
+                  <tr><td>Student MS</td><td><code>8080</code> · <code>8082</code> · <code>8083</code></td></tr>
+                  <tr><td>Customer MS</td><td><code>8081</code></td></tr>
+                  <tr><td>API Gateway</td><td><code>9393</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Key properties</h3>
+              <table>
+                <thead><tr><th>Property</th><th>Where</th></tr></thead>
+                <tbody>
+                  <tr><td><code>spring.application.name</code></td><td>every app — registry identity</td></tr>
+                  <tr><td><code>eureka.client.register-with-eureka=false</code></td><td>Eureka server</td></tr>
+                  <tr><td><code>eureka.client.fetch-registry=false</code></td><td>Eureka server</td></tr>
+                  <tr><td><code>eureka.client.service-url.defaultZone</code></td><td>every client</td></tr>
+                  <tr><td><code>eureka.instance.prefer-ip-address=true</code></td><td>clients — avoids DNS issues</td></tr>
+                  <tr><td><code>…routes[n].uri=lb://NAME</code></td><td>gateway</td></tr>
+                  <tr><td><code>…routes[n].predicates[0]=Path=/x/**</code></td><td>gateway</td></tr>
+                  <tr><td><code>…discovery.locator.enabled=true</code></td><td>gateway — auto-route</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Gateway prefix by version</h3>
+              <table>
+                <tbody>
+                  <tr><td>2025.0+</td><td><code>spring.cloud.gateway.server.webflux.*</code></td></tr>
+                  <tr><td>≤2024.0</td><td><code>spring.cloud.gateway.*</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Running extra instances</h3>
           <table>
-            <thead><tr><th>Concept</th><th>Tool / Annotation</th><th>Key config property</th></tr></thead>
+            <thead><tr><th>Command</th><th>What it does</th></tr></thead>
             <tbody>
-              <tr><td>Eureka Server</td><td><code>@EnableEurekaServer</code></td><td><code>server.port=8761</code></td></tr>
-              <tr><td>Eureka Client</td><td>Auto-detected (or <code>@EnableEurekaClient</code>)</td><td><code>eureka.client.service-url.defaultZone</code></td></tr>
-              <tr><td>Service Identity</td><td>—</td><td><code>spring.application.name</code></td></tr>
-              <tr><td>Gateway Load Balance</td><td><code>lb://</code> URI prefix</td><td><code>spring.cloud.gateway.routes[n].uri</code></td></tr>
-              <tr><td>Route Predicate</td><td>—</td><td><code>...routes[n].predicates[0]=Path=...</code></td></tr>
-              <tr><td>Discovery Locator</td><td>—</td><td><code>spring.cloud.gateway.discovery.locator.enabled=true</code></td></tr>
-              <tr><td>Multiple Instances</td><td>VM arg at runtime</td><td><code>-Dserver.port=XXXX</code></td></tr>
+              <tr><td><code>./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=8082</code></td><td>Run another instance on 8082</td></tr>
+              <tr><td><code>java -jar target/student-ms-0.0.1-SNAPSHOT.jar --server.port=8083</code></td><td>Run the packaged JAR on 8083</td></tr>
+              <tr><td><code>curl -s -H "Accept: application/json" localhost:8761/eureka/apps</code></td><td>Read the registry as JSON</td></tr>
+              <tr><td><code>curl -s localhost:9393/actuator/gateway/routes</code></td><td>List the gateway's loaded routes</td></tr>
             </tbody>
           </table>
         </div>
@@ -1490,13 +2379,21 @@ public class StudentMsApplication {
       <!-- ===== WRAP UP ===== -->
       <section class="section">
         <div class="concept" style="margin-top:18px;">
-          <span class="lbl">That's the series — congratulations</span>
-          You started with a single Hello World controller in Session 1 and you've finished with a running
-          <strong>microservices architecture</strong>: a service registry, two microservices, multiple load-balanced
-          instances, and an API gateway as the single front door. In the real world this skeleton grows with a
-          <strong>Config Server</strong>, <strong>JWT security</strong> across services, <strong>Docker</strong> +
-          <strong>Kubernetes</strong> for packaging and orchestration, <strong>CI/CD</strong> pipelines, and
-          <strong>distributed tracing</strong> with Zipkin. You now have the foundation every one of those builds on.
+          <span class="lbl">🎓 That's the series — congratulations</span>
+          Over four sessions you went from an empty folder to a distributed system.
+          <strong>Session 1:</strong> Spring Boot's fundamentals — auto-configuration, beans, dependency injection, and
+          your first endpoint. <strong>Session 2:</strong> a complete REST API with proper verbs, status codes and JSON.
+          <strong>Session 3:</strong> real persistence with JPA, clean layering with DTOs, and global error handling.
+          <strong>Session 4:</strong> several services discovering each other, behind a gateway, load balanced and
+          self-healing.
+          <br><br>
+          Notice how the earlier sessions made the later ones possible: Session 2's <strong>stateless</strong> design
+          and Session 3's <strong>shared database</strong> are exactly what let three instances of one service work
+          together today. That wasn't a coincidence — it's what good architecture feels like from the inside.
+          <br><br>
+          <strong>Where to go next:</strong> learn to write tests (JUnit 5, Mockito, Testcontainers) before anything
+          else — everything on the roadmap becomes easier once you can change code with confidence. Then Docker and
+          Kubernetes, Spring Security in depth, and observability with Prometheus and Grafana.
         </div>
         <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
           Spring Boot — Session 4 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
@@ -1522,7 +2419,7 @@ public class StudentMsApplication {
     }
 
     /* ============================================================
-       Progress tracker + readiness.
+       Progress tracker + prerequisite readiness badge.
        ============================================================ */
     var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
 
@@ -1541,7 +2438,7 @@ public class StudentMsApplication {
     }
 
     /* ============================================================
-       Copy buttons.
+       Copy buttons on every code block.
        ============================================================ */
     function flash(btn, cls, label) {
       var original = btn.getAttribute('data-label') || 'Copy';
