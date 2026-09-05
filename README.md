@@ -29,12 +29,14 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 
 ### Angular — 4-part series (frontend)
 
-| Session | Theory (slideshow) | Hands-on lab |
-|--------:|--------------------|--------------|
-| 1 — TypeScript & Angular basics | `angular-session1-theory.html` | `angular-session1-lab.html` |
-| 2 — Components & data binding | `angular-session2-theory.html` | `angular-session2-lab.html` |
-| 3 — Forms, services & HTTP | `angular-session3-theory.html` | `angular-session3-lab.html` |
-| 4 — Routing & full CRUD | `angular-session4-theory.html` | `angular-session4-lab.html` |
+| Session | Theory (slideshow) | Hands-on lab | Study guide |
+|--------:|--------------------|--------------|-------------|
+| 1 — TypeScript & Angular basics | `angular-session1-theory.html` | `angular-session1-lab.html` | [`angular-session1-study-guide.md`](angular-session1-study-guide.md) |
+| 2 — Components & data binding | `angular-session2-theory.html` | `angular-session2-lab.html` | [`angular-session2-study-guide.md`](angular-session2-study-guide.md) |
+| 3 — Forms, services & HTTP | `angular-session3-theory.html` | `angular-session3-lab.html` | [`angular-session3-study-guide.md`](angular-session3-study-guide.md) |
+| 4 — Routing & full CRUD | `angular-session4-theory.html` | `angular-session4-lab.html` | [`angular-session4-study-guide.md`](angular-session4-study-guide.md) |
+
+The **study guides** are Markdown, so they render directly on GitHub with no preview tool needed — start there if you are learning Angular yourself or preparing to teach it. See [Study guides](#study-guides) below.
 
 - **Theory files** are interactive slideshows (arrow keys / on-screen controls, slide counter, progress rail).
 - **Lab files** are scrollable companions with a progress checklist and copy-to-clipboard code blocks.
@@ -67,6 +69,25 @@ Two ideas are deliberately reinforced across every session rather than mentioned
 
 - **Swapping the data layer never changes the template.** The employee table is written in Session 2 against a hardcoded array, then re-pointed at a service, then at an HTTP call, and in Session 4 the CRUD moves onto a service again. Four complete changes to how data is fetched, and the template is never touched. Each session stops and points this out.
 - **Most Angular bugs are silent.** A missing `*`, a missing `()`, a self-closing component tag, a wildcard route in the wrong place, a route parameter compared as a string — none of these report an error. Every lab deliberately walks the reader *into* these bugs and back out again, and every lab ends with a troubleshooting table organised by symptom rather than by error message.
+
+## Study guides
+
+Each Angular session has a Markdown **study guide** — a third document alongside the deck and the lab, written to be **learned from first and taught from second**.
+
+They exist because the deck and the lab both assume a trainer who already knows the material. The study guides fill that gap: read one to learn the topic properly, then re-read only the teaching notes to prepare a session on it.
+
+| What's inside | Why |
+|---|---|
+| **Prose explanations**, not bullets | Slides are for projecting; these are for reading and thinking |
+| **🎓 Teaching notes** per concept | How to explain it out loud, what learners reliably get wrong, what to demo live, and which questions to expect |
+| **Answers to every self-check question**, behind a collapsible toggle | The decks and labs deliberately omit answers, which is no use when you are learning alone |
+| **Mermaid diagrams** | Render natively on GitHub — component trees, request flows, the boot chain, routing |
+| **A delivery plan** | Minute-by-minute timings mapped to slide numbers and lab tasks, plus what to cut when you are short on time |
+| **Analogies** | An Observable as a coffee ticket, a component as a LEGO brick, types as scaffolding |
+
+They also flag, honestly, which topics matter and which don't — tuples get a paragraph saying they rarely appear in real Angular code, so that emphasis elsewhere can be trusted.
+
+Read them in order; each ends by pointing at the next.
 
 ## Delivery model
 
