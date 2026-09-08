@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Servlets Part 1 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into the other servlets session files. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Schema reminder box (pinned visual) === */
+    .schema-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .schema-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .schema-box pre {
+      margin: 0; background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.55; white-space: pre;
+    }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Hard-stop warning — for the traps that cost an hour */
+    .trap {
+      border: 1px solid #ffc9c4;
+      border-left: 5px solid var(--tl-red);
+      background: linear-gradient(135deg,#fff4f3,#ffecea);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .trap .lbl { font-weight: 700; color: var(--tl-red); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .code-add { color: #a6e22e; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Output console block */
+    .outblock {
+      background: #11131a; color: #d6e9c6; border: 1px solid var(--mac-border);
+      border-radius: 8px; padding: 12px 16px; margin: 8px 0;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; overflow-x: auto; white-space: pre;
+    }
+
+    /* === Browser mock — shows what the PAGE looks like === */
+    .browser-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      overflow: hidden; margin: 10px 0; background: #fff;
+    }
+    .browser-mock .bm-bar {
+      display: flex; align-items: center; gap: 9px; padding: 7px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser-mock .bm-dots { display: flex; gap: 5px; flex: 0 0 auto; }
+    .browser-mock .bm-dot { width: 9px; height: 9px; border-radius: 50%; background: #c9c9cf; }
+    .browser-mock .bm-url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .browser-mock .bm-page { padding: 14px 18px; font-size: 15px; }
+    .browser-mock .bm-page h2 { font-size: 19px; margin: 0 0 8px; }
+    .browser-mock .bm-page h3 { font-size: 16px; margin: 8px 0; }
+    .browser-mock .bm-page p { font-size: 14.5px; margin: 8px 0; }
+    .browser-mock .bm-page table { border-collapse: collapse; margin: 8px 0; }
+    .browser-mock .bm-page th, .browser-mock .bm-page td {
+      border: 1px solid #999; padding: 5px 10px; font-size: 14px; text-align: left;
+    }
+    .browser-mock .bm-page a { color: #0000ee; text-decoration: underline; }
+    .browser-mock .bm-page input[type="text"], .browser-mock .bm-page input[type="password"] {
+      border: 1px solid #767676; border-radius: 2px; padding: 2px 4px; font-size: 13.5px; width: 150px;
+    }
+    .browser-mock .bm-page .btn {
+      border: 1px solid #767676; border-radius: 3px; background: #efefef;
+      padding: 2px 10px; font-size: 13.5px; display: inline-block;
+    }
+    .browser-mock .bm-page .lit {
+      font-family: var(--mac-mono); font-size: 13.5px; color: #1d1d1f;
+    }
+    .ok-txt { color: #1a9e34; font-weight: 700; }
+    .err-txt { color: var(--tl-red); font-weight: 700; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* H2 alternative box */
+    .altbox {
+      border: 2px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .altbox h3 { margin: 0 0 6px; color: #00827b; font-size: 18px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors */
+    details.exp.lab0 { border-left-color: #8e8e93; }
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff375f; }
+    details.exp.lab8 { border-left-color: #0a84ff; }
+    details.exp.lab9 { border-left-color: #5e5ce6; }
+    details.exp.lab10 { border-left-color: #28c840; }
+    details.exp.lab11 { border-left-color: #ff9f0a; }
+    details.exp.lab12 { border-left-color: #00c7be; }
+    details.exp.lab13 { border-left-color: #bf5af2; }
+    details.exp.lab14 { border-left-color: #ff375f; }
+    details.exp.lab0 > summary { background: linear-gradient(135deg,#f4f4f6,#eaeaec); }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab9 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab10 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab11 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab12 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab13 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab14 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab0 .lab-tag { background:#8e8e93; }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff375f; }
+    details.exp.lab9 .lab-tag { background:#5e5ce6; }
+    details.exp.lab10 .lab-tag { background:#28c840; }
+    details.exp.lab11 .lab-tag { background:#ff9f0a; }
+    details.exp.lab12 .lab-tag { background:#00c7be; }
+    details.exp.lab13 .lab-tag { background:#bf5af2; }
+    details.exp.lab14 .lab-tag { background:#ff375f; }
+
+    /* SQL verb badge */
+    .verb-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .verb-badge.create { background: #8e8e93; }
+    .verb-badge.insert { background: #49cc90; }
+    .verb-badge.select { background: #61affe; }
+    .verb-badge.update { background: #fca130; }
+    .verb-badge.delete { background: #f93e3e; }
+
+    /* HTTP method badge */
+    .m-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .m-badge.get { background: #61affe; }
+    .m-badge.post { background: #49cc90; }
+
+    /* Layer badge — which MVC package this lab builds */
+    .layer-badge {
+      font-family: var(--mac-font); font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: #fff; background: #6e6e73;
+      padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { color: #8fd3ff; font-size: 17px; margin: 18px 0 6px; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref ol { margin: 10px 0 0; padding-left: 22px; }
+    .qref ol li { font-size: 14.5px; margin: 5px 0; color: #e6e6ea; }
+    .qref ol li code { color: #a6e22e; }
+
+    /* Data Source Explorer mock */
+    .dse-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+    }
+    .dse-mock .dse-top { background: #2a2a40; color: #fff; padding: 6px 12px; font-weight: 700; }
+    .dse-mock .dse-row { padding: 5px 14px; border-bottom: 1px solid var(--mac-border); }
+    .dse-mock .dse-row:last-child { border-bottom: none; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-path { color: #6b7089; font-size: 13px; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    /* When a filebar sits directly on top of a code block, square the code's top corners */
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* Numbered "where to paste" mini-steps inside a lab */
+    .wheretopaste {
+      background: #fffdf3; border: 1px solid #f0e3a8; border-radius: 10px;
+      padding: 6px 18px 6px; margin: 14px 0;
+    }
+    .wheretopaste .lbl { font-weight:700; color:#b8860b; display:block; margin:10px 0 2px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Project tree */
+    .treebox {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; white-space: pre;
+    }
+    .treebox .t-dir { color: #8fd3ff; font-weight: 700; }
+    .treebox .t-new { color: #a6e22e; }
+    .treebox .t-note { color: #6b7089; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">servlets-session1-lab.html — Web, HTTP &amp; Your First Servlet</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🌐</div>
+        <div>
+          <h1>Java Servlets Part 1 — Hands-on Lab</h1>
+          <p class="section-intro">Create a Dynamic Web Project, get a page on screen, then write a login servlet from scratch — and break it on purpose to see every failure mode. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for <strong>Part 1</strong> of the Servlets session. We build one project,
+          <code>ServletBasics</code>, and one working servlet — a login check. Every lab tells you <strong>exactly which
+          file to create and where</strong>, then gives you the complete contents; use the <strong>Copy</strong> button and
+          tick each checkbox as you go. Expected results are shown as <strong>browser mock-ups</strong>, so you can compare
+          your page against the target at a glance.
+          <br><br>
+          <strong>Keep this project.</strong> Part 2 extends the very same project with a database and four more layers —
+          don't delete it at the end of the session.
+        </div>
+      </section>
+
+      <!-- ===== WHAT WE'RE BUILDING ===== -->
+      <div class="section-band">What you'll have by the end</div>
+      <section class="section">
+        <div class="expected">
+          <span class="lbl">The finished Part 1 application</span>
+          A login form served by Tomcat, and a servlet that reads it, converts and validates the input, and answers with
+          a colour-coded HTML message — handling correct credentials, wrong credentials, and garbage input without ever
+          showing the user a stack trace.
+          <div class="browser-mock" style="margin-top:10px;">
+            <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/login?action=login&amp;id=123&amp;pwd=Christi</span></div>
+            <div class="bm-page">
+              <h2>Login result</h2>
+              <h3 class="ok-txt">Login successful. Welcome!</h3>
+              <p><a href="#">&laquo; Back to login</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 7-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all seven are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Project created</strong> — Dynamic Web Project with the globe icon, Tomcat runtime set, <code>web.xml</code> present.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · Server runs</strong> — a static page appears at the app's root URL via the welcome file.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · Login form built</strong> — table-based form, and you can see its parameters in the address bar.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · Servlet working</strong> — correct credentials show green, wrong ones red, letters in the id box handled.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · Three failures reproduced</strong> — content-type bug, console-vs-browser, and a 405 — each seen and fixed.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · Checkpoint exercise done</strong> — email field added and validated, written by you.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · Annotation mapping tried</strong> — a second servlet mapped with <code>@WebServlet</code>, no XML.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. The "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDK 11 or 17 installed</strong>
+                <span class="verify">Verify: <code>java -version</code> in a terminal.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Eclipse IDE for Enterprise Java and Web Developers</strong> — <em>not</em> the plain "Eclipse IDE for Java Developers"
+                <span class="verify">Verify: File → New → Other → is there a <strong>"Web"</strong> category containing <strong>"Dynamic Web Project"</strong>? If not, install the Enterprise edition — nothing today works without it.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Apache Tomcat 9 downloaded and unzipped</strong>
+                <span class="verify">Any folder is fine, e.g. <code>C:\apache-tomcat-9.0.x</code>. We wire it into Eclipse in Lab 0. <strong>Tomcat 9 is strongly recommended</strong> — see the box below.</span>
+              </span>
+            </label>
+
+            <div class="trap">
+              <span class="lbl">⚠ Read this first — Tomcat 9 vs Tomcat 10 decides your imports</span>
+              This is the single most common reason servlet code from a tutorial won't compile. The package was renamed when Java EE became Jakarta EE:
+              <table class="issues" style="margin:10px 0 6px;">
+                <thead><tr><th style="width:26%;">Your Tomcat</th><th style="width:32%;">Import you must use</th><th>What happens if you get it wrong</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Tomcat 9 or lower</strong><br><span style="color:#1a9e34;font-weight:700;">← this lab's code</span></td><td><code>javax.servlet.*</code></td><td>Using <code>jakarta</code> → <code>import cannot be resolved</code></td></tr>
+                  <tr><td><strong>Tomcat 10 or higher</strong></td><td><code>jakarta.servlet.*</code></td><td>Using <code>javax</code> → compiles, but Tomcat returns <strong>404/500</strong> and your servlet never runs</td></tr>
+                </tbody>
+              </table>
+              <strong>All code in this lab uses <code>javax.servlet</code> (Tomcat 9).</strong> On Tomcat 10+, find-and-replace <code>javax.servlet</code> → <code>jakarta.servlet</code> in every servlet. <strong>Nothing else changes.</strong>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">No database needed today</span>
+              Part 1 is pure servlet mechanics — no Derby, no JDBC, no driver JARs. That keeps the moving parts to a
+              minimum while you learn the request/response cycle. <strong>Part 2 adds the database</strong>, and its lab
+              sheet walks through that setup from scratch.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Part 1 labs — from empty workspace to a working servlet</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== LAB 0: PROJECT SETUP ===== -->
+      <section class="section">
+        <details class="exp lab0" open>
+          <summary><span class="lab-tag">LAB 0</span><span class="chevron">▶</span> Create the Dynamic Web Project</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Create the right <em>kind</em> of project and connect it to Tomcat. This is the step where more people go
+              wrong than anywhere else today — a plain Java Project cannot run a servlet, and the symptoms are confusing.
+              Five minutes of care here saves an hour later.
+            </div>
+            <ol class="steps">
+              <li><strong>New project:</strong> File → New → <strong>Dynamic Web Project</strong>. <span class="muted">Don't see it? File → New → Other → type "dynamic" in the filter. Still nothing? You're on the wrong Eclipse edition — see prerequisites.</span></li>
+              <li><strong>Project name:</strong> <code>ServletBasics</code> — exactly this, because it becomes part of every URL you type across both sessions.</li>
+              <li><strong>Target runtime:</strong> click <strong>New Runtime…</strong> → <strong>Apache Tomcat v9.0</strong> → Next → browse to your unzipped Tomcat folder → Finish. <span class="muted">This is what puts the Servlet API on your build path — without it <code>HttpServlet</code> won't resolve.</span></li>
+              <li><strong>Dynamic web module version:</strong> leave the default (3.1 or 4.0).</li>
+              <li><strong>Click Next twice</strong> to reach the final "Web Module" page. <strong>Tick "Generate web.xml deployment descriptor"</strong> — this is easy to miss and we need that file immediately.</li>
+              <li><strong>Finish.</strong> Then verify what you got, below.</li>
+            </ol>
+
+            <div class="observe">
+              <span class="lbl">Verify the project type — the 5-second check</span>
+              Look at the project's icon in Project Explorer. A Dynamic Web Project shows a small <strong>globe 🌐</strong>
+              badge on the folder; a plain Java Project doesn't. Then expand it — you must see a
+              <strong><code>WebContent</code></strong> folder (some Eclipse versions name it <code>src/main/webapp</code>)
+              containing <strong><code>WEB-INF</code></strong> with <strong><code>web.xml</code></strong> inside.
+              <br><br>
+              <strong>Second check:</strong> right-click the project. Is there a <strong>"Run As → Run on Server"</strong>
+              option? If not, you created the wrong project type — delete it and start again.
+            </div>
+
+            <div class="treebox"><span class="t-dir">ServletBasics/</span>
+├── <span class="t-dir">src/</span>                        <span class="t-note">&lt;- all .java files go here</span>
+├── <span class="t-dir">WebContent/</span>                 <span class="t-note">&lt;- everything the browser can reach</span>
+│   └── <span class="t-dir">WEB-INF/</span>                <span class="t-note">&lt;- protected: browser can NEVER reach these</span>
+│       ├── web.xml             <span class="t-note">&lt;- the deployment descriptor</span>
+│       └── <span class="t-dir">lib/</span>                <span class="t-note">&lt;- JARs (empty today; used in Part 2)</span>
+└── build/                      <span class="t-note">&lt;- Eclipse's compiler output (ignore it)</span></div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>No "Dynamic Web Project" in the New menu</td><td>You have Eclipse IDE for <em>Java</em> Developers, not <em>Enterprise Java</em>.</td><td>Download "Eclipse IDE for Enterprise Java and Web Developers", or Help → Install New Software → add the Web Tools (WTP) package.</td></tr>
+                <tr><td>No <code>web.xml</code> in <code>WEB-INF</code></td><td>You didn't tick "Generate web.xml deployment descriptor".</td><td>Right-click project → Java EE Tools → <strong>Generate Deployment Descriptor Stub</strong>.</td></tr>
+                <tr><td>Red error marker on the project</td><td>No target runtime selected.</td><td>Project → Properties → <strong>Targeted Runtimes</strong> → tick your Tomcat → Apply.</td></tr>
+                <tr><td>Port 8080 already in use</td><td>Another Tomcat (or another app) holds the port.</td><td>Stop the other process, or double-click the server in the Servers view and change the HTTP port to 8081 — then use <code>:8081</code> in every URL today.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>ServletBasics</code> created as a Dynamic Web Project; globe icon, <code>WebContent/WEB-INF/web.xml</code> present, "Run on Server" available.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 1: WELCOME FILE ===== -->
+      <section class="section">
+        <details class="exp lab1">
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Welcome File — get <em>anything</em> on screen</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — and why we do this before any Java</span>
+              Deploying a plain HTML page proves three things at once: your project is the right type, Tomcat is wired up,
+              and the app is being deployed. <strong>Establish that baseline first</strong> — then when the servlet fails in
+              Lab 3, you'll know the problem is your servlet and not your setup. Debugging one unknown at a time is the
+              whole skill.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 1 — set the welcome file</span>
+              <p style="margin:2px 0 0;">Open <code>WebContent/WEB-INF/web.xml</code> and replace its whole contents with this. <strong>Keep this file open</strong> — we come back to it in Lab 3.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">web.xml</span><span class="fb-path">WebContent/WEB-INF/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"&gt;
+
+    &lt;display-name&gt;ServletBasics&lt;/display-name&gt;
+
+    &lt;!-- Served when the URL names no file: http://localhost:8080/ServletBasics/ --&gt;
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+
+&lt;/web-app&gt;</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 2 — create a placeholder page</span>
+              <p style="margin:2px 0 0;">Right-click <strong><code>WebContent</code></strong> (not <code>WEB-INF</code>, not <code>src</code>) → New → <strong>HTML File</strong> → name it <code>index.html</code> → Finish. Replace everything with this two-line placeholder; the real form comes in Lab 2.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">index.html</span><span class="fb-path">WebContent/</span><span class="fb-tag">temporary — replaced in Lab 2</span></div>
+            <div class="codewrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;ServletBasics&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;It works!&lt;/h2&gt;
+&lt;p&gt;Tomcat is running and this project is deployed.&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Right-click the <strong>project</strong> → <strong>Run As → Run on Server</strong>.</li>
+                <li>Choose <strong>Tomcat v9.0</strong> → tick <em>"Always use this server"</em> → <strong>Finish</strong>.</li>
+                <li>Eclipse opens its internal browser. <strong>Copy the URL into a real browser</strong> — Chrome's address bar and dev tools make everything today easier to see.</li>
+                <li>Visit <code>http://localhost:8080/ServletBasics/</code> — note the <strong>trailing slash and no filename</strong>. That's the welcome file doing its job.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/</span></div>
+                <div class="bm-page">
+                  <h2>It works!</h2>
+                  <p>Tomcat is running and this project is deployed.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Two 30-second experiments — do both, they teach real things</span>
+              <strong>1 · Prove <code>WEB-INF</code> is protected.</strong> Try to open
+              <code>http://localhost:8080/ServletBasics/WEB-INF/web.xml</code> in your browser. You'll get a
+              <strong>404</strong> — even though the file definitely exists. <strong>The servlet spec forbids serving
+              anything under <code>WEB-INF</code></strong>, which is exactly why config and JARs live there.
+              <br><br>
+              <strong>2 · Break the welcome file.</strong> Change <code>&lt;welcome-file&gt;</code> to
+              <code>home.html</code>, restart Tomcat, and reload the root URL. <strong>404</strong> — because no
+              <code>home.html</code> exists. This is a confusing error in the wild, because the URL looks perfectly
+              correct. <strong>Change it back to <code>index.html</code> before continuing.</strong>
+            </div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>404 on the root URL</td><td><code>index.html</code> is in the wrong folder, or the welcome-file name doesn't match.</td><td>The file must be directly inside <code>WebContent/</code> — <strong>not</strong> inside <code>WEB-INF/</code>.</td></tr>
+                <tr><td>Old content keeps showing</td><td>Stale deployment or browser cache.</td><td>Servers view → right-click Tomcat → <strong>Clean</strong>, then restart. Hard-refresh with <span class="kbd">Ctrl+Shift+R</span>.</td></tr>
+                <tr><td>"Server Tomcat failed to start"</td><td>Port conflict, or a previous run still holding the port.</td><td>Stop all servers in the Servers view; if it persists, change the port (Lab 0 issues table).</td></tr>
+                <tr><td>Blank white page, no error</td><td>Wrong URL — you hit the server root, not the app.</td><td>The project name must be in the path: <code>/ServletBasics/</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">"It works!" renders at the app's root URL; <code>WEB-INF</code> confirmed inaccessible from the browser.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 2: THE LOGIN FORM ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="m-badge get">GET</span><span class="chevron">▶</span> Build the Login Form</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — the <code>name</code> attribute is the contract</span>
+              A form is how the browser collects data and packages it into a request. The single most important thing on
+              this page is the <strong><code>name</code></strong> attribute of each input: that's the exact string your
+              servlet will pass to <code>getParameter()</code>. <strong>Get a name wrong and the servlet silently reads
+              <code>null</code></strong> — no error, just a confusing failure later.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Replace the entire contents of <code>WebContent/index.html</code> with the code below.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">index.html</span><span class="fb-path">WebContent/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Login — ServletBasics&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;Login&lt;/h2&gt;
+
+&lt;!-- action="login" is the servlet's url-pattern (mapped in Lab 3).
+     method="get" puts the data in the URL and calls doGet(). --&gt;
+&lt;form action="login" method="get"&gt;
+
+    &lt;table border="0" cellpadding="6"&gt;
+        &lt;tr&gt;
+            &lt;td&gt;User ID&lt;/td&gt;
+            &lt;td&gt;&lt;input type="text" name="id" /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;Password&lt;/td&gt;
+            &lt;td&gt;&lt;input type="password" name="pwd" /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;!-- name="action" value="login" sends action=login, which is how
+                 the servlet knows WHICH button was pressed --&gt;
+            &lt;td colspan="2"&gt;&lt;input type="submit" name="action" value="login" /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+
+&lt;/form&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">The four attributes that matter, and why</span>
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:26%;">Attribute</th><th>What it controls</th></tr></thead>
+                <tbody>
+                  <tr><td><code>action="login"</code></td><td><strong>Where</strong> the request goes. It's relative, so it resolves to <code>/ServletBasics/login</code> — the servlet's <code>url-pattern</code>.</td></tr>
+                  <tr><td><code>method="get"</code></td><td><strong>Which servlet method</strong> is called — <code>doGet</code>. Change it to <code>post</code> and Tomcat looks for <code>doPost</code> instead.</td></tr>
+                  <tr><td><code>name="id"</code>, <code>name="pwd"</code></td><td><strong>The parameter names.</strong> These become <code>getParameter("id")</code> and <code>getParameter("pwd")</code>. Case-sensitive.</td></tr>
+                  <tr><td><code>type="password"</code></td><td>Masks the characters <strong>on screen only</strong>. The value still travels in plain text — <em>especially</em> obvious with GET, as you're about to see.</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Save. Reload <code>http://localhost:8080/ServletBasics/</code></li>
+                <li>Type <strong>123</strong> and <strong>Christi</strong>, then press the <strong>login</strong> button.</li>
+                <li>You'll get a <strong>404</strong> — that's expected, no servlet is mapped yet. <strong>Look at the address bar instead.</strong></li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — a 404, and a very revealing URL</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/login?action=login&amp;id=123&amp;pwd=Christi</span></div>
+                <div class="bm-page">
+                  <h3 class="err-txt">HTTP Status 404 — Not Found</h3>
+                  <p class="lit">The requested resource [/ServletBasics/login] is not available.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Stop and read that URL — it's the GET vs POST slide, live</span>
+              <code>?action=login&amp;id=123&amp;pwd=<strong>Christi</strong></code>
+              <ul style="margin:8px 0 0;">
+                <li>The <code>?</code> starts the <strong>query string</strong>; <code>&amp;</code> separates the pairs.</li>
+                <li>All three parameters are <strong>visible in the address bar</strong> — and in your browser history, and in Tomcat's access log.</li>
+                <li><strong>The password is right there in plain text</strong>, despite <code>type="password"</code> masking it on screen. The masking is cosmetic.</li>
+                <li>This is exactly <strong>why a real login form uses POST</strong>. We're using GET here purely so you can <em>see</em> the mechanism.</li>
+              </ul>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Login form renders; submitting shows all three parameters — including the password — in the address bar (404 is expected at this stage).</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: THE SERVLET ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="m-badge get">GET</span><span class="m-badge post">POST</span><span class="chevron">▶</span> Your First Servlet — <code>LoginServlet</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal — the centrepiece of Part 1</span>
+              Write a real servlet: read the form data, convert it, check it, and write HTML back. Every mechanic from the
+              theory appears in this one file — <code>setContentType</code>, <code>PrintWriter</code>,
+              <code>getParameter</code>, String-to-int conversion, null-safe comparison, and a <code>doPost</code> delegate.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 1 — create the package and the class</span>
+              <p style="margin:2px 0 0;">Right-click <strong><code>src</code></strong> → New → <strong>Package</strong> → name it <code>com.tcs.web</code> → Finish.<br>
+              Then right-click <code>com.tcs.web</code> → New → <strong>Class</strong> → name it <code>LoginServlet</code> → Finish. Replace the file's entire contents with the code below.</p>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">LoginServlet.java</span><span class="fb-path">src/com/tcs/web/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+<span class="code-comment">// On Tomcat 10+ change these four to jakarta.servlet.*</span>
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public class LoginServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    <span class="code-comment">// Constants, not per-request data — so fields are safe here.</span>
+    <span class="code-comment">// Hardcoded on purpose: this is a teaching exercise, not real auth.</span>
+    <span class="code-comment">// Real apps check a database and store only hashed passwords.</span>
+    private static final int    VALID_ID  = 123;
+    private static final String VALID_PWD = "Christi";
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        <span class="code-comment">// 1. Tell the browser we're sending HTML. MUST come before getWriter().</span>
+        response.setContentType("text/html");
+
+        <span class="code-comment">// 2. This writer is the pipe to the browser (NOT System.out).</span>
+        PrintWriter out = response.getWriter();
+
+        <span class="code-comment">// 3. Which button was pressed? Our submit had name="action" value="login".</span>
+        String action = request.getParameter("action");
+
+        out.println("&lt;html&gt;&lt;body&gt;");
+        out.println("&lt;h2&gt;Login result&lt;/h2&gt;");
+
+        <span class="code-comment">// Constant FIRST: safe even when action is null.</span>
+        <span class="code-comment">// action.equals("login") would throw NullPointerException -&gt; 500 page.</span>
+        if ("login".equals(action)) {
+
+            <span class="code-comment">// 4. Form data always arrives as String — even the numeric field.</span>
+            <span class="code-comment">// These are LOCAL variables: one per thread, therefore thread-safe.</span>
+            String idText = request.getParameter("id");
+            String pwd    = request.getParameter("pwd");
+
+            try {
+                <span class="code-comment">// 5. Convert it yourself. This throws if the user typed letters.</span>
+                int id = Integer.parseInt(idText);
+
+                if (id == VALID_ID &amp;&amp; VALID_PWD.equals(pwd)) {
+                    out.println("&lt;h3&gt;&lt;font color='green'&gt;Login successful. Welcome!&lt;/font&gt;&lt;/h3&gt;");
+                } else {
+                    <span class="code-comment">// Deliberately vague: never reveal WHICH one was wrong.</span>
+                    out.println("&lt;h3&gt;&lt;font color='red'&gt;Invalid id or password.&lt;/font&gt;&lt;/h3&gt;");
+                }
+
+            } catch (NumberFormatException e) {
+                <span class="code-comment">// User typed letters, or left the box empty. Without this catch</span>
+                <span class="code-comment">// the user would see a raw 500 error page with a stack trace.</span>
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;User ID must be a number.&lt;/font&gt;&lt;/h3&gt;");
+            }
+
+        } else {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;Unknown action: " + action + "&lt;/font&gt;&lt;/h3&gt;");
+        }
+
+        out.println("&lt;p&gt;&lt;a href='index.html'&gt;&amp;laquo; Back to login&lt;/a&gt;&lt;/p&gt;");
+        out.println("&lt;/body&gt;&lt;/html&gt;");
+    }
+
+    <span class="code-comment">// Without this, a form using method="post" gets 405 Method Not Allowed.</span>
+    <span class="code-comment">// Delegating keeps all the logic in one place.</span>
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+}</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 2 — map the servlet to a URL</span>
+              <p style="margin:2px 0 0;">Tomcat still doesn't know this class exists. Open <code>web.xml</code> and paste these two blocks <strong>immediately before the closing <code>&lt;/web-app&gt;</code></strong> tag.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">web.xml</span><span class="fb-path">WebContent/WEB-INF/</span><span class="fb-tag">ADD before &lt;/web-app&gt;</span></div>
+            <div class="codewrap"><pre><code>    &lt;servlet&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;com.tcs.web.LoginServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/login&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">Understand what those two blocks do</span>
+              They're joined by the identical <code>&lt;servlet-name&gt;</code> — that string is just a nickname used to
+              link them. The first block says <em>"the nickname LoginServlet means the class
+              <code>com.tcs.web.LoginServlet</code>."</em> The second says <em>"the URL <code>/login</code> should be
+              handled by the nickname LoginServlet."</em> Together they connect
+              <code>/ServletBasics/login</code> &rarr; your Java class.
+              <br><br>
+              <strong>Two rules:</strong> the <code>&lt;servlet-class&gt;</code> must be the <strong>fully-qualified
+              name</strong> (package included), and the <code>&lt;url-pattern&gt;</code> must <strong>start with
+              <code>/</code></strong>.
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><strong>Restart Tomcat</strong> — Servers view → right-click → Restart. <span class="kbd">web.xml is read at startup, so edits need a restart</span></li>
+                <li>Go to <code>http://localhost:8080/ServletBasics/</code></li>
+                <li>Enter <strong>123</strong> / <strong>Christi</strong> → press login. <span class="muted">The password is case-sensitive.</span></li>
+                <li>Go back and try <strong>999</strong> / <strong>wrong</strong>, then try typing <strong>abc</strong> in the ID box.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected results — all three cases</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">.../login?action=login&amp;id=123&amp;pwd=Christi</span></div>
+                <div class="bm-page">
+                  <h2>Login result</h2>
+                  <h3 class="ok-txt">Login successful. Welcome!</h3>
+                  <p><a href="#">&laquo; Back to login</a></p>
+                </div>
+              </div>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">.../login?action=login&amp;id=999&amp;pwd=wrong</span></div>
+                <div class="bm-page">
+                  <h2>Login result</h2>
+                  <h3 class="err-txt">Invalid id or password.</h3>
+                  <p><a href="#">&laquo; Back to login</a></p>
+                </div>
+              </div>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">.../login?action=login&amp;id=abc&amp;pwd=Christi</span></div>
+                <div class="bm-page">
+                  <h2>Login result</h2>
+                  <h3 class="err-txt">User ID must be a number.</h3>
+                  <p><a href="#">&laquo; Back to login</a></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">One more case worth trying — the null-safety proof</span>
+              Visit <code>http://localhost:8080/ServletBasics/login</code> directly, with <strong>no parameters at
+              all</strong>. You get <strong>"Unknown action: null"</strong> — a clean message, not a crash. That's
+              <code>"login".equals(action)</code> earning its keep. <strong>Swap it to
+              <code>action.equals("login")</code>, restart, and try the same URL:</strong> now you get a
+              <strong>500</strong> page and a <code>NullPointerException</code> in the console. Change it back.
+            </div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><strong>404</strong> at <code>/ServletBasics/login</code></td><td>Mapping missing, name mismatch, or Tomcat not restarted.</td><td>Check both <code>&lt;servlet-name&gt;</code> values are identical, that <code>&lt;url-pattern&gt;</code> starts with <code>/</code>, then <strong>restart Tomcat</strong>.</td></tr>
+                <tr><td><strong>404</strong> + console <code>ClassNotFoundException</code></td><td><code>&lt;servlet-class&gt;</code> isn't the fully-qualified name.</td><td>It must include the package: <code>com.tcs.web.LoginServlet</code>.</td></tr>
+                <tr><td><code>HttpServlet cannot be resolved</code></td><td>Wrong project type, no target runtime, or wrong package name.</td><td>Set the Targeted Runtime (Lab 0); on Tomcat 10+ use <code>jakarta.servlet</code>.</td></tr>
+                <tr><td>Always "Invalid id or password"</td><td>Password typo — it's case-sensitive.</td><td>Exactly <code>Christi</code>, capital C. Add a <code>System.out.println(pwd)</code> to see what actually arrived.</td></tr>
+                <tr><td>Always "Unknown action"</td><td>The submit button lost its <code>name="action"</code>.</td><td>Check the button in <code>index.html</code> has both <code>name</code> and <code>value</code>.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Login servlet works: correct credentials green, wrong ones red, non-numeric id handled, and no-parameters case gives a clean message.</span></label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== LAB 4: BREAK IT ON PURPOSE ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Break It On Purpose — three failures, deliberately</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Why this is the most valuable lab of the session</span>
+              These three bugs will happen to you — in an assignment, in an interview task, or at work. If you've
+              <strong>seen each symptom once, on purpose, in a file you understand</strong>, you'll recognise it in five
+              seconds instead of losing an afternoon. Do all three. <strong>Undo each one before moving to the next.</strong>
+            </div>
+
+            <!-- Experiment 1 -->
+            <h3 style="margin-top:4px;">Experiment 1 · Remove <code>setContentType</code></h3>
+            <div class="wheretopaste">
+              <span class="lbl">Break it</span>
+              <p style="margin:2px 0 0;">In <code>LoginServlet.doGet</code>, comment out the content-type line, save, and log in successfully again:</p>
+            </div>
+            <div class="codewrap"><pre><code><span class="code-comment">// response.setContentType("text/html");</span>     <span class="code-comment">&lt;- comment this out</span>
+PrintWriter out = response.getWriter();</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Symptom — tags render as literal text</span>
+              <div class="browser-mock" style="margin-top:6px;">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">.../login?action=login&amp;id=123&amp;pwd=Christi</span></div>
+                <div class="bm-page"><span class="lit">&lt;html&gt;&lt;body&gt; &lt;h2&gt;Login result&lt;/h2&gt; &lt;h3&gt;&lt;font color='green'&gt;Login successful. Welcome!&lt;/font&gt;&lt;/h3&gt;</span></div>
+              </div>
+              Your Java is perfect. The browser simply wasn't told the body was HTML, so it displayed the characters
+              literally. <strong>No exception, no console error</strong> — just a wrong-looking page.
+            </div>
+            <div class="observe">
+              <span class="lbl">Now the sneakier version — put it back, but in the wrong place</span>
+              Uncomment the line and move it to <strong>after</strong> <code>getWriter()</code>:
+              <div class="codewrap"><pre><code>PrintWriter out = response.getWriter();
+response.setContentType("text/html");        <span class="code-comment">&lt;- TOO LATE. Silently ignored.</span></code></pre></div>
+              <strong>Still broken, and still no error.</strong> Response headers are committed the moment you obtain the
+              writer, so the call does nothing. <strong>This is the version that wastes people's time</strong>, because the
+              line is right there in the file and looks correct. <strong>Move it back above <code>getWriter()</code>.</strong>
+            </div>
+
+            <!-- Experiment 2 -->
+            <h3>Experiment 2 · Print to the wrong stream</h3>
+            <div class="wheretopaste">
+              <span class="lbl">Break it</span>
+              <p style="margin:2px 0 0;">Change the success line to use <code>System.out</code> instead of <code>out</code>, save, and log in:</p>
+            </div>
+            <div class="codewrap"><pre><code>System.out.println("&lt;h3&gt;&lt;font color='green'&gt;Login successful. Welcome!&lt;/font&gt;&lt;/h3&gt;");</code></pre></div>
+            <div class="observe">
+              <span class="lbl">Symptom — the message vanishes from the page and appears in Eclipse</span>
+              The browser shows the heading and the back-link, but <strong>no success message</strong>. Meanwhile in
+              Eclipse's <strong>Console view</strong>:
+              <div class="outblock">&lt;h3&gt;&lt;font color='green'&gt;Login successful. Welcome!&lt;/font&gt;&lt;/h3&gt;</div>
+              <strong><code>System.out</code> is for you; <code>out</code> is for the user.</strong> Change it back to
+              <code>out.println</code>.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Keep this one as a habit, though</span>
+              Add this as the <strong>first line</strong> of <code>doGet</code> and leave it there for the rest of the lab:
+              <div class="codewrap"><pre><code>System.out.println("doGet called — action=" + request.getParameter("action")
+                 + ", id=" + request.getParameter("id"));</code></pre></div>
+              Now every request prints a trace line. <strong>This is how you check what actually arrived</strong> when a
+              value is mysteriously null or a comparison unexpectedly fails.
+            </div>
+
+            <!-- Experiment 3 -->
+            <h3>Experiment 3 · Cause a 405</h3>
+            <div class="wheretopaste">
+              <span class="lbl">Break it — two edits</span>
+              <p style="margin:2px 0 0;"><strong>1.</strong> In <code>index.html</code>, change <code>method="get"</code> to <code>method="post"</code>.<br>
+              <strong>2.</strong> In <code>LoginServlet</code>, comment out the <em>whole</em> <code>doPost</code> method. Save both, restart, and submit the form.</p>
+            </div>
+            <div class="observe">
+              <span class="lbl">Symptom — 405 Method Not Allowed</span>
+              <div class="browser-mock" style="margin-top:6px;">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/login</span></div>
+                <div class="bm-page">
+                  <h3 class="err-txt">HTTP Status 405 — Method Not Allowed</h3>
+                  <p class="lit">The specified HTTP method is not allowed for the requested resource.</p>
+                </div>
+              </div>
+              Tomcat <strong>found your servlet</strong> — this is not a 404 — but the request was a POST and your servlet
+              only implements <code>doGet</code>. <code>HttpServlet</code>'s default <code>doPost</code> replies 405.
+              <br><br>
+              <strong>Two things to notice:</strong> the URL now has <strong>no query string</strong> (POST puts the data
+              in the body — the password is no longer in the address bar), and there's <strong>nothing in the
+              console</strong>, because your code never ran.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Fix it — and see why the delegate pattern is worth knowing</span>
+              <strong>Uncomment <code>doPost</code></strong> and reload. It works immediately, over POST, with the password
+              no longer visible in the URL. <strong>Then decide what to leave:</strong> keeping
+              <code>method="post"</code> is the more realistic choice for a login form; reverting to
+              <code>method="get"</code> keeps the parameters visible, which is handy while you're still learning.
+              <strong>Either is fine — the <code>doPost</code> delegate handles both.</strong>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Recap — three symptoms, three instant diagnoses</span>
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:34%;">What you see</th><th>What it means</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Tags shown as literal text</strong></td><td><code>setContentType</code> missing, or called after <code>getWriter()</code></td></tr>
+                  <tr><td><strong>Blank / missing content</strong>, text in the console</td><td>You printed with <code>System.out</code> instead of <code>out</code></td></tr>
+                  <tr><td><strong>405 Method Not Allowed</strong></td><td>Form method doesn't match the servlet methods you implemented</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All three failures reproduced, understood and reverted; servlet works again and a <code>System.out</code> trace line is in place.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: CHECKPOINT EXERCISE ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> Checkpoint Exercise — Add a Third Field</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Your turn — write this one yourself</span>
+              No full solution given up front. You have everything you need, and this is where it moves from "I pasted
+              it" to "I can do it." Budget about 10 minutes.
+            </div>
+            <div class="tryit">
+              <span class="lbl">The task</span>
+              Add an <strong>email</strong> field to the login form and extend the validation:
+              <ol class="steps" style="margin:8px 0 0;">
+                <li>Add a new table row in <code>index.html</code> with an input named <code>email</code>.</li>
+                <li>In the servlet, read it with <code>request.getParameter("email")</code>.</li>
+                <li>Require that it isn't null, isn't blank, and <strong>contains an <code>@</code></strong>. <span class="muted">Hint: <code>email.contains("@")</code>.</span></li>
+                <li>Login succeeds only if <strong>all three</strong> checks pass — id, password, and email.</li>
+                <li>Show a <strong>specific</strong> red message for a bad email, different from the wrong-password message. Good error messages tell the user what to fix.</li>
+              </ol>
+            </div>
+            <div class="observe">
+              <span class="lbl">Test these four cases before you call it done</span>
+              <strong>1.</strong> Everything valid &rarr; green success. &nbsp;<strong>2.</strong> Valid id/password but email
+              <code>ravi.example.com</code> (no @) &rarr; the email-specific red message. &nbsp;<strong>3.</strong> Email left
+              completely blank &rarr; still a clean message, <strong>not</strong> a 500 page. &nbsp;<strong>4.</strong> Valid
+              email but wrong password &rarr; the password message.
+            </div>
+            <div class="tryit">
+              <span class="lbl">Stuck? Here's the shape of the check — fill in the rest</span>
+              <div class="codewrap"><pre><code>String email = request.getParameter("email");
+
+<span class="code-comment">// Order matters: the null check must come FIRST, so the later</span>
+<span class="code-comment">// calls can never throw NullPointerException (short-circuit &amp;&amp;).</span>
+boolean emailOk = email != null &amp;&amp; !email.trim().isEmpty() &amp;&amp; email.contains("@");
+
+if (!emailOk) {
+    out.println("&lt;h3&gt;&lt;font color='red'&gt;Please enter a valid email address.&lt;/font&gt;&lt;/h3&gt;");
+} else if (id == VALID_ID &amp;&amp; VALID_PWD.equals(pwd)) {
+    <span class="code-comment">// ... success ...</span>
+} else {
+    <span class="code-comment">// ... invalid id or password ...</span>
+}</code></pre></div>
+            </div>
+            <div class="tryit">
+              <span class="lbl">Going further, if you finish early</span>
+              Real email validation uses a regular expression, not <code>contains("@")</code>. Try
+              <code>email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")</code> and test it against
+              <code>a@b</code> (should fail — no top-level domain) and <code>ravi.sharma@tcs.com</code> (should pass).
+              <br><br>
+              Then try <strong><code>type="email"</code></strong> on the input instead of <code>type="text"</code>. The
+              browser now validates before submitting — but <strong>keep your server-side check anyway</strong>: anyone can
+              bypass browser validation by editing the URL. <strong>Never trust the client.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Email field added and validated; all four test cases produce sensible messages and no 500 error.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: ANNOTATION MAPPING ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="chevron">▶</span> Mapping Without XML — <code>@WebServlet</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal — two things at once</span>
+              Map a servlet using an <strong>annotation instead of <code>web.xml</code></strong>, and build a small tool that
+              makes the theory's "HTTP request structure" slide tangible: a servlet that <strong>echoes back what the
+              browser actually sent you</strong>. You'll use this to inspect requests for the rest of the course.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.web</code> → New → <strong>Class</strong> → name it <code>EchoServlet</code> → Finish. Paste the whole file. <strong>Note: you add nothing to <code>web.xml</code> this time.</strong></p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">EchoServlet.java</span><span class="fb-path">src/com/tcs/web/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Enumeration;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;      <span class="code-comment">// &lt;- the new import</span>
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+<span class="code-comment">/**
+ * Shows what the browser actually sent. Mapped by annotation —
+ * there is NO entry for this servlet in web.xml.
+ */</span>
+@WebServlet("/echo")
+public class EchoServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        out.println("&lt;html&gt;&lt;body&gt;");
+        out.println("&lt;h2&gt;Echo — what the browser actually sent&lt;/h2&gt;");
+
+        <span class="code-comment">// ===== The request line (theory slide 10, part 1) =====</span>
+        out.println("&lt;h3&gt;Request line&lt;/h3&gt;");
+        out.println("&lt;p&gt;Method: &lt;b&gt;"       + request.getMethod()      + "&lt;/b&gt;&lt;br /&gt;");
+        out.println("URI: &lt;b&gt;"              + request.getRequestURI()  + "&lt;/b&gt;&lt;br /&gt;");
+        out.println("Query string: &lt;b&gt;"     + request.getQueryString() + "&lt;/b&gt;&lt;/p&gt;");
+
+        <span class="code-comment">// ===== Every parameter, whatever its name =====</span>
+        out.println("&lt;h3&gt;Parameters&lt;/h3&gt;");
+        Enumeration&lt;String&gt; names = request.getParameterNames();
+
+        if (!names.hasMoreElements()) {
+            out.println("&lt;p&gt;None sent. Try adding &lt;code&gt;?name=Ravi&amp;amp;city=Ahmedabad&lt;/code&gt;"
+                      + " to the URL.&lt;/p&gt;");
+        } else {
+            out.println("&lt;table border='1' cellpadding='6'&gt;");
+            out.println("&lt;tr&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;");
+            while (names.hasMoreElements()) {
+                String n = names.nextElement();
+                out.println("&lt;tr&gt;&lt;td&gt;" + n + "&lt;/td&gt;&lt;td&gt;"
+                          + request.getParameter(n) + "&lt;/td&gt;&lt;/tr&gt;");
+            }
+            out.println("&lt;/table&gt;");
+        }
+
+        <span class="code-comment">// ===== A few real headers (theory slide 10, part 2) =====</span>
+        out.println("&lt;h3&gt;Some headers&lt;/h3&gt;");
+        out.println("&lt;p&gt;Host: "       + request.getHeader("Host")            + "&lt;br /&gt;");
+        out.println("Accept: "         + request.getHeader("Accept")          + "&lt;br /&gt;");
+        out.println("Accept-Language: "+ request.getHeader("Accept-Language") + "&lt;br /&gt;");
+        out.println("User-Agent: "     + request.getHeader("User-Agent")      + "&lt;/p&gt;");
+
+        out.println("&lt;p&gt;&lt;a href='index.html'&gt;&amp;laquo; Back to login&lt;/a&gt;&lt;/p&gt;");
+        out.println("&lt;/body&gt;&lt;/html&gt;");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><strong>Restart Tomcat.</strong></li>
+                <li>Visit <code>http://localhost:8080/ServletBasics/echo</code> — bare, no parameters.</li>
+                <li>Now visit <code>http://localhost:8080/ServletBasics/echo?name=Ravi&amp;city=Ahmedabad&amp;id=7</code></li>
+                <li>Invent your own parameters and watch them appear. <strong>You never declared these names anywhere</strong> — the servlet discovers whatever arrives.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/echo?name=Ravi&amp;city=Ahmedabad&amp;id=7</span></div>
+                <div class="bm-page">
+                  <h2>Echo — what the browser actually sent</h2>
+                  <h3>Request line</h3>
+                  <p>Method: <b>GET</b><br />URI: <b>/ServletBasics/echo</b><br />Query string: <b>name=Ravi&amp;city=Ahmedabad&amp;id=7</b></p>
+                  <h3>Parameters</h3>
+                  <table>
+                    <tr><th>Name</th><th>Value</th></tr>
+                    <tr><td>name</td><td>Ravi</td></tr>
+                    <tr><td>city</td><td>Ahmedabad</td></tr>
+                    <tr><td>id</td><td>7</td></tr>
+                  </table>
+                  <h3>Some headers</h3>
+                  <p>Host: localhost:8080<br />Accept: text/html,application/xhtml+xml,*/*<br />Accept-Language: en-US,en;q=0.9<br />User-Agent: Mozilla/5.0 (Windows NT 10.0) Chrome/120.0</p>
+                </div>
+              </div>
+              <strong>Those headers aren't invented for the slides</strong> — they're the real ones your browser is sending
+              on every single request, exactly as shown on the theory's HTTP-request slide.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Compare the two mapping styles you've now used</span>
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:20%;">&nbsp;</th><th><code>web.xml</code> (LoginServlet)</th><th><code>@WebServlet</code> (EchoServlet)</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Lines needed</strong></td><td>8 lines of XML, in another file</td><td><strong>1 line</strong>, above the class</td></tr>
+                  <tr><td><strong>Find all mappings</strong></td><td><strong>Easy</strong> — they're all listed in one file</td><td>Harder — scattered across source files</td></tr>
+                  <tr><td><strong>Change a URL</strong></td><td>Edit XML, restart</td><td>Edit the annotation, restart</td></tr>
+                  <tr><td><strong>Risk</strong></td><td>Name mismatch between the two blocks</td><td>Forgetting the leading <code>/</code></td></tr>
+                  <tr><td><strong>Needs</strong></td><td>Any servlet version</td><td>Servlet <strong>3.0+</strong> (Tomcat 7+)</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="trap">
+              <span class="lbl">⚠ Never map the same servlet both ways</span>
+              If you add <code>@WebServlet("/echo")</code> <em>and</em> a <code>web.xml</code> entry for the same class or the
+              same URL, Tomcat may refuse to start with a <strong>duplicate mapping</strong> error — and the message is not
+              obvious. <strong>Pick one per servlet.</strong>
+              <br><br>
+              Also note: <code>&lt;welcome-file-list&gt;</code> has <strong>no annotation equivalent</strong>, so
+              <code>web.xml</code> never disappears entirely.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself</span>
+              <strong>1.</strong> Change the annotation to <code>@WebServlet("/inspect")</code>, restart, and confirm
+              <code>/echo</code> now 404s while <code>/inspect</code> works. <strong>2.</strong> Point the login form's
+              <code>action</code> at <code>echo</code> and submit it — you'll see your login parameters listed in the
+              table, which is a genuinely useful debugging trick when a form isn't sending what you expect.
+              <strong>3.</strong> Change the form to <code>method="post"</code> and submit again: the <strong>Method</strong>
+              row now reads <code>POST</code> and <strong>Query string</strong> becomes <code>null</code> — the data moved
+              into the body. <strong>That's the GET/POST difference, visible in one screen.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>EchoServlet</code> works at <code>/echo</code> with no <code>web.xml</code> entry; parameters and real headers displayed.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE CODE REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Code Reference (final files)</summary>
+          <div class="exp-body">
+            <p>Fell behind, or something won't compile? Here's the full file list, plus the one file that was built in
+            pieces and is worth showing complete.</p>
+
+            <table class="issues">
+              <thead><tr><th style="width:28%;">File</th><th style="width:30%;">Location</th><th>Where the final version is</th></tr></thead>
+              <tbody>
+                <tr><td><code>web.xml</code></td><td><code>WebContent/WEB-INF/</code></td><td><strong>Below</strong> — assembled from Labs 1 and 3</td></tr>
+                <tr><td><code>index.html</code></td><td><code>WebContent/</code></td><td>Lab 2 <span class="muted">(plus your Lab 5 email field)</span></td></tr>
+                <tr><td><code>LoginServlet.java</code></td><td><code>src/com/tcs/web/</code></td><td>Lab 3</td></tr>
+                <tr><td><code>EchoServlet.java</code></td><td><code>src/com/tcs/web/</code></td><td>Lab 6</td></tr>
+              </tbody>
+            </table>
+
+            <h3>The complete <code>web.xml</code> for Part 1</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">web.xml</span><span class="fb-path">WebContent/WEB-INF/</span><span class="fb-tag">FINAL — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"&gt;
+
+    &lt;display-name&gt;ServletBasics&lt;/display-name&gt;
+
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+
+    &lt;!-- LoginServlet is mapped here. EchoServlet uses @WebServlet instead,
+         so it deliberately has NO entry in this file. --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;com.tcs.web.LoginServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/login&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+&lt;/web-app&gt;</code></pre></div>
+
+            <div class="observe">
+              <span class="lbl">The five-minute triage list</span>
+              <strong>404?</strong> URL wrong — check the project name, then <code>&lt;url-pattern&gt;</code>, then restart Tomcat.
+              &nbsp;<strong>500?</strong> Read the <em>first</em> line of the stack trace in the Eclipse console.
+              &nbsp;<strong>405?</strong> Form method doesn't match your servlet methods — add <code>doPost</code>.
+              &nbsp;<strong>Tags shown as text?</strong> <code>setContentType</code> missing or after <code>getWriter()</code>.
+              &nbsp;<strong>Blank page?</strong> You printed with <code>System.out</code>.
+              &nbsp;<strong>Value always null?</strong> The <code>name=""</code> attribute doesn't match your <code>getParameter("...")</code> string.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference card — Part 1</h2>
+
+          <h3>The servlet API you used today</h3>
+          <table>
+            <thead><tr><th>Call</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>extends HttpServlet</code></td><td>Makes your class a servlet the container can run</td></tr>
+              <tr><td><code>doGet(req, res)</code></td><td>Handles GET requests — links, address-bar visits</td></tr>
+              <tr><td><code>doPost(req, res)</code></td><td>Handles POST requests — form submissions</td></tr>
+              <tr><td><code>response.setContentType("text/html")</code></td><td><strong>Call before getWriter()</strong> — tells the browser it's HTML</td></tr>
+              <tr><td><code>response.getWriter()</code></td><td>Returns the <code>PrintWriter</code> — the pipe to the browser</td></tr>
+              <tr><td><code>request.getParameter("name")</code></td><td>Reads one parameter as a <code>String</code>; <code>null</code> if absent</td></tr>
+              <tr><td><code>request.getParameterNames()</code></td><td><code>Enumeration&lt;String&gt;</code> of everything that arrived</td></tr>
+              <tr><td><code>request.getParameterValues("n")</code></td><td><code>String[]</code> — for checkbox groups</td></tr>
+              <tr><td><code>request.getMethod()</code></td><td><code>"GET"</code> or <code>"POST"</code></td></tr>
+              <tr><td><code>request.getHeader("Host")</code></td><td>One request header by name</td></tr>
+              <tr><td><code>@WebServlet("/path")</code></td><td>Maps the servlet without <code>web.xml</code> (Servlet 3.0+)</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Lifecycle</h3>
+          <ol>
+            <li><code>init()</code> — <strong>once</strong>, on the first request ever</li>
+            <li><code>service()</code> &rarr; <code>doGet()</code> / <code>doPost()</code> — <strong>every request</strong></li>
+            <li><code>destroy()</code> — <strong>once</strong>, at shutdown</li>
+            <li>One instance, many threads &rarr; <strong>per-request data in locals, never fields</strong></li>
+          </ol>
+
+          <h3>URL you type all day</h3>
+          <table>
+            <thead><tr><th>Part</th><th>Value here</th></tr></thead>
+            <tbody>
+              <tr><td>Protocol + host + port</td><td><code>http://localhost:8080</code></td></tr>
+              <tr><td>Context path (project)</td><td><code>/ServletBasics</code></td></tr>
+              <tr><td>url-pattern (servlet)</td><td><code>/login</code> or <code>/echo</code></td></tr>
+              <tr><td>Query parameters</td><td><code>?action=login&amp;id=123</code></td></tr>
+            </tbody>
+          </table>
+
+          <h3>GET vs POST, at a glance</h3>
+          <table>
+            <thead><tr><th>&nbsp;</th><th>GET</th><th>POST</th></tr></thead>
+            <tbody>
+              <tr><td>Data rides in</td><td>the URL</td><td>the body</td></tr>
+              <tr><td>Visible in address bar</td><td>yes</td><td>no</td></tr>
+              <tr><td>Idempotent</td><td>yes</td><td>no</td></tr>
+              <tr><td>Bookmarkable</td><td>yes</td><td>no</td></tr>
+              <tr><td>Servlet method</td><td><code>doGet</code></td><td><code>doPost</code></td></tr>
+              <tr><td>Use for</td><td>reading</td><td>writing</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Status codes to recognise</h3>
+          <table>
+            <thead><tr><th>Code</th><th>Meaning &amp; first thing to check</th></tr></thead>
+            <tbody>
+              <tr><td><code>200</code></td><td>OK</td></tr>
+              <tr><td><code>302</code></td><td>Redirect — what <code>sendRedirect()</code> sends</td></tr>
+              <tr><td><code>404</code></td><td>Not found — <strong>your URL or url-pattern is wrong</strong></td></tr>
+              <tr><td><code>405</code></td><td>Method not allowed — form POSTs but only <code>doGet</code> exists</td></tr>
+              <tr><td><code>500</code></td><td>Server error — <strong>your code threw; read the console</strong></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Habits to keep</h3>
+          <ol>
+            <li><code>setContentType</code> <strong>before</strong> <code>getWriter()</code> — always</li>
+            <li><code>"literal".equals(variable)</code>, never <code>variable.equals("literal")</code></li>
+            <li>Wrap every <code>parseInt</code> / <code>parseDouble</code> in <code>try/catch</code></li>
+            <li>Per-request data in <strong>local variables</strong>, never instance fields</li>
+            <li>Changed <code>web.xml</code>? <strong>Restart Tomcat</strong></li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ===== WRAP UP ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">What you just built — and what's next</span>
+          You went from an empty workspace to a deployed web application with a working servlet: reading form data,
+          converting it, validating it, and answering in HTML — plus a request inspector, two mapping styles, and
+          first-hand experience of the three failures that bite everyone. <strong>That's the complete mechanical
+          vocabulary of servlets.</strong>
+          <br><br>
+          <strong>Part 2</strong> takes exactly this project and turns it into a real application: five MVC packages, a
+          Derby database, and a full CRUD product manager — with the servlet reduced to what a controller should actually
+          be. <strong>Keep <code>ServletBasics</code>; we build straight on top of it.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Servlets Part 1 — Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

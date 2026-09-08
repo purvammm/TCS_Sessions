@@ -1,0 +1,2304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Servlets — Mini Project Brief</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into the other servlets session files. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Schema reminder box (pinned visual) === */
+    .schema-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .schema-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .schema-box pre {
+      margin: 0; background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.55; white-space: pre;
+    }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Hard-stop warning — for the traps that cost an hour */
+    .trap {
+      border: 1px solid #ffc9c4;
+      border-left: 5px solid var(--tl-red);
+      background: linear-gradient(135deg,#fff4f3,#ffecea);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .trap .lbl { font-weight: 700; color: var(--tl-red); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .code-add { color: #a6e22e; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Output console block */
+    .outblock {
+      background: #11131a; color: #d6e9c6; border: 1px solid var(--mac-border);
+      border-radius: 8px; padding: 12px 16px; margin: 8px 0;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; overflow-x: auto; white-space: pre;
+    }
+
+    /* === Browser mock — shows what the PAGE looks like === */
+    .browser-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      overflow: hidden; margin: 10px 0; background: #fff;
+    }
+    .browser-mock .bm-bar {
+      display: flex; align-items: center; gap: 9px; padding: 7px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser-mock .bm-dots { display: flex; gap: 5px; flex: 0 0 auto; }
+    .browser-mock .bm-dot { width: 9px; height: 9px; border-radius: 50%; background: #c9c9cf; }
+    .browser-mock .bm-url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .browser-mock .bm-page { padding: 14px 18px; font-size: 15px; }
+    .browser-mock .bm-page h2 { font-size: 19px; margin: 0 0 8px; }
+    .browser-mock .bm-page h3 { font-size: 16px; margin: 8px 0; }
+    .browser-mock .bm-page p { font-size: 14.5px; margin: 8px 0; }
+    .browser-mock .bm-page table { border-collapse: collapse; margin: 8px 0; }
+    .browser-mock .bm-page th, .browser-mock .bm-page td {
+      border: 1px solid #999; padding: 5px 10px; font-size: 14px; text-align: left;
+    }
+    .browser-mock .bm-page a { color: #0000ee; text-decoration: underline; }
+    .browser-mock .bm-page input[type="text"], .browser-mock .bm-page input[type="password"] {
+      border: 1px solid #767676; border-radius: 2px; padding: 2px 4px; font-size: 13.5px; width: 150px;
+    }
+    .browser-mock .bm-page .btn {
+      border: 1px solid #767676; border-radius: 3px; background: #efefef;
+      padding: 2px 10px; font-size: 13.5px; display: inline-block;
+    }
+    .browser-mock .bm-page .lit {
+      font-family: var(--mac-mono); font-size: 13.5px; color: #1d1d1f;
+    }
+    .ok-txt { color: #1a9e34; font-weight: 700; }
+    .err-txt { color: var(--tl-red); font-weight: 700; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* H2 alternative box */
+    .altbox {
+      border: 2px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .altbox h3 { margin: 0 0 6px; color: #00827b; font-size: 18px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors */
+    details.exp.lab0 { border-left-color: #8e8e93; }
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff375f; }
+    details.exp.lab8 { border-left-color: #0a84ff; }
+    details.exp.lab9 { border-left-color: #5e5ce6; }
+    details.exp.lab10 { border-left-color: #28c840; }
+    details.exp.lab11 { border-left-color: #ff9f0a; }
+    details.exp.lab12 { border-left-color: #00c7be; }
+    details.exp.lab13 { border-left-color: #bf5af2; }
+    details.exp.lab14 { border-left-color: #ff375f; }
+    details.exp.lab0 > summary { background: linear-gradient(135deg,#f4f4f6,#eaeaec); }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab9 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab10 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab11 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab12 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab13 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab14 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab0 .lab-tag { background:#8e8e93; }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff375f; }
+    details.exp.lab9 .lab-tag { background:#5e5ce6; }
+    details.exp.lab10 .lab-tag { background:#28c840; }
+    details.exp.lab11 .lab-tag { background:#ff9f0a; }
+    details.exp.lab12 .lab-tag { background:#00c7be; }
+    details.exp.lab13 .lab-tag { background:#bf5af2; }
+    details.exp.lab14 .lab-tag { background:#ff375f; }
+
+    /* SQL verb badge */
+    .verb-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .verb-badge.create { background: #8e8e93; }
+    .verb-badge.insert { background: #49cc90; }
+    .verb-badge.select { background: #61affe; }
+    .verb-badge.update { background: #fca130; }
+    .verb-badge.delete { background: #f93e3e; }
+
+    /* HTTP method badge */
+    .m-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .m-badge.get { background: #61affe; }
+    .m-badge.post { background: #49cc90; }
+
+    /* Layer badge — which MVC package this lab builds */
+    .layer-badge {
+      font-family: var(--mac-font); font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: #fff; background: #6e6e73;
+      padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { color: #8fd3ff; font-size: 17px; margin: 18px 0 6px; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref ol { margin: 10px 0 0; padding-left: 22px; }
+    .qref ol li { font-size: 14.5px; margin: 5px 0; color: #e6e6ea; }
+    .qref ol li code { color: #a6e22e; }
+
+    /* Data Source Explorer mock */
+    .dse-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+    }
+    .dse-mock .dse-top { background: #2a2a40; color: #fff; padding: 6px 12px; font-weight: 700; }
+    .dse-mock .dse-row { padding: 5px 14px; border-bottom: 1px solid var(--mac-border); }
+    .dse-mock .dse-row:last-child { border-bottom: none; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-path { color: #6b7089; font-size: 13px; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    /* When a filebar sits directly on top of a code block, square the code's top corners */
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* Numbered "where to paste" mini-steps inside a lab */
+    .wheretopaste {
+      background: #fffdf3; border: 1px solid #f0e3a8; border-radius: 10px;
+      padding: 6px 18px 6px; margin: 14px 0;
+    }
+    .wheretopaste .lbl { font-weight:700; color:#b8860b; display:block; margin:10px 0 2px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Project tree */
+    .treebox {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; white-space: pre;
+    }
+    .treebox .t-dir { color: #8fd3ff; font-weight: 700; }
+    .treebox .t-new { color: #a6e22e; }
+    .treebox .t-note { color: #6b7089; }
+
+    /* === MINI-PROJECT SPECIFIC ADDITIONS === */
+
+    /* "No code here" banner — the defining rule of this document */
+    .nocode {
+      border: 2px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin: 18px 0;
+      box-shadow: 0 4px 14px rgba(191,90,242,0.14);
+    }
+    .nocode h3 {
+      margin: 0 0 8px; font-size: 19px; color: #8e2fd6;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nocode p { margin: 0 0 8px; font-size: 16.5px; }
+    .nocode p:last-child { margin-bottom: 0; }
+
+    /* Hint box — guidance without giving the answer */
+    .hint {
+      border-left: 4px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .hint .lbl {
+      font-weight: 700; color: #00827b; display: block; margin-bottom: 6px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .hint ul, .hint ol { margin: 6px 0 0; padding-left: 22px; }
+    .hint li { margin: 5px 0; font-size: 16px; }
+
+    /* Goal / deliverable strips at the top and bottom of each phase */
+    .goal {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 16.5px;
+    }
+    .goal .lbl {
+      font-weight: 700; color: var(--mac-accent); display: block; margin-bottom: 6px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .deliverable {
+      border: 1px dashed #28c840;
+      background: rgba(40,200,64,0.06);
+      border-radius: 10px; padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .deliverable .lbl {
+      font-weight: 700; color: #1a9e34; display: block; margin-bottom: 6px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+
+    /* Difficulty badges on each phase */
+    .d-badge {
+      font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase; color: #fff;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .d-badge.easy   { background: #28c840; }
+    .d-badge.medium { background: #ff9f0a; }
+    .d-badge.hard   { background: #ff375f; }
+
+    /* Time estimate pill */
+    .t-pill {
+      font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      background: rgba(142,142,147,0.2); color: #5a5a5f;
+      padding: 3px 10px; border-radius: 20px; white-space: nowrap;
+    }
+
+    /* Spec table — column definitions, requirements */
+    table.spec { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 15.5px; }
+    table.spec th, table.spec td {
+      border: 1px solid var(--mac-border); padding: 10px 14px; text-align: left; vertical-align: top;
+    }
+    table.spec thead th { background: var(--mac-titlebar); font-size: 15px; font-weight: 700; }
+    table.spec tbody tr:nth-child(even) { background: #fafafc; }
+    table.spec code { font-family: var(--mac-mono); font-size: 14px; }
+    table.spec td.must { background: rgba(255,95,87,0.07); font-weight: 600; }
+    table.spec td.opt  { background: rgba(142,142,147,0.10); color: var(--mac-text-muted); }
+
+    /* Screen list / feature grid */
+    .featgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 16px 0; }
+    .featgrid .feat {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 18px; background: #fafafc;
+    }
+    .featgrid .feat h4 {
+      margin: 0 0 6px; font-size: 16.5px; display: flex; align-items: center; gap: 8px;
+    }
+    .featgrid .feat p { margin: 0; font-size: 15px; color: var(--mac-text-muted); }
+    .featgrid .feat .ic { font-size: 20px; }
+
+    /* Phase accent colours (reuses the lab* classes, adds two more) */
+    details.exp.phase-plan { border-left-color: #8e8e93; }
+    details.exp.phase-plan > summary { background: linear-gradient(135deg,#f4f4f6,#eaeaec); }
+    details.exp.phase-plan .lab-tag { background:#8e8e93; }
+
+    /* Layer map — which file talks to which */
+    .layermap {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 16px 20px; margin: 14px 0; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.65; white-space: pre;
+    }
+    .layermap .lm-web    { color: #78dce8; font-weight: 700; }
+    .layermap .lm-svc    { color: #ffd866; font-weight: 700; }
+    .layermap .lm-dao    { color: #a6e22e; font-weight: 700; }
+    .layermap .lm-bean   { color: #ff6188; font-weight: 700; }
+    .layermap .lm-help   { color: #fc9867; font-weight: 700; }
+    .layermap .lm-note   { color: #6b7089; }
+
+    /* Question prompts — make them think before building */
+    .think {
+      border: 1px solid #f0e3a8; background: #fffdf3;
+      border-radius: 10px; padding: 14px 18px; margin: 14px 0; font-size: 16.5px;
+    }
+    .think .lbl {
+      font-weight: 700; color: #b8860b; display: block; margin-bottom: 6px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .think ol { margin: 6px 0 0; padding-left: 22px; }
+    .think li { margin: 6px 0; }
+
+    /* Inline reference pointer */
+    .seealso {
+      font-size: 15px; color: var(--mac-text-muted);
+      border-top: 1px solid var(--mac-border); padding-top: 10px; margin-top: 14px;
+    }
+    .seealso strong { color: var(--mac-text); }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">servlets-mini-project.html — Library Management System</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+
+
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">📚</div>
+        <div>
+          <h1>Java Servlets — Mini Project</h1>
+          <p class="section-intro">Build a <strong>Library Management System</strong> from scratch, on your own, using everything from both Servlets sessions. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== THE DEFINING RULE ===== -->
+      <section class="section">
+        <div class="nocode" style="margin-top:18px;">
+          <h3><span>🚫</span> There is no code in this document — and that's the point</h3>
+          <p>The two lab sheets gave you complete files to paste. <strong>This one gives you none.</strong>
+          What you'll find instead: what each piece must <em>do</em>, what it should take and return,
+          which layer it belongs in, hints when you're stuck, and wireframes of the screens you're
+          aiming for.</p>
+          <p>You have already <strong>seen</strong> every technique this project needs. The gap between
+          "I followed a lab" and "I can build this" is exactly what these pages are designed to close —
+          and the only way across it is to write the code yourself.</p>
+          <p style="font-size:15.5px; color:#8e2fd6;"><strong>If you get properly stuck:</strong> the lab
+          sheets and study notes are your reference. Look up the <em>technique</em>, then come back and
+          apply it to <em>your</em> problem. Don't copy a file wholesale — a <code>Product</code> DAO is
+          not a <code>Book</code> DAO.</p>
+        </div>
+      </section>
+
+      <!-- ===== WHAT YOU'RE BUILDING ===== -->
+      <div class="section-band">The project</div>
+      <section class="section">
+        <div class="concept">
+          <span class="lbl">Library Management System</span>
+          A small web application a librarian would actually use. A librarian logs in, manages the book
+          catalogue, registers members, and issues and returns books — with the system refusing anything
+          that doesn't make sense, like issuing a book that has no copies left.
+          <br><br>
+          <strong>Why this project and not another product CRUD?</strong> Because issuing a book is not a
+          CRUD operation. It <em>reads</em> one table, <em>checks several rules</em>, then <em>writes to
+          two tables</em>. That forces genuine business logic into your service layer — which is the
+          thing plain CRUD never teaches you.
+        </div>
+
+        <div class="featgrid">
+          <div class="feat">
+            <h4><span class="ic">🔐</span> Librarian login</h4>
+            <p>A login screen. Every other page must be unreachable without it — this is the session
+            work Part 2 deliberately left undone.</p>
+          </div>
+          <div class="feat">
+            <h4><span class="ic">📗</span> Book catalogue</h4>
+            <p>Add, view, update and remove books. Each book tracks how many copies exist and how many
+            are currently available.</p>
+          </div>
+          <div class="feat">
+            <h4><span class="ic">👤</span> Member registry</h4>
+            <p>Register members and list them. A member can hold only a limited number of books at
+            once.</p>
+          </div>
+          <div class="feat">
+            <h4><span class="ic">🔄</span> Issue &amp; return</h4>
+            <p><strong>The heart of the project.</strong> Issue a book to a member, and take it back
+            later. Several rules must hold before either is allowed.</p>
+          </div>
+          <div class="feat">
+            <h4><span class="ic">🔎</span> Search</h4>
+            <p>Find books by title or author using a partial match, not an exact one.</p>
+          </div>
+          <div class="feat">
+            <h4><span class="ic">📋</span> Currently-issued report</h4>
+            <p>A screen showing every book currently out, who has it, and when it was taken.</p>
+          </div>
+        </div>
+
+        <div class="goal">
+          <span class="lbl">The one-sentence summary</span>
+          <strong>A five-layer servlet application, backed by three database tables, with a protected
+          login, full CRUD on books, and an issue/return feature whose rules live in the service
+          layer.</strong>
+        </div>
+      </section>
+
+      <!-- ===== SCREENS YOU'RE AIMING FOR ===== -->
+      <div class="section-band">The screens you're aiming for</div>
+      <section class="section">
+        <p>These are <strong>wireframes, not designs.</strong> Plain HTML is completely fine — nobody is
+        judging your CSS. What matters is that the information and the actions are there.</p>
+
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Four target screens</summary>
+          <div class="exp-body">
+
+            <h3 style="margin-top:0;">1 · Login</h3>
+            <div class="browser-mock">
+              <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/LibraryApp/</span></div>
+              <div class="bm-page">
+                <h2>Library Login</h2>
+                <table style="border:none;">
+                  <tr><td style="border:none;">Staff ID</td><td style="border:none;"><input type="text" /></td></tr>
+                  <tr><td style="border:none;">Password</td><td style="border:none;"><input type="password" /></td></tr>
+                  <tr><td colspan="2" style="border:none;"><span class="btn">Sign in</span></td></tr>
+                </table>
+              </div>
+            </div>
+
+            <h3>2 · Book catalogue — after a successful action</h3>
+            <div class="browser-mock">
+              <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/LibraryApp/book?action=view</span></div>
+              <div class="bm-page">
+                <h2>Book Catalogue</h2>
+                <h3 class="ok-txt">Book added successfully.</h3>
+                <table>
+                  <tr><th>ID</th><th>Title</th><th>Author</th><th>Total</th><th>Available</th><th>Action</th></tr>
+                  <tr><td>1</td><td>Head First Java</td><td>Kathy Sierra</td><td>4</td><td>2</td><td><a href="#">Delete</a></td></tr>
+                  <tr><td>2</td><td>Effective Java</td><td>Joshua Bloch</td><td>3</td><td>3</td><td><a href="#">Delete</a></td></tr>
+                  <tr><td>3</td><td>Clean Code</td><td>Robert Martin</td><td>2</td><td>0</td><td><a href="#">Delete</a></td></tr>
+                </table>
+                <p><a href="#">&laquo; Back to menu</a></p>
+              </div>
+            </div>
+            <p style="font-size:15.5px; color:var(--mac-text-muted);">Note book 3: <strong>2 copies,
+            0 available</strong> — both are out. Your issue feature must refuse this one.</p>
+
+            <h3>3 · Issue a book — a rule being enforced</h3>
+            <div class="browser-mock">
+              <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/LibraryApp/issue</span></div>
+              <div class="bm-page">
+                <h2>Issue a Book</h2>
+                <h3 class="err-txt">Cannot issue — no copies of "Clean Code" are available.</h3>
+                <table style="border:none;">
+                  <tr><td style="border:none;">Book ID</td><td style="border:none;"><input type="text" /></td></tr>
+                  <tr><td style="border:none;">Member ID</td><td style="border:none;"><input type="text" /></td></tr>
+                  <tr><td colspan="2" style="border:none;"><span class="btn">Issue</span></td></tr>
+                </table>
+                <p><a href="#">&laquo; Back to menu</a></p>
+              </div>
+            </div>
+            <p style="font-size:15.5px; color:var(--mac-text-muted);"><strong>The message names the
+            reason.</strong> "Issue failed" is not good enough here — see Phase 6.</p>
+
+            <h3>4 · Currently-issued report</h3>
+            <div class="browser-mock">
+              <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/LibraryApp/report?action=issued</span></div>
+              <div class="bm-page">
+                <h2>Currently Issued</h2>
+                <table>
+                  <tr><th>Issue ID</th><th>Book</th><th>Member</th><th>Issued on</th><th>Action</th></tr>
+                  <tr><td>7</td><td>Head First Java</td><td>Priya Mehta</td><td>2026-08-24</td><td><a href="#">Return</a></td></tr>
+                  <tr><td>8</td><td>Clean Code</td><td>Ravi Sharma</td><td>2026-08-26</td><td><a href="#">Return</a></td></tr>
+                  <tr><td>9</td><td>Clean Code</td><td>Anita Desai</td><td>2026-08-28</td><td><a href="#">Return</a></td></tr>
+                </table>
+                <p><a href="#">&laquo; Back to menu</a></p>
+              </div>
+            </div>
+            <div class="hint">
+              <span class="lbl">💡 Hint about that table</span>
+              It shows the book <em>title</em> and the member <em>name</em> — but your issue table only
+              stores their <strong>ids</strong>. You have two ways to bridge that gap. One uses SQL, one
+              uses Java. Think about which layer each belongs in, and pick whichever you can explain.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== GROUND RULES ===== -->
+      <div class="section-band">Ground rules</div>
+      <section class="section">
+        <table class="spec">
+          <thead><tr><th style="width:34%;">Rule</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="must">Use all <strong>five layers</strong> — web, service, dao, bean, helper</td>
+              <td>The whole point of Part 2. A servlet containing SQL is the one thing that fails this project on its own terms.</td>
+            </tr>
+            <tr>
+              <td class="must">Every SQL statement uses <strong>PreparedStatement with <code>?</code></strong></td>
+              <td>String-concatenated SQL is injectable. There is no situation in this project that needs it.</td>
+            </tr>
+            <tr>
+              <td class="must">Business rules live in the <strong>service</strong> layer</td>
+              <td>Not in the servlet, not in the DAO. The issue/return rules are the reason this layer exists.</td>
+            </tr>
+            <tr>
+              <td class="must">No page shows a raw <strong>500 error</strong></td>
+              <td>Every bad input — letters in a number box, a missing id, an empty field — gets a readable message.</td>
+            </tr>
+            <tr>
+              <td class="must">Protected pages require a <strong>session</strong></td>
+              <td>Anyone pasting a URL without logging in must be sent back to the login screen.</td>
+            </tr>
+            <tr>
+              <td class="must">Write it <strong>yourself</strong></td>
+              <td>Reference the labs for technique. Don't copy files and rename <code>Product</code> to <code>Book</code> — you'll learn nothing and it shows immediately.</td>
+            </tr>
+            <tr>
+              <td class="opt">Styling, CSS, layout polish</td>
+              <td>Optional. Plain HTML tables are fine. Spend your time on the logic.</td>
+            </tr>
+            <tr>
+              <td class="opt">Password hashing, real dates, overdue fines</td>
+              <td>Optional stretch goals. Get the core working first.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="think">
+          <span class="lbl">Before you open Eclipse — answer these on paper</span>
+          <ol>
+            <li>How does the system know a book has copies left? Do you <strong>store</strong> that number, or <strong>calculate</strong> it every time? What are the trade-offs?</li>
+            <li>When a book is issued, <strong>how many tables change</strong>?</li>
+            <li>When a book is returned, how do you know <strong>which</strong> issue record to close?</li>
+            <li>If two librarians issue the last copy at the same moment, what goes wrong? <span class="muted">(You don't have to fix this — but you should be able to describe it.)</span></li>
+          </ol>
+          <p style="margin:8px 0 0; font-size:15.5px;">If you can answer 1–3 clearly, the code will be
+          straightforward. If you can't, <strong>you are not ready to start typing</strong> — and that's
+          the most useful thing this page can tell you.</p>
+        </div>
+      </section>
+
+      <!-- ===== PROGRESS TRACKER ===== -->
+      <div class="section-band">Your progress</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 13-phase progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each phase as you finish it. The bar at the top fills to 100% when all thirteen are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>0 · Planned on paper</strong> — tables sketched, actions listed, the four questions above answered.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Project created</strong> — Dynamic Web Project, five packages, driver JAR in place, a page renders.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · Database ready</strong> — three tables created and seeded, verified with a SELECT.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · Beans written</strong> — one class per table, compiling.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · Helper written</strong> — connection opens and closes; proved with a throwaway test.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · DAOs written</strong> — every SQL statement the project needs, and nothing else.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · Service written</strong> — all the issue/return rules, with reasons.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · Login + session</strong> — protected pages redirect when not logged in; logout works.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · Book CRUD working</strong> — add, view, update, delete through one servlet.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · Issue &amp; return working</strong> — both directions, with every rule enforced.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>10 · Search + report working</strong> — partial-match search and the currently-issued screen.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>11 · Polished</strong> — no 500s anywhere, messages name their reasons.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>12 · Self-tested</strong> — every row of the test table passes.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PREREQUISITES ===== -->
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>The "ready" badge at the top lights up when all four are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Both Servlets sessions completed</strong>
+                <span class="verify">You should be able to write a servlet, map it, read a form, and explain the five layers without looking anything up.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A working Dynamic Web Project + Tomcat setup</strong>
+                <span class="verify">You know your Tomcat version and therefore whether your imports are <code>javax.servlet</code> or <code>jakarta.servlet</code>.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>A database you can connect to</strong>
+                <span class="verify">Derby or H2 — whichever worked for you in Part 2. You remember the absolute-path trap and the JAR-in-two-places trap.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>The lab sheets and notes to hand</strong>
+                <span class="verify">Open, but used for <em>looking up technique</em> — not for copying files.</span>
+              </span>
+            </label>
+
+            <div class="hint">
+              <span class="lbl">💡 Where to look things up</span>
+              <ul>
+                <li><strong>Forgot how to map a servlet, or read a form?</strong> Session 1 lab, or notes chapters 16–22.</li>
+                <li><strong>Forgot the DAO method shape?</strong> Session 2 notes, chapter 7 — and its cheat sheet.</li>
+                <li><strong>Database won't connect?</strong> Session 2 notes, chapter 14 — the three traps.</li>
+                <li><strong>Never written a session before?</strong> Session 2 notes, chapter 21 shows the pattern in outline. That's the one genuinely new technique in this project.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Phase 0 — Plan it before you build it</div>
+      <!-- ================================================================ -->
+
+      <section class="section">
+        <details class="exp phase-plan" open>
+          <summary><span class="lab-tag">PHASE 0</span><span class="d-badge easy">Thinking</span><span class="t-pill">30–45 min</span><span class="chevron">▶</span> Design on paper</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Decide your data model and your list of actions <strong>before</strong> writing a line of
+              Java. Every hour spent here saves three later — and rewriting a table halfway through means
+              touching all five layers.
+            </div>
+
+            <h3 style="margin-top:4px;">Step 1 — Sketch your three tables</h3>
+            <p>You need three. Two are obvious; the third is the interesting one.</p>
+            <table class="spec">
+              <thead><tr><th style="width:20%;">Table</th><th style="width:38%;">What one row represents</th><th>Think about</th></tr></thead>
+              <tbody>
+                <tr><td><strong>book</strong></td><td>One title in the catalogue</td><td>How do you know how many copies are free right now?</td></tr>
+                <tr><td><strong>member</strong></td><td>One person who can borrow</td><td>What's the minimum you need to identify and contact them?</td></tr>
+                <tr><td><strong>issue</strong></td><td>One <em>act of borrowing</em> — not a book, not a member</td><td>How do you tell an <em>open</em> loan from a <em>closed</em> one?</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — the issue table is where people go wrong</span>
+              A row in <code>issue</code> is <strong>an event</strong>: "member 4 took book 2 on this
+              date." It needs its own primary key, a reference to the book, a reference to the member,
+              and enough information to answer <em>"has this been returned yet?"</em>
+              <br><br>
+              There are two common ways to answer that last question. One adds a flag column; one uses
+              the return date itself. <strong>Both work.</strong> Pick one, write down why, and stay
+              consistent — because your "currently issued" query depends entirely on this choice.
+            </div>
+
+            <h3>Step 2 — List every action your app performs</h3>
+            <p>Write them out as a table. This becomes your servlet routing plan, so be exhaustive.</p>
+            <table class="spec">
+              <thead><tr><th style="width:20%;">Action</th><th style="width:16%;">Triggered by</th><th style="width:16%;">GET or POST?</th><th>What it needs from the user</th></tr></thead>
+              <tbody>
+                <tr><td>view all books</td><td>a link</td><td>?</td><td>nothing</td></tr>
+                <tr><td>add a book</td><td>a form</td><td>?</td><td>title, author, number of copies…</td></tr>
+                <tr><td>delete a book</td><td>?</td><td>?</td><td>which book</td></tr>
+                <tr><td>issue a book</td><td>?</td><td>?</td><td>?</td></tr>
+                <tr><td>return a book</td><td>?</td><td>?</td><td>?</td></tr>
+                <tr><td colspan="4" class="opt">…keep going. Aim for 10–12 rows. Fill in every question mark yourself.</td></tr>
+              </tbody>
+            </table>
+            <div class="hint">
+              <span class="lbl">💡 Hint — deciding GET vs POST</span>
+              Ask the Part 1 question: <strong>am I reading or writing?</strong> And: <strong>does the
+              user have to type anything?</strong> Nothing to type → a link. Something to type → a form.
+              Changing data → POST. You already know this; just apply it consistently and note your
+              reasoning next to each row.
+            </div>
+
+            <h3>Step 3 — Decide how many servlets</h3>
+            <p>Part 2 used <strong>one</strong> servlet with an <code>action</code> parameter. This
+            project is bigger. You have a real choice:</p>
+            <table class="spec">
+              <thead><tr><th style="width:34%;">Approach</th><th>Consider</th></tr></thead>
+              <tbody>
+                <tr><td>One servlet for everything</td><td>One mapping — but a very long <code>if</code>-ladder covering books, members and loans.</td></tr>
+                <tr><td>One servlet <strong>per area</strong> — books, members, loans, auth</td><td>Each has its own short action ladder. More mappings, much clearer files. <span class="muted">This is what most people find easier here.</span></td></tr>
+                <tr><td>One servlet per action</td><td>Many tiny classes and many mappings. Usually more overhead than it's worth at this size.</td></tr>
+              </tbody>
+            </table>
+            <p style="font-size:15.5px;"><strong>There is no single right answer</strong> — but there is a
+            requirement: <strong>you must be able to justify your choice.</strong> Write one sentence
+            explaining it and keep it with your plan.</p>
+
+            <div class="deliverable">
+              <span class="lbl">Before moving on, you should have</span>
+              Three table sketches with column names and types · a list of 10–12 actions with GET/POST
+              decided · a decision on how many servlets, with a reason · answers to the four questions
+              from the Ground rules section.
+              <br><br>
+              <strong>On paper, or in a text file. Not in Eclipse yet.</strong>
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ================================================================ -->
+      <div class="section-band">Phases 1–2 — Foundation</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== PHASE 1: SETUP ===== -->
+      <section class="section">
+        <details class="exp lab1">
+          <summary><span class="lab-tag">PHASE 1</span><span class="d-badge easy">Easy</span><span class="t-pill">20 min</span><span class="chevron">▶</span> Project setup</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              An empty but <strong>proven</strong> project: a Dynamic Web Project that deploys, serves a
+              page, and has all five packages waiting. Nothing clever — just a solid base you've verified
+              works.
+            </div>
+
+            <p>You have done every step of this before. Work down the list from memory, and only look
+            things up if you stall.</p>
+
+            <table class="spec">
+              <thead><tr><th style="width:6%;">#</th><th style="width:38%;">Do this</th><th>How you know it worked</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Create a <strong>Dynamic Web Project</strong> named <code>LibraryApp</code></td><td>Globe icon on the project, and a <code>web.xml</code> exists</td></tr>
+                <tr><td>2</td><td>Set the <strong>target runtime</strong> to your Tomcat</td><td><code>HttpServlet</code> resolves without a red error</td></tr>
+                <tr><td>3</td><td>Create your <strong>five packages</strong></td><td>All five visible under <code>src</code></td></tr>
+                <tr><td>4</td><td>Copy your <strong>driver JAR</strong> into the folder the app loads from</td><td>It's listed inside that folder in Eclipse</td></tr>
+                <tr><td>5</td><td>Add a placeholder page and set it as the <strong>welcome file</strong></td><td>It appears at the app's root URL, with no filename in the address</td></tr>
+                <tr><td>6</td><td><strong>Run on Server</strong></td><td>Your page renders in a browser</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — name your packages for this project</span>
+              Don't reuse <code>com.tcs.web</code> and friends verbatim if you can help it — pick a
+              package root that reflects <em>this</em> app. Keep the five layer names though; they're the
+              part that carries meaning.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Two traps you already know — don't rediscover them</span>
+              <strong>1.</strong> The driver JAR must be in the folder your <em>running app</em> loads
+              from, not only in Eclipse's driver definition. Two different programs.
+              <br><strong>2.</strong> Your database path must be <strong>absolute</strong>, with forward
+              slashes, and identical everywhere it appears.
+              <br><br>
+              <span class="muted">If either of those sentences doesn't ring a bell, re-read Session 2
+              notes chapter 14 before continuing. These two cost people an hour each.</span>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              A deployed project serving one page, with five empty packages and the driver JAR in place.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 1 complete — project deploys, a page renders, packages and JAR ready.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 2: DATABASE ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">PHASE 2</span><span class="d-badge medium">Medium</span><span class="t-pill">30–40 min</span><span class="chevron">▶</span> Database design &amp; setup</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Three tables, created and seeded with enough sample data that you can actually test — and
+              verified with a <code>SELECT</code> before you write any Java.
+            </div>
+
+            <p><strong>You write the SQL.</strong> Below is the <em>specification</em> — what each table
+            must be able to hold. Turning it into <code>CREATE TABLE</code> statements is your job.</p>
+
+            <h3 style="margin-top:4px;">Table 1 · <code>book</code></h3>
+            <table class="spec">
+              <thead><tr><th style="width:24%;">Must store</th><th style="width:22%;">Suitable type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="must">A unique id</td><td>whole number</td><td>Primary key. Every lookup uses it.</td></tr>
+                <tr><td class="must">Title</td><td>text</td><td>Long enough for real titles — don't be stingy.</td></tr>
+                <tr><td class="must">Author</td><td>text</td><td></td></tr>
+                <tr><td class="must">Total copies owned</td><td>whole number</td><td>How many the library bought.</td></tr>
+                <tr><td class="must">Copies available now</td><td>whole number</td><td><strong>See the design note below — this one is a real decision.</strong></td></tr>
+                <tr><td class="opt">Category / genre</td><td>text</td><td>Optional. Only if you want to filter by it later.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="think">
+              <span class="lbl">Design decision — store "available", or calculate it?</span>
+              <ol>
+                <li><strong>Store it as a column.</strong> Issuing decrements it; returning increments it. Fast to read — but now <em>two</em> places hold the truth, and they can drift apart if a bug slips in.</li>
+                <li><strong>Calculate it.</strong> Available = total copies minus the number of open loans for that book. Always correct by construction — but every book listing needs a count query.</li>
+              </ol>
+              <p style="margin:8px 0 0;"><strong>Either is acceptable.</strong> Option 1 is simpler to
+              write and is what the wireframe implies. Option 2 is more robust. <strong>Choose, write
+              down why, and be ready to explain the trade-off</strong> — that explanation matters more
+              than which one you picked.</p>
+            </div>
+
+            <h3>Table 2 · <code>member</code></h3>
+            <table class="spec">
+              <thead><tr><th style="width:24%;">Must store</th><th style="width:22%;">Suitable type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="must">A unique id</td><td>whole number</td><td>Primary key.</td></tr>
+                <tr><td class="must">Name</td><td>text</td><td></td></tr>
+                <tr><td class="must">Email or phone</td><td>text</td><td>Pick one. You'll validate its format in the service layer.</td></tr>
+                <tr><td class="opt">Join date</td><td>date or text</td><td>Optional.</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Table 3 · <code>issue</code> — the important one</h3>
+            <table class="spec">
+              <thead><tr><th style="width:24%;">Must store</th><th style="width:22%;">Suitable type</th><th>Notes</th></tr></thead>
+              <tbody>
+                <tr><td class="must">A unique id for this loan</td><td>whole number</td><td>Primary key. This is <em>the loan's</em> id — not the book's, not the member's.</td></tr>
+                <tr><td class="must">Which book</td><td>whole number</td><td>Refers to <code>book</code>'s id.</td></tr>
+                <tr><td class="must">Which member</td><td>whole number</td><td>Refers to <code>member</code>'s id.</td></tr>
+                <tr><td class="must">When it was issued</td><td>date or text</td><td>See the hint below about dates.</td></tr>
+                <tr><td class="must">Whether it's still out</td><td>your choice</td><td><strong>This is the design decision from Phase 0.</strong></td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — dates, the pragmatic version</span>
+              Proper date handling is a topic of its own. For this project, storing the date as
+              <strong>text in <code>YYYY-MM-DD</code> form</strong> is a perfectly reasonable
+              simplification: it sorts correctly as a string and it's easy to generate and display.
+              <br><br>
+              If you'd rather use a real date type, go ahead — but know that you're taking on JDBC date
+              conversion as well. <strong>Don't let it block the rest of the project.</strong>
+            </div>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — foreign keys</span>
+              You <em>can</em> declare the book and member columns as foreign keys, and it's good
+              practice: the database will then refuse to record a loan against a book that doesn't exist.
+              <br><br>
+              But be aware of the consequence — you will no longer be able to delete a book that has
+              loan history, and you'll have to decide what your delete feature should do about that.
+              <strong>That's a genuine design question, and either answer is defensible</strong> as long
+              as your app handles it with a message rather than a stack trace.
+            </div>
+
+            <h3>Seed data — make it useful for testing</h3>
+            <p>Don't seed the minimum. Seed data that lets you test the interesting cases <em>immediately</em>:</p>
+            <table class="spec">
+              <thead><tr><th style="width:30%;">Seed this</th><th>So you can test</th></tr></thead>
+              <tbody>
+                <tr><td>4–5 books</td><td>A listing with more than one row</td></tr>
+                <tr><td>One book with <strong>several copies</strong></td><td>Issuing the same title twice</td></tr>
+                <tr><td>One book with <strong>exactly one copy</strong></td><td>The "last copy" boundary</td></tr>
+                <tr><td>One book with <strong>zero available</strong></td><td>The refusal path, without setting it up by hand each time</td></tr>
+                <tr><td>3–4 members</td><td>Issuing to different people</td></tr>
+                <tr><td>2–3 open loans</td><td>The currently-issued report, and returns</td></tr>
+              </tbody>
+            </table>
+
+            <div class="observe">
+              <span class="lbl">Save your setup script — you will need it repeatedly</span>
+              Keep every statement in one saved <code>.sql</code> file, including the seed rows. You'll
+              re-run it every time your testing leaves the data in a mess — which will be often, because
+              you're about to build a delete feature.
+              <br><br>
+              <strong>End it with a <code>SELECT</code> on each table and actually look at the output.</strong>
+              Building four layers on top of an empty table is a miserable way to spend an afternoon.
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Three tables created, seeded with the cases above, verified by <code>SELECT</code> — plus a
+              saved setup script and a written note of your "available copies" decision.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 2 complete — three tables created, seeded and verified; setup script saved.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Phases 3–6 — Build the layers, bottom-up</div>
+      <!-- ================================================================ -->
+
+      <section class="section">
+        <div class="concept">
+          <span class="lbl">The order, and why it doesn't change</span>
+          Build <strong>bean → helper → dao → service → web</strong>, exactly as in Part 2. Each layer
+          only depends on the one below it, so everything you call already exists and compiles.
+          <div class="layermap"><span class="lm-web">web</span>      servlets  <span class="lm-note">— read parameters, call the service, write HTML.  NO SQL.</span>
+   │
+   ▼
+<span class="lm-svc">service</span>  rules     <span class="lm-note">— can this be issued? is this input sane?  NO SQL, NO HTML.</span>
+   │
+   ▼
+<span class="lm-dao">dao</span>      SQL       <span class="lm-note">— every statement in the app lives here.  NO HTML, NO RULES.</span>
+   │
+   ▼
+<span class="lm-help">helper</span>   plumbing  <span class="lm-note">— open and close connections. Knows the URL. Nothing else.</span>
+   │
+   ▼
+         DATABASE
+
+<span class="lm-bean">bean</span>     Book, Member, Issue  <span class="lm-note">— the CURRENCY passed between all layers, not a step.</span></div>
+        </div>
+      </section>
+
+      <!-- ===== PHASE 3: BEANS ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">PHASE 3</span><span class="layer-badge">bean</span><span class="d-badge easy">Easy</span><span class="t-pill">20 min</span><span class="chevron">▶</span> The bean layer</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              One plain data class per table. No logic, no SQL, no HTML — just fields and accessors.
+            </div>
+
+            <table class="spec">
+              <thead><tr><th style="width:24%;">Class</th><th>Mirrors</th></tr></thead>
+              <tbody>
+                <tr><td><code>Book</code></td><td>Your <code>book</code> table — one field per column, matching types</td></tr>
+                <tr><td><code>Member</code></td><td>Your <code>member</code> table</td></tr>
+                <tr><td><code>Issue</code></td><td>Your <code>issue</code> table</td></tr>
+              </tbody>
+            </table>
+
+            <p>Each one needs: <strong>private fields</strong>, a <strong>no-argument constructor</strong>,
+            an <strong>all-arguments constructor</strong>, <strong>getters and setters</strong> following
+            the standard naming convention, and a <strong>toString</strong> for your own debugging.</p>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — don't type the boilerplate</span>
+              Declare the fields, then let Eclipse generate the accessors, the constructor and
+              <code>toString</code> from the <strong>Source</strong> menu. Three classes by hand is a
+              waste of forty minutes.
+              <br><br>
+              <strong>But do keep the naming convention exact</strong> — <code>get</code> plus the
+              capitalised field name. Tooling relies on it, and so will you if you ever move to JSP or
+              JSON.
+            </div>
+
+            <div class="think">
+              <span class="lbl">Worth thinking about</span>
+              <ol>
+                <li>Your <code>Issue</code> bean holds a book <em>id</em> and a member <em>id</em>. But the report screen shows a book <em>title</em> and a member <em>name</em>. Does <code>Issue</code> need extra fields for those? Or is there a better place to solve it?</li>
+                <li>There's no single right answer — but whatever you choose, make sure <code>Issue</code> stays a <strong>data class with no logic in it</strong>.</li>
+              </ol>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Three bean classes, compiling, containing nothing but data.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 3 complete — Book, Member and Issue beans written and compiling.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 4: HELPER ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">PHASE 4</span><span class="layer-badge">helper</span><span class="d-badge easy">Easy</span><span class="t-pill">15 min</span><span class="chevron">▶</span> The helper layer</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              One class that opens and closes database connections, and is the <strong>only</strong> place
+              in your project that knows the database URL.
+            </div>
+
+            <table class="spec">
+              <thead><tr><th style="width:30%;">It needs</th><th>Behaviour</th></tr></thead>
+              <tbody>
+                <tr><td>A way to <strong>get a connection</strong></td><td>Hands back an open connection, or signals failure clearly. Whatever it does on failure, <strong>callers must handle it</strong> — decide the contract and stick to it.</td></tr>
+                <tr><td>A way to <strong>close a connection</strong></td><td>Safe to call even when something already went wrong, so callers don't need their own guards.</td></tr>
+                <tr><td>The URL, user and password</td><td>Stored once, here. If these appear anywhere else in your project, that's a bug.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — prove it before you build on it</span>
+              Add a temporary <code>main</code> method that gets a connection, prints whether it's
+              non-null, and closes it. Run it as a plain Java application.
+              <br><br>
+              <strong>Two minutes here saves a very confusing hour later</strong>, because from Phase 5
+              onwards a connection failure will reach you as a mysterious empty table rather than a clear
+              error. Delete the <code>main</code> when it passes.
+              <br><br>
+              <span class="muted">Remember: running it from Eclipse may need the driver JAR on the project
+              build path too — and if you're using an embedded database, disconnect any open database
+              browser first.</span>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              A helper class whose connection test prints success, and a URL that appears nowhere else.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 4 complete — connection opens and closes, proved by a throwaway test.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 5: DAO ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">PHASE 5</span><span class="layer-badge">dao</span><span class="d-badge hard">Hard</span><span class="t-pill">60–90 min</span><span class="chevron">▶</span> The DAO layer</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Every SQL statement your project will ever run, written once, in one place — and
+              <strong>nothing else</strong>. No rules, no HTML.
+            </div>
+
+            <p>This is the biggest phase. Below is <strong>what each method must achieve</strong>. The
+            SQL, the signatures and the bodies are yours to write.</p>
+
+            <h3 style="margin-top:4px;">Book DAO</h3>
+            <table class="spec">
+              <thead><tr><th style="width:30%;">Must be able to…</th><th style="width:24%;">Roughly takes</th><th>Roughly gives back</th></tr></thead>
+              <tbody>
+                <tr><td>Add a new book</td><td>a Book</td><td>whether it saved</td></tr>
+                <tr><td>Fetch every book</td><td>nothing</td><td>a collection of Books — <strong>empty, never null</strong></td></tr>
+                <tr><td>Fetch one book by id</td><td>an id</td><td>one Book, or a clear "not found" answer</td></tr>
+                <tr><td>Update a book's details</td><td>a Book, or the id plus changed values</td><td>whether a row changed</td></tr>
+                <tr><td>Delete a book</td><td>an id</td><td>whether a row was removed</td></tr>
+                <tr><td>Search by title or author</td><td>a keyword</td><td>matching Books — <strong>partial matches</strong></td></tr>
+                <tr><td>Change the available-copies count</td><td>an id and a direction</td><td>whether it worked</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — the search method</span>
+              A partial match needs the SQL <code>LIKE</code> comparison, and the wildcard characters
+              belong in the <strong>bound value</strong>, not in the SQL text. If you find yourself
+              concatenating a keyword into the statement, stop — that's the injectable pattern you were
+              taught to avoid.
+              <br><br>
+              To match title <em>or</em> author in one query, you'll need the same keyword bound twice.
+              Remember placeholders are numbered in the order they appear.
+            </div>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — the available-copies method</span>
+              You need to move that number up and down by one. You could pass the new absolute value —
+              but it's cleaner and safer to let the database do the arithmetic on the current value,
+              which avoids reading it and writing it back as two separate steps.
+              <br><br>
+              Also consider: should the SQL itself refuse to take the count below zero? Adding that
+              condition to your <code>WHERE</code> clause is a neat safety net — and it means "no copies
+              left" shows up naturally as <em>zero rows affected</em>.
+              <br><br>
+              <span class="muted">If you chose to <em>calculate</em> availability in Phase 2 instead of
+              storing it, this method doesn't exist — you'll need a counting query instead.</span>
+            </div>
+
+            <h3>Member DAO</h3>
+            <table class="spec">
+              <thead><tr><th style="width:30%;">Must be able to…</th><th style="width:24%;">Roughly takes</th><th>Roughly gives back</th></tr></thead>
+              <tbody>
+                <tr><td>Register a new member</td><td>a Member</td><td>whether it saved</td></tr>
+                <tr><td>Fetch every member</td><td>nothing</td><td>a collection of Members</td></tr>
+                <tr><td>Fetch one member by id</td><td>an id</td><td>one Member, or "not found"</td></tr>
+                <tr><td>Count how many books a member currently holds</td><td>an id</td><td>a number</td></tr>
+              </tbody>
+            </table>
+            <div class="hint">
+              <span class="lbl">💡 Hint — that last one is not about the member table</span>
+              "How many books does this member currently hold?" is answered by counting rows in your
+              <strong>issue</strong> table — the ones for this member that are still open. Which table a
+              method queries doesn't have to match the DAO it lives in; group by <em>what the method is
+              about</em>.
+            </div>
+
+            <h3>Issue DAO</h3>
+            <table class="spec">
+              <thead><tr><th style="width:30%;">Must be able to…</th><th style="width:24%;">Roughly takes</th><th>Roughly gives back</th></tr></thead>
+              <tbody>
+                <tr><td>Record a new loan</td><td>book id, member id, today's date</td><td>whether it saved</td></tr>
+                <tr><td>Close a loan (mark returned)</td><td>a loan id</td><td>whether a row changed</td></tr>
+                <tr><td>Fetch all <strong>open</strong> loans</td><td>nothing</td><td>the data the report screen needs</td></tr>
+                <tr><td>Find the open loan for a given book and member</td><td>book id, member id</td><td>one loan, or "none"</td></tr>
+                <tr><td>Count open loans for a book</td><td>a book id</td><td>a number</td></tr>
+              </tbody>
+            </table>
+
+            <div class="think">
+              <span class="lbl">The report query — think before you code</span>
+              <ol>
+                <li>The report needs the book <strong>title</strong> and member <strong>name</strong>, but <code>issue</code> stores only ids.</li>
+                <li><strong>Option A:</strong> one SQL query that pulls from all three tables at once. Efficient, one round trip — you'll need to look up how to combine tables in a query if you haven't met it.</li>
+                <li><strong>Option B:</strong> fetch the loans, then look up each book and member separately in Java. Simpler SQL, but many more queries.</li>
+              </ol>
+              <p style="margin:8px 0 0;">Option A is the better engineering answer and worth the learning.
+              Option B is acceptable and honest. <strong>Pick one, and know why the other exists.</strong></p>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Every method in this layer follows the same shape</span>
+              You learned it in Part 2 and it does not change: get a connection, <strong>guard against
+              failure</strong>, use a prepared statement with placeholders, bind values in order,
+              <strong>match the execute call to the SQL verb</strong>, catch and <strong>log</strong> the
+              database error, and <strong>release the connection in a way that always runs</strong>.
+              <br><br>
+              <strong>Write one method completely and get it working. Then the other fifteen are
+              mechanical.</strong> Don't write all sixteen and then start debugging.
+            </div>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — test the DAO before building on it</span>
+              You don't need the web layer to test this. A temporary <code>main</code> method that calls
+              your fetch-all and prints the results will tell you in seconds whether your SQL and your
+              row-to-object mapping are right.
+              <br><br>
+              <strong>Debugging a DAO through a browser is far harder than debugging it directly.</strong>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Three DAO classes covering every operation above, each one verified by a throwaway
+              <code>main</code> before you move on. No HTML and no business rules anywhere in them.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 5 complete — all DAO methods written and spot-tested directly.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 6: SERVICE ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">PHASE 6</span><span class="layer-badge">service</span><span class="d-badge hard">Hard</span><span class="t-pill">60–90 min</span><span class="chevron">▶</span> The service layer — the heart of the project</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              All the <strong>rules</strong>. This is where this project stops being another CRUD exercise
+              — and it's the phase that will teach you the most.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Why this layer matters here more than in Part 2</span>
+              In Part 2 the service checked a few obvious things — no negative prices, no blank names.
+              Useful, but not exciting.
+              <br><br>
+              <strong>Here, "issue a book" is a genuine business operation.</strong> It has to check
+              several conditions across two tables, and only then perform two separate writes. That logic
+              belongs in exactly one place, and this is it. Put it in the servlet and you'll duplicate it
+              the first time you add another way to issue a book.
+            </div>
+
+            <h3 style="margin-top:4px;">Rules for issuing a book</h3>
+            <p>Before a loan may be recorded, <strong>all</strong> of these must hold. Your job is to
+            check them in a sensible order and report <em>which one</em> failed.</p>
+            <table class="spec">
+              <thead><tr><th style="width:6%;">#</th><th style="width:40%;">Rule</th><th>Why it matters</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td class="must">The book id must exist</td><td>Otherwise you'd record a loan against nothing</td></tr>
+                <tr><td>2</td><td class="must">The member id must exist</td><td>Same reason</td></tr>
+                <tr><td>3</td><td class="must">At least one copy must be available</td><td>The core rule. This is what the wireframe's red message is about</td></tr>
+                <tr><td>4</td><td class="must">The member must be under their borrowing limit</td><td>Pick a limit — 3 is sensible. Define it as a named constant, not a number buried in an <code>if</code></td></tr>
+                <tr><td>5</td><td class="must">The member must not already hold <em>this same title</em></td><td>A library lends one copy of a title per person</td></tr>
+              </tbody>
+            </table>
+
+            <p><strong>If every rule passes</strong>, two things must happen: record the loan, and reduce
+            the available count by one. Both, or the data no longer makes sense.</p>
+
+            <h3>Rules for returning a book</h3>
+            <table class="spec">
+              <thead><tr><th style="width:6%;">#</th><th style="width:40%;">Rule</th><th>Why it matters</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td class="must">The loan must exist</td><td>You can't close something that isn't there</td></tr>
+                <tr><td>2</td><td class="must">It must still be open</td><td>Returning the same loan twice would inflate the available count above the number of copies you own</td></tr>
+              </tbody>
+            </table>
+            <p><strong>If both pass:</strong> close the loan and increase the available count by one.</p>
+
+            <div class="dangerbox">
+              <span class="lbl">⚠ The trap in both operations — two writes, one operation</span>
+              Issuing writes to <strong>two</strong> tables. So does returning. If the first write succeeds
+              and the second fails, your data is now <strong>wrong</strong>: a loan recorded but the count
+              not reduced, or vice versa.
+              <br><br>
+              <strong>The real fix is a database transaction</strong> — both writes commit together, or
+              neither does. You have not been taught transactions yet, so <strong>you are not required to
+              implement them.</strong>
+              <br><br>
+              <strong>What you are required to do:</strong> notice the problem, and write a comment where
+              it occurs saying what should happen there. Recognising a correctness gap you can't yet fix
+              is a real engineering skill — and it's exactly the kind of thing a reviewer looks for.
+            </div>
+
+            <h3>The big question: how do you report <em>which</em> rule failed?</h3>
+            <p>In Part 2 every write method returned a plain true/false. That was honest about its own
+            limitation: <code>false</code> says <em>that</em> it failed, never <em>why</em>.</p>
+            <p><strong>Here that isn't good enough.</strong> Look at the wireframe again — the screen says
+            <em>"no copies of Clean Code are available"</em>, not <em>"issue failed"</em>. Five different
+            rules can block an issue, and the user needs to know which.</p>
+
+            <table class="spec">
+              <thead><tr><th style="width:26%;">Approach</th><th>Trade-off</th></tr></thead>
+              <tbody>
+                <tr><td>Return a <strong>message string</strong> — empty or null meaning success</td><td>Very easy. But now your service layer is deciding user-facing wording, which is really the web layer's job.</td></tr>
+                <tr><td>Return a small <strong>result object</strong> carrying a success flag and a reason</td><td>Clean separation, and easy to extend. A little more code. <span class="muted">Often the sweet spot here.</span></td></tr>
+                <tr><td>Throw a <strong>custom exception</strong> per failure reason</td><td>The most "professional" answer, and what Spring does. More classes, and you must catch them properly in the servlet.</td></tr>
+                <tr><td>Return an <strong>enum</strong> of outcomes</td><td>Neat and type-safe; the servlet maps each outcome to a message. Nicely keeps wording in the web layer.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="think">
+              <span class="lbl">Choose deliberately</span>
+              <ol>
+                <li><strong>All four are acceptable.</strong> The plain true/false is the only option that is <em>not</em>, because it cannot express five different reasons.</li>
+                <li>Ask yourself: <em>which layer should decide the exact wording the user sees?</em> Your answer should push you towards one of the last three.</li>
+                <li>Write down your choice and one sentence of reasoning. <strong>Being able to justify a design decision is the actual skill being practised here.</strong></li>
+              </ol>
+            </div>
+
+            <h3>Don't forget the ordinary validation too</h3>
+            <p>Alongside the interesting rules, this layer still does the unglamorous work: ids must be
+            positive, titles and names must not be blank, copy counts must not be negative, and an email
+            must look like an email. <span class="muted">You wrote all of this in Part 2 — the same
+            patterns apply.</span></p>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Service classes containing every rule above, no SQL, no HTML — plus a written note of how
+              you chose to report failure reasons and why, and a comment marking the two-writes problem.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 6 complete — all issue and return rules implemented, with reasons reportable.</span></label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ================================================================ -->
+      <div class="section-band">Phases 7–10 — The web layer &amp; features</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== PHASE 7: LOGIN + SESSION ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">PHASE 7</span><span class="layer-badge">web</span><span class="d-badge medium">Medium</span><span class="t-pill">40 min</span><span class="chevron">▶</span> Login &amp; session protection <span class="muted" style="font-weight:400;font-size:14px;">— the one new technique</span></summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              A librarian logs in once and can then use the app. Anyone who hasn't logged in is sent back
+              to the login screen, <strong>no matter which URL they type</strong>.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">This is the gap Part 2 deliberately left open</span>
+              Remember the experiment at the end of Part 2: open a private browser window, skip the login,
+              paste the CRUD URL — and it worked. Because HTTP is stateless and the servlet never asked
+              who you were.
+              <br><br>
+              <strong>Closing that gap is this phase.</strong> It is the only genuinely new technique in
+              the whole project, so expect to look it up — that's intended, not a failure.
+            </div>
+
+            <h3 style="margin-top:4px;">What you need to build</h3>
+            <table class="spec">
+              <thead><tr><th style="width:26%;">Piece</th><th>What it must do</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Login page</strong></td><td>A form asking for staff id and password. Think about which HTTP method a login form should use, and why.</td></tr>
+                <tr><td><strong>Login servlet</strong></td><td>Check the credentials. On success, <strong>record in the session that this person is authenticated</strong>. On failure, show a message and let them retry.</td></tr>
+                <tr><td><strong>A protection check</strong></td><td>At the top of <strong>every</strong> protected servlet: is there a session, and does it say this person logged in? If not, send them to the login page and <strong>stop processing</strong>.</td></tr>
+                <tr><td><strong>Logout</strong></td><td>Discard the session and return to the login page. Then confirm the protected pages really are locked again.</td></tr>
+                <tr><td><strong>Menu page</strong></td><td>A simple hub linking to books, members, issue, return and the report. Only reachable when logged in.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — the two things to look up</span>
+              <ul>
+                <li><strong>Storing something in a session:</strong> the request object can give you a session, and a session can hold named values. That's all you need — put a marker in on successful login, read it back later.</li>
+                <li><strong>Checking without creating:</strong> there's a version of "get me the session" that <em>creates</em> one if none exists, and a version that <em>doesn't</em>. For a login check you want the second — otherwise you'd always get a session and your check would never fail. <span class="muted">Session 2 notes, chapter 21, shows the shape of this in outline.</span></li>
+              </ul>
+            </div>
+
+            <div class="dangerbox">
+              <span class="lbl">⚠ The mistake almost everyone makes here</span>
+              After redirecting an unauthenticated visitor, you must <strong>stop the method</strong>. If
+              you redirect and then carry on building the page, you'll get an error about the response
+              already being committed — and the protection won't actually protect anything.
+              <br><br>
+              <strong>Redirect, then return immediately.</strong>
+            </div>
+
+            <div class="think">
+              <span class="lbl">Worth thinking about</span>
+              <ol>
+                <li>You'll repeat the same protection check at the top of four or five servlets. That's duplication. <strong>How could you write it once?</strong> <span class="muted">There are at least three answers: a shared helper method, a common parent class, or a servlet filter. A filter is the proper tool — look it up if you're curious, but don't let it block you.</span></li>
+                <li>Where do the librarian's credentials come from? Hardcoded is fine for this project. <strong>What would production do instead?</strong> Two things change — where they're stored, and what form the password is stored in.</li>
+              </ol>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Login, logout, a menu page, and protection on every other page — verified by pasting a
+              protected URL into a fresh private window and being bounced to the login screen.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 7 complete — login works, logout works, protected URLs redirect when not authenticated.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 8: BOOK CRUD ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">PHASE 8</span><span class="layer-badge">web</span><span class="d-badge medium">Medium</span><span class="t-pill">50 min</span><span class="chevron">▶</span> Book catalogue screens</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Full CRUD on books through the web, routed by an <code>action</code> parameter — territory
+              you covered in Part 2, now applied to your own design.
+            </div>
+
+            <table class="spec">
+              <thead><tr><th style="width:16%;">Action</th><th style="width:22%;">Comes from</th><th>Reads</th></tr></thead>
+              <tbody>
+                <tr><td><code>view</code></td><td>a link</td><td>nothing</td></tr>
+                <tr><td><code>insert</code></td><td>a form</td><td>title, author, copies…</td></tr>
+                <tr><td><code>update</code></td><td>a form</td><td>the id plus whatever may change</td></tr>
+                <tr><td><code>delete</code></td><td>a per-row link</td><td>which book</td></tr>
+                <tr><td><code>search</code></td><td>a small form</td><td>a keyword</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hints — all things you did in Part 2</span>
+              <ul>
+                <li><strong>Default the action</strong> when none is supplied, rather than letting a null crash the method.</li>
+                <li><strong>Every parameter arrives as text.</strong> Convert the numeric ones, and handle the case where someone typed letters.</li>
+                <li><strong>Write the table-rendering code once</strong> and call it from every action, so the user always sees the fresh list under the status message. Copy-pasting that loop four times is the exact mistake Part 2's refactor existed to teach.</li>
+                <li><strong>The per-row delete link</strong> carries the row's own id. Watch your quotes: a Java string in double quotes, HTML attributes in single quotes.</li>
+              </ul>
+            </div>
+
+            <div class="think">
+              <span class="lbl">A decision your Phase 2 design forces on you</span>
+              <ol>
+                <li>What should <strong>deleting</strong> a book do if copies of it are currently on loan? Silently delete and leave orphaned loan records? Refuse with a message? Something else?</li>
+                <li>If you declared foreign keys, the database may refuse for you — but the user must still see a sentence, not a stack trace.</li>
+                <li><strong>Any defensible answer is fine.</strong> An undefended one isn't.</li>
+              </ol>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              A book servlet handling all five actions, showing the refreshed catalogue after every one,
+              with a per-row delete link and a considered answer to the on-loan question.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 8 complete — book CRUD and search working through the browser.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 9: ISSUE & RETURN ===== -->
+      <section class="section">
+        <details class="exp lab9">
+          <summary><span class="lab-tag">PHASE 9</span><span class="layer-badge">web</span><span class="d-badge hard">Hard</span><span class="t-pill">50 min</span><span class="chevron">▶</span> Issue &amp; return screens</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Put your Phase 6 rules on screen — including making sure the user is told <strong>exactly
+              which rule blocked them</strong>.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Almost nothing happens in this servlet</span>
+              And that's the sign you got the layering right. The servlet should read two ids, hand them
+              to the service, and turn the answer into a sentence. <strong>If you find yourself checking
+              availability or counting a member's loans here, that logic is in the wrong layer</strong> —
+              move it down to the service.
+            </div>
+
+            <table class="spec">
+              <thead><tr><th style="width:20%;">Screen</th><th>What it does</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Issue</strong></td><td>A form taking a book id and a member id. Reports success, or <strong>the specific reason</strong> it was refused.</td></tr>
+                <tr><td><strong>Return</strong></td><td>Either a form taking the loan id, or — nicer — a <strong>Return link on each row</strong> of the currently-issued report.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — make the messages genuinely useful</span>
+              Compare these two:
+              <ul>
+                <li>❌ <em>"Issue failed."</em> — the user has no idea what to do next.</li>
+                <li>✅ <em>"Cannot issue — no copies of 'Clean Code' are available."</em> — actionable.</li>
+                <li>✅ <em>"Cannot issue — Ravi Sharma already has 3 books, the maximum allowed."</em></li>
+                <li>✅ <em>"Cannot issue — Ravi Sharma already holds a copy of this title."</em></li>
+              </ul>
+              This is exactly why Phase 6 asked you to choose a way of reporting <em>which</em> rule
+              failed. <strong>If your messages are all identical, go back and revisit that decision</strong> —
+              this screen is where that design pays off or doesn't.
+            </div>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — a small usability upgrade worth making</span>
+              Typing raw ids is awkward and easy to get wrong. Consider rendering a <strong>dropdown of
+              books and a dropdown of members</strong> instead of two text boxes, built from your existing
+              fetch-all methods.
+              <br><br>
+              It removes a whole class of user error, and it's a genuinely small change — the value sent to
+              the server is still just an id.
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Working issue and return, where every one of the five refusal reasons produces its own
+              distinct, readable message.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 9 complete — issue and return work, and each refusal names its reason.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 10: SEARCH & REPORT ===== -->
+      <section class="section">
+        <details class="exp lab10">
+          <summary><span class="lab-tag">PHASE 10</span><span class="layer-badge">web</span><span class="d-badge medium">Medium</span><span class="t-pill">30 min</span><span class="chevron">▶</span> Search &amp; the currently-issued report</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Two read-only screens that make the app feel finished — and that exercise the two most
+              interesting queries you wrote.
+            </div>
+
+            <h3 style="margin-top:4px;">Search</h3>
+            <table class="spec">
+              <thead><tr><th style="width:30%;">Requirement</th><th>Detail</th></tr></thead>
+              <tbody>
+                <tr><td class="must">Partial matches</td><td>Searching <em>java</em> finds <em>Head First Java</em>. Exact-match only doesn't count.</td></tr>
+                <tr><td class="must">Title <em>or</em> author</td><td>One box searches both.</td></tr>
+                <tr><td class="must">Handles no results</td><td>A clear "nothing found" message — not a blank page or an empty table with headers.</td></tr>
+                <tr><td class="opt">Case-insensitive</td><td>Optional, but nice. Worth thinking about where you'd handle it — in SQL, or before you bind the value?</td></tr>
+              </tbody>
+            </table>
+
+            <h3>Currently-issued report</h3>
+            <p>The screen from wireframe 4: every open loan, with the book title, the member name, the
+            issue date, and a way to return it.</p>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — you already made this decision in Phase 5</span>
+              This is the screen that needs data from three tables at once. Whichever approach you chose
+              back then — one combined query, or several lookups in Java — this is where it gets used.
+              <br><br>
+              If it turns out awkward now, that's useful feedback about the design. <strong>Noticing that
+              is worth more than getting it right first time</strong>, and it's fine to change your mind
+              at this point.
+            </div>
+
+            <div class="think">
+              <span class="lbl">If you have time — two easy additions</span>
+              <ol>
+                <li><strong>Days on loan.</strong> You stored the issue date; today's date is easy to get. Which layer should do that subtraction — and why not the DAO?</li>
+                <li><strong>Highlight overdue loans.</strong> Pick a loan period, say 14 days, and mark anything past it. Where does the number 14 belong so it isn't scattered through your code?</li>
+              </ol>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              A working partial-match search with a proper empty state, and a report listing open loans
+              with titles and names rather than bare ids.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 10 complete — search and the currently-issued report both working.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Phases 11–12 — Finish it properly</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== PHASE 11: POLISH ===== -->
+      <section class="section">
+        <details class="exp lab11">
+          <summary><span class="lab-tag">PHASE 11</span><span class="d-badge medium">Medium</span><span class="t-pill">30 min</span><span class="chevron">▶</span> Polish — error handling &amp; edge cases</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Make the app <strong>unbreakable by a confused user</strong>. This is the phase that
+              separates "it works when I use it correctly" from "it works".
+            </div>
+
+            <p>Go through your app deliberately trying to break it. Every one of these must produce a
+            readable message rather than a stack trace:</p>
+
+            <table class="spec">
+              <thead><tr><th style="width:44%;">Try this</th><th>Must produce</th></tr></thead>
+              <tbody>
+                <tr><td>Letters where a number belongs</td><td>"…must be a number", not a 500</td></tr>
+                <tr><td>Submit a form with every field empty</td><td>A clear validation message per problem</td></tr>
+                <tr><td>An id that doesn't exist, in every feature</td><td>"No book with id 999" — naming the id helps the user</td></tr>
+                <tr><td>Hand-edit a URL to a nonsense action</td><td>"Unknown action", plus a usable page</td></tr>
+                <tr><td>Hand-edit a URL to remove a required parameter</td><td>A message, not a crash</td></tr>
+                <tr><td>Return the same loan twice</td><td>Refused the second time — your Phase 6 rule 2</td></tr>
+                <tr><td>Issue the last copy, then try again</td><td>Refused, naming availability as the reason</td></tr>
+                <tr><td>A search matching nothing</td><td>"No books found", not an empty table</td></tr>
+                <tr><td>Paste a protected URL while logged out</td><td>Redirected to login</td></tr>
+                <tr><td>Stop the database, then use the app</td><td>A message. Ugly is acceptable; a stack trace is not</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — where each of these gets caught</span>
+              <ul>
+                <li><strong>Text that should be a number</strong> → the web layer, when converting.</li>
+                <li><strong>Blank or nonsensical values</strong> → the service layer, as validation.</li>
+                <li><strong>Missing rows / rule violations</strong> → the service layer, using what the DAO reports back.</li>
+                <li><strong>Database unreachable</strong> → caught in the DAO, logged there, surfaced upward as a failure.</li>
+              </ul>
+              If you're catching number-conversion problems in your DAO, or database problems in your
+              servlet, <strong>something is in the wrong layer.</strong>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Also worth tidying while you're here</span>
+              Consistent page titles and headings · a "back to menu" link on every page so nobody gets
+              stranded · your success messages in one colour and failures in another · and remove any
+              debugging output that would confuse someone reading the console. <span class="muted">Keeping
+              a few deliberate trace lines is fine and sensible — just make them intentional.</span>
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              Every row of the table above handled. <strong>No input, however silly, produces a raw
+              error page.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 11 complete — every edge case above produces a readable message.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PHASE 12: SELF TEST ===== -->
+      <section class="section">
+        <details class="exp lab12">
+          <summary><span class="lab-tag">PHASE 12</span><span class="d-badge easy">Easy</span><span class="t-pill">30 min</span><span class="chevron">▶</span> Test it yourself, properly</summary>
+          <div class="exp-body">
+            <div class="goal">
+              <span class="lbl">Goal</span>
+              Walk the whole application once, deliberately, from a clean database — checking the
+              <strong>data</strong> as well as the screens.
+            </div>
+
+            <p><strong>Re-run your setup script first</strong> so you start from known data. Then work
+            straight down this list without skipping.</p>
+
+            <table class="spec">
+              <thead><tr><th style="width:6%;">#</th><th style="width:38%;">Do this</th><th>Expect</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td>Visit a protected URL while logged out</td><td>Redirected to login</td></tr>
+                <tr><td>2</td><td>Log in with wrong credentials</td><td>A message; still not logged in</td></tr>
+                <tr><td>3</td><td>Log in correctly</td><td>The menu page</td></tr>
+                <tr><td>4</td><td>View the catalogue</td><td>All seeded books, with availability</td></tr>
+                <tr><td>5</td><td>Add a book</td><td>Success message <strong>and</strong> it appears in the list</td></tr>
+                <tr><td>6</td><td>Add a book with a blank title</td><td>Refused with a reason</td></tr>
+                <tr><td>7</td><td>Update a book</td><td>The change is visible in the list</td></tr>
+                <tr><td>8</td><td>Search a partial word</td><td>Matching books only</td></tr>
+                <tr><td>9</td><td>Search nonsense</td><td>A "nothing found" message</td></tr>
+                <tr><td>10</td><td>Register a member</td><td>Appears in the member list</td></tr>
+                <tr><td>11</td><td><strong>Issue a book with copies free</strong></td><td>Success — <strong>and availability drops by exactly one</strong></td></tr>
+                <tr><td>12</td><td>Issue until no copies remain, then once more</td><td>Refused, naming availability</td></tr>
+                <tr><td>13</td><td>Issue the same title to the same member twice</td><td>Refused, naming that rule</td></tr>
+                <tr><td>14</td><td>Issue past the member's limit</td><td>Refused, naming the limit</td></tr>
+                <tr><td>15</td><td>Issue to a member id that doesn't exist</td><td>Refused, naming the member</td></tr>
+                <tr><td>16</td><td>Open the currently-issued report</td><td>Every open loan, with titles and names</td></tr>
+                <tr><td>17</td><td><strong>Return a book</strong></td><td>Success — <strong>availability rises by exactly one</strong>, loan disappears from the report</td></tr>
+                <tr><td>18</td><td>Return the same loan again</td><td>Refused</td></tr>
+                <tr><td>19</td><td>Delete a book</td><td>Behaves the way you decided in Phase 8</td></tr>
+                <tr><td>20</td><td>Log out, then paste a protected URL</td><td>Redirected to login</td></tr>
+              </tbody>
+            </table>
+
+            <div class="observe">
+              <span class="lbl">Steps 11 and 17 are the ones that really matter</span>
+              Don't just read the screen — <strong>look at the database</strong> in your explorer.
+              <br><br>
+              Availability must go down by exactly one when issuing and up by exactly one when returning,
+              and the available count must <strong>never</strong> exceed the number of copies you own, or
+              drop below zero. If either drifts, you have a bug in the two-writes logic from Phase 6 —
+              and it's much easier to find now than later.
+            </div>
+
+            <div class="hint">
+              <span class="lbl">💡 Hint — a quick consistency check worth running</span>
+              After a round of issuing and returning, ask your database directly: for each book, does
+              <em>total copies minus open loans</em> equal <em>available copies</em>?
+              <br><br>
+              If those two numbers disagree, your writes have drifted apart. That single query is the
+              fastest way to catch the class of bug this project is designed to expose.
+            </div>
+
+            <div class="deliverable">
+              <span class="lbl">Deliverable</span>
+              All twenty steps pass, and your consistency check comes back clean.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Phase 12 complete — all twenty test steps pass and the data stays consistent.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== STRETCH GOALS ===== -->
+      <div class="section-band">If you finish early</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> 🚀 Stretch goals — pick whichever interests you</summary>
+          <div class="exp-body">
+            <p>All optional. Each one teaches something genuinely new rather than just adding screens.</p>
+
+            <table class="spec">
+              <thead><tr><th style="width:24%;">Extension</th><th style="width:14%;">Difficulty</th><th>What it teaches</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Transactions</strong></td><td><span class="d-badge hard">Hard</span></td><td>Properly fix the two-writes problem from Phase 6 — both writes commit together or neither does. <strong>The most valuable item on this list.</strong></td></tr>
+                <tr><td><strong>A servlet filter</strong></td><td><span class="d-badge medium">Medium</span></td><td>Write the login check <em>once</em> instead of at the top of five servlets. The proper tool for a cross-cutting concern.</td></tr>
+                <tr><td><strong>Password hashing</strong></td><td><span class="d-badge medium">Medium</span></td><td>Store a hash instead of the password itself. What every real login does.</td></tr>
+                <tr><td><strong>Escape your output</strong></td><td><span class="d-badge medium">Medium</span></td><td>Add a book titled with some HTML tags and watch what happens. Then fix it. That's XSS, and it's a genuinely important lesson.</td></tr>
+                <tr><td><strong>Overdue tracking</strong></td><td><span class="d-badge medium">Medium</span></td><td>Real date arithmetic, and a report with a computed column.</td></tr>
+                <tr><td><strong>Edit form pre-filled</strong></td><td><span class="d-badge easy">Easy</span></td><td>An Edit link that opens a form already containing the row's current values.</td></tr>
+                <tr><td><strong>Member borrowing history</strong></td><td><span class="d-badge easy">Easy</span></td><td>Closed loans as well as open ones — a second use for your issue table.</td></tr>
+                <tr><td><strong>Move display to JSP</strong></td><td><span class="d-badge hard">Hard</span></td><td>Get the HTML out of your Java. The natural next step after servlets, and it makes the Spring sessions easier.</td></tr>
+                <tr><td><strong>Connection pooling</strong></td><td><span class="d-badge hard">Hard</span></td><td>Stop opening a connection per operation. What production always does.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 If you only do one</span>
+              Do <strong>transactions</strong>. It's the one item that fixes a real correctness bug in
+              what you've built, rather than adding a feature on top of it — and understanding why it's
+              needed is a genuine step up as an engineer.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMMON PITFALLS ===== -->
+      <div class="section-band">When you get stuck</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> 🧭 Common pitfalls — symptom first</summary>
+          <div class="exp-body">
+            <p>You've met most of these before. This is a lookup table, ordered by <strong>what you
+            see</strong> — because that's how problems arrive.</p>
+
+            <table class="issues">
+              <thead><tr><th style="width:32%;">Symptom</th><th>Where to look</th></tr></thead>
+              <tbody>
+                <tr><td><strong>404</strong> on a page you just added</td><td>The URL, then your mapping, then — did you restart the server after changing the descriptor?</td></tr>
+                <tr><td><strong>500</strong> error page</td><td>The console. First line of the trace, not the last. It names the exception and your line number.</td></tr>
+                <tr><td>Tags showing as <strong>literal text</strong></td><td>Content type — missing, or set after you took the writer.</td></tr>
+                <tr><td><strong>Blank</strong> page</td><td>You printed to the console instead of the response.</td></tr>
+                <tr><td><strong>405</strong></td><td>Your form's method doesn't match the methods your servlet implements.</td></tr>
+                <tr><td>"No suitable driver"</td><td>The driver JAR isn't in the folder your running app loads from.</td></tr>
+                <tr><td>Table is <strong>empty</strong> but your explorer shows rows</td><td>Two different databases — a relative path. Make it absolute and identical everywhere.</td></tr>
+                <tr><td>"Already booted" / locked database</td><td>Your database browser is still connected. Disconnect it.</td></tr>
+                <tr><td><strong>Null pointer</strong> in a DAO method</td><td>You used a connection without checking it was actually opened.</td></tr>
+                <tr><td>A parameter is always <strong>null</strong></td><td>The <code>name</code> in your HTML doesn't match the string you're reading. It's case-sensitive.</td></tr>
+                <tr><td>Update or delete <strong>silently does nothing</strong></td><td>Check what your statement reports as rows affected — zero means it matched nothing. Also check your placeholder order.</td></tr>
+                <tr><td>Availability count <strong>drifts</strong> from reality</td><td>One of your two writes is failing, or running twice. Phase 6, and the consistency check in Phase 12.</td></tr>
+                <tr><td>Protection redirects but then <strong>errors</strong></td><td>You redirected and kept going. Return immediately after.</td></tr>
+                <tr><td>Login "works" but every page bounces you back</td><td>You're storing one thing in the session and checking for a different one. Or you're creating a fresh session in your check instead of reading the existing one.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              <span class="lbl">💡 The debugging habit that beats all of these</span>
+              When something doesn't behave, <strong>print what actually arrived</strong> — the parameter
+              values at the top of the servlet, and the values being bound in the DAO.
+              <br><br>
+              Most of the time the bug isn't in your logic at all; it's that the data reaching your logic
+              isn't what you assumed. <strong>Assume nothing, print everything, narrow it down.</strong>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">And when you're properly stuck for more than 20 minutes</span>
+              Go back to the lab sheet or notes for the <em>technique</em> — how a DAO method is shaped,
+              how a session is read — then return and apply it to your own problem.
+              <br><br>
+              <strong>Resist copying a whole file across.</strong> It usually creates two new problems
+              (names that don't fit, layers that don't match your design) and skips the learning this
+              project exists for.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== WRAP UP ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">What finishing this actually proves</span>
+          Not that you can write servlets — the labs already showed you that. It proves you can take a
+          <strong>described problem</strong>, design a data model for it, place logic in the right layer,
+          and build something that stands up to a user trying to break it.
+          <br><br>
+          It also means you've built, by hand, the exact architecture Spring Boot generates: a controller
+          reading requests, a service holding the rules, a repository owning the SQL, entities carrying
+          the data, and configuration holding the connection. <strong>When you meet those annotations,
+          you'll recognise your own design in them.</strong>
+        </div>
+        <div class="hint">
+          <span class="lbl">💡 One last piece of advice</span>
+          Keep a short notes file as you go: your table design, the two design decisions you were asked
+          to justify, anything that doesn't work, and anything you'd do differently.
+          <br><br>
+          <strong>An honest list of known issues is worth more than a silent bug</strong> — and when you
+          come back to this in six months, that file is what will make sense of it.
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Servlets Mini Project &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,2640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Java Servlets Part 2 — Hands-on Lab Sheet</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into the other servlets session files. Do not edit one copy without the other.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #0a84ff;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (lab) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      margin: 0 auto;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+    }
+    .mac-content { padding: 22px 26px 40px; }
+    .lab-canvas {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      background: #f7f7f9;
+      padding: 8px 26px 30px;
+    }
+
+    h1 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+    h2 { font-size: 26px; margin: 0; }
+    h3 { font-size: 19px; }
+    p, li { line-height: 1.65; font-size: 17.5px; }
+    a { color: var(--mac-accent); }
+    code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* === Hero (non-sticky) === */
+    .lab-hero {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
+      color: #fff;
+      border-radius: 14px;
+      padding: 24px 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 22px rgba(10,132,255,0.25);
+    }
+    .lab-hero .hero-icon {
+      font-size: 46px;
+      line-height: 1;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 14px;
+      padding: 10px 14px;
+      flex: 0 0 auto;
+    }
+    .lab-hero h1 { color: #fff; font-size: 32px; margin: 0 0 4px; }
+    .lab-hero .section-intro { color: rgba(255,255,255,0.92); font-size: 16px; margin: 0; }
+    .lab-hero .section-intro strong { color: #fff; }
+
+    /* === Slim sticky progress bar === */
+    .lab-stickybar {
+      position: sticky;
+      top: 8px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: saturate(180%) blur(12px);
+      -webkit-backdrop-filter: saturate(180%) blur(12px);
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 10px 18px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+    }
+    .sb-track {
+      flex: 1 1 auto;
+      height: 12px;
+      background: var(--mac-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 7px;
+      overflow: hidden;
+    }
+    .sb-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0a84ff, #28c840);
+      transition: width 0.35s ease;
+    }
+    .sb-meta {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-size: 14px;
+    }
+    .sb-pct { font-weight: 800; color: var(--mac-accent); font-size: 16px; min-width: 42px; }
+    .sb-count { color: var(--mac-text-muted); font-weight: 600; }
+    .sb-ready {
+      display: none;
+      background: rgba(40,200,64,0.14);
+      color: #1a9e34;
+      border: 1px solid rgba(40,200,64,0.45);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .sb-ready.show { display: inline-block; }
+
+    .section { padding: 0; margin-bottom: 4px; }
+    .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
+
+    /* === Schema reminder box (pinned visual) === */
+    .schema-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .schema-box h3 { margin: 0 0 8px; font-size: 16px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .schema-box pre {
+      margin: 0; background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 14px 16px; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.55; white-space: pre;
+    }
+
+    /* === Expandable sections === */
+    details.exp {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid var(--mac-accent);
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    details.exp > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg, #f5f9ff, #eef3fb);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      user-select: none;
+    }
+    details.exp > summary::-webkit-details-marker { display: none; }
+    details.exp > summary .chevron {
+      transition: transform 0.25s ease;
+      color: var(--mac-accent);
+      font-size: 18px;
+    }
+    details.exp[open] > summary .chevron { transform: rotate(90deg); }
+    details.exp[open] > summary { border-bottom: 1px solid var(--mac-border); }
+    details.exp > summary .lab-tag {
+      font-size: 13px;
+      background: var(--mac-accent);
+      color: #fff;
+      padding: 4px 11px;
+      border-radius: 10px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .exp-body { padding: 14px 24px 24px; }
+
+    /* === Checklist items === */
+    .check {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 11px 0;
+      background: #fafafc;
+      transition: background 0.2s ease;
+    }
+    .check:hover { background: #f0f6ff; }
+    .check input[type="checkbox"] {
+      width: 22px; height: 22px;
+      margin-top: 2px;
+      accent-color: var(--mac-accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+    .check .ctext { font-size: 17px; }
+    .check .ctext .verify {
+      display: block;
+      color: var(--mac-text-muted);
+      font-size: 15px;
+      margin-top: 4px;
+    }
+
+    /* Steps */
+    ol.steps { padding-left: 24px; }
+    ol.steps > li { margin: 16px 0; font-size: 17.5px; }
+    ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .tryit {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(10,132,255,0.06);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .tryit .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .observe {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.1);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .observe .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .concept {
+      background: #f3f8ff;
+      border: 1px solid #cfe4ff;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    /* Hard-stop warning — for the traps that cost an hour */
+    .trap {
+      border: 1px solid #ffc9c4;
+      border-left: 5px solid var(--tl-red);
+      background: linear-gradient(135deg,#fff4f3,#ffecea);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .trap .lbl { font-weight: 700; color: var(--tl-red); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Code blocks with copy button */
+    .codewrap { position: relative; margin: 14px 0; }
+    .codewrap pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .codewrap pre code {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    .code-comment { color: #6b7089; }
+    .code-add { color: #a6e22e; }
+    .copy-btn {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(255,255,255,0.12);
+      color: #f8f8f2;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 6px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-family: var(--mac-font);
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: rgba(255,255,255,0.22); }
+    .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
+    .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
+
+    /* Output console block */
+    .outblock {
+      background: #11131a; color: #d6e9c6; border: 1px solid var(--mac-border);
+      border-radius: 8px; padding: 12px 16px; margin: 8px 0;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; overflow-x: auto; white-space: pre;
+    }
+
+    /* === Browser mock — shows what the PAGE looks like === */
+    .browser-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      overflow: hidden; margin: 10px 0; background: #fff;
+    }
+    .browser-mock .bm-bar {
+      display: flex; align-items: center; gap: 9px; padding: 7px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser-mock .bm-dots { display: flex; gap: 5px; flex: 0 0 auto; }
+    .browser-mock .bm-dot { width: 9px; height: 9px; border-radius: 50%; background: #c9c9cf; }
+    .browser-mock .bm-url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .browser-mock .bm-page { padding: 14px 18px; font-size: 15px; }
+    .browser-mock .bm-page h2 { font-size: 19px; margin: 0 0 8px; }
+    .browser-mock .bm-page h3 { font-size: 16px; margin: 8px 0; }
+    .browser-mock .bm-page p { font-size: 14.5px; margin: 8px 0; }
+    .browser-mock .bm-page table { border-collapse: collapse; margin: 8px 0; }
+    .browser-mock .bm-page th, .browser-mock .bm-page td {
+      border: 1px solid #999; padding: 5px 10px; font-size: 14px; text-align: left;
+    }
+    .browser-mock .bm-page a { color: #0000ee; text-decoration: underline; }
+    .browser-mock .bm-page input[type="text"], .browser-mock .bm-page input[type="password"] {
+      border: 1px solid #767676; border-radius: 2px; padding: 2px 4px; font-size: 13.5px; width: 150px;
+    }
+    .browser-mock .bm-page .btn {
+      border: 1px solid #767676; border-radius: 3px; background: #efefef;
+      padding: 2px 10px; font-size: 13.5px; display: inline-block;
+    }
+    .browser-mock .bm-page .lit {
+      font-family: var(--mac-mono); font-size: 13.5px; color: #1d1d1f;
+    }
+    .ok-txt { color: #1a9e34; font-weight: 700; }
+    .err-txt { color: var(--tl-red); font-weight: 700; }
+
+    /* Common issues */
+    table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
+    table.issues th, table.issues td {
+      border: 1px solid var(--mac-border);
+      padding: 12px 14px; text-align: left; vertical-align: top;
+    }
+    table.issues thead th { background: var(--mac-titlebar); font-size: 15px; }
+    table.issues tbody tr:nth-child(even) { background: #fafafc; }
+
+    /* H2 alternative box */
+    .altbox {
+      border: 2px solid #00c7be;
+      background: rgba(0,199,190,0.07);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .altbox h3 { margin: 0 0 6px; color: #00827b; font-size: 18px; }
+
+    .section-band {
+      font-size: 15px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--mac-accent);
+      margin: 30px 4px 6px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid rgba(10,132,255,0.2);
+    }
+
+    /* Per-lab accent colors */
+    details.exp.lab0 { border-left-color: #8e8e93; }
+    details.exp.lab1 { border-left-color: #0a84ff; }
+    details.exp.lab2 { border-left-color: #5e5ce6; }
+    details.exp.lab3 { border-left-color: #28c840; }
+    details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff375f; }
+    details.exp.lab8 { border-left-color: #0a84ff; }
+    details.exp.lab9 { border-left-color: #5e5ce6; }
+    details.exp.lab10 { border-left-color: #28c840; }
+    details.exp.lab11 { border-left-color: #ff9f0a; }
+    details.exp.lab12 { border-left-color: #00c7be; }
+    details.exp.lab13 { border-left-color: #bf5af2; }
+    details.exp.lab14 { border-left-color: #ff375f; }
+    details.exp.lab0 > summary { background: linear-gradient(135deg,#f4f4f6,#eaeaec); }
+    details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
+    details.exp.lab9 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
+    details.exp.lab10 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
+    details.exp.lab11 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab12 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab13 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab14 > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
+    details.exp.lab0 .lab-tag { background:#8e8e93; }
+    details.exp.lab2 .lab-tag { background:#5e5ce6; }
+    details.exp.lab3 .lab-tag { background:#28c840; }
+    details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff375f; }
+    details.exp.lab9 .lab-tag { background:#5e5ce6; }
+    details.exp.lab10 .lab-tag { background:#28c840; }
+    details.exp.lab11 .lab-tag { background:#ff9f0a; }
+    details.exp.lab12 .lab-tag { background:#00c7be; }
+    details.exp.lab13 .lab-tag { background:#bf5af2; }
+    details.exp.lab14 .lab-tag { background:#ff375f; }
+
+    /* SQL verb badge */
+    .verb-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .verb-badge.create { background: #8e8e93; }
+    .verb-badge.insert { background: #49cc90; }
+    .verb-badge.select { background: #61affe; }
+    .verb-badge.update { background: #fca130; }
+    .verb-badge.delete { background: #f93e3e; }
+
+    /* HTTP method badge */
+    .m-badge {
+      font-family: var(--mac-mono); font-size: 12px; font-weight: 700; color: #fff;
+      padding: 3px 9px; border-radius: 6px; letter-spacing: 0.04em;
+    }
+    .m-badge.get { background: #61affe; }
+    .m-badge.post { background: #49cc90; }
+
+    /* Layer badge — which MVC package this lab builds */
+    .layer-badge {
+      font-family: var(--mac-font); font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em;
+      text-transform: uppercase; color: #fff; background: #6e6e73;
+      padding: 3px 10px; border-radius: 20px;
+    }
+
+    /* Reference + Quick reference card */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
+
+    .qref {
+      background: linear-gradient(135deg, #1e1e2e, #2a2a40);
+      color: #f8f8f2;
+      border-radius: 12px;
+      padding: 24px 26px;
+      margin: 16px 0 0;
+    }
+    .qref h2 { color: #fff; }
+    .qref h3 { color: #8fd3ff; font-size: 17px; margin: 18px 0 6px; }
+    .qref table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .qref th, .qref td {
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 8px 12px; text-align: left; font-size: 14px;
+    }
+    .qref th { background: rgba(255,255,255,0.08); }
+    .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref ol { margin: 10px 0 0; padding-left: 22px; }
+    .qref ol li { font-size: 14.5px; margin: 5px 0; color: #e6e6ea; }
+    .qref ol li code { color: #a6e22e; }
+
+    /* Data Source Explorer mock */
+    .dse-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+    }
+    .dse-mock .dse-top { background: #2a2a40; color: #fff; padding: 6px 12px; font-weight: 700; }
+    .dse-mock .dse-row { padding: 5px 14px; border-bottom: 1px solid var(--mac-border); }
+    .dse-mock .dse-row:last-child { border-bottom: none; }
+
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-path { color: #6b7089; font-size: 13px; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    /* When a filebar sits directly on top of a code block, square the code's top corners */
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* Numbered "where to paste" mini-steps inside a lab */
+    .wheretopaste {
+      background: #fffdf3; border: 1px solid #f0e3a8; border-radius: 10px;
+      padding: 6px 18px 6px; margin: 14px 0;
+    }
+    .wheretopaste .lbl { font-weight:700; color:#b8860b; display:block; margin:10px 0 2px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+
+    /* Project tree */
+    .treebox {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 14px 18px; margin: 14px 0; overflow-x: auto;
+      font-family: var(--mac-mono); font-size: 14px; line-height: 1.6; white-space: pre;
+    }
+    .treebox .t-dir { color: #8fd3ff; font-weight: 700; }
+    .treebox .t-new { color: #a6e22e; }
+    .treebox .t-note { color: #6b7089; }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">servlets-session2-lab.html — MVC Architecture &amp; CRUD with JDBC</span>
+    </div>
+
+    <main class="mac-content" id="app">
+
+
+
+      <!-- ===== HERO ===== -->
+      <header class="lab-hero">
+        <div class="hero-icon">🗄️</div>
+        <div>
+          <h1>Java Servlets Part 2 — Hands-on Lab</h1>
+          <p class="section-intro">Add a Derby database and five MVC layers to your Part 1 project, then build a complete <code>product</code> CRUD application — bean, helper, DAO, service, servlet. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+        </div>
+      </header>
+
+      <!-- ===== STICKY PROGRESS BAR ===== -->
+      <div class="lab-stickybar" id="stickyBar">
+        <div class="sb-track"><div class="sb-fill" id="progressBar"></div></div>
+        <div class="sb-meta">
+          <span class="sb-pct" id="progressText">0%</span>
+          <span class="sb-count" id="progressCount">0 / 0 steps</span>
+          <span class="sb-ready" id="readyBadge">✓ Ready to begin</span>
+        </div>
+      </div>
+
+      <div class="lab-canvas">
+
+      <!-- ===== ABOUT ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">How to use this sheet</span>
+          This is your hands-on companion for <strong>Part 2</strong>. We extend the <code>ServletBasics</code> project from
+          Part 1 with a real database and five MVC packages, building <strong>bottom-up</strong>: bean → helper → DAO →
+          service → servlet. Each layer only depends on the one below it, so nothing is ever red for long.
+          <br><br>
+          Every lab names <strong>exactly which file to create and where</strong>, then gives the complete contents — use the
+          <strong>Copy</strong> button and tick each checkbox. Keep the <strong>schema box</strong> below in view; one table
+          drives everything.
+        </div>
+      </section>
+
+      <!-- ===== WHAT WE'RE BUILDING ===== -->
+      <div class="section-band">What you'll have by the end</div>
+      <section class="section">
+        <div class="expected">
+          <span class="lbl">The finished Part 2 application</span>
+          A product manager where every action — view, insert, update, delete — returns a status message <em>and</em> the
+          live table, generated from a real database through five clean layers.
+          <div class="browser-mock" style="margin-top:10px;">
+            <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product</span></div>
+            <div class="bm-page">
+              <h2>Product Manager</h2>
+              <h3 class="ok-txt">Product added successfully.</h3>
+              <table>
+                <tr><th>ID</th><th>Name</th><th>Price</th><th>Quantity</th><th>Action</th></tr>
+                <tr><td>1</td><td>Laptop</td><td>55000.0</td><td>10</td><td><a href="#">Delete</a></td></tr>
+                <tr><td>2</td><td>Mouse</td><td>750.5</td><td>100</td><td><a href="#">Delete</a></td></tr>
+                <tr><td>5</td><td>Webcam</td><td>2500.0</td><td>15</td><td><a href="#">Delete</a></td></tr>
+              </table>
+              <p><a href="#">&laquo; Back to the form</a></p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SCHEMA REMINDER (pinned) ===== -->
+      <div class="schema-box">
+        <h3>📌 Database schema — used by every lab below</h3>
+        <pre>CREATE TABLE product (
+    id       INT PRIMARY KEY,
+    name     VARCHAR(50),
+    price    DOUBLE,
+    quantity INT
+)</pre>
+      </div>
+
+      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <div class="section-band">Today's checklist</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> 11-step progress tracker</summary>
+          <div class="exp-body">
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eleven are done.</p>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>1 · Derby connected</strong> — "Ping succeeded!", <code>product</code> table created with 4 rows.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>2 · JAR + packages ready</strong> — <code>derby.jar</code> in <code>WEB-INF/lib</code>, four new packages created.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>3 · Bean written</strong> — <code>Product</code> POJO with both constructors and accessors.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>4 · Helper written</strong> — <code>DBHelper.connect()</code> and <code>close()</code>, with your own URL.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>5 · DAO written</strong> — all four SQL methods using <code>PreparedStatement</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>6 · Service written</strong> — validation layer wrapping the DAO.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>7 · VIEW working</strong> — all 4 products render as an HTML table. <em>The full stack connects here.</em></span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>8 · INSERT working</strong> — new product added from the form and visible in the table.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · UPDATE + DELETE working</strong> — both branch correctly on valid and invalid ids.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>10 · Refactor complete</strong> — one <code>displayAllProducts()</code> serving every action.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>11 · Full test pass</strong> — 12 cases verified, including every failure case.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== PRE-REQUISITES ===== -->
+      <div class="section-band">Before you start</div>
+      <section class="section">
+        <details class="exp" open>
+          <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
+          <div class="exp-body">
+            <p>Verify each item before starting. The "ready" badge at the top lights up when all three are green.</p>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>Part 1 completed — the <code>ServletBasics</code> project exists and runs</strong>
+                <span class="verify">Verify: <code>http://localhost:8080/ServletBasics/</code> shows your login form, and logging in with <strong>123 / Christi</strong> still works. We build directly on this project.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong><code>derby.jar</code> located on disk</strong>
+                <span class="verify">Eclipse often bundles it under a <code>db-derby*/lib/</code> folder; otherwise download Apache Derby. <strong>You'll need this file path twice</strong> — remember where it is.</span>
+              </span>
+            </label>
+            <label class="check">
+              <input type="checkbox" class="prereq" />
+              <span class="ctext"><strong>JDBC from the earlier session is fresh in your mind</strong>
+                <span class="verify"><code>Connection</code>, <code>PreparedStatement</code>, <code>ResultSet</code>, <code>executeQuery</code> vs <code>executeUpdate</code>. If any of those are hazy, skim the JDBC lab sheet first — today's DAO assumes them.</span>
+              </span>
+            </label>
+
+            <div class="concept">
+              <span class="lbl">Didn't do Part 1? You can still start here</span>
+              Create a Dynamic Web Project named <code>ServletBasics</code> with a Tomcat 9 target runtime and a generated
+              <code>web.xml</code> containing a <code>&lt;welcome-file-list&gt;</code> pointing at <code>index.html</code>.
+              That's the only inheritance Part 2 needs. <strong>The <code>javax</code> vs <code>jakarta</code> rule still
+              applies:</strong> all code here uses <code>javax.servlet</code> (Tomcat 9) — on Tomcat 10+, find-and-replace
+              it with <code>jakarta.servlet</code>.
+            </div>
+
+            <div class="altbox">
+              <h3>🔄 Prefer H2 over Derby? Every lab works identically</h3>
+              <p style="font-size:15.5px; margin:0 0 8px;">H2 is a tiny zero-setup database, and its <code>AUTO_SERVER</code> mode dodges the Derby locking problem you'll read about in Lab 0. Change only the URL in <code>DBHelper</code>:</p>
+              <div class="codewrap"><pre><code><span class="code-comment">// DBHelper.java — swap the URL, keep everything else</span>
+private static final String URL  = "jdbc:h2:~/productdb;AUTO_SERVER=TRUE";
+private static final String USER = "sa";
+private static final String PASS = "";
+
+<span class="code-comment">// Put h2-*.jar in WEB-INF/lib instead of derby.jar.</span>
+<span class="code-comment">// AUTO_SERVER=TRUE lets Eclipse AND Tomcat hold the database open at once.</span></code></pre></div>
+              <p style="font-size:14.5px; margin:0; color:#00827b;">The <code>CREATE TABLE</code>, all four SQL statements, and every Java class are <strong>unchanged</strong>.</p>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Stage 1 — Database &amp; project setup</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== LAB 0: DERBY SETUP ===== -->
+      <section class="section">
+        <details class="exp lab0" open>
+          <summary><span class="lab-tag">LAB 0</span><span class="verb-badge create">CREATE</span><span class="verb-badge insert">INSERT</span><span class="chevron">▶</span> Derby Connection + the <code>product</code> Table</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Get a working database with data in it <strong>before</strong> writing any JDBC code, using Eclipse's Data
+              Source Explorer. Debugging a connection through a web app means reading stack traces; debugging it here gives
+              you a clear message and a Test Connection button.
+            </div>
+
+            <ol class="steps">
+              <li><strong>Open the view:</strong> Window → Show View → Other → <strong>Data Management</strong> → <strong>Data Source Explorer</strong>.</li>
+              <li><strong>New connection:</strong> right-click <strong>Database Connections</strong> → New → select <strong>Derby</strong> → Next.</li>
+              <li><strong>Driver definition — first time vs later:</strong> click the <strong>⊕ New Driver Definition</strong> icon (top right of the dialog). Eclipse ships the Derby <em>template</em> but not the JAR, so you must supply one. <span class="muted">On later projects the definition already exists — pick it from the dropdown, or use <strong>✎ Edit Driver Definition</strong> to repair a stale path. <strong>New = first-time setup. Edit = reuse or repair.</strong></span></li>
+              <li><strong>Pick the driver type:</strong> choose <strong>Derby Embedded JDBC Driver</strong> (e.g. 10.x). Then open the <strong>JAR List</strong> tab: <strong>delete any entry with a red ✗</strong> (a placeholder path that doesn't exist), then <strong>Add JAR/Zip</strong> → select your real <code>derby.jar</code> → OK.</li>
+              <li><strong>Set the properties:</strong> Database location <code>C:/derbydb/productdb</code> (see the trap below — <strong>use an absolute path</strong>), user <code>sa</code>, password blank, and tick <strong>"Create database if it does not exist"</strong>.</li>
+              <li><strong>Test:</strong> click <strong>Test Connection</strong>. You want <strong>"Ping succeeded!"</strong>. Then <strong>copy the generated URL exactly</strong> — <code>DBHelper</code> needs it verbatim in Lab 3.</li>
+            </ol>
+
+            <div class="dse-mock">
+              <div class="dse-top">🗂️ Data Source Explorer</div>
+              <div class="dse-row">▾ Database Connections</div>
+              <div class="dse-row">&nbsp;&nbsp;&nbsp;▾ Derby — productdb &nbsp;<span style="color:#1a9e34;">● connected</span></div>
+              <div class="dse-row">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▾ Schemas &rarr; SA &rarr; Tables</div>
+              <div class="dse-row">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▸ PRODUCT</div>
+            </div>
+
+            <div class="trap">
+              <span class="lbl">⚠ Trap 1 — use an ABSOLUTE database path, or your servlet will see an empty table</span>
+              A relative URL like <code>jdbc:derby:productdb</code> creates the database in the JVM's
+              <strong>current working directory</strong> — and Eclipse's working directory is <em>not</em> Tomcat's. The
+              result is baffling: the Data Source Explorer shows your 4 rows, but the servlet reports "No products found,"
+              because it silently created a <strong>second, empty database</strong> somewhere else.
+              <div class="codewrap" style="margin-top:8px;"><pre><code><span class="code-comment">// ✗ Relative — two different databases, depending on who connects</span>
+jdbc:derby:productdb;create=true
+
+<span class="code-comment">// ✓ Absolute — Eclipse and Tomcat both open the SAME database</span>
+jdbc:derby:C:/derbydb/productdb;create=true               <span class="code-comment">// Windows</span>
+jdbc:derby:/home/yourname/derbydb/productdb;create=true   <span class="code-comment">// macOS / Linux</span></code></pre></div>
+              <strong>Use forward slashes even on Windows</strong> — backslashes in a Java string need escaping and cause
+              needless errors. Use this same absolute URL in the Data Source Explorer <em>and</em> in <code>DBHelper</code>.
+            </div>
+
+            <div class="trap">
+              <span class="lbl">⚠ Trap 2 — embedded Derby allows only ONE program at a time</span>
+              Embedded Derby loads <em>inside</em> whichever JVM opens it and takes an exclusive lock. So if Eclipse's Data
+              Source Explorer is <strong>connected</strong> when Tomcat starts, your servlet fails with:
+              <div class="outblock">ERROR XSDB6: Another instance of Derby may have already booted the database
+C:\derbydb\productdb.</div>
+              <strong>The fix:</strong> in Data Source Explorer, right-click the connection → <strong>Disconnect</strong>
+              before running the app. Reconnect when you want to inspect rows, then disconnect again.
+              <br><br>
+              <strong>Tired of that dance?</strong> Two clean options: switch to <strong>H2 with
+              <code>AUTO_SERVER=TRUE</code></strong> (see prerequisites — simultaneous access just works), or run
+              <strong>Derby Network Server</strong> and use the client URL
+              <code>jdbc:derby://localhost:1527/productdb;create=true</code>. Both let Eclipse and Tomcat connect at once.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Now create the table</span>
+              <p style="margin:2px 0 0;">Right-click your connection → <strong>Open SQL Scrapbook</strong>. In the toolbar at the top, set <strong>Type</strong>=Derby, <strong>Name</strong>=your connection, <strong>Database</strong>=productdb — <em>a scrapbook with no connection selected silently does nothing</em>. Then run the statements <strong>one at a time</strong>: select a statement and press <span class="kbd">Ctrl + Alt + X</span>.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">🗄️</span><span class="fb-name">product-setup.sql</span><span class="fb-path">SQL Scrapbook — save this file, you'll reuse it</span><span class="fb-tag">run one statement at a time</span></div>
+            <div class="codewrap"><pre><code>CREATE TABLE product (
+    id       INT PRIMARY KEY,
+    name     VARCHAR(50),
+    price    DOUBLE,
+    quantity INT
+);
+
+INSERT INTO product VALUES (1, 'Laptop',   55000.00, 10);
+INSERT INTO product VALUES (2, 'Mouse',      750.50, 100);
+INSERT INTO product VALUES (3, 'Keyboard',  1200.00, 45);
+INSERT INTO product VALUES (4, 'Monitor',   9500.00, 20);
+
+SELECT * FROM product;</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the SELECT returns 4 rows</span>
+              <div class="outblock">ID | NAME     | PRICE    | QUANTITY
+---+----------+----------+---------
+1  | Laptop   | 55000.0  | 10
+2  | Mouse    | 750.5    | 100
+3  | Keyboard | 1200.0   | 45
+4  | Monitor  | 9500.0   | 20</div>
+              Results appear in the <strong>SQL Results</strong> tab at the bottom. <strong>Save the scrapbook as
+              <code>product-setup.sql</code></strong> — you'll want to re-seed this data after testing delete, and
+              re-running it takes seconds.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Two Derby details that confuse people</span>
+              <strong>1.</strong> Derby folds unquoted names to <strong>UPPERCASE</strong>, so the explorer shows
+              <code>PRODUCT</code>. Your SQL can still say <code>product</code> — same table. <strong>2.</strong> SQL strings
+              use <strong>single quotes</strong>: <code>'Laptop'</code>. Double quotes mean <em>identifier</em>, so
+              <code>"Laptop"</code> would be read as a column name and error.
+            </div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>Test Connection fails immediately</td><td>Driver JAR path is wrong or missing.</td><td>Edit Driver Definition → JAR List → remove red-✗ entries → Add your real <code>derby.jar</code>.</td></tr>
+                <tr><td>"Database not found"</td><td>"Create database if it does not exist" wasn't ticked.</td><td>Tick it, or append <code>;create=true</code> to the URL.</td></tr>
+                <tr><td><code>Table/View 'PRODUCT' already exists</code></td><td>You ran CREATE TABLE twice.</td><td>Harmless — skip to the INSERTs. To start over: <code>DROP TABLE product;</code> then re-create.</td></tr>
+                <tr><td>Duplicate key error on INSERT</td><td>Those ids already exist.</td><td>Also harmless. To reset: <code>DELETE FROM product;</code> then re-run the inserts.</td></tr>
+                <tr><td>Scrapbook does nothing on Ctrl+Alt+X</td><td>No connection selected in the scrapbook toolbar.</td><td>Set Type / Name / Database in the dropdowns at the top of the editor.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">"Ping succeeded!"; <code>product</code> table created with 4 rows; absolute JDBC URL copied and scrapbook saved.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 1: JAR + PACKAGES ===== -->
+      <section class="section">
+        <details class="exp lab1">
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> The Derby JAR + Scaffolding the Five Packages</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Two small but essential jobs: put the Derby driver where <strong>your running application</strong> can find it,
+              and create the packages so every class written from here has an obvious home.
+            </div>
+
+            <div class="trap">
+              <span class="lbl">⚠ The two-JAR trap — this catches nearly everybody</span>
+              You just added <code>derby.jar</code> to the <em>driver definition</em> in Lab 0. That copy is used by
+              <strong>Eclipse's own tools</strong> — the explorer and the scrapbook. <strong>Your web application cannot see
+              it.</strong> Tomcat runs your code in a separate JVM with its own classpath, so you must supply the JAR a
+              second time, in the place the servlet spec looks:
+              <div class="codewrap" style="margin-top:8px;"><pre><code>WebContent/WEB-INF/lib/derby.jar      <span class="code-comment">&lt;- copy the SAME file here</span></code></pre></div>
+              <strong>The symptom if you skip this:</strong> the explorer shows your rows perfectly, but the page shows a
+              <strong>500</strong> and the console says <code>No suitable driver found for jdbc:derby:...</code>. Whenever
+              you see "No suitable driver," this is the answer.
+            </div>
+
+            <ol class="steps">
+              <li><strong>Copy the JAR:</strong> find <code>derby.jar</code> in your file manager, copy it, then in Eclipse right-click <code>WebContent/WEB-INF/lib</code> → <strong>Paste</strong>. <span class="muted">No <code>lib</code> folder? Right-click <code>WEB-INF</code> → New → Folder → name it <code>lib</code>.</span></li>
+              <li><strong>Verify:</strong> expand <code>WEB-INF/lib</code> — you should see <code>derby.jar</code> listed. That's all; <strong>no build-path configuration needed</strong>, because a web app's classloader picks up every JAR in that folder automatically.</li>
+              <li><strong>Create four more packages:</strong> right-click <code>src</code> → New → Package, once for each. You already have <code>com.tcs.web</code> from Part 1.</li>
+            </ol>
+
+            <div class="codewrap"><pre><code>com.tcs.web        <span class="code-comment">// servlets — already exists (LoginServlet, EchoServlet)</span>
+com.tcs.service    <span class="code-comment">// business logic + validation</span>
+com.tcs.dao        <span class="code-comment">// ALL the SQL</span>
+com.tcs.bean       <span class="code-comment">// the Product POJO</span>
+com.tcs.helper     <span class="code-comment">// database connection management</span></code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">The layer rules — re-read this before every file you write today</span>
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:18%;">Package</th><th style="width:40%;">Contains</th><th>Must NEVER contain</th></tr></thead>
+                <tbody>
+                  <tr><td><code>web</code></td><td>Servlets: read parameters, call the service, write HTML</td><td><strong>SQL</strong>, connection code</td></tr>
+                  <tr><td><code>service</code></td><td>Validation and business rules; calls the DAO</td><td><strong>HTML</strong>, SQL, anything HTTP</td></tr>
+                  <tr><td><code>dao</code></td><td>Every SQL statement, via <code>PreparedStatement</code></td><td><strong>HTML</strong>, validation rules</td></tr>
+                  <tr><td><code>bean</code></td><td>Fields, getters, setters, constructors</td><td><strong>Any logic at all</strong></td></tr>
+                  <tr><td><code>helper</code></td><td>The JDBC URL; open/close connections</td><td>SQL statements, HTML</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="treebox"><span class="t-dir">ServletBasics/</span>
+├── <span class="t-dir">src/com/tcs/</span>
+│   ├── <span class="t-dir">web/</span>        LoginServlet.java  EchoServlet.java  <span class="t-new">ProductServlet.java (Lab 6)</span>
+│   ├── <span class="t-dir">service/</span>    <span class="t-new">ProductService.java (Lab 5)</span>
+│   ├── <span class="t-dir">dao/</span>        <span class="t-new">ProductDao.java (Lab 4)</span>
+│   ├── <span class="t-dir">bean/</span>       <span class="t-new">Product.java (Lab 2)</span>
+│   └── <span class="t-dir">helper/</span>     <span class="t-new">DBHelper.java (Lab 3)</span>
+└── <span class="t-dir">WebContent/</span>
+    ├── index.html
+    ├── <span class="t-new">product.html (Lab 6)</span>
+    └── <span class="t-dir">WEB-INF/</span>
+        ├── web.xml
+        └── <span class="t-dir">lib/</span>    <span class="t-new">derby.jar  &lt;- MUST be here</span></div>
+
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>derby.jar</code> visible inside <code>WebContent/WEB-INF/lib</code>; all five <code>com.tcs.*</code> packages exist.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Stage 2 — Build the layers, bottom-up</div>
+      <!-- ================================================================ -->
+
+      <section class="section">
+        <div class="concept">
+          <span class="lbl">The build order — and why it's bottom-up</span>
+          Each layer only depends on the one below it, so by the time you write the servlet, everything it calls already
+          exists and compiles. Build top-down instead and you'd spend the session staring at red errors for classes that
+          don't exist yet.
+          <div class="codewrap" style="margin-top:10px;"><pre><code>Lab 2:  bean      Product.java        <span class="code-comment">// the data carrier — no dependencies</span>
+Lab 3:  helper    DBHelper.java       <span class="code-comment">// the connection — no dependencies</span>
+Lab 4:  dao       ProductDao.java     <span class="code-comment">// uses bean + helper</span>
+Lab 5:  service   ProductService.java <span class="code-comment">// uses dao + bean</span>
+Lab 6:  web       ProductServlet.java <span class="code-comment">// uses service + bean  &lt;- VIEW works here</span>
+Lab 7:            ...add INSERT
+Lab 8:            ...add UPDATE + DELETE
+Lab 9:            ...refactor the duplication away</code></pre></div>
+        </div>
+      </section>
+
+      <!-- ===== LAB 2: BEAN ===== -->
+      <section class="section">
+        <details class="exp lab2">
+          <summary><span class="lab-tag">LAB 2</span><span class="layer-badge">bean</span><span class="chevron">▶</span> The Model — <code>Product</code> POJO</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — what a POJO is and why it's so plain</span>
+              A <strong>POJO</strong> (Plain Old Java Object) — also called a <em>bean</em> — is a class that does nothing but
+              <strong>hold data</strong>. Private fields, public getters and setters, constructors. No SQL, no HTML, no
+              logic. Its plainness is the point: it's the neutral currency the layers pass to each other, so no layer has to
+              know anything about any other. <strong>One field per table column</strong>, with matching types.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.bean</code> → New → <strong>Class</strong> → name it <code>Product</code> → Finish. Paste the whole file.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">Product.java</span><span class="fb-path">src/com/tcs/bean/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.bean;
+
+<span class="code-comment">/**
+ * One row of the product table, as a Java object.
+ * Field names and types mirror the columns exactly.
+ */</span>
+public class Product {
+
+    private int    id;         <span class="code-comment">// id       INT PRIMARY KEY</span>
+    private String name;       <span class="code-comment">// name     VARCHAR(50)</span>
+    private double price;      <span class="code-comment">// price    DOUBLE</span>
+    private int    quantity;   <span class="code-comment">// quantity INT</span>
+
+    <span class="code-comment">// No-argument constructor: needed if you create an empty object</span>
+    <span class="code-comment">// and fill it via setters. Frameworks require it too.</span>
+    public Product() {
+    }
+
+    <span class="code-comment">// All-arguments constructor: build a complete object in one line.</span>
+    <span class="code-comment">// This is the one the DAO and the servlet use.</span>
+    public Product(int id, String name, double price, int quantity) {
+        this.id       = id;
+        this.name     = name;
+        this.price    = price;
+        this.quantity = quantity;
+    }
+
+    <span class="code-comment">// ===== getters and setters =====</span>
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    <span class="code-comment">// Handy for System.out debugging — prints readable values instead</span>
+    <span class="code-comment">// of something like com.tcs.bean.Product@1b6d3586</span>
+    @Override
+    public String toString() {
+        return "Product [id=" + id + ", name=" + name
+             + ", price=" + price + ", quantity=" + quantity + "]";
+    }
+}</code></pre></div>
+
+            <div class="tryit">
+              <span class="lbl">Time-saver worth learning now</span>
+              You don't have to type accessors by hand. Declare the four fields, then use Eclipse:
+              <strong>Source → Generate Getters and Setters</strong> (<span class="kbd">Alt+Shift+S</span>, then
+              <span class="kbd">R</span>) → Select All → Generate. The same menu has <strong>Generate Constructor using
+              Fields</strong> and <strong>Generate toString()</strong>. <strong>Every Java developer uses these;</strong>
+              typing forty lines of boilerplate is not a rite of passage.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Why private fields with public getters, rather than just public fields?</span>
+              <strong>Encapsulation.</strong> Right now the getter just returns the value — so it does look like extra
+              typing. But the moment a rule appears ("price can never be negative", "name is always trimmed"), a setter
+              gives you <strong>one place</strong> to enforce it, and no calling code needs to change. Public fields give you
+              nowhere to put that rule.
+              <br><br>
+              The naming matters too: <code>getPrice()</code>/<code>setPrice()</code> is the <strong>JavaBeans</strong>
+              convention, and tooling depends on it — it's how JSP tags, Spring form binding and JSON libraries discover
+              that there's a property called <code>price</code>. <strong>Name them wrong and frameworks stop seeing your
+              data.</strong>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>Product</code> bean created with four fields, both constructors, accessors and <code>toString()</code>; no compile errors.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 3: HELPER ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="layer-badge">helper</span><span class="chevron">▶</span> Connection Management — <code>DBHelper</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              One class whose only job is opening and closing database connections. Put the URL here and
+              <strong>nowhere else</strong>, and switching from Derby to MySQL later becomes a one-file change. This is the
+              same idea as JDBC's <code>DBConnector</code> — and it's what Spring Boot's
+              <code>application.properties</code> replaces.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.helper</code> → New → <strong>Class</strong> → name it <code>DBHelper</code> → Finish. Paste the whole file, then <strong>replace the URL with the one you copied in Lab 0</strong>.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">DBHelper.java</span><span class="fb-path">src/com/tcs/helper/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.helper;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+<span class="code-comment">/**
+ * The ONLY class that knows how to reach the database.
+ * Change the URL here and the whole application follows.
+ */</span>
+public class DBHelper {
+
+    <span class="code-comment">// &lt;&lt;&lt; PASTE YOUR OWN URL FROM LAB 0 HERE &gt;&gt;&gt;</span>
+    <span class="code-comment">// Must be an ABSOLUTE path, with forward slashes, and must be the</span>
+    <span class="code-comment">// SAME path the Data Source Explorer uses — otherwise Tomcat quietly</span>
+    <span class="code-comment">// creates a second, empty database and "view" shows nothing.</span>
+    private static final String URL  = "jdbc:derby:C:/derbydb/productdb;create=true";
+    private static final String USER = "sa";
+    private static final String PASS = "";
+
+    <span class="code-comment">/** Opens a connection. Returns null if it fails — callers MUST check. */</span>
+    public static Connection connect() {
+        try {
+            <span class="code-comment">// No Class.forName() needed: JDBC 4.0+ auto-discovers the driver</span>
+            <span class="code-comment">// from the JAR — which is why it must be in WEB-INF/lib.</span>
+            return DriverManager.getConnection(URL, USER, PASS);
+
+        } catch (SQLException e) {
+            <span class="code-comment">// System.out -&gt; Eclipse console. This is your debugging channel;</span>
+            <span class="code-comment">// the user never sees it. Read it when a page says "failed".</span>
+            System.out.println("DB connect failed [" + e.getSQLState() + "]: " + e.getMessage());
+            return null;
+        }
+    }
+
+    <span class="code-comment">/** Closes a connection. Null-tolerant, so callers can call it blindly. */</span>
+    public static void close(Connection con) {
+        try {
+            if (con != null) {
+                con.close();
+            }
+        } catch (SQLException e) {
+            System.out.println("DB close failed: " + e.getMessage());
+        }
+    }
+}</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">Three design decisions worth understanding</span>
+              <strong>1 · Why <code>static</code> methods?</strong> There's no state to keep, so there's nothing to
+              instantiate — <code>DBHelper.connect()</code> reads cleanly from anywhere.
+              <br><strong>2 · Why return <code>null</code> on failure rather than throwing?</strong> It keeps the DAO simple
+              for a first build. It <em>is</em> a compromise — null-returning methods are easy to misuse — which is exactly
+              why every DAO method below starts with an <code>if (con == null)</code> guard. Production code would throw a
+              custom <code>DataAccessException</code>.
+              <br><strong>3 · Why is <code>close()</code> null-tolerant?</strong> So a <code>finally</code> block can call it
+              unconditionally without its own null check. Fewer branches, fewer bugs.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Optional 2-minute sanity check — highly recommended</span>
+              Before building three more layers on top, prove the connection works. Temporarily add a <code>main</code>
+              method to <code>DBHelper</code> and run it as a plain Java Application:
+              <div class="codewrap"><pre><code>public static void main(String[] args) {
+    Connection con = connect();
+    System.out.println("Connected: " + (con != null));
+    close(con);
+}</code></pre></div>
+              <strong>Expected:</strong> <code>Connected: true</code> in the console. Get that working now and the rest of
+              the lab is about logic instead of configuration.
+              <br><br>
+              <strong>Note:</strong> running this from Eclipse needs <code>derby.jar</code> on the <em>project build
+              path</em> too (Properties → Java Build Path → Libraries → Add JARs → the one in <code>WEB-INF/lib</code>). If
+              you'd rather not bother, skip this check — Lab 6 will tell you soon enough.
+              <strong>Remember to disconnect the Data Source Explorer first</strong> (Trap 2 in Lab 0), and delete this
+              <code>main</code> when you're done.
+            </div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td><code>No suitable driver found</code></td><td><code>derby.jar</code> isn't on the classpath being used.</td><td>For the servlet: <code>WEB-INF/lib</code>. For a <code>main</code> test: also the project build path.</td></tr>
+                <tr><td><code>XSDB6: Another instance ... has already booted</code></td><td>Eclipse's explorer holds the embedded database.</td><td>Right-click the connection → <strong>Disconnect</strong>. Or move to H2 <code>AUTO_SERVER=TRUE</code>.</td></tr>
+                <tr><td><code>Connected: false</code></td><td>Wrong URL or path.</td><td>Read the console's SQLState; compare your URL character by character with Lab 0's.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>DBHelper</code> written with your own absolute JDBC URL; <code>connect()</code> and <code>close()</code> compile.</span></label>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== LAB 4: DAO ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="layer-badge">dao</span><span class="verb-badge insert">INSERT</span><span class="verb-badge select">SELECT</span><span class="verb-badge update">UPDATE</span><span class="verb-badge delete">DELETE</span><span class="chevron">▶</span> All the SQL — <code>ProductDao</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              The <strong>Data Access Object</strong> is the only place in the entire application where SQL appears. Four
+              methods, one per CRUD operation. Every one uses a <strong>PreparedStatement</strong> with <code>?</code>
+              placeholders — never string concatenation — and the three write methods return a
+              <strong><code>boolean</code></strong> so the layers above can branch on success without knowing any SQL.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.dao</code> → New → <strong>Class</strong> → name it <code>ProductDao</code> → Finish. Paste the whole file. It's the longest one today — <strong>read the comments as you go</strong> rather than just pasting.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductDao.java</span><span class="fb-path">src/com/tcs/dao/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.dao;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.tcs.bean.Product;
+import com.tcs.helper.DBHelper;
+
+<span class="code-comment">/**
+ * Every SQL statement in the application lives in this class.
+ * No HTML here, no validation here — just data access.
+ */</span>
+public class ProductDao {
+
+    <span class="code-comment">// ==================== CREATE ====================</span>
+    public boolean insertProduct(Product p) {
+
+        String sql = "INSERT INTO product VALUES (?, ?, ?, ?)";
+
+        Connection con = DBHelper.connect();
+        if (con == null) {
+            return false;                <span class="code-comment">// couldn't even connect</span>
+        }
+
+        <span class="code-comment">// try-with-resources: the PreparedStatement closes itself,</span>
+        <span class="code-comment">// on success AND on exception.</span>
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, p.getId());          <span class="code-comment">// placeholders are 1-based, not 0</span>
+            ps.setString(2, p.getName());
+            ps.setDouble(3, p.getPrice());
+            ps.setInt(4, p.getQuantity());
+
+            <span class="code-comment">// executeUpdate returns the number of rows changed.</span>
+            return ps.executeUpdate() &gt; 0;    <span class="code-comment">// 1 row -&gt; true, 0 rows -&gt; false</span>
+
+        } catch (SQLException e) {
+            <span class="code-comment">// SQLState 23505 = duplicate primary key (that id already exists)</span>
+            System.out.println("Insert failed [" + e.getSQLState() + "]: " + e.getMessage());
+            return false;
+
+        } finally {
+            DBHelper.close(con);              <span class="code-comment">// always release the connection</span>
+        }
+    }
+
+    <span class="code-comment">// ==================== READ ALL ====================</span>
+    public List&lt;Product&gt; getAllProducts() {
+
+        String sql = "SELECT id, name, price, quantity FROM product ORDER BY id";
+
+        <span class="code-comment">// Return an EMPTY list rather than null on failure — then callers</span>
+        <span class="code-comment">// can always safely write "for (Product p : list)".</span>
+        List&lt;Product&gt; list = new ArrayList&lt;Product&gt;();
+
+        Connection con = DBHelper.connect();
+        if (con == null) {
+            return list;
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {          <span class="code-comment">// SELECT -&gt; executeQuery</span>
+
+            <span class="code-comment">// rs.next() starts BEFORE row 1; each call advances one row</span>
+            <span class="code-comment">// and returns false when the rows run out.</span>
+            while (rs.next()) {
+                Product p = new Product(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getDouble("price"),
+                        rs.getInt("quantity"));
+                list.add(p);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Select failed [" + e.getSQLState() + "]: " + e.getMessage());
+
+        } finally {
+            DBHelper.close(con);
+        }
+
+        return list;
+    }
+
+    <span class="code-comment">// ==================== UPDATE ====================</span>
+    public boolean updateProduct(int id, double price) {
+
+        String sql = "UPDATE product SET price = ? WHERE id = ?";
+
+        Connection con = DBHelper.connect();
+        if (con == null) {
+            return false;
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setDouble(1, price);      <span class="code-comment">// order matches the ?s in the SQL:</span>
+            ps.setInt(2, id);            <span class="code-comment">// first ? = price, second ? = id</span>
+
+            <span class="code-comment">// 0 rows means "no product had that id" — NOT an error,</span>
+            <span class="code-comment">// which is exactly the case the boolean lets us report.</span>
+            return ps.executeUpdate() &gt; 0;
+
+        } catch (SQLException e) {
+            System.out.println("Update failed [" + e.getSQLState() + "]: " + e.getMessage());
+            return false;
+
+        } finally {
+            DBHelper.close(con);
+        }
+    }
+
+    <span class="code-comment">// ==================== DELETE ====================</span>
+    public boolean deleteProduct(int id) {
+
+        String sql = "DELETE FROM product WHERE id = ?";
+
+        Connection con = DBHelper.connect();
+        if (con == null) {
+            return false;
+        }
+
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            return ps.executeUpdate() &gt; 0;    <span class="code-comment">// false = nothing matched that id</span>
+
+        } catch (SQLException e) {
+            System.out.println("Delete failed [" + e.getSQLState() + "]: " + e.getMessage());
+            return false;
+
+        } finally {
+            DBHelper.close(con);
+        }
+    }
+}</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">The five patterns repeating in every method — learn the shape, not the lines</span>
+              <ol class="steps" style="margin:6px 0 0;">
+                <li><strong>Connect, then guard.</strong> <code>DBHelper.connect()</code> can return null, so every method checks before using it. Skipping the guard gives you a <code>NullPointerException</code> and a 500 page instead of a clean failure.</li>
+                <li><strong><code>PreparedStatement</code> with <code>?</code>, always.</strong> Parameters are bound as data and can never become SQL, so <strong>SQL injection is impossible</strong>. It's also faster, since the database compiles the template once.</li>
+                <li><strong>Bind in the <code>?</code> order, 1-based.</strong> <code>SET price = ? WHERE id = ?</code> means <code>setDouble(1, price)</code> then <code>setInt(2, id)</code>. Reverse them and you'd update the wrong thing.</li>
+                <li><strong>Match the execute method to the SQL verb.</strong> <code>executeQuery()</code> for SELECT (returns a <code>ResultSet</code>); <code>executeUpdate()</code> for INSERT/UPDATE/DELETE (returns a row count). Swap them and you get 0 rows or an exception.</li>
+                <li><strong>Close in <code>finally</code>.</strong> The statement and result set are auto-closed by try-with-resources; the <code>Connection</code> is closed in <code>finally</code> so it's released even when an exception fires. <strong>Leaked connections eventually exhaust the database.</strong></li>
+              </ol>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Why <code>getAllProducts()</code> returns a list instead of printing</span>
+              It would be shorter to print the table right here — and completely wrong. The DAO must not know that its caller
+              is a web page. Returning <code>List&lt;Product&gt;</code> keeps it reusable by a servlet, a REST endpoint, a
+              scheduled report, or a unit test. <strong>Data layers return data; presentation layers decide how it
+              looks.</strong>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — after the app works end to end</span>
+              Add two more methods, following the same shape: <code>Product getProductById(int id)</code> — use
+              <code>if (rs.next())</code> rather than <code>while</code>, since a primary key matches at most one row, and
+              return <code>null</code> when nothing is found. Then
+              <code>List&lt;Product&gt; searchByName(String keyword)</code> using <code>WHERE name LIKE ?</code> with
+              <code>ps.setString(1, "%" + keyword + "%")</code>. <span class="muted">Note the wildcards go in the
+              <em>value</em>, not the SQL.</span>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>ProductDao</code> written with all four methods; no compile errors.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: SERVICE ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="layer-badge">service</span><span class="chevron">▶</span> Business Logic — <code>ProductService</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — and an honest answer to "isn't this layer pointless?"</span>
+              A service that only forwarded calls to the DAO <em>would</em> be pointless. So ours does real work:
+              <strong>validation</strong>. Business rules like "a price can't be negative" and "a name can't be blank" belong
+              here — not in the servlet (where every new UI would duplicate them) and not in the DAO (whose job is data
+              access, not policy). <strong>Put the rule in one place and every caller inherits it.</strong>
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.service</code> → New → <strong>Class</strong> → name it <code>ProductService</code> → Finish. Paste the whole file.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductService.java</span><span class="fb-path">src/com/tcs/service/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.service;
+
+import java.util.List;
+
+import com.tcs.bean.Product;
+import com.tcs.dao.ProductDao;
+
+<span class="code-comment">/**
+ * Business rules live here. Knows nothing about HTTP (no request/response)
+ * and nothing about SQL (no statements) — it sits cleanly between the two.
+ */</span>
+public class ProductService {
+
+    private ProductDao dao = new ProductDao();
+
+    <span class="code-comment">// ===== CREATE — validate before touching the database =====</span>
+    public boolean addProduct(Product p) {
+
+        if (p == null) {
+            return false;
+        }
+        if (p.getId() &lt;= 0) {
+            return false;                                  <span class="code-comment">// ids must be positive</span>
+        }
+        if (p.getName() == null || p.getName().trim().isEmpty()) {
+            return false;                                  <span class="code-comment">// name is required</span>
+        }
+        if (p.getPrice() &lt; 0 || p.getQuantity() &lt; 0) {
+            return false;                                  <span class="code-comment">// no negative money or stock</span>
+        }
+
+        <span class="code-comment">// Only now do we hit the database.</span>
+        return dao.insertProduct(p);
+    }
+
+    <span class="code-comment">// ===== READ — nothing to validate, so just pass it through =====</span>
+    public List&lt;Product&gt; getAllProducts() {
+        return dao.getAllProducts();
+    }
+
+    <span class="code-comment">// ===== UPDATE =====</span>
+    public boolean updateProduct(int id, double price) {
+
+        if (id &lt;= 0 || price &lt; 0) {
+            return false;
+        }
+        return dao.updateProduct(id, price);
+    }
+
+    <span class="code-comment">// ===== DELETE =====</span>
+    public boolean deleteProduct(int id) {
+
+        if (id &lt;= 0) {
+            return false;
+        }
+        return dao.deleteProduct(id);
+    }
+}</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">Notice what this layer does <em>not</em> do</span>
+              No <code>HttpServletRequest</code>, no <code>PrintWriter</code>, no SQL, no HTML. That's what makes it
+              <strong>testable as a plain Java class</strong> — no server required — and reusable by any front end. When you
+              write Spring Boot, this exact class becomes <code>@Service</code> with the repository injected.
+              <strong>Same layer, same job, less wiring.</strong>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">The limitation of returning <code>boolean</code> — worth naming honestly</span>
+              <code>false</code> tells the servlet <em>that</em> something failed, never <em>why</em>. "Blank name",
+              "duplicate id", and "database unreachable" all look identical from above. That's an acceptable simplification
+              while learning, and the reason the DAO logs the real <code>SQLException</code> to the console —
+              <strong>the detail isn't lost, just not surfaced.</strong> You'll watch both paths in Lab 7.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>ProductService</code> written with validation on add and update; no compile errors.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: SERVLET — VIEW ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="layer-badge">web</span><span class="m-badge get">GET</span><span class="verb-badge select">READ</span><span class="chevron">▶</span> The Servlet, Part 1 — VIEW all products</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal — the first end-to-end request</span>
+              This is the moment all five layers connect. A browser request reaches the servlet, which calls the service,
+              which calls the DAO, which queries Derby — and the rows come back and become an HTML table. Get this working
+              and the remaining three operations are variations on a theme.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 1 — the form page</span>
+              <p style="margin:2px 0 0;">Right-click <strong><code>WebContent</code></strong> → New → <strong>HTML File</strong> → <code>product.html</code> → Finish. Paste the whole file. It already contains the insert and update forms we wire up in Labs 7 and 8.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">product.html</span><span class="fb-path">WebContent/</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Product Manager&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;h2&gt;Product Manager&lt;/h2&gt;
+
+&lt;!-- A LINK: nothing to type, so a GET with the action in the query string --&gt;
+&lt;p&gt;&lt;a href="product?action=view"&gt;View all products&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;!-- A FORM: the user types, so POST. The hidden field carries the action. --&gt;
+&lt;h3&gt;Add a product&lt;/h3&gt;
+&lt;form action="product" method="post"&gt;
+    &lt;input type="hidden" name="action" value="insert" /&gt;
+    &lt;table border="0" cellpadding="4"&gt;
+        &lt;tr&gt;&lt;td&gt;ID&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="id" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Name&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="name" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Price&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="price" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;Quantity&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="quantity" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan="2"&gt;&lt;input type="submit" value="Add product" /&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/form&gt;
+
+&lt;hr /&gt;
+
+&lt;h3&gt;Update a price&lt;/h3&gt;
+&lt;form action="product" method="post"&gt;
+    &lt;input type="hidden" name="action" value="update" /&gt;
+    &lt;table border="0" cellpadding="4"&gt;
+        &lt;tr&gt;&lt;td&gt;ID&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="id" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;New price&lt;/td&gt;&lt;td&gt;&lt;input type="text" name="price" /&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td colspan="2"&gt;&lt;input type="submit" value="Update price" /&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/form&gt;
+
+&lt;p&gt;&lt;a href="index.html"&gt;&amp;laquo; Back to login&lt;/a&gt;&lt;/p&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">Note the two ways the action travels — deliberately different from Part 1</span>
+              The <strong>link</strong> puts <code>action=view</code> in the query string. The <strong>forms</strong> use a
+              <code>&lt;input type="hidden" name="action"&gt;</code>. Part 1 used the submit-button trick
+              (<code>name="action"</code> on the button itself); a hidden field is clearer, because the value the server
+              reads no longer depends on the button's visible label. <strong>You've now seen both approaches.</strong>
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 2 — the servlet (view only, for now)</span>
+              <p style="margin:2px 0 0;">Right-click <code>com.tcs.web</code> → New → <strong>Class</strong> → <code>ProductServlet</code> → Finish. Paste the whole file. We add the other three actions in the next two labs.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">src/com/tcs/web/</span><span class="fb-tag">paste the WHOLE file — version 1 of 3</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+<span class="code-comment">// On Tomcat 10+ change these four to jakarta.servlet.*</span>
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.tcs.bean.Product;
+import com.tcs.service.ProductService;
+
+public class ProductServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    <span class="code-comment">// Safe as an instance field: the service holds no per-request state,</span>
+    <span class="code-comment">// so all threads can share this one object. NEVER store a request</span>
+    <span class="code-comment">// value (an id, a name) in a field — one servlet instance, many threads.</span>
+    private ProductService service = new ProductService();
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        <span class="code-comment">// Read the action, and default it instead of crashing on null.</span>
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "view";
+        }
+
+        out.println("&lt;html&gt;&lt;body&gt;");
+        out.println("&lt;h2&gt;Product Manager&lt;/h2&gt;");
+
+        if (action.equals("view")) {
+
+            <span class="code-comment">// ---- fetch and print every product as an HTML table ----</span>
+            List&lt;Product&gt; list = service.getAllProducts();
+
+            if (list.isEmpty()) {
+                out.println("&lt;h3&gt;No products found.&lt;/h3&gt;");
+            } else {
+                out.println("&lt;table border='1' cellpadding='6'&gt;");
+                out.println("&lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;th&gt;Quantity&lt;/th&gt;&lt;/tr&gt;");
+
+                for (Product p : list) {
+                    out.println("&lt;tr&gt;");
+                    out.println("&lt;td&gt;" + p.getId()       + "&lt;/td&gt;");
+                    out.println("&lt;td&gt;" + p.getName()     + "&lt;/td&gt;");
+                    out.println("&lt;td&gt;" + p.getPrice()    + "&lt;/td&gt;");
+                    out.println("&lt;td&gt;" + p.getQuantity() + "&lt;/td&gt;");
+                    out.println("&lt;/tr&gt;");
+                }
+                out.println("&lt;/table&gt;");
+            }
+
+        } else {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;Unknown action: " + action + "&lt;/font&gt;&lt;/h3&gt;");
+        }
+
+        out.println("&lt;p&gt;&lt;a href='product.html'&gt;&amp;laquo; Back to the form&lt;/a&gt;&lt;/p&gt;");
+        out.println("&lt;/body&gt;&lt;/html&gt;");
+    }
+
+    <span class="code-comment">// product.html posts its forms, so we need this or we'd get a 405.</span>
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+}</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Step 3 — map it</span>
+              <p style="margin:2px 0 0;">Open <code>web.xml</code> and add these two blocks before <code>&lt;/web-app&gt;</code>, alongside the LoginServlet ones from Part 1.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">web.xml</span><span class="fb-path">WebContent/WEB-INF/</span><span class="fb-tag">ADD before &lt;/web-app&gt;</span></div>
+            <div class="codewrap"><pre><code>    &lt;servlet&gt;
+        &lt;servlet-name&gt;ProductServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;com.tcs.web.ProductServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;ProductServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/product&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><strong>Disconnect</strong> the Derby connection in Data Source Explorer — right-click → Disconnect. <span class="kbd">embedded Derby: one JVM at a time</span></li>
+                <li><strong>Restart Tomcat</strong> (you changed <code>web.xml</code>).</li>
+                <li>Open <code>http://localhost:8080/ServletBasics/product.html</code></li>
+                <li>Click <strong>"View all products"</strong>.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected result — your four seeded rows, rendered by Java</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product?action=view</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <table>
+                    <tr><th>ID</th><th>Name</th><th>Price</th><th>Quantity</th></tr>
+                    <tr><td>1</td><td>Laptop</td><td>55000.0</td><td>10</td></tr>
+                    <tr><td>2</td><td>Mouse</td><td>750.5</td><td>100</td></tr>
+                    <tr><td>3</td><td>Keyboard</td><td>1200.0</td><td>45</td></tr>
+                    <tr><td>4</td><td>Monitor</td><td>9500.0</td><td>20</td></tr>
+                  </table>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+              <strong>That table came out of a database, through four Java classes, as generated HTML.</strong> That's the
+              whole point of the session — take a moment on it.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Prove to yourself it really is just text</span>
+              Right-click the page → <strong>View Page Source</strong>. You'll see the exact <code>&lt;table&gt;</code>,
+              <code>&lt;tr&gt;</code> and <code>&lt;td&gt;</code> tags your <code>out.println</code> calls wrote — one per
+              line, because <code>println</code> adds the newlines. <strong>The browser turned those characters into a grid;
+              your servlet only ever produced a string.</strong>
+            </div>
+
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr><td>"No products found."</td><td>Connected to a <strong>different</strong> database than the explorer — the relative-path trap.</td><td>Make <code>DBHelper</code>'s URL an <strong>absolute path</strong>, identical to Lab 0's. <strong>This is the most common cause by far.</strong></td></tr>
+                <tr><td>500; console: <code>No suitable driver found</code></td><td><code>derby.jar</code> not in <code>WEB-INF/lib</code>.</td><td>Copy it there (Lab 1), then restart Tomcat.</td></tr>
+                <tr><td>500; console: <code>XSDB6 ... already booted</code></td><td>Data Source Explorer still connected.</td><td>Disconnect it, then reload the page.</td></tr>
+                <tr><td>500; console: <code>NullPointerException</code></td><td>Connection was null and used unguarded.</td><td>Check the <code>if (con == null)</code> guards are present in every DAO method.</td></tr>
+                <tr><td>404 on <code>/product</code></td><td>Mapping missing, or Tomcat not restarted.</td><td>Verify both <code>&lt;servlet-name&gt;</code>s match; restart Tomcat.</td></tr>
+                <tr><td>Table shows but looks plain</td><td>Nothing — that's correct.</td><td><code>border='1'</code> is deliberately minimal. Styling isn't the lesson today.</td></tr>
+              </tbody>
+            </table>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All four products render as an HTML table in the browser — the full five-layer stack works end to end.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 7: INSERT ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">LAB 7</span><span class="m-badge post">POST</span><span class="verb-badge insert">CREATE</span><span class="chevron">▶</span> The Servlet, Part 2 — INSERT a product</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              Handle the <code>insert</code> action: read four form fields, convert the three numeric ones, build a
+              <code>Product</code>, hand it to the service, and report the result. This is where "form data is always a
+              String" becomes something you feel rather than something you were told.
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Edit 1 — add a branch to the chain in <code>doGet</code></span>
+              <p style="margin:2px 0 0;">Add this immediately after the closing brace of the <code>view</code> branch.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">inside doGet — after the "view" branch</span><span class="fb-tag">edit 1 of 2</span></div>
+            <div class="codewrap"><pre><code>        } else if (action.equals("insert")) {
+
+            handleInsert(request, out);
+</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Edit 2 — add the handler method</span>
+              <p style="margin:2px 0 0;">Paste this <strong>inside the class but outside <code>doGet</code></strong> — a good spot is just after <code>doPost</code>.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">new method — paste after doPost()</span><span class="fb-tag">edit 2 of 2</span></div>
+            <div class="codewrap"><pre><code>    <span class="code-comment">// ---------- CREATE ----------</span>
+    private void handleInsert(HttpServletRequest request, PrintWriter out) {
+
+        try {
+            <span class="code-comment">// Every parameter arrives as a String — we convert the numeric ones.</span>
+            int    id       = Integer.parseInt(request.getParameter("id"));
+            String name     = request.getParameter("name");          <span class="code-comment">// already a String</span>
+            double price    = Double.parseDouble(request.getParameter("price"));
+            int    quantity = Integer.parseInt(request.getParameter("quantity"));
+
+            <span class="code-comment">// Bundle the values into one object to pass down the layers.</span>
+            Product p = new Product(id, name, price, quantity);
+
+            <span class="code-comment">// The boolean-return pattern: branch on success.</span>
+            if (service.addProduct(p)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product added successfully.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Insertion failed — is the id already used, "
+                          + "or a value invalid?&lt;/font&gt;&lt;/h3&gt;");
+            }
+
+        } catch (NumberFormatException e) {
+            <span class="code-comment">// Letters in a number box, or an empty box. Without this catch</span>
+            <span class="code-comment">// the user gets a raw 500 stack trace.</span>
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;ID, price and quantity must be numbers.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }</code></pre></div>
+
+            <div class="observe">
+              <span class="lbl">Deliberate duplication — you'll fix it in Lab 9</span>
+              After inserting, the page shows only a message: <strong>you can't see whether the row actually landed</strong>
+              without clicking "View all products" again. The obvious fix is to copy the 15-line table loop into this branch
+              too. <strong>Don't.</strong> Notice the urge, because that's exactly the duplication Lab 9 removes with one
+              extracted method. Feeling the problem first is what makes the refactor stick.
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Restart Tomcat (or just save — Eclipse usually hot-reloads Java changes).</li>
+                <li>Go to <code>http://localhost:8080/ServletBasics/product.html</code></li>
+                <li>In <strong>Add a product</strong>: ID <strong>5</strong>, Name <strong>Webcam</strong>, Price <strong>2500</strong>, Quantity <strong>15</strong> → <strong>Add product</strong>.</li>
+                <li>Click <strong>Back to the form</strong> → <strong>View all products</strong> to confirm 5 rows.</li>
+                <li>Now test the failures: submit ID <strong>5</strong> again, then ID <strong>abc</strong>, then price <strong>-100</strong>.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected results</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <h3 class="ok-txt">Product added successfully.</h3>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+              Note the URL: <strong>no parameters visible</strong> — that's POST putting them in the body. Then, submitting
+              id 5 a second time:
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <h3 class="err-txt">Insertion failed — is the id already used, or a value invalid?</h3>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+              And in the <strong>Eclipse console</strong> at the same moment — the real reason, logged by the DAO:
+              <div class="outblock">Insert failed [23505]: The statement was aborted because it would have caused a
+duplicate key value in a unique or primary key constraint...</div>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">★ The best demonstration in the whole lab — two failures, two code paths</span>
+              Compare these two carefully; they produce the <strong>same page</strong> but for completely different reasons:
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:24%;">You submit</th><th style="width:26%;">Page says</th><th>Console says</th></tr></thead>
+                <tbody>
+                  <tr><td>id <strong>5</strong> (duplicate)</td><td class="err-txt">Insertion failed</td><td><code>Insert failed [23505]: duplicate key...</code> — <strong>the DAO caught a real database error</strong></td></tr>
+                  <tr><td>price <strong>-100</strong></td><td class="err-txt">Insertion failed</td><td><strong>Nothing at all</strong> — <code>ProductService</code> rejected it <em>before</em> any SQL ran</td></tr>
+                </tbody>
+              </table>
+              <strong>That silence is your service layer earning its place.</strong> The database was never even contacted.
+              Try a blank name for the same effect.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">INSERT works: new product appears; duplicate id, non-numeric input and negative price all handled — and you've seen the two different failure paths.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 8: UPDATE + DELETE ===== -->
+      <section class="section">
+        <details class="exp lab8">
+          <summary><span class="lab-tag">LAB 8</span><span class="verb-badge update">UPDATE</span><span class="verb-badge delete">DELETE</span><span class="chevron">▶</span> The Servlet, Part 3 — UPDATE and DELETE</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Goal</span>
+              The last two operations. <strong>Update</strong> comes from a form (the user types a new price).
+              <strong>Delete</strong> comes from a <em>link</em> on each table row — nothing to type, so a link carrying the
+              row's id is exactly right. Both branch on the boolean to distinguish "done" from "no such id".
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Edit 1 — add two more branches</span>
+              <p style="margin:2px 0 0;">Add these to the <code>if</code>-chain in <code>doGet</code>, after the <code>insert</code> branch.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">inside doGet — after the "insert" branch</span><span class="fb-tag">edit 1 of 3</span></div>
+            <div class="codewrap"><pre><code>        } else if (action.equals("update")) {
+
+            handleUpdate(request, out);
+
+        } else if (action.equals("delete")) {
+
+            handleDelete(request, out);
+</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Edit 2 — add both handler methods</span>
+              <p style="margin:2px 0 0;">Paste both inside the class, next to <code>handleInsert</code>.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">new methods — paste after handleInsert()</span><span class="fb-tag">edit 2 of 3</span></div>
+            <div class="codewrap"><pre><code>    <span class="code-comment">// ---------- UPDATE ----------</span>
+    private void handleUpdate(HttpServletRequest request, PrintWriter out) {
+
+        try {
+            int    id    = Integer.parseInt(request.getParameter("id"));
+            double price = Double.parseDouble(request.getParameter("price"));
+
+            if (service.updateProduct(id, price)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product updated successfully.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                <span class="code-comment">// false here almost always means "no row had that id"</span>
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Updation failed — no product with id "
+                          + id + ".&lt;/font&gt;&lt;/h3&gt;");
+            }
+
+        } catch (NumberFormatException e) {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;ID and price must be numbers.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }
+
+    <span class="code-comment">// ---------- DELETE ----------</span>
+    private void handleDelete(HttpServletRequest request, PrintWriter out) {
+
+        try {
+            <span class="code-comment">// The delete LINK sends: product?action=delete&amp;p=3</span>
+            <span class="code-comment">// so the id parameter is called "p" here, NOT "id".</span>
+            int id = Integer.parseInt(request.getParameter("p"));
+
+            if (service.deleteProduct(id)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product " + id
+                          + " deleted.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Deletion failed — no product with id "
+                          + id + ".&lt;/font&gt;&lt;/h3&gt;");
+            }
+
+        } catch (NumberFormatException e) {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;Invalid product id in the delete link.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }</code></pre></div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Edit 3 — add the Delete link to each table row</span>
+              <p style="margin:2px 0 0;">In the <code>view</code> branch, add an <strong>Action</strong> header and a link cell per row. Find these two lines and change them:</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">inside the "view" branch — modify these lines</span><span class="fb-tag">edit 3 of 3</span></div>
+            <div class="codewrap"><pre><code><span class="code-comment">// 1. Add a fifth column to the header row:</span>
+out.println("&lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;&lt;th&gt;Quantity&lt;/th&gt;<span class="code-add">&lt;th&gt;Action&lt;/th&gt;</span>&lt;/tr&gt;");
+
+<span class="code-comment">// 2. Inside the for loop, after the quantity cell, add:</span>
+<span class="code-add">out.println("&lt;td&gt;&lt;a href='product?action=delete&amp;p=" + p.getId() + "'&gt;Delete&lt;/a&gt;&lt;/td&gt;");</span></code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">Read that link line carefully — it's the fiddliest string in the lab</span>
+              <code>"&lt;td&gt;&lt;a href='product?action=delete&amp;p=" + p.getId() + "'&gt;Delete&lt;/a&gt;&lt;/td&gt;"</code>
+              <ul style="margin:8px 0 0; font-size:16px;">
+                <li><strong>Single quotes inside double quotes.</strong> The Java string uses <code>"</code>, so the HTML attribute uses <code>'</code> — no escaping needed. Mixing these up is the usual cause of a broken link.</li>
+                <li><strong>Two parameters</strong> joined by <code>&amp;</code>: the fixed <code>action=delete</code>, and <code>p=</code> plus <em>this row's</em> id.</li>
+                <li><strong>Each row gets a different URL</strong> — row 3 renders <code>product?action=delete&amp;p=3</code>. That's the whole trick: the link already knows which record it refers to, so the user types nothing.</li>
+                <li><strong>The parameter is <code>p</code>, not <code>id</code></strong> — which is why <code>handleDelete</code> reads <code>getParameter("p")</code>. Mismatch these and you get a silent <code>null</code>, then a <code>NumberFormatException</code>.</li>
+              </ul>
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Restart Tomcat, then <code>product.html</code> → <strong>View all products</strong>. Every row now has a <strong>Delete</strong> link.</li>
+                <li><strong>Update, valid:</strong> in "Update a price", ID <strong>2</strong>, New price <strong>999</strong> → submit. Then view all — Mouse should be 999.0.</li>
+                <li><strong>Update, invalid:</strong> ID <strong>777</strong>, price <strong>500</strong> → expect "Updation failed".</li>
+                <li><strong>Delete:</strong> view all, click <strong>Delete</strong> on row 5 (Webcam). Then view again — it's gone.</li>
+                <li><strong>Delete twice:</strong> press the browser's <strong>Back</strong> button and click that same Delete link again → expect "Deletion failed".</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the table with Delete links</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product?action=view</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <table>
+                    <tr><th>ID</th><th>Name</th><th>Price</th><th>Quantity</th><th>Action</th></tr>
+                    <tr><td>1</td><td>Laptop</td><td>55000.0</td><td>10</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>2</td><td>Mouse</td><td>999.0</td><td>100</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>3</td><td>Keyboard</td><td>1200.0</td><td>45</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>4</td><td>Monitor</td><td>9500.0</td><td>20</td><td><a href="#">Delete</a></td></tr>
+                  </table>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+              And a failed delete on an already-removed id:
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product?action=delete&amp;p=5</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <h3 class="err-txt">Deletion failed — no product with id 5.</h3>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Two things to notice about that delete URL</span>
+              <strong>1 · It's a GET, and it changes data</strong> — which technically breaks the "GET is idempotent" rule
+              from Part 1. It's the pragmatic classic approach and fine for learning, but be aware: a search-engine crawler
+              or a browser pre-fetcher following that link would <strong>silently delete your data</strong>. Real
+              applications use a POST form (or a <code>DELETE</code> request) with a confirmation for destructive actions.
+              <br><br>
+              <strong>2 · The parameters are visible and editable</strong> — you can change <code>p=5</code> to
+              <code>p=1</code> in the address bar and delete a different row without touching the UI. That's GET's
+              transparency, and a preview of why real apps check permissions on the <em>server</em>, never trusting the URL.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">UPDATE and DELETE both work; both report failure correctly for a non-existent id.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 9: REFACTOR ===== -->
+      <section class="section">
+        <details class="exp lab9">
+          <summary><span class="lab-tag">LAB 9</span><span class="chevron">▶</span> Refactor — one <code>displayAllProducts()</code> for every action</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">The problem we're fixing</span>
+              Right now only <code>view</code> shows the table. After an insert, update or delete you see a message and have
+              to navigate back to check the result — poor UX. The tempting fix is to copy the table loop into all four
+              branches; the right fix is to <strong>extract it into one method and call it once, for every action</strong>.
+              <strong>DRY: the second time you'd copy-paste code, extract it instead.</strong>
+            </div>
+
+            <div class="wheretopaste">
+              <span class="lbl">Do this</span>
+              <p style="margin:2px 0 0;">Replace the <strong>entire</strong> <code>ProductServlet.java</code> with the version below — the final, complete file with all four actions and the extracted display method. <strong>Compare it against your own version before pasting</strong>; the diff is the lesson.</p>
+            </div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">ProductServlet.java</span><span class="fb-path">src/com/tcs/web/</span><span class="fb-tag">FINAL — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.web;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+<span class="code-comment">// On Tomcat 10+ change these four to jakarta.servlet.*</span>
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import com.tcs.bean.Product;
+import com.tcs.service.ProductService;
+
+<span class="code-comment">/**
+ * One servlet, four actions — a hand-written "front controller".
+ * Spring MVC's DispatcherServlet is an industrial version of this.
+ */</span>
+public class ProductServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    <span class="code-comment">// Stateless helper: safe to share across all request threads.</span>
+    private ProductService service = new ProductService();
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        String action = request.getParameter("action");
+        if (action == null) {
+            action = "view";                     <span class="code-comment">// sensible default</span>
+        }
+
+        out.println("&lt;html&gt;&lt;body&gt;");
+        out.println("&lt;h2&gt;Product Manager&lt;/h2&gt;");
+
+        <span class="code-comment">// ===== ROUTING: pick the operation, print only its MESSAGE =====</span>
+        if (action.equals("view")) {
+            <span class="code-comment">// nothing to do — the table below is the whole point of "view"</span>
+
+        } else if (action.equals("insert")) {
+            handleInsert(request, out);
+
+        } else if (action.equals("update")) {
+            handleUpdate(request, out);
+
+        } else if (action.equals("delete")) {
+            handleDelete(request, out);
+
+        } else {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;Unknown action: " + action + "&lt;/font&gt;&lt;/h3&gt;");
+        }
+
+        <span class="code-comment">// ===== THE REFACTOR: written once, runs for EVERY action, so the</span>
+        <span class="code-comment">// user always sees the up-to-date table right below the message. =====</span>
+        displayAllProducts(out);
+
+        out.println("&lt;p&gt;&lt;a href='product.html'&gt;&amp;laquo; Back to the form&lt;/a&gt;&lt;/p&gt;");
+        out.println("&lt;/body&gt;&lt;/html&gt;");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+
+    <span class="code-comment">// ---------- CREATE ----------</span>
+    private void handleInsert(HttpServletRequest request, PrintWriter out) {
+        try {
+            int    id       = Integer.parseInt(request.getParameter("id"));
+            String name     = request.getParameter("name");
+            double price    = Double.parseDouble(request.getParameter("price"));
+            int    quantity = Integer.parseInt(request.getParameter("quantity"));
+
+            Product p = new Product(id, name, price, quantity);
+
+            if (service.addProduct(p)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product added successfully.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Insertion failed — is the id already used, "
+                          + "or a value invalid?&lt;/font&gt;&lt;/h3&gt;");
+            }
+        } catch (NumberFormatException e) {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;ID, price and quantity must be numbers.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }
+
+    <span class="code-comment">// ---------- UPDATE ----------</span>
+    private void handleUpdate(HttpServletRequest request, PrintWriter out) {
+        try {
+            int    id    = Integer.parseInt(request.getParameter("id"));
+            double price = Double.parseDouble(request.getParameter("price"));
+
+            if (service.updateProduct(id, price)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product updated successfully.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Updation failed — no product with id "
+                          + id + ".&lt;/font&gt;&lt;/h3&gt;");
+            }
+        } catch (NumberFormatException e) {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;ID and price must be numbers.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }
+
+    <span class="code-comment">// ---------- DELETE ----------</span>
+    private void handleDelete(HttpServletRequest request, PrintWriter out) {
+        try {
+            <span class="code-comment">// the delete link sends ?action=delete&amp;p=&lt;id&gt;</span>
+            int id = Integer.parseInt(request.getParameter("p"));
+
+            if (service.deleteProduct(id)) {
+                out.println("&lt;h3&gt;&lt;font color='green'&gt;Product " + id + " deleted.&lt;/font&gt;&lt;/h3&gt;");
+            } else {
+                out.println("&lt;h3&gt;&lt;font color='red'&gt;Deletion failed — no product with id "
+                          + id + ".&lt;/font&gt;&lt;/h3&gt;");
+            }
+        } catch (NumberFormatException e) {
+            out.println("&lt;h3&gt;&lt;font color='red'&gt;Invalid product id in the delete link.&lt;/font&gt;&lt;/h3&gt;");
+        }
+    }
+
+    <span class="code-comment">// ---------- THE EXTRACTED METHOD: written ONCE, used by all four ----------</span>
+    <span class="code-comment">// 'out' is a PARAMETER, not a field — one servlet instance, many threads.</span>
+    <span class="code-comment">// A field would be shared between simultaneous users.</span>
+    private void displayAllProducts(PrintWriter out) {
+
+        List&lt;Product&gt; list = service.getAllProducts();
+
+        if (list.isEmpty()) {
+            out.println("&lt;h3&gt;No products found.&lt;/h3&gt;");
+            return;                              <span class="code-comment">// nothing to tabulate</span>
+        }
+
+        out.println("&lt;table border='1' cellpadding='6'&gt;");
+        out.println("&lt;tr&gt;&lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;&lt;th&gt;Price&lt;/th&gt;"
+                  + "&lt;th&gt;Quantity&lt;/th&gt;&lt;th&gt;Action&lt;/th&gt;&lt;/tr&gt;");
+
+        for (Product p : list) {
+            out.println("&lt;tr&gt;");
+            out.println("&lt;td&gt;" + p.getId()       + "&lt;/td&gt;");
+            out.println("&lt;td&gt;" + p.getName()     + "&lt;/td&gt;");
+            out.println("&lt;td&gt;" + p.getPrice()    + "&lt;/td&gt;");
+            out.println("&lt;td&gt;" + p.getQuantity() + "&lt;/td&gt;");
+            out.println("&lt;td&gt;&lt;a href='product?action=delete&amp;p="
+                      + p.getId() + "'&gt;Delete&lt;/a&gt;&lt;/td&gt;");
+            out.println("&lt;/tr&gt;");
+        }
+
+        out.println("&lt;/table&gt;");
+    }
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected — every action now ends with the live table</span>
+              <div class="browser-mock">
+                <div class="bm-bar"><span class="bm-dots"><span class="bm-dot"></span><span class="bm-dot"></span><span class="bm-dot"></span></span><span class="bm-url">http://localhost:8080/ServletBasics/product</span></div>
+                <div class="bm-page">
+                  <h2>Product Manager</h2>
+                  <h3 class="ok-txt">Product added successfully.</h3>
+                  <table>
+                    <tr><th>ID</th><th>Name</th><th>Price</th><th>Quantity</th><th>Action</th></tr>
+                    <tr><td>1</td><td>Laptop</td><td>55000.0</td><td>10</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>2</td><td>Mouse</td><td>999.0</td><td>100</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>3</td><td>Keyboard</td><td>1200.0</td><td>45</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>4</td><td>Monitor</td><td>9500.0</td><td>20</td><td><a href="#">Delete</a></td></tr>
+                    <tr><td>6</td><td>Headset</td><td>1800.0</td><td>30</td><td><a href="#">Delete</a></td></tr>
+                  </table>
+                  <p><a href="#">&laquo; Back to the form</a></p>
+                </div>
+              </div>
+              <strong>Message plus fresh table, for every single action</strong> — insert, update, delete and view. You can
+              now see the result of what you did without navigating anywhere. One method, four callers.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">What the refactor bought you — count it</span>
+              <table class="issues" style="margin:8px 0 0;">
+                <thead><tr><th style="width:34%;">&nbsp;</th><th>Duplicated in 4 branches</th><th>Extracted once</th></tr></thead>
+                <tbody>
+                  <tr><td>Lines of table-building code</td><td>~60</td><td><strong>~15</strong></td></tr>
+                  <tr><td>Edits to add one column</td><td>4 (and you'd miss one)</td><td><strong>1</strong></td></tr>
+                  <tr><td>Places a bug in the loop can hide</td><td>4</td><td><strong>1</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it yourself — prove the payoff in 60 seconds</span>
+              Add a <strong>Total value</strong> column showing <code>p.getPrice() * p.getQuantity()</code>. You'll add one
+              <code>&lt;th&gt;</code> and one <code>&lt;td&gt;</code>, in <strong>one method</strong>, and it appears for
+              every action instantly. Then imagine having done that four times in the unrefactored version.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><code>displayAllProducts()</code> extracted and called once for all four actions; the live table appears after every operation.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ================================================================ -->
+      <div class="section-band">Stage 3 — Test, wrap up &amp; assignment</div>
+      <!-- ================================================================ -->
+
+      <!-- ===== LAB 10: FULL TEST PASS ===== -->
+      <section class="section">
+        <details class="exp lab10">
+          <summary><span class="lab-tag">LAB 10</span><span class="chevron">▶</span> Full Test Pass — including every failure case</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Why test the failures, not just the happy path</span>
+              Anyone can demo software that works when used correctly. <strong>The failure cases are where real bugs
+              live</strong>, and they're what an interviewer or a reviewer will poke at. Work through all twelve below — if
+              any produces a raw <strong>500</strong> page, that's a bug to fix, not a quirk to ignore.
+            </div>
+
+            <p><strong>Reset first:</strong> re-run your saved <code>product-setup.sql</code> so you start from the known 4 rows. Then work down the list.</p>
+
+            <table class="issues">
+              <thead><tr><th style="width:6%;">#</th><th style="width:32%;">Do this</th><th>Expect this</th></tr></thead>
+              <tbody>
+                <tr><td><strong>1</strong></td><td><code>product.html</code> → View all products</td><td>Table with 4 rows, each with a Delete link</td></tr>
+                <tr><td><strong>2</strong></td><td>Visit <code>/product</code> with no parameters</td><td>Same table — the <code>action == null</code> default working</td></tr>
+                <tr><td><strong>3</strong></td><td>Visit <code>/product?action=banana</code></td><td><span class="err-txt">Red</span> "Unknown action: banana" <em>plus</em> the table</td></tr>
+                <tr><td><strong>4</strong></td><td>Insert id <code>5</code>, Webcam, 2500, 15</td><td><span class="ok-txt">Green</span> "added successfully" + table now shows 5 rows</td></tr>
+                <tr><td><strong>5</strong></td><td>Insert id <code>5</code> again</td><td><span class="err-txt">Red</span> "Insertion failed" + console logs SQLState <code>23505</code></td></tr>
+                <tr><td><strong>6</strong></td><td>Insert with price <code>-100</code></td><td><span class="err-txt">Red</span> "Insertion failed" + <strong>nothing in the console</strong> (service blocked it)</td></tr>
+                <tr><td><strong>7</strong></td><td>Insert with a <strong>blank name</strong></td><td><span class="err-txt">Red</span> "Insertion failed", console silent — service again</td></tr>
+                <tr><td><strong>8</strong></td><td>Insert with quantity <code>ten</code></td><td><span class="err-txt">Red</span> "must be numbers" — <strong>not a 500</strong></td></tr>
+                <tr><td><strong>9</strong></td><td>Update id <code>2</code> to price <code>999</code></td><td><span class="ok-txt">Green</span> "updated successfully" + Mouse shows 999.0</td></tr>
+                <tr><td><strong>10</strong></td><td>Update id <code>777</code> (doesn't exist)</td><td><span class="err-txt">Red</span> "Updation failed — no product with id 777"</td></tr>
+                <tr><td><strong>11</strong></td><td>Delete id <code>5</code>, then Back and click that Delete link again</td><td>First: <span class="ok-txt">green</span> "deleted". Second: <span class="err-txt">red</span> "Deletion failed" — the boolean pattern earning its keep</td></tr>
+                <tr><td><strong>12</strong></td><td>Edit the URL by hand: <code>/product?action=delete&amp;p=abc</code></td><td><span class="err-txt">Red</span> "Invalid product id in the delete link" — <strong>not a 500</strong></td></tr>
+              </tbody>
+            </table>
+
+            <div class="observe">
+              <span class="lbl">One extra experiment — see HTTP's statelessness for yourself</span>
+              Open a <strong>brand-new browser window</strong> (or a private window) and go straight to
+              <code>/ServletBasics/product?action=view</code>, <strong>without logging in at all</strong>. The full product
+              manager works — insert, update, delete, everything. <strong>Nothing is protected</strong>, because HTTP forgot
+              you the instant the login response was sent, and <code>ProductServlet</code> never asks who you are.
+              <br><br>
+              That's exactly the gap <strong>sessions</strong> fill: <code>request.getSession()</code>, storing the user at
+              login, and checking it at the top of every protected servlet. <strong>Recognising the hole is today's
+              lesson</strong> — filling it is the natural next topic.
+            </div>
+
+            <div class="expected">
+              <span class="lbl">What you built across both sessions</span>
+              A complete Java web application: a login servlet, and a five-layer MVC product manager doing full CRUD against
+              a real database, with validation, error handling, and no duplicated display code. <strong>Every request you
+              served followed the flow from Part 1's request-tracing slide</strong> — browser, Tomcat, servlet, service, DAO,
+              JDBC driver, database, and back as generated HTML.
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">All twelve test cases pass; no case produces a raw 500 error page.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== ASSIGNMENT ===== -->
+      <section class="section">
+        <details class="exp lab13">
+          <summary><span class="lab-tag">ASSIGNMENT</span><span class="chevron">▶</span> CRUD Mini-Project — build one independently</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">The task</span>
+              Build the same five-layer servlet CRUD application <strong>from scratch, on your own</strong>, for a different
+              domain. Don't copy the product code — <strong>rebuild the pattern</strong>. That's the difference between having
+              followed a lab and being able to do the work.
+            </div>
+
+            <p><strong>Pick one domain</strong> (or propose your own):</p>
+            <table class="issues">
+              <thead><tr><th style="width:22%;">Domain</th><th>Suggested table</th></tr></thead>
+              <tbody>
+                <tr><td><strong>Student</strong></td><td><code>student(roll_no INT PK, name VARCHAR(50), course VARCHAR(30), marks DOUBLE)</code></td></tr>
+                <tr><td><strong>Employee</strong></td><td><code>employee(emp_id INT PK, name VARCHAR(50), department VARCHAR(30), salary DOUBLE)</code></td></tr>
+                <tr><td><strong>Book</strong></td><td><code>book(book_id INT PK, title VARCHAR(80), author VARCHAR(50), price DOUBLE)</code></td></tr>
+              </tbody>
+            </table>
+
+            <p><strong>Required — the baseline for full marks:</strong></p>
+            <ul class="steps" style="padding-left:24px;">
+              <li>A Dynamic Web Project with all <strong>five packages</strong>: web, service, dao, bean, helper.</li>
+              <li>A <strong>bean</strong> with private fields, both constructors, getters/setters.</li>
+              <li>A <strong>helper</strong> holding the JDBC URL and nothing else.</li>
+              <li>A <strong>DAO</strong> with all four operations, every one using <code>PreparedStatement</code>.</li>
+              <li>A <strong>service</strong> with at least <strong>two real validation rules</strong> of your own choosing.</li>
+              <li><strong>One servlet</strong> routing on an <code>action</code> parameter, mapped in <code>web.xml</code> or with <code>@WebServlet</code>.</li>
+              <li>An HTML page with an insert form, an update form, and a view link.</li>
+              <li>A <strong>Delete link on each row</strong> of the rendered table.</li>
+              <li><strong>Every failure handled</strong> — no raw 500 pages for bad input or missing ids.</li>
+              <li>A shared <strong>display method</strong> called by all four actions (no copy-pasted table loop).</li>
+            </ul>
+
+            <div class="tryit">
+              <span class="lbl">Stretch goals — attempt these if you want to go further</span>
+              <ul style="margin:6px 0 0;">
+                <li><strong>Search:</strong> a box that filters by name using <code>WHERE name LIKE ?</code>.</li>
+                <li><strong>Edit pre-filled:</strong> an "Edit" link per row that opens a form already containing that record's values. <span class="muted">Hint: <code>getProductById</code>, then print the value into the input's <code>value=</code> attribute.</span></li>
+                <li><strong>Sessions:</strong> store the user in <code>request.getSession()</code> on login and redirect anyone unauthenticated away from the CRUD page — closing the gap you saw in Lab 10.</li>
+                <li><strong>Update every field</strong>, not just one — and think about which fields should be editable at all.</li>
+                <li><strong>Confirm before delete</strong>, so a stray click can't destroy a row.</li>
+              </ul>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Submission</span>
+              Submit your project as a zip (or a Git repository) containing the <code>src</code> folder,
+              <code>WebContent</code>, and your <code>.sql</code> setup script. Include a short
+              <strong><code>README</code></strong> stating your table schema, your two validation rules, and anything that
+              doesn't work — <strong>an honest known-issues list scores better than a silent bug.</strong>
+              <br><br>
+              <strong>Deadline:</strong> __________ &nbsp;<span class="muted">(to be confirmed with the batch before publishing)</span>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">Assignment understood; domain chosen and project started.</span></label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE CODE REFERENCE ===== -->
+      <div class="section-band">Catch-up safety net</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Code Reference (final files)</summary>
+          <div class="exp-body">
+            <p>Fell behind, or something won't compile? Here's the definitive file list for the <strong>whole</strong>
+            project — both sessions — plus the one file that was built in pieces.</p>
+
+            <table class="issues">
+              <thead><tr><th style="width:28%;">File</th><th style="width:30%;">Location</th><th>Where the final version is</th></tr></thead>
+              <tbody>
+                <tr><td><code>web.xml</code></td><td><code>WebContent/WEB-INF/</code></td><td><strong>Below</strong> — both sessions combined</td></tr>
+                <tr><td><code>index.html</code></td><td><code>WebContent/</code></td><td>Part 1, Lab 2</td></tr>
+                <tr><td><code>product.html</code></td><td><code>WebContent/</code></td><td><strong>Lab 6</strong></td></tr>
+                <tr><td><code>LoginServlet.java</code></td><td><code>src/com/tcs/web/</code></td><td>Part 1, Lab 3</td></tr>
+                <tr><td><code>EchoServlet.java</code></td><td><code>src/com/tcs/web/</code></td><td>Part 1, Lab 6 <span class="muted">(optional)</span></td></tr>
+                <tr><td><code>Product.java</code></td><td><code>src/com/tcs/bean/</code></td><td><strong>Lab 2</strong></td></tr>
+                <tr><td><code>DBHelper.java</code></td><td><code>src/com/tcs/helper/</code></td><td><strong>Lab 3</strong> <span class="muted">— use your own URL</span></td></tr>
+                <tr><td><code>ProductDao.java</code></td><td><code>src/com/tcs/dao/</code></td><td><strong>Lab 4</strong></td></tr>
+                <tr><td><code>ProductService.java</code></td><td><code>src/com/tcs/service/</code></td><td><strong>Lab 5</strong></td></tr>
+                <tr><td><code>ProductServlet.java</code></td><td><code>src/com/tcs/web/</code></td><td><strong>Lab 9</strong> — the final refactored version</td></tr>
+                <tr><td><code>derby.jar</code></td><td><code>WebContent/WEB-INF/lib/</code></td><td>Lab 1 <span class="muted">— easy to forget</span></td></tr>
+              </tbody>
+            </table>
+
+            <h3>The complete <code>web.xml</code> — both sessions</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">web.xml</span><span class="fb-path">WebContent/WEB-INF/</span><span class="fb-tag">FINAL — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1"&gt;
+
+    &lt;display-name&gt;ServletBasics&lt;/display-name&gt;
+
+    &lt;welcome-file-list&gt;
+        &lt;welcome-file&gt;index.html&lt;/welcome-file&gt;
+    &lt;/welcome-file-list&gt;
+
+    &lt;!-- ===== Part 1: login servlet ===== --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;com.tcs.web.LoginServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;LoginServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/login&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+    &lt;!-- ===== Part 2: product CRUD servlet ===== --&gt;
+    &lt;servlet&gt;
+        &lt;servlet-name&gt;ProductServlet&lt;/servlet-name&gt;
+        &lt;servlet-class&gt;com.tcs.web.ProductServlet&lt;/servlet-class&gt;
+    &lt;/servlet&gt;
+    &lt;servlet-mapping&gt;
+        &lt;servlet-name&gt;ProductServlet&lt;/servlet-name&gt;
+        &lt;url-pattern&gt;/product&lt;/url-pattern&gt;
+    &lt;/servlet-mapping&gt;
+
+    &lt;!-- EchoServlet is NOT here — it uses @WebServlet("/echo") instead. --&gt;
+
+&lt;/web-app&gt;</code></pre></div>
+
+            <div class="observe">
+              <span class="lbl">The five-minute triage list</span>
+              <strong>404?</strong> URL wrong — check the project name, then <code>&lt;url-pattern&gt;</code>, then restart Tomcat.
+              &nbsp;<strong>500?</strong> Read the <em>first</em> line of the stack trace in the Eclipse console.
+              &nbsp;<strong>"No suitable driver"?</strong> <code>derby.jar</code> isn't in <code>WEB-INF/lib</code>.
+              &nbsp;<strong>"No products found" but rows exist?</strong> Relative Derby path — use an absolute one.
+              &nbsp;<strong>"Already booted"?</strong> Disconnect the Data Source Explorer.
+              &nbsp;<strong><code>NullPointerException</code>?</strong> Missing <code>if (con == null)</code> guard in a DAO method.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <section class="section">
+        <div class="qref">
+          <h2>Quick reference card — Part 2</h2>
+
+          <h3>The five layers</h3>
+          <table>
+            <thead><tr><th>Package</th><th>Class</th><th>Holds</th><th>Never holds</th></tr></thead>
+            <tbody>
+              <tr><td><code>web</code></td><td><code>ProductServlet</code></td><td>Parameters in, HTML out</td><td>SQL</td></tr>
+              <tr><td><code>service</code></td><td><code>ProductService</code></td><td>Validation, business rules</td><td>HTML or SQL</td></tr>
+              <tr><td><code>dao</code></td><td><code>ProductDao</code></td><td>All the SQL</td><td>HTML</td></tr>
+              <tr><td><code>bean</code></td><td><code>Product</code></td><td>Data only</td><td>Any logic</td></tr>
+              <tr><td><code>helper</code></td><td><code>DBHelper</code></td><td>The connection + URL</td><td>SQL</td></tr>
+            </tbody>
+          </table>
+
+          <h3>JDBC calls used in the DAO</h3>
+          <table>
+            <thead><tr><th>Call</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>DriverManager.getConnection(url, user, pass)</code></td><td>Open a session</td></tr>
+              <tr><td><code>con.prepareStatement(sql)</code></td><td>Compile a parameterised statement</td></tr>
+              <tr><td><code>ps.setInt(1, v)</code> / <code>setString</code> / <code>setDouble</code></td><td>Bind a value — <strong>1-based</strong></td></tr>
+              <tr><td><code>ps.executeQuery()</code></td><td><strong>SELECT</strong> → returns a <code>ResultSet</code></td></tr>
+              <tr><td><code>ps.executeUpdate()</code></td><td><strong>INSERT/UPDATE/DELETE</strong> → returns row count</td></tr>
+              <tr><td><code>rs.next()</code></td><td>Advance the cursor; <code>false</code> when rows run out</td></tr>
+              <tr><td><code>rs.getInt("id")</code> / <code>getString</code> / <code>getDouble</code></td><td>Read a column of the current row</td></tr>
+              <tr><td><code>con.close()</code></td><td>Release it — in <code>finally</code>, always</td></tr>
+            </tbody>
+          </table>
+
+          <h3>The CRUD routing table</h3>
+          <table>
+            <thead><tr><th>Action</th><th>Comes from</th><th>Method</th><th>Parameters read</th></tr></thead>
+            <tbody>
+              <tr><td><code>view</code></td><td>a link</td><td>GET</td><td>none</td></tr>
+              <tr><td><code>insert</code></td><td>a form</td><td>POST</td><td><code>id, name, price, quantity</code></td></tr>
+              <tr><td><code>update</code></td><td>a form</td><td>POST</td><td><code>id, price</code></td></tr>
+              <tr><td><code>delete</code></td><td>a per-row link</td><td>GET</td><td><code>p</code> <span style="color:#ffd866;">(not "id"!)</span></td></tr>
+            </tbody>
+          </table>
+
+          <h3>Derby SQLState codes you'll meet</h3>
+          <table>
+            <thead><tr><th>SQLState</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>23505</code></td><td>Duplicate primary key — that id already exists</td></tr>
+              <tr><td><code>42X05</code></td><td>Table not found — did you run CREATE TABLE?</td></tr>
+              <tr><td><code>42X14</code></td><td>Column not found — typo in a column name</td></tr>
+              <tr><td><code>XSDB6</code></td><td>Database already booted — disconnect the Data Source Explorer</td></tr>
+              <tr><td><code>08001</code></td><td>Cannot connect — check the URL and the JAR</td></tr>
+            </tbody>
+          </table>
+
+          <h3>Habits to keep</h3>
+          <ol>
+            <li><strong>Absolute</strong> database path, forward slashes, same URL as the explorer</li>
+            <li>Driver JAR in <strong><code>WEB-INF/lib</code></strong>, not just the driver definition</li>
+            <li><code>PreparedStatement</code> with <code>?</code> — <strong>never</strong> string concatenation</li>
+            <li><code>if (con == null)</code> guard at the top of every DAO method</li>
+            <li>Close the connection in <code>finally</code></li>
+            <li>Return an <strong>empty list</strong>, never <code>null</code>, from a read</li>
+            <li>Validation in the <strong>service</strong>, SQL in the <strong>DAO</strong>, HTML in the <strong>servlet</strong></li>
+          </ol>
+
+          <h3>Translation to Spring Boot — coming next</h3>
+          <table>
+            <thead><tr><th>What you wrote today</th><th>Its Spring Boot equivalent</th></tr></thead>
+            <tbody>
+              <tr><td><code>ProductServlet</code> + action ladder</td><td><code>@RestController</code> + <code>@GetMapping</code>/<code>@PostMapping</code></td></tr>
+              <tr><td><code>ProductService</code></td><td><code>@Service</code></td></tr>
+              <tr><td><code>ProductDao</code></td><td><code>@Repository</code> / <code>JpaRepository</code></td></tr>
+              <tr><td><code>Product</code> bean</td><td><code>@Entity</code></td></tr>
+              <tr><td><code>DBHelper</code></td><td><code>application.properties</code></td></tr>
+              <tr><td><code>Integer.parseInt(getParameter("id"))</code></td><td><code>@RequestParam int id</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ===== WRAP UP ===== -->
+      <section class="section">
+        <div class="concept" style="margin-top:18px;">
+          <span class="lbl">What you just built</span>
+          Across both sessions you went from "Java prints to a console" to a running, layered web application: a servlet
+          answering HTTP requests, five MVC packages with clean responsibilities, full database CRUD with validation and
+          error handling, and a refactor that removed every line of duplicated display code.
+          <br><br>
+          <strong>Every Java web framework is built on exactly this.</strong> When you write <code>@GetMapping</code> in
+          Spring Boot, it's a URL mapping; <code>@RequestParam</code> is <code>getParameter()</code> with automatic
+          conversion; <code>@Service</code> and <code>@Repository</code> are the layers you just created by hand; and
+          <code>DispatcherServlet</code> is the <code>action</code> router you wrote yourself. <strong>You now know what the
+          annotations are doing.</strong>
+        </div>
+        <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
+          Java Servlets Part 2 — Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
+        </p>
+      </section>
+      </div><!-- /.lab-canvas -->
+
+    </main>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function computeProgress(ticked, total) {
+      return total === 0 ? 0 : Math.round((ticked / total) * 100);
+    }
+    function getSnippetText(el) {
+      if (typeof el === 'string') return el;
+      if (el && typeof el.textContent === 'string') return el.textContent;
+      return '';
+    }
+
+    /* ============================================================
+       Progress tracker + readiness.
+       ============================================================ */
+    var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
+
+    function recomputeProgress() {
+      var total = allChecks.length;
+      var ticked = 0;
+      allChecks.forEach(function (c) { if (c.checked) ticked++; });
+      var pct = computeProgress(ticked, total);
+      progressBar.style.width = pct + '%';
+      progressText.textContent = pct + '%';
+      progressCount.textContent = ticked + ' / ' + total + ' steps';
+
+      var allPrereq = prereqChecks.length > 0 &&
+        prereqChecks.every(function (c) { return c.checked; });
+      readyBadge.classList.toggle('show', allPrereq);
+    }
+
+    /* ============================================================
+       Copy buttons.
+       ============================================================ */
+    function flash(btn, cls, label) {
+      var original = btn.getAttribute('data-label') || 'Copy';
+      btn.classList.remove('ok', 'err');
+      btn.classList.add(cls);
+      btn.textContent = label;
+      setTimeout(function () {
+        btn.classList.remove('ok', 'err');
+        btn.textContent = original;
+      }, 2000);
+    }
+
+    function fallbackCopy(text) {
+      try {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        return ok;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function attachCopyButtons() {
+      var wraps = Array.prototype.slice.call(document.querySelectorAll('.codewrap'));
+      wraps.forEach(function (wrap) {
+        var code = wrap.querySelector('code');
+        if (!code) return;
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copy';
+        btn.setAttribute('data-label', 'Copy');
+        btn.addEventListener('click', function () {
+          var text = getSnippetText(code);
+          if (text.length === 0) {
+            flash(btn, 'err', 'Nothing to copy');
+            return;
+          }
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(function () {
+              flash(btn, 'ok', 'Copied!');
+            }, function () {
+              flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                    fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+            });
+          } else {
+            flash(btn, fallbackCopy(text) ? 'ok' : 'err',
+                  fallbackCopy(text) ? 'Copied!' : 'Copy failed');
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    function init() {
+      allChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq, .labstep'));
+      prereqChecks = Array.prototype.slice.call(
+        document.querySelectorAll('.prereq'));
+      progressBar = document.getElementById('progressBar');
+      progressText = document.getElementById('progressText');
+      progressCount = document.getElementById('progressCount');
+      readyBadge = document.getElementById('readyBadge');
+
+      allChecks.forEach(function (c) {
+        c.addEventListener('change', recomputeProgress);
+      });
+
+      attachCopyButtons();
+      recomputeProgress();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

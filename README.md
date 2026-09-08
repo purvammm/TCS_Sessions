@@ -2,7 +2,7 @@
 
 Slide decks and hands-on lab sheets for a Spring Boot training series, authored by **Purvam Prajapati** (Faculty, AHD).
 
-Each session ships two self-contained HTML files — open them directly in any browser, no build step needed.
+Each session ships two self-contained HTML files — open them directly in any browser, no build step needed. The two **Servlets** sessions additionally ship Markdown **study notes** that double as a trainer's guide.
 
 ## Start here
 
@@ -10,20 +10,62 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 
 ## Contents
 
-| Session | Theory (slideshow) | Hands-on lab |
-|--------:|--------------------|--------------|
-| Java Foundations | `java-foundations-theory.html` | — |
-| Collections, Class Relationships & File I/O | `java-collections-theory.html` | — |
-| JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` |
-| 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` |
-| 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` |
-| 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` |
-| 4 — Microservices with Spring Cloud | `springboot-session4-theory.html` | `springboot-session4-lab.html` |
+| Session | Theory (slideshow) | Hands-on lab | Study notes |
+|--------:|--------------------|--------------|-------------|
+| Java Foundations | `java-foundations-theory.html` | — | — |
+| Collections, Class Relationships & File I/O | `java-collections-theory.html` | — | — |
+| JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` | — |
+| Servlets 1 — Web, HTTP & your first servlet | `servlets-session1-theory.html` | `servlets-session1-lab.html` | [`notes`](servlets-session1-theory-notes.md) |
+| Servlets 2 — MVC architecture & CRUD with JDBC | `servlets-session2-theory.html` | `servlets-session2-lab.html` | [`notes`](servlets-session2-theory-notes.md) |
+| Servlets — Mini Project (Library System) | — | `servlets-mini-project.html` | — |
+| 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` | — |
+| 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` | — |
+| 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` | — |
+| 4 — Microservices with Spring Cloud | `springboot-session4-theory.html` | `springboot-session4-lab.html` | — |
 
 - **Theory files** are interactive slideshows (arrow keys / on-screen controls, slide counter, progress rail).
 - **Lab files** are scrollable companions with a progress checklist and copy-to-clipboard code blocks.
+- **Study notes** are Markdown — they render directly on GitHub, no preview tool needed.
+
+## Study notes (Markdown)
+
+The two Servlets sessions also ship **written notes** that work as a standalone course *and* as a
+trainer's guide:
+
+| File | What's in it |
+|---|---|
+| [`servlets-session1-theory-notes.md`](servlets-session1-theory-notes.md) | 24 chapters — web & HTTP foundations through a complete login servlet |
+| [`servlets-session2-theory-notes.md`](servlets-session2-theory-notes.md) | 22 chapters — MVC, the five layers, Derby, and full CRUD |
+
+Each chapter has a plain explanation, a real-world analogy, runnable code, an ASCII diagram, a
+**🎓 Teaching tip**, and **✅ Check yourself** questions (all answered in an appendix). Both files
+end with a **Teaching Guide** containing a timed session plan, the demos worth doing live, the
+analogies that land, and the questions your audience will actually ask — with answers.
+
+Read them top-to-bottom to learn the topic, or jump to Appendix D to prepare to teach it.
+
+## Mini project
+
+[`servlets-mini-project.html`](servlets-mini-project.html) is a **Library Management System** brief
+for building independently after both Servlets sessions.
+
+**It deliberately contains no solution code.** Instead: what each piece must do, what it should take
+and return, which layer it belongs in, wireframes of the target screens, hints when you're stuck, and
+design questions you have to answer yourself — such as whether to *store* or *calculate* the number of
+available copies, and how to report *which* of five rules blocked an issue.
+
+13 phases, from planning on paper through to a 20-step self-test. The issue/return feature is the
+point: it reads one table, checks five rules, then writes to two — which is what plain CRUD never
+teaches.
 
 ## The journey
+
+The foundation sessions run in order — **JDBC** (how Java reaches a database), then the two **Servlets** sessions (how Java answers a browser):
+
+1. **Servlets 1** — the mechanics: HTTP, the servlet lifecycle, and one login servlet built properly.
+2. **Servlets 2** — the architecture: five MVC layers and a full CRUD app on top of JDBC.
+
+Servlets 2 extends the same Eclipse project created in Servlets 1, so the two sessions are best taken in order. Together they build by hand exactly the architecture the Spring Boot sessions then rebuild with far less boilerplate.
 
 The four Spring Boot sessions build on each other — from a Hello World endpoint to a running microservices architecture:
 

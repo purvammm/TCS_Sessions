@@ -117,6 +117,7 @@
 
     .links { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .links.single { grid-template-columns: 1fr; }
+    .links.c3 { grid-template-columns: repeat(3, 1fr); }
     .doc-link {
       display: flex; align-items: center; gap: 12px; text-decoration: none;
       border: 1px solid var(--mac-border); border-radius: 10px; padding: 13px 16px;
@@ -134,8 +135,11 @@
       border-top: 1px solid var(--mac-border); padding-top: 16px;
     }
 
+    @media (max-width: 900px) {
+      .links.c3 { grid-template-columns: 1fr 1fr; }
+    }
     @media (max-width: 640px) {
-      .links { grid-template-columns: 1fr; }
+      .links, .links.c3 { grid-template-columns: 1fr; }
       .hero { flex-direction: column; text-align: center; }
     }
   </style>
@@ -213,6 +217,76 @@
           <a class="doc-link" href="jdbc-lab.html">
             <span class="dl-ic">🧪</span>
             <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">jdbc-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <div class="band">Java Servlets — 2-part series</div>
+
+      <!-- Servlets Session 1 -->
+      <section class="session s1">
+        <div class="s-head">
+          <div class="s-num">S1</div>
+          <div class="s-title">Web, HTTP &amp; Your First Servlet</div>
+        </div>
+        <p class="s-desc">How Java answers a browser instead of a <code>main</code> method — web servers and Tomcat, URL anatomy, HTTP requests &amp; responses, status codes, GET vs POST, the servlet lifecycle, and a working login servlet.</p>
+        <div class="links c3">
+          <a class="doc-link" href="servlets-session1-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">servlets-session1-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="servlets-session1-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">servlets-session1-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="servlets-session1-theory-notes.md">
+            <span class="dl-ic">📖</span>
+            <span class="dl-text"><span class="dl-kind">Study notes</span><span class="dl-sub">+ teaching guide (Markdown)</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Servlets Session 2 -->
+      <section class="session s2">
+        <div class="s-head">
+          <div class="s-num">S2</div>
+          <div class="s-title">MVC Architecture &amp; CRUD with JDBC</div>
+        </div>
+        <p class="s-desc">Turning one servlet into a real application — Model-View-Controller, the five packages (web, service, dao, bean, helper), Derby setup, and a complete product CRUD app. The architecture Spring Boot generates for you.</p>
+        <div class="links c3">
+          <a class="doc-link" href="servlets-session2-theory.html">
+            <span class="dl-ic">📊</span>
+            <span class="dl-text"><span class="dl-kind">Theory slideshow</span><span class="dl-sub">servlets-session2-theory.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="servlets-session2-lab.html">
+            <span class="dl-ic">🧪</span>
+            <span class="dl-text"><span class="dl-kind">Hands-on lab</span><span class="dl-sub">servlets-session2-lab.html</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+          <a class="doc-link" href="servlets-session2-theory-notes.md">
+            <span class="dl-ic">📖</span>
+            <span class="dl-text"><span class="dl-kind">Study notes</span><span class="dl-sub">+ teaching guide (Markdown)</span></span>
+            <span class="dl-arrow">→</span>
+          </a>
+        </div>
+      </section>
+
+      <!-- Servlets Mini Project -->
+      <section class="session s4">
+        <div class="s-head">
+          <div class="s-num">MP</div>
+          <div class="s-title">Mini Project — Library Management System</div>
+        </div>
+        <p class="s-desc">Build it yourself, from a brief with <strong>no solution code</strong> — only requirements, hints, wireframes and design questions. Three tables, five layers, a protected login, and an issue/return feature whose rules force real business logic into the service layer.</p>
+        <div class="links single">
+          <a class="doc-link" href="servlets-mini-project.html">
+            <span class="dl-ic">🛠️</span>
+            <span class="dl-text"><span class="dl-kind">Project brief</span><span class="dl-sub">servlets-mini-project.html · 13 phases, no code given</span></span>
             <span class="dl-arrow">→</span>
           </a>
         </div>
