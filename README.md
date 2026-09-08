@@ -17,6 +17,7 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 | JDBC — Database Connectivity | `jdbc-theory.html` | `jdbc-lab.html` | — |
 | Servlets 1 — Web, HTTP & your first servlet | `servlets-session1-theory.html` | `servlets-session1-lab.html` | [`notes`](servlets-session1-theory-notes.md) |
 | Servlets 2 — MVC architecture & CRUD with JDBC | `servlets-session2-theory.html` | `servlets-session2-lab.html` | [`notes`](servlets-session2-theory-notes.md) |
+| Servlets — Mini Project (Library System) | — | `servlets-mini-project.html` | — |
 | 1 — Spring Boot foundations | `springboot-session1-theory.html` | `springboot-session1-lab.html` | — |
 | 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` | — |
 | 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` | — |
@@ -42,6 +43,20 @@ end with a **Teaching Guide** containing a timed session plan, the demos worth d
 analogies that land, and the questions your audience will actually ask — with answers.
 
 Read them top-to-bottom to learn the topic, or jump to Appendix D to prepare to teach it.
+
+## Mini project
+
+[`servlets-mini-project.html`](servlets-mini-project.html) is a **Library Management System** brief
+for building independently after both Servlets sessions.
+
+**It deliberately contains no solution code.** Instead: what each piece must do, what it should take
+and return, which layer it belongs in, wireframes of the target screens, hints when you're stuck, and
+design questions you have to answer yourself — such as whether to *store* or *calculate* the number of
+available copies, and how to report *which* of five rules blocked an issue.
+
+13 phases, from planning on paper through to a 20-step self-test. The issue/return feature is the
+point: it reads one table, checks five rules, then writes to two — which is what plain CRUD never
+teaches.
 
 ## The journey
 
