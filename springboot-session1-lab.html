@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session1-lab.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -183,7 +184,7 @@
     .section { padding: 0; margin-bottom: 4px; }
     .section-intro { color: var(--mac-text-muted); margin-bottom: 6px; }
 
-    /* === Expandable sections (Req 9) === */
+    /* === Expandable sections === */
     details.exp {
       border: 1px solid var(--mac-border);
       border-left: 5px solid var(--mac-accent);
@@ -223,8 +224,9 @@
       letter-spacing: 0.03em;
     }
     .exp-body { padding: 14px 24px 24px; }
+    .exp-body h3 { font-size: 19px; }
 
-    /* === Checklist items (Req 8.3, 11.2) === */
+    /* === Checklist items === */
     .check {
       display: flex;
       align-items: flex-start;
@@ -292,8 +294,47 @@
       font-size: 16.5px;
     }
     .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .muted { color: var(--mac-text-muted); }
 
-    /* Code blocks with copy button (Req 10, 17.1, 17.3, 17.4) */
+    /* Status-code badge, used in expected-output headings */
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s2 { background: #49cc90; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s5 { background: #f93e3e; }
+
+    /* === THE GOLDEN RULE box — the single most important lab callout === */
+    .golden {
+      border: 2px solid #ff9f0a;
+      background: linear-gradient(135deg,#fffaf0,#fff3dc);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 16.5px;
+      box-shadow: 0 3px 14px rgba(255,159,10,0.18);
+    }
+    .golden .lbl {
+      font-weight: 800; color: #b8860b; display: block; margin-bottom: 8px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .golden code { background: rgba(184,134,11,0.12) !important; color: #8a6100 !important; }
+    .golden .rule {
+      background: #fff; border: 1px dashed #e4c48a; border-radius: 8px;
+      padding: 10px 14px; margin: 10px 0; font-weight: 600;
+    }
+
+    /* Code blocks with copy button */
     .codewrap { position: relative; margin: 14px 0; }
     .codewrap pre {
       margin: 0;
@@ -310,6 +351,8 @@
       line-height: 1.6;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
     .copy-btn {
       position: absolute;
@@ -352,15 +395,27 @@
     details.exp.lab2 { border-left-color: #5e5ce6; }
     details.exp.lab3 { border-left-color: #28c840; }
     details.exp.lab4 { border-left-color: #ff9f0a; }
+    details.exp.lab5 { border-left-color: #00c7be; }
+    details.exp.lab6 { border-left-color: #bf5af2; }
+    details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.lab8 { border-left-color: #30b0c7; }
     details.exp.bonus { border-left-color: #ff375f; }
     details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
     details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
     details.exp.lab3 > summary { background: linear-gradient(135deg,#eefcf1,#e3f8e8); }
     details.exp.lab4 > summary { background: linear-gradient(135deg,#fff6ea,#fdeed6); }
+    details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
+    details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
+    details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#eaf8fb,#d9f1f6); }
     details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
     details.exp.lab2 .lab-tag { background:#5e5ce6; }
     details.exp.lab3 .lab-tag { background:#28c840; }
     details.exp.lab4 .lab-tag { background:#ff9f0a; }
+    details.exp.lab5 .lab-tag { background:#00c7be; }
+    details.exp.lab6 .lab-tag { background:#bf5af2; }
+    details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.lab8 .lab-tag { background:#30b0c7; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
     /* === File banner: tells the beginner EXACTLY which file to create === */
@@ -392,7 +447,7 @@
     .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
     .runbox ol { margin: 6px 0 0; padding-left: 22px; }
     .runbox ol li { margin: 6px 0; }
-    .runbox .kbd {
+    .kbd, .runbox .kbd {
       font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
       border: 1px solid var(--mac-border); border-bottom-width: 2px;
       border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
@@ -406,6 +461,107 @@
     .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
     .dothis ol { margin: 0; padding-left: 22px; }
     .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Spring Initializr recipe card */
+    .newproj {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .newproj .lbl {
+      font-weight:700; color: var(--mac-accent); display:block;
+      margin: 0 0 8px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .newproj table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 15.5px; }
+    .newproj th, .newproj td { border: 1px solid var(--mac-border); padding: 7px 12px; text-align: left; vertical-align: top; }
+    .newproj th { background: rgba(10,132,255,0.08); width: 32%; font-weight: 700; }
+    .newproj tr.keyrow td, .newproj tr.keyrow th { background: rgba(255,159,10,0.14); font-weight: 700; }
+
+    /* Property annotation list */
+    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
+    .prop-row {
+      display: grid; grid-template-columns: 1fr; gap: 2px;
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 10px 14px; background: #fafafc;
+    }
+    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
+    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* Version compatibility warning box */
+    .vercompat {
+      border: 2px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .vercompat h3 { margin: 0 0 6px; color: #b8860b; font-size: 18px; }
+    .vercompat table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+    .vercompat th, .vercompat td { border: 1px solid #e4c48a; padding: 9px 13px; text-align: left; }
+    .vercompat th { background: rgba(254,188,46,0.18); }
+    .vercompat code { font-family: var(--mac-mono); }
+
+    /* Architecture reminder box */
+    .arch-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
+    }
+    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
+    .arch-node.reg { border-color: #ff9f0a; }
+    .arch-node.svc { border-color: #28c840; }
+    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
+
+    /* HTTP verb badges */
+    .verb-badge {
+      font-family: var(--mac-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      padding: 3px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+    }
+    .verb-badge.get { background: #61affe; }
+    .verb-badge.post { background: #49cc90; }
+    .verb-badge.put { background: #fca130; }
+    .verb-badge.del { background: #f93e3e; }
+
+    /* Reference block (green) */
+    .ref-block {
+      border: 1px solid var(--mac-border);
+      border-left: 5px solid #28c840;
+      border-radius: 12px;
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--mac-window);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.05);
+    }
+    .ref-block > summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 18px 22px;
+      background: linear-gradient(135deg,#eefcf1,#e3f8e8);
+      font-size: 21px;
+      font-weight: 700;
+      display: flex; align-items: center; gap: 12px;
+      user-select: none;
+    }
+    .ref-block > summary::-webkit-details-marker { display: none; }
+    .ref-block > summary .chevron { transition: transform 0.25s ease; color: #1a9e34; font-size: 18px; }
+    .ref-block[open] > summary .chevron { transform: rotate(90deg); }
+    .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
 
     /* Quick reference card */
     .qref {
@@ -425,6 +581,46 @@
     .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
     .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    /* Test part / H2 console mockups */
+    .testpart { border: 1px solid var(--mac-border); border-radius: 10px; margin: 14px 0; overflow: hidden; }
+    .testpart .tp-head {
+      background: var(--mac-titlebar); padding: 10px 16px; font-weight: 700; font-size: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .testpart .tp-body { padding: 8px 16px 16px; }
+    .h2-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin-top: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px;
+    }
+    .h2-mock .h2-top { background:#0a3d62; color:#fff; padding:6px 12px; font-weight:700; }
+    .h2-mock .h2-row { padding: 6px 12px; border-bottom: 1px solid var(--mac-border); background:#fff; }
+    .h2-mock .h2-row:last-child { border-bottom: none; }
+
+    /* Eureka dashboard mockup */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin: 12px 0;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+
+    /* Console log mock */
+    .logmock {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 12px 16px; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.7; overflow-x: auto;
+    }
+    .logmock .hit { color: #a6e22e; }
+    .logmock .port { color: #fd9353; }
+    .logmock .dim { color: #6b7089; }
   </style>
 </head>
 <body>
@@ -443,7 +639,7 @@
         <div class="hero-icon">🌱</div>
         <div>
           <h1>Spring Boot — Session 1 Hands-on Lab</h1>
-          <p class="section-intro">Your step-by-step companion. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+          <p class="section-intro">Build and run your first Spring Boot application, then wire beans together with dependency injection. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
 
@@ -463,25 +659,26 @@
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">How to use this sheet</span>
-          This is your hands-on companion for Spring Boot Session 1 — the theory stays on the main screen while
-          you work here on your machine. Click a lab heading to expand it, use the <strong>Copy</strong> button
-          on any snippet instead of retyping, and tick each checkbox as you go. The progress bar at the top fills
-          as you complete steps — aim for 100%. Read the "Expected output" boxes to confirm you're on track, and
-          raise your hand if you get stuck.
+          This is your hands-on companion for Session 1 — the theory stays on the main screen while you work here
+          on your own machine. Click any lab heading to expand it, use the <strong>Copy</strong> button on every
+          snippet instead of retyping, and tick each checkbox as you go. The bar at the top fills as you complete
+          steps — aim for 100%. Every code block shows its <strong>full file path</strong> on a dark banner above
+          it, and every snippet is a <strong>complete file</strong> you can paste in whole. Read the
+          "Expected output" boxes to confirm you're on track, and raise your hand the moment you're stuck.
         </div>
       </section>
 
-      <!-- ===== SECTION 2: PRE-REQUISITES ===== -->
+      <!-- ===== PRE-REQUISITES ===== -->
       <div class="section-band">Before you start</div>
       <section class="section">
         <details class="exp" open>
           <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
           <div class="exp-body">
-            <p>Verify each item before starting. Tick it once the verification passes — the "ready" badge at the top lights up when all three are green.</p>
+            <p>Verify each item before starting. Tick it once the verification passes — the green "ready" badge at the top lights up when all three are done.</p>
             <label class="check">
               <input type="checkbox" class="prereq" />
               <span class="ctext"><strong>JDK 17 or higher</strong> installed
-                <span class="verify">Verify: run <code>java -version</code> → expect version 17 or higher. If the command isn't found, the JDK isn't on your PATH.</span>
+                <span class="verify">Verify: run <code>java -version</code> → expect 17 or higher. If the command isn't found, the JDK isn't on your PATH.</span>
               </span>
             </label>
             <div class="codewrap"><pre><code>java -version
@@ -489,71 +686,140 @@
 # openjdk version "17.0.10" 2024-01-16</code></pre></div>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>An IDE</strong> ready (IntelliJ IDEA, Eclipse/STS, or VS Code)
-                <span class="verify">IntelliJ Community Edition is free and recommended for beginners.</span>
+              <span class="ctext"><strong>An IDE</strong> ready — IntelliJ IDEA, Eclipse / STS, or VS Code
+                <span class="verify">IntelliJ IDEA Community Edition is free and the smoothest option for beginners.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Maven 3.6+</strong> available (standalone or bundled with the IDE)
-                <span class="verify">Verify: run <code>mvn -version</code>. Spring Boot also ships a wrapper (<code>mvnw</code>), so a global install is optional.</span>
+              <span class="ctext"><strong>Internet access</strong> so Maven can download the Spring libraries
+                <span class="verify">The first build downloads roughly 40&nbsp;MB. Later builds use the cache and are fast.</span>
               </span>
             </label>
-            <div class="codewrap"><pre><code>mvn -version
-# Expected (example):
-# Apache Maven 3.9.6</code></pre></div>
             <div class="observe">
-              <span class="lbl">Don't have a JDK yet?</span>
-              Install Temurin 17 from Adoptium (or your package manager), then re-open your terminal so the new
-              PATH takes effect. On Windows, check <code>JAVA_HOME</code> points to the JDK 17 folder.
+              <span class="lbl">Maven is optional</span>
+              You do <strong>not</strong> need Maven installed separately. Every generated project ships a wrapper
+              (<code>mvnw</code> / <code>mvnw.cmd</code>) that fetches the right Maven version itself, and your IDE
+              has Maven built in. If you do want to check, run <code>mvn -version</code>.
+            </div>
+            <div class="observe">
+              <span class="lbl">No JDK yet?</span>
+              Install <strong>Temurin 17</strong> from Adoptium (or use your package manager), then <strong>re-open
+              your terminal</strong> so the updated PATH takes effect. On Windows, also confirm <code>JAVA_HOME</code>
+              points at the JDK 17 folder.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 3: LAB 1 ===== -->
-      <div class="section-band">The four labs</div>
+      <!-- ===== THE GOLDEN RULE (pinned, before any code) ===== -->
+      <div class="section-band">Read this once — it prevents the #1 lab failure</div>
+      <section class="section">
+        <div class="golden">
+          <span class="lbl">⚠️ The Golden Rule of Spring Boot packages</span>
+          <p style="margin-top:0;">Spring can only manage classes it is able to <strong>find</strong>. It searches
+          starting from the package that holds your main application class, and works <strong>downward</strong>
+          into sub-packages. It never looks sideways or upward.</p>
+          <div class="rule">
+            Every class you create must live in the <strong>same package as the main class</strong>, or in a
+            <strong>sub-package of it</strong>.
+          </div>
+          <p><strong>In today's project the base package is <code>com.tcs.training.demo</code></strong>, so your
+          classes go in <code>com.tcs.training.demo.controller</code>, <code>com.tcs.training.demo.service</code>,
+          and so on. Put a controller in <code>com.tcs.training.controller</code> instead — one word shorter — and
+          Spring will <strong>never see it</strong>. The app still starts with no error, but every request returns
+          the <strong>Whitelabel Error Page (404)</strong>. That is the trap; the file banners in this sheet spell
+          out the full path of every file so you can't fall into it.</p>
+        </div>
+      </section>
+
+      <!-- ===== LAB 1 ===== -->
+      <div class="section-band">The labs</div>
       <section class="section">
         <details class="exp lab1" open>
-          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create &amp; Run Your First Spring Boot Project</summary>
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create, Verify &amp; Run Your First Spring Boot Project</summary>
           <div class="exp-body">
+            <div class="newproj">
+              <span class="lbl">📦 Generate the project on Spring Initializr</span>
+              Open <code>https://start.spring.io</code> and fill the form in <strong>exactly</strong> like this:
+              <table>
+                <tr><th>Project</th><td><code>Maven</code></td></tr>
+                <tr><th>Language</th><td><code>Java</code></td></tr>
+                <tr><th>Spring Boot</th><td>the default <strong>3.x</strong> release (avoid SNAPSHOT / M / RC versions)</td></tr>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>demo</code></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.demo</code> &nbsp;← <strong>check this field, don't just assume it</strong></td></tr>
+                <tr><th>Packaging</th><td><code>Jar</code></td></tr>
+                <tr><th>Java</th><td><code>17</code> (or <code>21</code> if that's what you installed)</td></tr>
+                <tr><th>Dependencies</th><td><code>Spring Web</code> — that is the only one for today</td></tr>
+              </table>
+              Then click <strong>Generate</strong>, and unzip the download into a folder you'll remember.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Can't see the "Package name" field?</span>
+              On <code>start.spring.io</code> the Group / Artifact / Package name fields sit under the
+              <strong>"Project Metadata"</strong> heading. If you only see Group and Artifact, click the small
+              <strong>"Options"</strong> toggle to expand the rest. Initializr auto-fills Package name by joining
+              Group + Artifact and removing hyphens — with <code>com.tcs.training</code> and <code>demo</code> it
+              should already read <code>com.tcs.training.demo</code>. If it doesn't, type it in yourself.
+            </div>
+
             <ol class="steps">
               <li>
-                <strong>Go to Spring Initializr.</strong> Open <code>https://start.spring.io</code> in your browser.
-              </li>
-              <li>
-                <strong>Fill in the fields exactly:</strong>
-                <ul>
-                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code></li>
-                  <li>Group: <code>com.tcs.training</code></li>
-                  <li>Artifact: <code>springboot-demo</code></li>
-                  <li>Packaging: <code>Jar</code> &nbsp;·&nbsp; Java: <code>17</code></li>
-                </ul>
-              </li>
-              <li>
-                <strong>Add one dependency:</strong> click "Add Dependencies" and choose
-                <code>Spring Web</code> (<code>spring-boot-starter-web</code>). Nothing else for now.
-              </li>
-              <li>
-                <strong>Generate &amp; extract.</strong> Click <em>Generate</em> to download the ZIP, then unzip it
-                to a folder you'll remember.
-              </li>
-              <li>
-                <strong>Import into your IDE:</strong>
+                <strong>Import into your IDE.</strong> Pick the row that matches your tool:
                 <label class="check"><input type="checkbox" class="labstep" />
-                  <span class="ctext"><strong>IntelliJ IDEA:</strong> File → Open → select the project's <code>pom.xml</code> → "Open as Project". Wait until the Maven tool window shows resolved dependencies and there are no red unresolved markers.</span>
+                  <span class="ctext"><strong>IntelliJ IDEA:</strong> File → Open → select the project's
+                  <code>pom.xml</code> → "Open as Project". Wait until the Maven tool window finishes and there are
+                  no red unresolved markers.</span>
                 </label>
                 <label class="check"><input type="checkbox" class="labstep" />
-                  <span class="ctext"><strong>Eclipse / STS:</strong> File → Import → Maven → "Existing Maven Projects" → select the project folder → Finish. Wait until the project tree appears with dependencies resolved.</span>
+                  <span class="ctext"><strong>Eclipse / STS:</strong> File → Import → Maven → "Existing Maven
+                  Projects" → select the project folder → Finish. Wait until the tree appears with dependencies
+                  resolved.</span>
+                </label>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext"><strong>VS Code:</strong> File → Open Folder → select the project folder.
+                  Install the "Extension Pack for Java" if prompted.</span>
                 </label>
               </li>
               <li>
-                <strong>Run the application — method A (IDE):</strong> open
-                <code>SpringbootDemoApplication.java</code> and run its <code>main</code> method.
+                <strong>⚠️ VERIFY YOUR BASE PACKAGE — do not skip this.</strong> Open the file
+                <code>DemoApplication.java</code> (under <code>src/main/java</code>) and read the very first line.
+                <div class="codewrap"><pre><code>package com.tcs.training.demo;   ←  THIS is your base package</code></pre></div>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext"><strong>The first line of <code>DemoApplication.java</code> reads exactly
+                  <code>package com.tcs.training.demo;</code></strong>
+                    <span class="verify">If it says something else (for example
+                    <code>com.tcs.training.springbootdemo</code>), you typed a different Artifact. That's fine —
+                    just use <em>your</em> value everywhere this sheet says <code>com.tcs.training.demo</code>, or
+                    re-generate the project with Artifact <code>demo</code>. Whatever you do,
+                    <strong>write your base package down now.</strong></span>
+                  </span>
+                </label>
               </li>
               <li>
-                <strong>Run the application — method B (Maven):</strong> from the project root run:
-                <div class="codewrap"><pre><code>mvn spring-boot:run</code></pre></div>
+                <strong>Run the application — method A (IDE):</strong> open <code>DemoApplication.java</code>,
+                right-click it → <strong>Run 'DemoApplication.main()'</strong>
+                (Eclipse: <strong>Run As → Java Application</strong>).
+              </li>
+              <li>
+                <strong>Run the application — method B (terminal):</strong> from the project root folder:
+                <div class="codewrap"><pre><code># Mac / Linux
+./mvnw spring-boot:run
+
+# Windows
+mvnw.cmd spring-boot:run</code></pre></div>
+              </li>
+              <li>
+                <strong>Confirm it's alive.</strong> Open <code>http://localhost:8080</code> in your browser.
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">The app started, and the browser shows a <strong>Whitelabel Error Page</strong>.
+                    <span class="verify">Yes — an error page is the <em>correct</em> result here! It proves the server
+                    is running and answering. There is simply no page mapped to <code>/</code> yet, because we
+                    haven't written one. You'll fix that in Lab 3.</span>
+                  </span>
+                </label>
               </li>
             </ol>
 
@@ -566,186 +832,200 @@
   '  |____| .__|_| |_|_| |_\__, | / / / /
  =========|_|==============|___/=/_/_/_/
 
+Starting DemoApplication using Java 17
+Tomcat initialized with port 8080 (http)
 Tomcat started on port 8080 (http) with context path ''
-Started SpringbootDemoApplication in 1.842 seconds (process running for 2.1)</code></pre></div>
+Started DemoApplication in 1.842 seconds (process running for 2.1)</code></pre></div>
+              The two lines that matter are <strong>"Tomcat started on port 8080"</strong> and
+              <strong>"Started DemoApplication"</strong>. If you see both, everything is working.
             </div>
 
-            <h3 style="margin-top:18px;">Common issues</h3>
+            <div class="concept">
+              <span class="lbl">What just happened</span>
+              You generated a fully-configured Spring Boot project, imported it, and started an
+              <strong>embedded Tomcat</strong> web server — with zero XML and no server installed anywhere on your
+              machine. Auto-configuration saw <code>spring-boot-starter-web</code> on the classpath, concluded
+              "this is a web application", and started Tomcat on the conventional port 8080. You configured none
+              of that.
+            </div>
+
+            <h3>Common issues</h3>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
                 <tr>
-                  <td>Startup fails with <code>Port 8080 was already in use</code></td>
-                  <td>Another process (or a previous run) is holding port 8080.</td>
-                  <td>Stop the other process, OR add <code>server.port=8081</code> to <code>application.properties</code> and re-run.</td>
+                  <td><code>Port 8080 was already in use</code></td>
+                  <td>Another process — often a previous run you forgot to stop — holds port 8080.</td>
+                  <td>Stop the old run (red square in the IDE), <em>or</em> add <code>server.port=8081</code> to <code>application.properties</code> and use that port in the browser.</td>
                 </tr>
                 <tr>
-                  <td>Maven can't download dependencies / build hangs</td>
-                  <td>No internet, or a corporate proxy is blocking Maven Central.</td>
+                  <td>Maven can't download dependencies; build hangs or fails</td>
+                  <td>No internet, or a corporate proxy blocking Maven Central.</td>
                   <td>Check your connection; configure the proxy in <code>~/.m2/settings.xml</code>; then re-run the build.</td>
                 </tr>
                 <tr>
-                  <td>IDE shows the project as plain files (not a Maven project)</td>
-                  <td>The project wasn't imported as Maven.</td>
-                  <td>Re-import: IntelliJ → right-click <code>pom.xml</code> → "Add as Maven Project"; Eclipse → right-click → Maven → "Update Project".</td>
+                  <td>IDE shows the project as plain files, not a Maven project</td>
+                  <td>It wasn't imported as Maven.</td>
+                  <td>IntelliJ → right-click <code>pom.xml</code> → "Add as Maven Project". Eclipse → right-click project → Maven → "Update Project".</td>
+                </tr>
+                <tr>
+                  <td><code>invalid target release: 17</code></td>
+                  <td>The Java version chosen in Initializr is newer than the JDK you have installed.</td>
+                  <td>Check <code>java -version</code>, then set the same number in <code>pom.xml</code> under <code>&lt;java.version&gt;</code>.</td>
                 </tr>
               </tbody>
             </table>
-            <div class="expected">
-              <span class="lbl">What just happened?</span>
-              You generated a fully-configured Spring Boot project, imported it, and started an embedded Tomcat
-              server — with zero XML and no separate server install. The "Tomcat started on port 8080" line means
-              your app is live and listening for requests.
-            </div>
+
             <div class="tryit">
               <span class="lbl">Stretch goal</span>
-              Add <code>server.port=9090</code> to <code>application.properties</code>, re-run, and confirm the
-              console now says the server started on port 9090. Then remove it to go back to the default.
+              Add <code>server.port=9090</code> to <code>src/main/resources/application.properties</code>, restart,
+              and confirm the console now says <strong>port 9090</strong>. Then delete the line to return to the
+              default. You have just overridden a convention with configuration — exactly the idea from the theory
+              deck.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 4: LAB 2 ===== -->
+      <!-- ===== LAB 2 ===== -->
       <section class="section">
         <details class="exp lab2">
-          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> Explore the Project Structure</summary>
+          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> Tour the Project — Read Before You Write</summary>
           <div class="exp-body">
-            <p>No coding here — just open each file and read it. This builds familiarity with what Spring Boot generated.</p>
+            <p>No coding in this lab. You'll open four files and understand what each one is for. Ten minutes here
+            saves hours later, because from now on you'll know where things live.</p>
+
             <ol class="steps">
               <li>
-                <strong>Open <code>pom.xml</code>.</strong> This file declares your project's
-                <strong>dependencies and build configuration</strong>. Find three things:
+                <strong>Open <code>pom.xml</code></strong> — the file that declares your dependencies and build
+                configuration. Find these three things:
                 <ul>
-                  <li>the <code>&lt;parent&gt;</code> block → <code>spring-boot-starter-parent</code> (manages versions)</li>
-                  <li>the <code>&lt;dependencies&gt;</code> section → <code>spring-boot-starter-web</code></li>
-                  <li>the <code>&lt;build&gt;</code> plugin → <code>spring-boot-maven-plugin</code> (builds the runnable JAR)</li>
+                  <li>the <code>&lt;parent&gt;</code> block → <code>spring-boot-starter-parent</code>, which decides every library version for you</li>
+                  <li>the <code>&lt;dependencies&gt;</code> section → <code>spring-boot-starter-web</code>, <strong>with no <code>&lt;version&gt;</code> tag</strong> (the parent supplies it)</li>
+                  <li>the <code>&lt;build&gt;</code> plugin → <code>spring-boot-maven-plugin</code>, which builds the runnable JAR</li>
                 </ul>
                 <label class="check"><input type="checkbox" class="labstep" />
-                  <span class="ctext">I found the parent, the web starter, and the build plugin in <code>pom.xml</code>.</span>
+                  <span class="ctext">I found the parent, the web starter (with no version), and the build plugin.</span>
                 </label>
               </li>
               <li>
-                <strong>Open the main class</strong> <code>SpringbootDemoApplication.java</code>. This is your
-                <strong>application's entry point</strong> — the class that starts everything. Identify:
+                <strong>Open the main class</strong>, <code>DemoApplication.java</code> — your application's entry
+                point. Identify:
                 <ul>
+                  <li>the <code>package</code> line (your base package — you noted this in Lab 1)</li>
                   <li>the <code>@SpringBootApplication</code> annotation on the class</li>
                   <li>the <code>SpringApplication.run(...)</code> call inside <code>main</code></li>
                 </ul>
                 <label class="check"><input type="checkbox" class="labstep" />
-                  <span class="ctext">I found <code>@SpringBootApplication</code> and <code>SpringApplication.run(...)</code>.</span>
+                  <span class="ctext">I found the package line, <code>@SpringBootApplication</code>, and <code>SpringApplication.run(...)</code>.</span>
                 </label>
               </li>
               <li>
-                <strong>Open <code>src/main/resources/application.properties</code>.</strong> This file holds your
-                <strong>configurable application settings</strong>. It's currently empty — and that's perfectly
-                fine. Spring Boot's defaults are doing the work.
+                <strong>Open <code>src/main/resources/application.properties</code></strong> — where all your
+                settings go. It is currently <strong>empty</strong>, and that's correct: every Spring Boot default
+                is fine for us so far.
                 <label class="check"><input type="checkbox" class="labstep" />
-                  <span class="ctext">I opened <code>application.properties</code> and confirmed it's empty (defaults apply).</span>
+                  <span class="ctext">I opened <code>application.properties</code> and saw it is empty.</span>
+                </label>
+              </li>
+              <li>
+                <strong>Look at the folder layout</strong> and locate where you'll be creating classes in Lab 3.
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">I can point to the folder that holds <code>DemoApplication.java</code> — that's where my new packages go.</span>
                 </label>
               </li>
             </ol>
-            <p>Here is what the generated main class looks like — read it line by line:</p>
-            <div class="codewrap"><pre><code>package com.tcs.training;
+
+            <p>Here is the generated main class. Read it line by line:</p>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/DemoApplication.java</span><span class="fb-tag">already exists — just read it</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringbootDemoApplication {
+public class DemoApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpringbootDemoApplication.class, args);
+        SpringApplication.run(DemoApplication.class, args);
     }
 }</code></pre></div>
-            <div class="concept">
-              <span class="lbl">Why the package matters</span>
-              The main class sits in <code>com.tcs.training</code>. Because <code>@SpringBootApplication</code>
-              triggers component scanning of <em>this package and everything below it</em>, your controllers and
-              services must live in sub-packages like <code>com.tcs.training.controller</code> — otherwise Spring
-              won't find them.
+
+            <div class="golden">
+              <span class="lbl">⚠️ Connect this to the golden rule</span>
+              That first line — <code>package com.tcs.training.demo;</code> — is the whole reason the golden rule
+              exists. <code>@SpringBootApplication</code> includes <code>@ComponentScan</code>, which searches
+              <strong>this package and every package beneath it</strong>. So the classes you're about to write must
+              go into:
+              <div class="rule">
+                <code>com.tcs.training.demo.controller</code> &nbsp;✅ &nbsp;&nbsp;
+                <code>com.tcs.training.demo.service</code> &nbsp;✅<br>
+                <code>com.tcs.training.controller</code> &nbsp;❌ — a <em>sibling</em> of <code>demo</code>, so never scanned
+              </div>
+              Practical shortcut: if the new package folder appears <strong>next to</strong>
+              <code>DemoApplication.java</code> in the IDE tree, you're safe.
             </div>
+
+            <h3>The folder map</h3>
             <table class="issues">
               <thead><tr><th>File / folder</th><th>What it's for</th></tr></thead>
               <tbody>
-                <tr><td><code>src/main/java</code></td><td>Your application code</td></tr>
-                <tr><td><code>src/main/resources</code></td><td>Config &amp; static files (<code>application.properties</code>)</td></tr>
-                <tr><td><code>src/test/java</code></td><td>Your tests</td></tr>
-                <tr><td><code>pom.xml</code></td><td>Dependencies &amp; build configuration</td></tr>
-                <tr><td><code>mvnw</code> / <code>mvnw.cmd</code></td><td>Maven wrapper — run Maven without installing it</td></tr>
-                <tr><td><code>.gitignore</code></td><td>Files Git should ignore (target/, IDE files)</td></tr>
+                <tr><td><code>src/main/java</code></td><td><strong>Your application code.</strong> All classes you write live here.</td></tr>
+                <tr><td><code>src/main/resources</code></td><td><strong>Configuration &amp; static files</strong> — <code>application.properties</code>, images, CSS.</td></tr>
+                <tr><td><code>src/test/java</code></td><td>Your tests. One starter test was generated for you.</td></tr>
+                <tr><td><code>pom.xml</code></td><td>Dependencies &amp; build configuration.</td></tr>
+                <tr><td><code>target/</code></td><td>Build output — compiled classes and the JAR. Never edit; safely deletable.</td></tr>
+                <tr><td><code>mvnw</code> / <code>mvnw.cmd</code></td><td>Maven wrapper — runs Maven without installing it.</td></tr>
+                <tr><td><code>.gitignore</code></td><td>Files Git should ignore (<code>target/</code>, IDE folders).</td></tr>
               </tbody>
             </table>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 5: LAB 3 ===== -->
+
+      <!-- ===== LAB 3 ===== -->
       <section class="section">
         <details class="exp lab3">
-          <summary><span class="lab-tag">LAB 3</span><span class="chevron">▶</span> Your First REST Controller</summary>
+          <summary><span class="lab-tag">LAB 3</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Your First REST Endpoint</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@RestController</code> tells Spring this class handles web requests and returns the response
-              body directly (not a view name). <code>@GetMapping("/hello")</code> maps HTTP GET requests for the
-              <code>/hello</code> path to a method.
+              <span class="lbl">Concept — what the two annotations do</span>
+              <code>@RestController</code> tells Spring: "this class handles web requests, and whatever my methods
+              return <em>is</em> the response body" (rather than the name of an HTML page to render).
+              <code>@GetMapping("/hello")</code> then says: "when an HTTP <strong>GET</strong> arrives for the path
+              <code>/hello</code>, call this method." Together, they're all you need for a working endpoint.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>In your IDE, find the package <code>com.tcs.training</code> (where the main class lives) and
-                    create a <strong>sub-package</strong> called <code>controller</code>. Right-click the parent
-                    package → <strong>New → Package</strong> → name it <code>com.tcs.training.controller</code>.</li>
-                <li>Inside that new package, right-click → <strong>New → Class</strong>. Class name:
-                    <code>HelloController</code> (no <code>.java</code>, capital H). Click <strong>Finish</strong>.</li>
-                <li>Eclipse opens an empty file. Press <span class="kbd">Ctrl</span>+<span class="kbd">A</span> →
-                    <strong>Delete</strong>, then paste the full file below.</li>
-                <li>Right-click the <strong>main application class</strong>
-                    (<code>SpringbootDemoApplication.java</code>) → <strong>Run As → Java Application</strong>.
-                    Wait for "Tomcat started on port 8080".</li>
+                <li>In the IDE project tree, find the package <code>com.tcs.training.demo</code> — the one containing
+                    <code>DemoApplication.java</code>.</li>
+                <li><strong>Right-click it → New → Package.</strong> Name it
+                    <code>com.tcs.training.demo.controller</code>
+                    (type the full name; most IDEs pre-fill the <code>com.tcs.training.demo.</code> part, so you may
+                    only need to add <code>controller</code>).</li>
+                <li>Confirm the new <code>controller</code> folder appears <strong>next to</strong>
+                    <code>DemoApplication.java</code>, not somewhere above it. ✅</li>
+                <li><strong>Right-click <code>controller</code> → New → Class.</strong> Name it
+                    <code>HelloController</code> — capital H and C, and <strong>no</strong> <code>.java</code>
+                    extension. Click Finish.</li>
+                <li>The IDE opens a nearly-empty file. Select everything
+                    (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>, or
+                    <span class="kbd">Cmd</span>+<span class="kbd">A</span> on Mac), delete it, then paste the
+                    <strong>whole file</strong> below.</li>
+                <li><strong>Restart the app.</strong> Stop the previous run first (the red square), then run
+                    <code>DemoApplication</code> again. Spring only scans for classes at startup, so a new
+                    controller is invisible until you restart.</li>
                 <li>Open <code>http://localhost:8080/hello</code> in your browser.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/controller/HelloController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-public class HelloController {
-
-    @GetMapping("/hello")
-    public String sayHello() {
-        return "Hello from Spring Boot!";
-    }
-}</code></pre></div>
-
-            <div class="expected">
-              <span class="lbl">Expected output</span>
-              Request: <code>GET http://localhost:8080/hello</code><br>
-              Response body (plain text): <code>Hello from Spring Boot!</code>
-            </div>
-
-            <div class="concept">
-              <span class="lbl">What happens under the hood</span>
-              Your browser sends <code>GET /hello</code> → the embedded Tomcat hands it to Spring's
-              <code>DispatcherServlet</code> → which routes it to your <code>sayHello()</code> method →
-              whose return value becomes the HTTP response body. That's the request flow from the slides, live.
-            </div>
-
-            <h3 style="margin-top:18px;">Now extend it — replace the file with this richer version</h3>
-            <p>Stop the app (red square in the console), <strong>replace the entire <code>HelloController.java</code></strong>
-               with the version below, save, then run again. It adds a second endpoint and a path-variable example.</p>
-
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">REPLACE — version 2</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
-
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -758,358 +1038,770 @@ public class HelloController {
 
     @GetMapping("/welcome")
     public String welcome() {
-        return "Welcome!";
-    }
-
-    @GetMapping("/hello/{name}")
-    public String helloName(@PathVariable String name) {
-        return "Hello, " + name + "!";
+        return "Welcome to the Spring Boot session!";
     }
 }</code></pre></div>
 
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li><strong>Stop</strong> the running app — the red square in your IDE's run panel.</li>
+                <li><strong>Run</strong> <code>DemoApplication</code> again and wait for "Started DemoApplication".</li>
+                <li>Visit <code>http://localhost:8080/hello</code> — then <code>http://localhost:8080/welcome</code>.</li>
+              </ol>
+            </div>
+
             <div class="expected">
-              <span class="lbl">Expected — try all three URLs</span>
-              <ul style="margin:6px 0 0;">
-                <li><code>http://localhost:8080/hello</code> → <code>Hello from Spring Boot!</code></li>
-                <li><code>http://localhost:8080/welcome</code> → <code>Welcome!</code></li>
-                <li><code>http://localhost:8080/hello/Purvam</code> → <code>Hello, Purvam!</code></li>
+              <span class="lbl">Expected output</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Request</th><th>Response body (plain text)</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET http://localhost:8080/hello</code></td><td><code>Hello from Spring Boot!</code></td></tr>
+                  <tr><td><code>GET http://localhost:8080/welcome</code></td><td><code>Welcome to the Spring Boot session!</code></td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Both URLs return their text in the browser.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">🚨 Got a Whitelabel Error Page instead? Check these, in order</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Did you restart the app?</strong> By far the most common cause. New classes are only
+                    picked up at startup.</li>
+                <li><strong>Is your package right?</strong> The first line of <code>HelloController.java</code> must
+                    read <code>package com.tcs.training.demo.controller;</code> — the base package <em>plus</em>
+                    <code>.controller</code>. If it's missing the <code>.demo</code> part, Spring never scanned it.</li>
+                <li><strong>Is <code>@RestController</code> present</strong> and spelled correctly, directly above
+                    <code>public class HelloController</code>?</li>
+                <li><strong>Does the path start with a slash?</strong> <code>@GetMapping("/hello")</code>, not
+                    <code>("hello")</code>.</li>
+                <li><strong>Check the startup log.</strong> With
+                    <code>logging.level.org.springframework.web=DEBUG</code> in
+                    <code>application.properties</code>, Spring prints every registered mapping. If
+                    <code>/hello</code> isn't in that list, the class was never found — go back to point 2.</li>
+              </ol>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it — learn by breaking things (2 minutes, worth it)</span>
+              Comment out the <code>@RestController</code> line (put <code>//</code> in front of it), restart, and
+              reload <code>/hello</code>. You'll get the Whitelabel 404 — because without the annotation Spring
+              never registered the class, even though the file compiles perfectly. <strong>Now put it back.</strong>
+              You have just seen, first-hand, that an annotation is what makes a class visible to the framework.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4 ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Reading Values From the URL</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — two places a value can hide in a URL</span>
+              A fixed response is not very useful. Real endpoints take input, and it arrives in one of two places:
+              <ul style="margin:8px 0 0;">
+                <li><strong><code>@PathVariable</code></strong> — the value is <em>part of the path</em>:
+                    <code>/hello/<strong>Purvam</strong></code>. Declare the slot with braces in the mapping:
+                    <code>@GetMapping("/hello/{name}")</code>. Use this to identify <em>which</em> thing you want.</li>
+                <li><strong><code>@RequestParam</code></strong> — the value comes <em>after a <code>?</code></em>:
+                    <code>/greet?name=<strong>Purvam</strong></code>. Use this to filter, sort, or pass optional
+                    extras.</li>
               </ul>
             </div>
 
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">My <code>/hello</code> endpoint returns the expected text in the browser.</span>
-            </label>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I added the <code>/welcome</code> and <code>/hello/{name}</code> endpoints and saw all three respond.</span>
-            </label>
-          </div>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== SECTION 6: LAB 4 ===== -->
-      <section class="section">
-        <details class="exp lab4">
-          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Dependency Injection in Action</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@Service</code> marks a class as a Spring-managed bean (a kind of <code>@Component</code>).
-              <code>@Autowired</code> asks Spring to inject that bean where it's needed — so the controller never
-              calls <code>new</code> on the service.
-            </div>
-
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Create a <strong>second</strong> sub-package next to <code>controller</code>: right-click
-                    <code>com.tcs.training</code> → <strong>New → Package</strong> → name it
-                    <code>com.tcs.training.service</code>.</li>
-                <li>Inside <code>service</code>, right-click → <strong>New → Class</strong> → name it
-                    <code>GreetingService</code> → Finish. Replace its contents with file ① below.</li>
-                <li>Open the existing <code>HelloController.java</code> (in the <code>controller</code> package),
-                    select all (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>), and replace it with file ②.</li>
-                <li>Stop the running app if it's still running (red square), then right-click
-                    <code>SpringbootDemoApplication.java</code> → <strong>Run As → Java Application</strong>.</li>
-                <li>Open <code>http://localhost:8080/hello</code> — the response should now come from the service.</li>
+                <li>Open the <code>HelloController.java</code> you created in Lab 3.</li>
+                <li>Select all and paste the <strong>whole updated file</strong> below over it — it keeps the two
+                    old methods and adds three new ones.</li>
+                <li>Stop the app, run it again.</li>
+                <li>Try each of the URLs in the expected-output table.</li>
               </ol>
             </div>
 
-            <h3 style="margin-top:6px;">① GreetingService.java <span style="font-size:14px;color:var(--mac-text-muted);">— a brand-new file</span></h3>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/GreetingService.java</span><span class="fb-tag">file ① — new file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.service;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/controller/HelloController.java</span><span class="fb-tag">replace the whole file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.controller;
 
-import org.springframework.stereotype.Service;
-
-@Service
-public class GreetingService {
-
-    public String getGreeting() {
-        return "Hello from the GreetingService bean!";
-    }
-}</code></pre></div>
-
-            <h3>② HelloController.java <span style="font-size:14px;color:var(--mac-text-muted);">— REPLACE the existing file</span></h3>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">file ② — REPLACE</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
-
-import com.tcs.training.service.GreetingService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class HelloController {
 
-    @Autowired
-    private GreetingService greetingService;
-
     @GetMapping("/hello")
     public String sayHello() {
-        return greetingService.getGreeting();
+        return "Hello from Spring Boot!";
     }
 
     @GetMapping("/welcome")
     public String welcome() {
-        return "Welcome!";
+        return "Welcome to the Spring Boot session!";
     }
 
+    // ---- NEW: a value taken from INSIDE the path ----
+    // GET /hello/Purvam        ->  Hello, Purvam!
     @GetMapping("/hello/{name}")
     public String helloName(@PathVariable String name) {
         return "Hello, " + name + "!";
     }
+
+    // ---- NEW: a value taken from AFTER the ? ----
+    // GET /greet?name=Purvam   ->  Greetings, Purvam!
+    // GET /greet               ->  Greetings, Guest!   (defaultValue kicks in)
+    @GetMapping("/greet")
+    public String greet(@RequestParam(defaultValue = "Guest") String name) {
+        return "Greetings, " + name + "!";
+    }
+
+    // ---- NEW: two path variables and simple maths ----
+    // GET /add/7/5             ->  7 + 5 = 12
+    @GetMapping("/add/{a}/{b}")
+    public String add(@PathVariable int a, @PathVariable int b) {
+        return a + " + " + b + " = " + (a + b);
+    }
 }</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Stop the app, then run <code>DemoApplication</code> again.</li>
+                <li>Visit each URL in the table below, substituting your own name.</li>
+              </ol>
+            </div>
 
             <div class="expected">
               <span class="lbl">Expected output</span>
-              <code>GET http://localhost:8080/hello</code> now returns:
-              <code>Hello from the GreetingService bean!</code><br>
-              The other two endpoints (<code>/welcome</code> and <code>/hello/{name}</code>) still work exactly as before.
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>Response</th><th>Why</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/hello/Purvam</code></td><td><code>Hello, Purvam!</code></td><td><code>@PathVariable</code> captured <code>Purvam</code> from the path</td></tr>
+                  <tr><td><code>/greet?name=Purvam</code></td><td><code>Greetings, Purvam!</code></td><td><code>@RequestParam</code> read the query string</td></tr>
+                  <tr><td><code>/greet</code></td><td><code>Greetings, Guest!</code></td><td>no parameter given, so <code>defaultValue</code> was used</td></tr>
+                  <tr><td><code>/add/7/5</code></td><td><code>7 + 5 = 12</code></td><td>two path variables, converted from text to <code>int</code> by Spring</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">All four URLs return the expected responses.</span>
+              </label>
             </div>
+
             <div class="observe">
-              <span class="lbl">Observation question — break it on purpose</span>
-              Remove the <code>@Service</code> annotation from <code>GreetingService</code> and re-run.
-              What happens? Write down the behavior you see. <em>(Expected: the app fails to start with an
-              "unsatisfied dependency" / "required a bean of type GreetingService that could not be found"
-              error — because without <code>@Service</code>, Spring no longer manages the bean to inject.)</em>
-              Put the annotation back when you're done.
+              <span class="lbl">Notice what Spring did for free in <code>/add/7/5</code></span>
+              A URL is <strong>always just text</strong> — <code>"7"</code> arrives as characters, not a number. You
+              declared the parameter as <code>int</code>, and Spring <strong>converted it for you</strong>. Now try
+              <code>/add/seven/5</code>: you get a <strong>400 Bad Request</strong>, because <code>"seven"</code>
+              can't become an <code>int</code>. Spring validated the input type without you writing a single check.
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">My controller uses the injected service, and I observed the startup failure when <code>@Service</code> was removed.</span>
-            </label>
-            <div class="concept">
-              <span class="lbl">The "aha" moment</span>
-              You never wrote <code>new GreetingService()</code>. Spring created the bean, stored it in its IoC
-              container, and handed it to your controller. That's dependency injection — and it's what makes
-              Spring apps so easy to test and change. Swap the service for a different implementation and the
-              controller doesn't change at all.
-            </div>
+
             <div class="tryit">
               <span class="lbl">Stretch goal</span>
-              Add a second method <code>getFarewell()</code> to <code>GreetingService</code> returning
-              <code>"Goodbye!"</code>, and a new controller endpoint <code>@GetMapping("/bye")</code> that calls it.
-              Expected: <code>/bye</code> returns <code>Goodbye!</code> using the same injected bean.
+              Add a method for <code>GET /shout/{word}</code> that returns the word in capitals with three
+              exclamation marks — so <code>/shout/spring</code> gives <code>SPRING!!!</code>. Hint:
+              <code>word.toUpperCase()</code>. Write it yourself rather than copying; it's the fastest way to check
+              you've understood the pattern.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 6b: BONUS LAB ===== -->
+      <!-- ===== LAB 5 ===== -->
       <section class="section">
-        <details class="exp bonus">
-          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Return JSON instead of plain text</summary>
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> Dependency Injection in Action</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              When a <code>@RestController</code> method returns an object (not a String), Spring Boot
-              automatically serializes it to <strong>JSON</strong> using Jackson — which came in with the web
-              starter. This is the first step toward building real APIs.
+              <span class="lbl">Concept — what we're actually demonstrating</span>
+              So far all our logic sat in the controller. That's fine for one line, but real business rules belong in
+              a <strong>service</strong>. So we need the controller to <em>use</em> a service object — and the
+              question is <strong>who creates that object</strong>. We will <em>not</em> write
+              <code>new GreetingService()</code>. Instead we'll mark the service with <code>@Service</code> so Spring
+              creates it, and let the controller <strong>ask for one in its constructor</strong>. Spring matches them
+              by type and hands it over. That handover is <strong>dependency injection</strong>.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>In <code>com.tcs.training.controller</code>, right-click → <strong>New → Class</strong> →
-                    name it <code>Greeting</code> → Finish. Replace its contents with file ① below.
-                    <br><span style="font-size:14px;color:var(--mac-text-muted);">(A Java <em>record</em> is a one-line data class — Java 16+. If your IDE complains, upgrade Java level to 17 or use a normal class with fields + getters.)</span></li>
-                <li>Open <code>HelloController.java</code> (your existing file from Lab 4), select all,
-                    and replace it with file ② — it adds <strong>one new method</strong> to the controller you already had.</li>
-                <li>Stop and re-run <code>SpringbootDemoApplication</code>. Open
-                    <code>http://localhost:8080/api/greeting</code>.</li>
+                <li>Right-click the package <code>com.tcs.training.demo</code> → <strong>New → Package</strong> →
+                    name it <code>com.tcs.training.demo.service</code>. It must land <strong>next to</strong>
+                    <code>controller</code> and <code>DemoApplication.java</code>.</li>
+                <li>In that new <code>service</code> package: <strong>New → Class</strong> named
+                    <code>GreetingService</code>. Paste file 1 below.</li>
+                <li>In the existing <code>controller</code> package: <strong>New → Class</strong> named
+                    <code>GreetController</code>. Paste file 2 below.</li>
+                <li>Stop the app, run it again.</li>
+                <li>Visit <code>http://localhost:8080/api/greet/Purvam</code>.</li>
               </ol>
             </div>
 
-            <h3 style="margin-top:6px;">① Greeting.java <span style="font-size:14px;color:var(--mac-text-muted);">— a tiny data record</span></h3>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/Greeting.java</span><span class="fb-tag">file ① — new file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/service/GreetingService.java</span><span class="fb-tag">file 1 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.service;
 
-public record Greeting(String message, String from) { }
-</code></pre></div>
+import org.springframework.stereotype.Service;
 
-            <h3>② HelloController.java <span style="font-size:14px;color:var(--mac-text-muted);">— REPLACE the existing file</span></h3>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/HelloController.java</span><span class="fb-tag">file ② — REPLACE</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+// @Service tells Spring: "create ONE of these at startup and keep it."
+// The object Spring creates and holds is what we call a BEAN.
+@Service
+public class GreetingService {
 
-import com.tcs.training.service.GreetingService;
-import org.springframework.beans.factory.annotation.Autowired;
+    public String greet(String name) {
+        return "Hello, " + name + "! (this text came from GreetingService)";
+    }
+
+    public String farewell(String name) {
+        return "Goodbye, " + name + ". See you next session!";
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/controller/GreetController.java</span><span class="fb-tag">file 2 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.controller;
+
+import com.tcs.training.demo.service.GreetingService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class HelloController {
+@RequestMapping("/api")     // every path in this class now starts with /api
+public class GreetController {
 
-    @Autowired
-    private GreetingService greetingService;
+    // 'final' means: set once in the constructor, never reassigned.
+    private final GreetingService greetingService;
 
-    @GetMapping("/hello")
-    public String sayHello() {
-        return greetingService.getGreeting();
+    // CONSTRUCTOR INJECTION.
+    // Spring sees this constructor needs a GreetingService, finds the bean
+    // it created from the @Service class, and passes it in automatically.
+    // Note: no @Autowired needed — there is only one constructor.
+    public GreetController(GreetingService greetingService) {
+        this.greetingService = greetingService;
     }
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "Welcome!";
+    // GET /api/greet/Purvam
+    @GetMapping("/greet/{name}")
+    public String greet(@PathVariable String name) {
+        return greetingService.greet(name);      // the controller delegates
     }
 
+    // GET /api/bye/Purvam
+    @GetMapping("/bye/{name}")
+    public String bye(@PathVariable String name) {
+        return greetingService.farewell(name);
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Stop the app, then run <code>DemoApplication</code> again.</li>
+                <li>Visit <code>http://localhost:8080/api/greet/Purvam</code></li>
+                <li>Then <code>http://localhost:8080/api/bye/Purvam</code></li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>Response</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/api/greet/Purvam</code></td><td><code>Hello, Purvam! (this text came from GreetingService)</code></td></tr>
+                  <tr><td><code>/api/bye/Purvam</code></td><td><code>Goodbye, Purvam. See you next session!</code></td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Both endpoints work, and the text visibly comes from the service class.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Notice <code>@RequestMapping("/api")</code> on the class</span>
+              Putting <code>@RequestMapping</code> at <strong>class level</strong> sets a prefix for every method
+              inside. So <code>@GetMapping("/greet/{name}")</code> actually serves
+              <code>/api/greet/{name}</code>. This is how real APIs group related endpoints under a common base
+              path — and you'll use it constantly from Session 2 onwards.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it — break it on purpose (do this one, it's the point of the lab)</span>
+              <ol style="margin:6px 0 0;">
+                <li>Open <code>GreetingService.java</code> and <strong>comment out the <code>@Service</code>
+                    line</strong>.</li>
+                <li>Restart the app. It now <strong>refuses to start</strong>, with a message like:
+                    <div class="codewrap"><pre><code>***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 0 of constructor in
+com.tcs.training.demo.controller.GreetController required a bean of type
+'com.tcs.training.demo.service.GreetingService' that could not be found.
+
+Action:
+
+Consider defining a bean of type
+'com.tcs.training.demo.service.GreetingService' in your configuration.</code></pre></div></li>
+                <li>Read it closely: the controller <em>asked</em> for a <code>GreetingService</code>, and because
+                    the annotation was gone Spring had never created one. <strong>Put <code>@Service</code> back</strong>
+                    and it starts again.</li>
+              </ol>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I removed <code>@Service</code>, saw the "required a bean … could not be found" failure, and restored it.</span>
+              </label>
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== BONUS 1 ===== -->
+      <div class="section-band">If you finish early</div>
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS 1</span><span class="chevron">▶</span> Return JSON Instead of Plain Text</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Real APIs return <strong>structured data</strong>, not sentences. In Spring Boot you don't build JSON
+              by hand: you return a <strong>Java object</strong>, and a library called <strong>Jackson</strong> —
+              already on your classpath courtesy of <code>spring-boot-starter-web</code> — converts it to JSON
+              automatically. One rule: the class needs <strong>getters</strong>, because that's how Jackson reads
+              the values out.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Create the package <code>com.tcs.training.demo.model</code> (again, right next to
+                    <code>controller</code> and <code>service</code>).</li>
+                <li>In it, create the class <code>Greeting</code> and paste file 1.</li>
+                <li>In the <code>controller</code> package, create <code>JsonController</code> and paste file 2.</li>
+                <li>Restart, then visit <code>http://localhost:8080/api/json/hello/Purvam</code>.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/model/Greeting.java</span><span class="fb-tag">file 1 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.model;
+
+import java.time.LocalDateTime;
+
+// A plain data-carrying class. Jackson turns it into JSON using the getters.
+public class Greeting {
+
+    private String message;
+    private String recipient;
+    private LocalDateTime timestamp;
+
+    // A no-argument constructor is required by Jackson when reading JSON in.
+    public Greeting() {
+    }
+
+    public Greeting(String message, String recipient) {
+        this.message = message;
+        this.recipient = recipient;
+        this.timestamp = LocalDateTime.now();
+    }
+
+    // ---- Getters: Jackson uses these to build the JSON ----
+    public String getMessage() {
+        return message;
+    }
+
+    public String getRecipient() {
+        return recipient;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    // ---- Setters: used when JSON is read back INTO an object ----
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setRecipient(String recipient) {
+        this.recipient = recipient;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/demo/controller/JsonController.java</span><span class="fb-tag">file 2 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.demo.controller;
+
+import com.tcs.training.demo.model.Greeting;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/json")
+public class JsonController {
+
+    // Returning an OBJECT -> Spring converts it to a JSON object
+    // GET /api/json/hello/Purvam
     @GetMapping("/hello/{name}")
-    public String helloName(@PathVariable String name) {
-        return "Hello, " + name + "!";
+    public Greeting helloJson(@PathVariable String name) {
+        return new Greeting("Hello from Spring Boot!", name);
     }
 
-    // NEW — returns an object; Spring Boot/Jackson turns it into JSON automatically
-    @GetMapping("/api/greeting")
-    public Greeting greetingJson() {
-        return new Greeting("Hello from Spring Boot!", "GreetingService");
+    // Returning a LIST -> Spring converts it to a JSON array
+    // GET /api/json/all
+    @GetMapping("/all")
+    public List&lt;Greeting&gt; allGreetings() {
+        return List.of(
+                new Greeting("Hello!", "Purvam"),
+                new Greeting("Namaste!", "Team"),
+                new Greeting("Welcome!", "Everyone")
+        );
     }
 }</code></pre></div>
 
             <div class="expected">
-              <span class="lbl">Expected output (JSON)</span>
+              <span class="lbl">Expected output — <code>GET /api/json/hello/Purvam</code></span>
               <div class="codewrap"><pre><code>{
   "message": "Hello from Spring Boot!",
-  "from": "GreetingService"
+  "recipient": "Purvam",
+  "timestamp": "2026-09-05T10:32:14.882"
 }</code></pre></div>
+              And <code>GET /api/json/all</code> returns a JSON <strong>array</strong> — square brackets containing
+              three objects.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Both JSON endpoints work and I can see the JSON in the browser.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">My <code>/api/greeting</code> endpoint returns JSON in the browser.</span>
-            </label>
+
+            <div class="observe">
+              <span class="lbl">Three things to notice</span>
+              <ol style="margin:6px 0 0;">
+                <li>The JSON <strong>field names came from the getter names</strong> —
+                    <code>getMessage()</code> became <code>"message"</code>. Rename the getter and the JSON key
+                    changes with it.</li>
+                <li>You never wrote <code>"{"</code> or a comma. Returning the object was enough.</li>
+                <li>Returning a <code>List</code> produced a JSON <em>array</em> automatically. This is exactly how
+                    you'll return "all students" in Session 2.</li>
+              </ol>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Prettier output in the browser</span>
+              Raw JSON is dense on one line. Install a "JSON Formatter" browser extension, or better, use
+              <strong>Swagger UI</strong> — which formats it automatically and is the tool we adopt properly in
+              Session 2.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 6c: TROUBLESHOOTING ===== -->
-      <div class="section-band">Reference material</div>
+      <!-- ===== BONUS 2 ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS 2</span><span class="chevron">▶</span> Add Actuator and Watch Auto-Configuration Work</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              This lab proves the theory. You'll add <strong>one dependency</strong>, write <strong>zero lines of
+              Java</strong>, and gain several working endpoints — because auto-configuration detected the new library
+              on the classpath and wired it up.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>pom.xml</code> and add the dependency below <strong>inside</strong> the existing
+                    <code>&lt;dependencies&gt;</code> block.</li>
+                <li>Save. IntelliJ downloads it automatically; if not, click the small Maven "reload" icon
+                    (Eclipse: right-click project → Maven → Update Project).</li>
+                <li>Add the two lines to <code>application.properties</code>.</li>
+                <li>Restart the app and visit the URLs listed below.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">add these lines</span></div>
+            <div class="codewrap"><pre><code># Expose extra Actuator endpoints (only health & info are public by default)
+management.endpoints.web.exposure.include=health,info,beans,mappings,env
+
+# Show full health detail instead of just "UP"
+management.endpoint.health.show-details=always</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>What you'll see</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/actuator/health</code></td><td><code>{"status":"UP", ...}</code> — the endpoint load balancers use to decide if your app should receive traffic</td></tr>
+                  <tr><td><code>/actuator/beans</code></td><td><strong>Every bean Spring is managing.</strong> Search this page for <code>greetingService</code> and <code>helloController</code> — proof they were found by component scanning</td></tr>
+                  <tr><td><code>/actuator/mappings</code></td><td>Every URL your app answers. Search for <code>/hello</code> — this is the definitive way to check whether an endpoint registered</td></tr>
+                  <tr><td><code>/actuator/env</code></td><td>Every configuration property in effect, and where each came from</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I can see <code>{"status":"UP"}</code> at <code>/actuator/health</code>.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I found my own <code>greetingService</code> bean listed in <code>/actuator/beans</code>.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Why this is the best debugging tool you learned today</span>
+              <code>/actuator/mappings</code> answers "is my endpoint actually registered?" and
+              <code>/actuator/beans</code> answers "did Spring actually find my class?" — the two questions behind
+              nearly every Whitelabel 404 and every "required a bean" failure. Next time you're stuck, look here
+              before guessing.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">One more experiment</span>
+              Add <code>debug=true</code> to <code>application.properties</code> and restart. Spring prints the full
+              <strong>conditions evaluation report</strong> from the theory deck — every auto-configuration it
+              considered, matched or rejected, with reasons. Scroll to the negative matches and find
+              <code>DataSourceAutoConfiguration</code>: it didn't match because we have no database yet. In
+              Session 3 you'll add one, and it'll move into the positive list.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TROUBLESHOOTING ===== -->
+      <div class="section-band">Reference</div>
       <section class="section">
         <details class="exp">
-          <summary><span class="chevron">▶</span> Troubleshooting Guide</summary>
+          <summary><span class="chevron">▶</span> 🔧 Troubleshooting Guide — every error you might hit today</summary>
           <div class="exp-body">
-            <p>The most common things that trip up freshers in Session 1, and how to fix each one.</p>
             <table class="issues">
-              <thead><tr><th>Problem</th><th>Likely cause</th><th>Fix</th></tr></thead>
+              <thead><tr><th>Symptom</th><th>Most likely cause</th><th>Fix</th></tr></thead>
               <tbody>
-                <tr><td>Endpoint returns 404 Not Found</td><td>Controller is outside the main class's package, or the path has a typo</td><td>Move the controller under <code>com.tcs.training.*</code>; check the exact path and case</td></tr>
-                <tr><td>App fails: "Port 8080 was already in use"</td><td>A previous run is still holding the port</td><td>Stop the old process or set <code>server.port</code> to a free port</td></tr>
-                <tr><td>"Field greetingService required a bean ... that could not be found"</td><td>Missing <code>@Service</code> on the service class</td><td>Add <code>@Service</code> so Spring manages the bean</td></tr>
-                <tr><td>Red squiggles on <code>@RestController</code> / imports</td><td>Dependencies not downloaded yet</td><td>Re-import / "Reload" the Maven project; check your internet</td></tr>
-                <tr><td>Changes don't show in the browser</td><td>App not restarted, or browser cached the page</td><td>Stop &amp; re-run the app; hard-refresh the browser (Ctrl/Cmd+Shift+R)</td></tr>
-                <tr><td>"Web server failed to start" with no clear reason</td><td>Another error earlier in the log</td><td>Scroll up to the first red exception — that's the real cause</td></tr>
+                <tr>
+                  <td><strong>Whitelabel Error Page, 404</strong>, on a URL you just created</td>
+                  <td><strong>You didn't restart the app</strong> (most common), or the class sits outside the base package, or <code>@RestController</code> is missing.</td>
+                  <td>Restart first. Then check the class's <code>package</code> line begins with <code>com.tcs.training.demo</code>. Then check the annotation. Then confirm the mapping path starts with <code>/</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>required a bean of type '…' that could not be found</code></td>
+                  <td>The class being injected has no stereotype annotation, or lives outside the scanned packages.</td>
+                  <td>Add <code>@Service</code> / <code>@Component</code> / <code>@Repository</code>, and verify its package is under <code>com.tcs.training.demo</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Port 8080 was already in use</code></td>
+                  <td>A previous run is still going, or another program owns the port.</td>
+                  <td>Stop the old run. Or set <code>server.port=8081</code>. To find the culprit: <code>lsof -i :8080</code> (Mac/Linux) or <code>netstat -ano | findstr :8080</code> (Windows).</td>
+                </tr>
+                <tr>
+                  <td><code>Ambiguous mapping. Cannot map … method</code></td>
+                  <td>Two methods claim the same HTTP verb <em>and</em> the same path.</td>
+                  <td>Make each verb+path combination unique. Remember a class-level <code>@RequestMapping</code> counts as part of the path.</td>
+                </tr>
+                <tr>
+                  <td><strong>405 Method Not Allowed</strong></td>
+                  <td>The path exists, but not for that verb — e.g. sending POST to a <code>@GetMapping</code>.</td>
+                  <td>Match the annotation to the verb you're sending. Note a browser address bar can only send GET.</td>
+                </tr>
+                <tr>
+                  <td><strong>400 Bad Request</strong> on <code>/add/seven/5</code></td>
+                  <td>Spring couldn't convert the text <code>"seven"</code> into an <code>int</code>.</td>
+                  <td>Working as intended — pass a number. (This is free input validation.)</td>
+                </tr>
+                <tr>
+                  <td><code>Cannot resolve symbol 'GreetingService'</code> in the IDE</td>
+                  <td>Missing import, or you're referring to a class in a different package.</td>
+                  <td>Add <code>import com.tcs.training.demo.service.GreetingService;</code> — or press <span class="kbd">Alt</span>+<span class="kbd">Enter</span> (IntelliJ) / <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">O</span> (Eclipse) to auto-import.</td>
+                </tr>
+                <tr>
+                  <td>Changes to a Java file seem to have no effect</td>
+                  <td>The app wasn't restarted. Spring scans classes only at startup.</td>
+                  <td>Always stop and re-run after editing. (Adding <code>spring-boot-devtools</code> gives automatic restarts.)</td>
+                </tr>
+                <tr>
+                  <td><code>invalid target release: 17</code> / <code>class file has wrong version</code></td>
+                  <td>Project's Java version is higher than your installed JDK.</td>
+                  <td>Check <code>java -version</code> and set the matching number in <code>pom.xml</code> → <code>&lt;java.version&gt;</code>.</td>
+                </tr>
+                <tr>
+                  <td>Red squiggles everywhere; nothing resolves</td>
+                  <td>Dependencies never downloaded.</td>
+                  <td>IntelliJ: Maven panel → Reload. Eclipse: right-click → Maven → Update Project (tick "Force Update"). Terminal: <code>./mvnw clean install</code>.</td>
+                </tr>
               </tbody>
             </table>
+            <div class="golden">
+              <span class="lbl">⚠️ The 30-second checklist for any "it doesn't work"</span>
+              <div class="rule">
+                1 · Did I <strong>restart</strong> the app? &nbsp;→&nbsp;
+                2 · Does the file's <code>package</code> line start with <code>com.tcs.training.demo</code>? &nbsp;→&nbsp;
+                3 · Is the <strong>annotation</strong> there? &nbsp;→&nbsp;
+                4 · Does the <strong>path</strong> start with <code>/</code> and match the URL exactly?
+              </div>
+              Those four questions resolve the overwhelming majority of Session 1 problems.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 6d: GLOSSARY ===== -->
+      <!-- ===== GLOSSARY ===== -->
       <section class="section">
         <details class="exp">
-          <summary><span class="chevron">▶</span> Glossary — terms you'll hear today</summary>
+          <summary><span class="chevron">▶</span> 📖 Glossary — every term you heard today</summary>
           <div class="exp-body">
             <table class="issues">
               <thead><tr><th>Term</th><th>Plain-English meaning</th></tr></thead>
               <tbody>
-                <tr><td><strong>Bean</strong></td><td>An object that Spring creates and manages for you</td></tr>
-                <tr><td><strong>IoC container</strong></td><td>The part of Spring that builds beans and wires them together</td></tr>
-                <tr><td><strong>Dependency Injection (DI)</strong></td><td>Giving an object the things it needs instead of it creating them</td></tr>
-                <tr><td><strong>Auto-configuration</strong></td><td>Spring Boot setting things up automatically based on the classpath</td></tr>
-                <tr><td><strong>Starter</strong></td><td>A bundle of related dependencies added with one line</td></tr>
-                <tr><td><strong>Embedded server</strong></td><td>A web server (Tomcat) packaged inside your app</td></tr>
-                <tr><td><strong>Endpoint</strong></td><td>A URL your app responds to (e.g. <code>/hello</code>)</td></tr>
-                <tr><td><strong>DispatcherServlet</strong></td><td>Spring's front controller that routes every request to the right method</td></tr>
-                <tr><td><strong>POM</strong></td><td>"Project Object Model" — the <code>pom.xml</code> that defines your Maven build</td></tr>
-                <tr><td><strong>Artifact</strong></td><td>The name/ID of your built project (here, <code>springboot-demo</code>)</td></tr>
+                <tr><td><strong>Framework</strong></td><td>Code that runs your code. It owns the main flow and calls your methods at the right moments (unlike a library, which you call).</td></tr>
+                <tr><td><strong>Bean</strong></td><td>An ordinary Java object that <em>Spring</em> created and holds on to — not one you made with <code>new</code>. One instance per app by default.</td></tr>
+                <tr><td><strong>IoC container</strong></td><td>The single big object Spring builds at startup that holds every bean and knows how they connect. Also called the <em>application context</em>.</td></tr>
+                <tr><td><strong>Inversion of Control</strong></td><td>The framework calls your code instead of your code calling the framework. Control of the flow is inverted.</td></tr>
+                <tr><td><strong>Dependency</strong></td><td>An object that another object needs to do its job. A controller depends on a service.</td></tr>
+                <tr><td><strong>Dependency Injection (DI)</strong></td><td>Objects don't create what they need — it's handed to them from outside (by Spring), usually through the constructor.</td></tr>
+                <tr><td><strong>Component scanning</strong></td><td>Spring's startup search for annotated classes, starting at the main class's package and going <em>downward</em>. The golden rule comes from this.</td></tr>
+                <tr><td><strong>Base package</strong></td><td>The package your main class sits in. Everything you write must live in it or below it.</td></tr>
+                <tr><td><strong>Auto-configuration</strong></td><td>Boot inspecting which libraries are present and creating sensible beans for them — always overridable by defining your own.</td></tr>
+                <tr><td><strong>Classpath</strong></td><td>The full list of code available at runtime: your classes plus every library JAR.</td></tr>
+                <tr><td><strong>Starter</strong></td><td>One dependency that pulls in a whole coherent set of libraries at versions verified to work together.</td></tr>
+                <tr><td><strong>Embedded server</strong></td><td>Tomcat living inside your application, so you run the app instead of deploying to a server.</td></tr>
+                <tr><td><strong>DispatcherServlet</strong></td><td>Spring's traffic cop. Receives every request and decides which of your methods should handle it.</td></tr>
+                <tr><td><strong>Endpoint</strong></td><td>One combination of HTTP verb + path that your app answers, e.g. <code>GET /hello</code>.</td></tr>
+                <tr><td><strong>REST</strong></td><td>A style of API design: URLs name resources (nouns), HTTP verbs say what to do to them, and the server keeps no session state.</td></tr>
+                <tr><td><strong>JSON</strong></td><td>The text format APIs use to exchange data. Spring converts your objects to and from it automatically.</td></tr>
+                <tr><td><strong>Jackson</strong></td><td>The library that does that JSON conversion. Included with <code>spring-boot-starter-web</code>.</td></tr>
+                <tr><td><strong>POM</strong></td><td>"Project Object Model" — the <code>pom.xml</code> file listing your dependencies and build settings.</td></tr>
+                <tr><td><strong>Whitelabel Error Page</strong></td><td>Spring Boot's plain default error page. On a URL you just wrote, it almost always means the endpoint isn't registered.</td></tr>
+                <tr><td><strong>Actuator</strong></td><td>A starter that adds ready-made health, metrics, beans and mappings endpoints for monitoring and debugging.</td></tr>
               </tbody>
             </table>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 6e: SELF-CHECK ===== -->
+      <!-- ===== SELF CHECK ===== -->
       <section class="section">
         <details class="exp">
-          <summary><span class="chevron">▶</span> Self-Check — can you answer these?</summary>
+          <summary><span class="chevron">▶</span> ✅ Self-Check — can you answer these?</summary>
           <div class="exp-body">
-            <p>If you can answer all of these, you're ready for Session 2. Discuss with a neighbour.</p>
+            <p>If you can answer all of these out loud, you're ready for Session 2. Try them with a neighbour — explaining it is the real test.</p>
             <ol class="steps">
-              <li>What three annotations does <code>@SpringBootApplication</code> combine?</li>
-              <li>Why don't you need to install Tomcat separately?</li>
-              <li>What does <code>@Autowired</code> ask Spring to do?</li>
-              <li>What happens if you remove <code>@Service</code> from a class that's being injected?</li>
-              <li>Which starter did we add, and what does it pull in?</li>
-              <li>Where must your controllers live for component scanning to find them?</li>
+              <li>What three annotations does <code>@SpringBootApplication</code> combine, and which one causes the golden rule?</li>
+              <li>Why don't you need to install Tomcat separately any more?</li>
+              <li>What is a <strong>bean</strong>, in one sentence?</li>
+              <li>Where must your controllers live for component scanning to find them — and what exactly goes wrong if they don't?</li>
+              <li>What happens if you remove <code>@Service</code> from a class that's being injected? What's the exact error?</li>
+              <li>What's the difference between <code>@PathVariable</code> and <code>@RequestParam</code>? Give a URL for each.</li>
+              <li>Why is constructor injection preferred over field injection?</li>
+              <li>You added <em>one</em> dependency in Bonus 2 and got working endpoints with no Java. Which Spring Boot feature made that possible?</li>
+              <li>You visit a URL you just wrote and get a Whitelabel 404. Name the four things you'd check, in order.</li>
             </ol>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">I can confidently answer all six self-check questions.</span>
+              <span class="ctext">I can confidently answer all nine self-check questions.</span>
             </label>
           </div>
         </details>
       </section>
 
-      <!-- ===== SECTION 7: QUICK REFERENCE CARD ===== -->
+      <!-- ===== QUICK REFERENCE ===== -->
       <section class="section">
         <div class="qref">
-          <h2>Quick Reference Card</h2>
+          <h2>Quick Reference Card — Session 1</h2>
           <div class="grid" style="margin-top:14px;">
             <div>
               <h3>Annotations used today</h3>
               <table>
                 <thead><tr><th>Annotation</th><th>What it does</th></tr></thead>
                 <tbody>
-                  <tr><td><code>@SpringBootApplication</code></td><td>Main class; bundles config, auto-config &amp; component scan</td></tr>
-                  <tr><td><code>@RestController</code></td><td>Handles web requests, returns response body directly</td></tr>
-                  <tr><td><code>@GetMapping</code></td><td>Maps an HTTP GET request to a method</td></tr>
-                  <tr><td><code>@PathVariable</code></td><td>Binds a URL path segment to a method parameter</td></tr>
-                  <tr><td><code>@Service</code></td><td>Marks a business-logic bean (a component)</td></tr>
-                  <tr><td><code>@Component</code></td><td>Generic Spring-managed bean</td></tr>
-                  <tr><td><code>@Repository</code></td><td>Marks a data-access bean</td></tr>
-                  <tr><td><code>@Autowired</code></td><td>Injects a managed bean where needed</td></tr>
+                  <tr><td><code>@SpringBootApplication</code></td><td>Main class. Config + auto-config + component scan</td></tr>
+                  <tr><td><code>@RestController</code></td><td>Handles web requests; returns data, not a view</td></tr>
+                  <tr><td><code>@RequestMapping("/api")</code></td><td>Class-level path prefix for every method inside</td></tr>
+                  <tr><td><code>@GetMapping("/x")</code></td><td>Maps HTTP GET <code>/x</code> to this method</td></tr>
+                  <tr><td><code>@PathVariable</code></td><td>Reads a value from inside the path</td></tr>
+                  <tr><td><code>@RequestParam</code></td><td>Reads a value from after the <code>?</code></td></tr>
+                  <tr><td><code>@Service</code></td><td>A business-logic bean</td></tr>
+                  <tr><td><code>@Component</code></td><td>A generic Spring-managed bean</td></tr>
+                  <tr><td><code>@Repository</code></td><td>A data-access bean</td></tr>
+                  <tr><td><code>@Autowired</code></td><td>Inject here (optional on a sole constructor)</td></tr>
                 </tbody>
               </table>
             </div>
             <div>
-              <h3>Common application.properties keys</h3>
+              <h3>Your project at a glance</h3>
+              <table>
+                <thead><tr><th>Item</th><th>Value</th></tr></thead>
+                <tbody>
+                  <tr><td>Group</td><td><code>com.tcs.training</code></td></tr>
+                  <tr><td>Artifact</td><td><code>demo</code></td></tr>
+                  <tr><td><strong>Base package</strong></td><td><code>com.tcs.training.demo</code></td></tr>
+                  <tr><td>Main class</td><td><code>DemoApplication</code></td></tr>
+                  <tr><td>Controllers</td><td><code>…demo.controller</code></td></tr>
+                  <tr><td>Services</td><td><code>…demo.service</code></td></tr>
+                  <tr><td>Models</td><td><code>…demo.model</code></td></tr>
+                  <tr><td>Default port</td><td><code>8080</code></td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Properties worth knowing</h3>
               <table>
                 <thead><tr><th>Key</th><th>Effect</th></tr></thead>
                 <tbody>
-                  <tr><td><code>server.port</code></td><td>Changes the HTTP port (default 8080)</td></tr>
-                  <tr><td><code>spring.application.name</code></td><td>Names the application in logs</td></tr>
-                  <tr><td><code>spring.jpa.show-sql</code></td><td>Logs generated SQL (Session 2)</td></tr>
-                  <tr><td><code>logging.level.root</code></td><td>Sets the global log level</td></tr>
-                </tbody>
-              </table>
-              <h3 style="margin-top:16px;">URL patterns</h3>
-              <table>
-                <thead><tr><th>Pattern</th><th>Example</th></tr></thead>
-                <tbody>
-                  <tr><td><code>/hello</code></td><td><code>http://localhost:8080/hello</code></td></tr>
-                  <tr><td><code>/welcome</code></td><td><code>http://localhost:8080/welcome</code></td></tr>
-                  <tr><td><code>/hello/{name}</code></td><td><code>http://localhost:8080/hello/Purvam</code></td></tr>
-                  <tr><td><code>/api/greeting</code></td><td><code>http://localhost:8080/api/greeting</code></td></tr>
+                  <tr><td><code>server.port</code></td><td>Change the HTTP port</td></tr>
+                  <tr><td><code>spring.application.name</code></td><td>Name shown in logs</td></tr>
+                  <tr><td><code>debug=true</code></td><td>Print the auto-config report</td></tr>
+                  <tr><td><code>logging.level.root</code></td><td>Global log level</td></tr>
                 </tbody>
               </table>
             </div>
           </div>
-          <h3 style="margin-top:18px;">Handy Maven commands</h3>
+          <h3 style="margin-top:18px;">Every URL you built today</h3>
+          <table>
+            <thead><tr><th>URL</th><th>Returns</th><th>Lab</th></tr></thead>
+            <tbody>
+              <tr><td><code>http://localhost:8080/hello</code></td><td><code>Hello from Spring Boot!</code></td><td>3</td></tr>
+              <tr><td><code>http://localhost:8080/welcome</code></td><td>Welcome text</td><td>3</td></tr>
+              <tr><td><code>http://localhost:8080/hello/Purvam</code></td><td><code>Hello, Purvam!</code></td><td>4</td></tr>
+              <tr><td><code>http://localhost:8080/greet?name=Purvam</code></td><td><code>Greetings, Purvam!</code></td><td>4</td></tr>
+              <tr><td><code>http://localhost:8080/add/7/5</code></td><td><code>7 + 5 = 12</code></td><td>4</td></tr>
+              <tr><td><code>http://localhost:8080/api/greet/Purvam</code></td><td>Text from the injected service</td><td>5</td></tr>
+              <tr><td><code>http://localhost:8080/api/json/hello/Purvam</code></td><td>A JSON object</td><td>Bonus 1</td></tr>
+              <tr><td><code>http://localhost:8080/actuator/health</code></td><td><code>{"status":"UP"}</code></td><td>Bonus 2</td></tr>
+            </tbody>
+          </table>
+          <h3 style="margin-top:18px;">Handy commands</h3>
           <table>
             <thead><tr><th>Command</th><th>What it does</th></tr></thead>
             <tbody>
-              <tr><td><code>mvn spring-boot:run</code></td><td>Build &amp; run the app</td></tr>
-              <tr><td><code>mvn clean package</code></td><td>Build a runnable JAR into <code>target/</code></td></tr>
-              <tr><td><code>java -jar target/springboot-demo-0.0.1-SNAPSHOT.jar</code></td><td>Run the packaged JAR</td></tr>
+              <tr><td><code>./mvnw spring-boot:run</code></td><td>Build &amp; run the app</td></tr>
+              <tr><td><code>./mvnw clean package</code></td><td>Build a runnable JAR into <code>target/</code></td></tr>
+              <tr><td><code>java -jar target/demo-0.0.1-SNAPSHOT.jar</code></td><td>Run the packaged JAR</td></tr>
+              <tr><td><code>./mvnw dependency:tree</code></td><td>List every library actually in use</td></tr>
             </tbody>
           </table>
         </div>
       </section>
 
-      <!-- ===== SECTION 8: WHAT'S NEXT ===== -->
+      <!-- ===== WHAT'S NEXT ===== -->
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">Coming up in Session 2</span>
-          You'll connect your app to a database. We'll add Spring Data JPA and an H2 in-memory database, map a
-          Java class to a table with <code>@Entity</code>, and build full CRUD (Create, Read, Update, Delete)
-          using a repository — with almost no boilerplate. Bring today's <code>springboot-demo</code> project;
-          we'll build on it.
+          You'll turn today's single endpoint into a <strong>complete REST API</strong>: all four CRUD operations
+          over a collection of students, JSON travelling in <em>both</em> directions with
+          <code>@RequestBody</code>, correct HTTP status codes via <code>ResponseEntity</code>, and proper testing
+          with <strong>Swagger UI</strong> — because a browser address bar can only send GET
+          requests. Bring this working project and your setup; everything you learned about packages, beans and
+          injection carries straight over.
         </div>
         <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
           Spring Boot — Session 1 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
@@ -1135,7 +1827,7 @@ public class HelloController {
     }
 
     /* ============================================================
-       Progress tracker (Req 8) + readiness (Req 11.4).
+       Progress tracker + prerequisite readiness badge.
        ============================================================ */
     var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
 
@@ -1154,7 +1846,7 @@ public class HelloController {
     }
 
     /* ============================================================
-       Copy buttons (Req 10).
+       Copy buttons on every code block.
        ============================================================ */
     function flash(btn, cls, label) {
       var original = btn.getAttribute('data-label') || 'Copy';

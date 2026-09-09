@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session3-lab.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -120,7 +121,7 @@
     }
     .slide-footer .who { font-weight: 600; color: var(--mac-text); }
 
-    /* Transition animation. Reduced-motion fallback below. */
+    /* Transition animation, with reduced-motion fallback below. */
     .slide.animating { animation: slideIn var(--slide-anim) ease both; }
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(28px); }
@@ -132,6 +133,7 @@
 
     .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
     .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; }
     .slide .eyebrow {
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -146,8 +148,16 @@
     .slide .muted { color: var(--mac-text-muted); }
     .slide strong { font-weight: 700; }
     .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
 
-    /* Callout / key-point box */
+    /* Callout / key-point boxes */
     .keybox {
       border-left: 4px solid var(--mac-accent);
       background: rgba(10,132,255,0.06);
@@ -180,6 +190,17 @@
     .slide .deep { font-size: 16.5px; line-height: 1.62; }
     .term { font-weight: 700; color: var(--mac-accent); }
 
+    /* Plain-English analogy box */
+    .analogy {
+      border-left: 4px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f5ebff);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #8e2fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+
     /* Cover slide */
     .cover {
       display: flex;
@@ -208,7 +229,6 @@
     /* Cards */
     .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
     .cards.c3 { grid-template-columns: repeat(3, 1fr); }
-    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
     .card {
       border: 1px solid var(--mac-border);
       border-radius: 12px;
@@ -253,9 +273,27 @@
     table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
     table.cmp td.good { background: rgba(40,200,64,0.10); }
     table.cmp td.bad { background: rgba(255,95,87,0.08); }
-    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
-    table.cmp td.hl { background: rgba(10,132,255,0.07); }
     table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    /* Highlighted row — draws the eye to the one field that matters */
+    table.cmp tr.keyrow td { background: rgba(255,159,10,0.16); font-weight: 600; }
+    table.cmp tr.keyrow td:first-child { font-weight: 700; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #f3f8ff;
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
 
     /* Generic flow diagram */
     .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
@@ -277,17 +315,39 @@
     .flow.vert { flex-direction: column; align-items: stretch; }
     .flow.vert .flow-arrow { text-align: center; }
 
-    /* Two-column diagram comparison */
-    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
-    .twocol .colbox {
-      border: 1px solid var(--mac-border);
-      border-radius: 12px;
-      padding: 16px 18px 20px;
-      background: #fafafc;
+    /* IoC container visual */
+    .ioc {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 22px;
+      background: #f6faff;
+      position: relative;
     }
-    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
-    .twocol .colbox.a h3 { color: #b8860b; }
-    .twocol .colbox.b h3 { color: #1a9e34; }
+    .ioc::before {
+      content: "Spring IoC Container";
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .ioc-beans { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .bean {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 13px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .bean .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .bean .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .ioc-inject { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
 
     /* Before / after split */
     .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
@@ -301,11 +361,41 @@
     .ba-col li { font-size: 14.5px; margin: 5px 0; }
     .ba-mid { font-size: 30px; color: var(--mac-accent); }
 
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 150px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #0a84ff; }
+    .stack-row.l2 { border-left-color: #5e5ce6; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
     /* Two-panel code comparison */
     .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
     .panel h3 { margin: 0 0 6px; font-size: 16px; }
     .panel.bad h3 { color: var(--tl-red); }
     .panel.good h3 { color: #1a9e34; }
+
+    /* Two-column diagram comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
 
     /* Annotation unpack */
     .anno-map { display: grid; gap: 10px; margin-top: 14px; }
@@ -319,7 +409,6 @@
       border-radius: 8px;
       text-align: center;
     }
-
     /* Annotation grid (preview + recap) */
     .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
     .anno-cell {
@@ -360,6 +449,7 @@
     .json-num { color: #fd9353; }
     .json-bool { color: #ff6188; }
     .json-punc { color: #f8f8f2; }
+    .code-comment { color: #6b7089; }
 
     /* Flash cards (recap) */
     .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
@@ -387,7 +477,34 @@
     .flash.revealed .a { display: block; }
     .flash.revealed .tap { display: none; }
 
-    /* Code-error mockup (generic Spring error response) */
+    /* Swagger UI mockup */
+    .swagger-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .swagger-mock .sm-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .swagger-mock .sm-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px; border-bottom: 1px solid var(--mac-border);
+    }
+    .swagger-mock .verb {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px; min-width: 64px; text-align: center;
+    }
+    .verb.get { background: #61affe; }
+    .verb.post { background: #49cc90; }
+    .verb.put { background: #fca130; }
+    .verb.del { background: #f93e3e; }
+    .swagger-mock .path { font-family: var(--mac-mono); font-size: 13px; }
+
+    /* Error-response mockup */
     .err-mock {
       border: 1px solid var(--mac-border);
       border-radius: 10px;
@@ -407,9 +524,11 @@
     }
     .em-badge.s5 { background: #f93e3e; }
     .em-badge.s4 { background: #fca130; }
+    .em-badge.s2 { background: #49cc90; }
 
     /* Step chips (numbered horizontal steps) */
     .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
     .step-chip {
       border: 1px solid var(--mac-border);
       border-radius: 12px;
@@ -425,6 +544,71 @@
     }
     .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
     .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Round-robin visual */
+    .rr { display: grid; grid-template-columns: 160px 1fr; gap: 14px; align-items: center; margin-top: 16px; }
+    .rr .req { font-family: var(--mac-mono); font-weight: 700; font-size: 15px; text-align: right; color: var(--mac-text); }
+    .rr .target { display: flex; gap: 10px; }
+    .rr-inst {
+      border: 2px solid var(--mac-border); border-radius: 10px;
+      padding: 8px 14px; font-family: var(--mac-mono); font-size: 14px; font-weight: 600;
+      background: #fafafc; min-width: 92px; text-align: center;
+    }
+    .rr-inst.hit { border-color: #28c840; background: #eefcf1; color: #1a9e34; box-shadow: 0 0 0 3px rgba(40,200,64,0.15); }
+
+    /* Circuit breaker states */
+    .cb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .cb-state { border-radius: 12px; padding: 16px 18px; border: 2px solid; }
+    .cb-state h3 { margin: 0 0 6px; font-size: 18px; font-family: var(--mac-mono); }
+    .cb-state p { font-size: 14.5px; margin: 0; }
+    .cb-state.closed { border-color: #28c840; background: #eefcf1; }
+    .cb-state.closed h3 { color: #1a9e34; }
+    .cb-state.open { border-color: var(--tl-red); background: #fff0ef; }
+    .cb-state.open h3 { color: var(--tl-red); }
+    .cb-state.half { border-color: #ff9f0a; background: #fff6ea; }
+    .cb-state.half h3 { color: #b8860b; }
+
+    /* Dashboard mockup (Eureka) */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin-top: 10px;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+    .port {
+      display: inline-block;
+      background: rgba(94,92,230,0.12);
+      color: #5e5ce6;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+    .tree .hl { color: #1a9e34; font-weight: 700; }
 
     /* Code blocks */
     .slide pre {
@@ -442,8 +626,9 @@
       line-height: 1.5;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
-    .code-comment { color: #6b7089; }
 
     .checklist { list-style: none; padding: 0; margin-top: 12px; }
     .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
@@ -533,10 +718,10 @@
         <!-- 1. COVER -->
         <section class="slide active">
           <div class="cover">
-            <span class="badge">Session 3 of the Spring Boot Series</span>
-            <h1>Spring Boot</h1>
-            <div class="sub">DTO, Layered Architecture &amp; Exception Handling — plus a first look at Spring Security and Microservices.</div>
-            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+            <span class="badge">Session 3 of 4 · Spring Boot Series</span>
+            <h1>Data &amp; Structure</h1>
+            <div class="sub">Real databases with JPA, clean layers with DTOs, and error handling that doesn't leak your internals.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
           </div>
         </section>
 
@@ -544,595 +729,1268 @@
         <section class="slide">
           <p class="eyebrow">What we'll cover today</p>
           <h2>Agenda</h2>
-          <p class="lead">Session 2 made our app <em>talk</em> with a CRUD REST API. Today we make it <em>professional</em>. We separate the layers, stop exposing our database objects to the outside world, and handle errors gracefully. Then we close with two "what's next" overviews — Spring Security and Microservices — that frame everything you've built so far in a bigger picture.</p>
+          <p class="lead">This is the session where the code starts to look <em>professional</em>. We fix the two things that were unsatisfying about Session 2: data that vanishes, and error handling made of <code>if</code> statements.</p>
           <ul class="agenda">
-            <li><span class="num">1</span> Layered architecture — Controller → Service → Repository</li>
-            <li><span class="num">2</span> DTO — why you never expose your Entity directly</li>
-            <li><span class="num">3</span> Exception handling — custom exceptions &amp; clean 404s</li>
-            <li><span class="num">4</span> Spring Security — a 5-minute demo (no lab)</li>
-            <li><span class="num">5</span> Microservices concepts — the bigger picture</li>
-            <li><span class="num">6</span> Recap + annotation cheatsheet</li>
+            <li><span class="num">1</span> The problem: our data disappears on every restart</li>
+            <li><span class="num">2</span> Databases, JDBC and what ORM actually solves</li>
+            <li><span class="num">3</span> JPA vs Hibernate vs Spring Data JPA — three names, three layers</li>
+            <li><span class="num">4</span> Entities: mapping a Java class to a table</li>
+            <li><span class="num">5</span> Repositories — CRUD with almost no code</li>
+            <li><span class="num">6</span> Proper layering, and why returning entities is a mistake</li>
+            <li><span class="num">7</span> DTOs: what to send instead, and how to convert</li>
+            <li><span class="num">8</span> Custom exceptions &amp; one global handler</li>
+            <li><span class="num">9</span> Validation, Spring Security, and a first look at microservices</li>
           </ul>
           <div class="note">
-            <span class="lbl">How to use these slides</span>
-            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic, so you can revise from these slides alone. By the end you'll be able to explain why we split an app into layers, build a clean layered Post API with a DTO and custom exceptions, and describe what Spring Security and microservices bring to the table.
+            <span class="lbl">Today's mindset shift</span>
+            Sessions 1 and 2 were about <em>making things work</em>. Today is about <strong>making things well-built</strong> — separating concerns, hiding internals, and failing gracefully. These are the habits that distinguish code that survives contact with a real team.
           </div>
         </section>
 
-        <!-- 3. SESSION 2 RECAP (flash cards) -->
+        <!-- 3. SESSION 2 RECAP -->
         <section class="slide">
-          <p class="eyebrow">Before we start something new</p>
+          <p class="eyebrow">Before we move on</p>
           <h2>Session 2 recap</h2>
-          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
-          <div class="flashwrap">
-            <div class="flash">
-              <div class="q">Q1 · What does <code>@RequestBody</code> do? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">It tells Spring to take the <strong>JSON in the request body</strong> and deserialize it into a Java object (via Jackson). You put it on a method parameter — e.g. <code>addPost(@RequestBody PostDTO dto)</code> — and Spring hands you a ready-built object filled with the client's data.</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q2 · What's the difference between <code>POST</code> and <code>PUT</code>? <span class="tap">click to reveal ▸</span></div>
-              <div class="a"><strong>POST</strong> = <em>create</em> a new resource (maps to "C" in CRUD). <strong>PUT</strong> = <em>update</em> an existing resource, usually identified by an id in the path (maps to "U"). POST goes to the collection (<code>/posts</code>); PUT targets one item (<code>/posts/{id}</code>).</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q3 · What does <code>@PathVariable</code> do? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">It binds a <strong>segment of the URL path</strong> to a method parameter. In <code>/posts/{id}</code> the <code>{id}</code> placeholder is bound to the method's <code>Long id</code> argument — so a request to <code>/posts/5</code> calls the method with <code>id = 5</code>.</div>
-            </div>
+          <div class="cards">
+            <div class="card"><div class="ic">🌐</div><h3>REST conventions</h3><p>Resources as nouns in URLs, HTTP verbs for actions, and statelessness so the server can be replicated.</p></div>
+            <div class="card"><div class="ic">🔁</div><h3>Full CRUD</h3><p><code>@GetMapping</code>, <code>@PostMapping</code>, <code>@PutMapping</code>, <code>@DeleteMapping</code> — plus <code>@RequestBody</code> for incoming JSON.</p></div>
+            <div class="card"><div class="ic">🔢</div><h3>Status codes matter</h3><p><code>201</code> on create, <code>204</code> on delete, <code>404</code> when missing. <code>4xx</code> is the caller's fault; <code>5xx</code> is yours.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>Jackson does the JSON</h3><p>Getters for going out, a no-arg constructor plus setters for coming in.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Today's project base package</span>
+            A fresh project: Group <code>com.tcs.training</code>, Artifact <code>posts</code>, giving the base package <span class="pill">com.tcs.training.posts</span>. Today you'll create <em>six</em> sub-packages under it — <code>entity</code>, <code>repository</code>, <code>dto</code>, <code>service</code>, <code>controller</code>, <code>exception</code> — so the golden rule matters more than ever.
           </div>
         </section>
 
-        <!-- 4. WHAT'S WRONG WITH RETURNING ENTITIES DIRECTLY -->
+        <!-- 4. THE PROBLEM -->
         <section class="slide">
-          <p class="eyebrow">The problem we're solving first</p>
-          <h2>What's wrong with returning Entities directly?</h2>
-          <p class="deep">In Session 2 our controller returned the same object that mapped to the database. That's convenient — but it leaks. When you return your <strong>Entity</strong> straight to the client, <em>every</em> field goes out, including ones the client should never see.</p>
+          <p class="eyebrow">Motivation</p>
+          <h2>The problem with Session 2</h2>
+          <p class="deep">Our Student API worked beautifully. Then someone restarted it, and every student ever created was <strong>gone</strong>. Here's why:</p>
+          <pre><code>@Service
+public class StudentService {
+    <span class="code-comment">// This list lives in RAM — inside the running process.</span>
+    private final List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+}</code></pre>
+          <p class="deep">RAM is <strong>volatile</strong>: when the process ends, the operating system reclaims that memory and the contents are simply gone. There is nothing to recover.</p>
+          <div class="warnbox">
+            <span class="lbl">Three separate problems, not one</span>
+            <ol style="margin:6px 0 0;">
+              <li><strong>No persistence.</strong> Restart, deploy, or crash → all data lost.</li>
+              <li><strong>No sharing.</strong> Run two copies of the app (as Session 4 does) and each has its <em>own</em> list. Create a student on copy A and copy B doesn't know about it.</li>
+              <li><strong>No capacity.</strong> A million students would exhaust your memory. A database keeps data on disk and loads only what's asked for.</li>
+            </ol>
+          </div>
+          <div class="keybox">
+            <span class="lbl">The fix</span>
+            Move the data <strong>out of the application</strong> and into a <span class="term">database</span> — a separate program built for storing data permanently, safely, and shared between many callers. Today we make that happen with remarkably little code.
+          </div>
+        </section>
+
+        <!-- 5. DATABASE REFRESHER -->
+        <section class="slide">
+          <p class="eyebrow">Groundwork · 1 of 4</p>
+          <h2>A quick database refresher</h2>
+          <p class="deep">A <strong>relational database</strong> stores data in <span class="term">tables</span> — a grid, much like a spreadsheet. The vocabulary maps neatly onto Java:</p>
+          <table class="cmp">
+            <thead><tr><th>Database term</th><th>What it is</th><th>Java equivalent</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Table</strong></td><td>A collection of records of one kind</td><td>A class, e.g. <code>Post</code></td></tr>
+              <tr><td><strong>Row</strong> (record)</td><td>One single item</td><td>One object</td></tr>
+              <tr><td><strong>Column</strong></td><td>One named field with a fixed type</td><td>A field</td></tr>
+              <tr><td><strong>Primary key</strong></td><td>The column that uniquely identifies each row</td><td>The <code>id</code> field</td></tr>
+              <tr><td><strong>SQL</strong></td><td>The language used to query and modify data</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <p class="deep" style="margin-top:16px;">A <code>posts</code> table might look like this:</p>
+          <div class="dash-mock">
+            <div class="dm-top">🗄️ TABLE: posts</div>
+            <table>
+              <thead><tr><th>id <span class="muted">(PK)</span></th><th>title</th><th>content</th><th>author</th></tr></thead>
+              <tbody>
+                <tr><td class="app">1</td><td>Learning Spring Boot</td><td>Today I built my first API…</td><td>Amit</td></tr>
+                <tr><td class="app">2</td><td>Understanding JPA</td><td>ORM makes database work…</td><td>Neha</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="deep" style="margin-top:16px;">And the four SQL statements matching our four CRUD operations:</p>
+          <pre><code>INSERT INTO posts (title, content, author) VALUES ('...', '...', 'Amit');  <span class="code-comment">-- Create</span>
+SELECT * FROM posts WHERE id = 1;                                        <span class="code-comment">-- Read</span>
+UPDATE posts SET title = '...' WHERE id = 1;                             <span class="code-comment">-- Update</span>
+DELETE FROM posts WHERE id = 1;                                          <span class="code-comment">-- Delete</span></code></pre>
+        </section>
+
+        <!-- 6. JDBC PAIN -->
+        <section class="slide">
+          <p class="eyebrow">Groundwork · 2 of 4</p>
+          <h2>Why we don't write JDBC by hand</h2>
+          <p class="deep"><span class="term">JDBC</span> is Java's built-in, low-level way to talk to a database. It works — and it is exhausting. Here is what fetching <em>one</em> post costs you:</p>
+          <pre><code>public Post findById(int id) {
+    String sql = "SELECT * FROM posts WHERE id = ?";
+
+    try (Connection conn = dataSource.getConnection();                <span class="code-comment">// 1. open a connection</span>
+         PreparedStatement ps = conn.prepareStatement(sql)) {         <span class="code-comment">// 2. prepare the SQL</span>
+
+        ps.setInt(1, id);                                            <span class="code-comment">// 3. bind the parameter</span>
+        try (ResultSet rs = ps.executeQuery()) {                      <span class="code-comment">// 4. execute</span>
+            if (rs.next()) {
+                Post post = new Post();                               <span class="code-comment">// 5. build the object</span>
+                post.setId(rs.getInt("id"));                          <span class="code-comment">//    field...</span>
+                post.setTitle(rs.getString("title"));                 <span class="code-comment">//    by field...</span>
+                post.setContent(rs.getString("content"));             <span class="code-comment">//    by hand</span>
+                post.setAuthor(rs.getString("author"));
+                return post;
+            }
+            return null;
+        }
+    } catch (SQLException e) {                                        <span class="code-comment">// 6. handle checked exceptions</span>
+        throw new RuntimeException(e);
+    }
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">Twenty lines for one read — and that's the easy case</span>
+            Now write the other three operations. Then add a fifth column and update <em>every</em> method. Then notice the SQL is a plain <code>String</code>, so a typo compiles fine and fails at runtime. Multiply by twenty tables. This is genuine, repetitive, error-prone work — and it's why ORM was invented.
+          </div>
+        </section>
+
+        <!-- 7. WHAT IS ORM -->
+        <section class="slide">
+          <p class="eyebrow">Groundwork · 3 of 4</p>
+          <h2>What is ORM?</h2>
+          <p class="deep"><span class="term">ORM</span> stands for <strong>Object-Relational Mapping</strong>. The name describes the gap it bridges: Java thinks in <em>objects</em>, databases think in <em>relations</em> (tables). ORM automates the translation.</p>
+          <div class="flow">
+            <div class="flow-box green">Java world <span class="sm">objects, fields, references</span></div>
+            <span class="flow-arrow">⇄</span>
+            <div class="flow-box alt">ORM <span class="sm">translates both ways</span></div>
+            <span class="flow-arrow">⇄</span>
+            <div class="flow-box">Database world <span class="sm">tables, columns, keys</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">You declare the mapping <strong>once</strong>, and the ORM generates the SQL and fills in your objects for you:</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Without ORM (JDBC)</h3>
+              <ul>
+                <li>Write every SQL statement by hand</li>
+                <li>Copy each column into each field, manually</li>
+                <li>Manage connections and resources yourself</li>
+                <li>Handle <code>SQLException</code> everywhere</li>
+                <li>SQL is a String → typos fail at runtime</li>
+                <li>~20 lines per operation</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>With ORM (JPA/Hibernate)</h3>
+              <ul>
+                <li>Annotate the class once with <code>@Entity</code></li>
+                <li>Mapping is automatic, by field name</li>
+                <li>Connections managed for you</li>
+                <li>Runtime exceptions, no boilerplate catches</li>
+                <li>Methods are type-checked by the compiler</li>
+                <li><code>repository.findById(1)</code> — one line</li>
+              </ul>
+            </div>
+          </div>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            ORM is a <strong>translator in a meeting between two people who don't share a language</strong>. You speak Java; the database speaks SQL. You could learn to say every sentence yourself — or you could state your intent once and let the translator handle the grammar, every time, without mistakes.
+          </div>
+        </section>
+
+        <!-- 8. JPA VS HIBERNATE VS SPRING DATA -->
+        <section class="slide">
+          <p class="eyebrow">Groundwork · 4 of 4</p>
+          <h2>JPA vs Hibernate vs Spring Data JPA</h2>
+          <p class="deep">Three names that get used interchangeably and confuse every beginner. They are <strong>three different layers stacked on each other</strong> — and once you see the stack, the confusion disappears.</p>
+          <div class="flow vert" style="max-width:680px;">
+            <div class="flow-box green">Spring Data JPA <span class="sm">Spring's convenience layer — gives you repositories with zero implementation</span></div>
+            <span class="flow-arrow">▼ uses</span>
+            <div class="flow-box alt">Hibernate <span class="sm">The implementation — actually generates and runs the SQL</span></div>
+            <span class="flow-arrow">▼ implements</span>
+            <div class="flow-box">JPA <span class="sm">The specification — just interfaces and annotations, no working code</span></div>
+            <span class="flow-arrow">▼ talks to</span>
+            <div class="flow-box warn">The database <span class="sm">H2, MySQL, PostgreSQL, Oracle…</span></div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Name</th><th>What it actually is</th><th>Analogy</th></tr></thead>
+            <tbody>
+              <tr><td><strong>JPA</strong></td><td>A <em>specification</em> — a standard set of interfaces and annotations (<code>@Entity</code>, <code>@Id</code>). Contains <strong>no working code</strong>.</td><td>The <strong>rules</strong> of the road</td></tr>
+              <tr><td><strong>Hibernate</strong></td><td>An <em>implementation</em> of JPA. Real code that generates SQL and runs it. The default in Spring Boot.</td><td>The <strong>car</strong> that obeys them</td></tr>
+              <tr><td><strong>Spring Data JPA</strong></td><td>A layer <em>on top</em> that removes even more code — you declare an interface and Spring writes the implementation.</td><td>The <strong>self-driving</strong> feature</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">What this means in practice</span>
+            You add <strong>one</strong> starter — <code>spring-boot-starter-data-jpa</code> — and all three arrive together. You write JPA <em>annotations</em>, Spring Data gives you the <em>repositories</em>, and Hibernate quietly does the work. Because you code against the JPA standard, swapping Hibernate for another implementation wouldn't change your code at all.
+          </div>
+        </section>
+
+        <!-- 9. H2 -->
+        <section class="slide">
+          <p class="eyebrow">Our database today</p>
+          <h2>H2 — a database with zero setup</h2>
+          <p class="deep">Installing MySQL or PostgreSQL in a two-hour session would eat the whole session. So we use <strong>H2</strong>: a complete SQL database written in Java that runs <em>inside</em> your application, storing everything in memory.</p>
+          <div class="cards">
+            <div class="card"><h3>✅ Nothing to install</h3><p>It's just a JAR. Add the dependency and it exists.</p></div>
+            <div class="card"><h3>✅ Real SQL</h3><p>Genuine tables, real SQL, actual constraints. Not a fake.</p></div>
+            <div class="card"><h3>✅ Web console built in</h3><p>Browse your tables and run queries at <code>/h2-console</code>.</p></div>
+            <div class="card"><h3>⚠️ In-memory by default</h3><p>Data is still lost on restart — but it's a genuine database while running, and switching to MySQL is a config change, not a code change.</p></div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">"So we haven't fixed persistence?"</span>
+            Fair challenge. With in-memory H2, data still resets on restart — but for a completely different and much better reason. Everything you write today (entities, repositories, SQL, transactions) is <strong>exactly</strong> what you'd write against MySQL in production. Moving there means changing four lines in <code>application.properties</code> and <strong>zero lines of Java</strong>. H2 also supports file-based storage (<code>jdbc:h2:file:./data/demo</code>) if you want the data to survive — try it as a stretch goal.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The configuration, in full</span>
+            <pre style="margin-top:8px;"><code>spring.datasource.url=jdbc:h2:mem:testdb      <span class="code-comment"># mem = in memory</span>
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+spring.h2.console.enabled=true                <span class="code-comment"># the web console</span>
+spring.jpa.hibernate.ddl-auto=update          <span class="code-comment"># create tables from entities</span>
+spring.jpa.show-sql=true                      <span class="code-comment"># print the generated SQL</span></code></pre>
+          </div>
+        </section>
+
+        <!-- 10. ENTITY -->
+        <section class="slide">
+          <p class="eyebrow">Entities · 1 of 3</p>
+          <h2><code>@Entity</code> — a class becomes a table</h2>
+          <p class="deep">An <span class="term">entity</span> is a Java class that <strong>represents a database table</strong>. Each object of that class is one row. You mark it with annotations and Hibernate builds the table for you.</p>
+          <pre><code>package com.tcs.training.posts.entity;
+
+import jakarta.persistence.*;
+
+@Entity                              <span class="code-comment">// "this class maps to a table"</span>
+@Table(name = "posts")               <span class="code-comment">// optional: name the table explicitly</span>
+public class Post {
+
+    @Id                              <span class="code-comment">// this field is the PRIMARY KEY</span>
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;                 <span class="code-comment">// the DB assigns the value</span>
+
+    @Column(nullable = false, length = 200)
+    private String title;            <span class="code-comment">// NOT NULL, VARCHAR(200)</span>
+
+    @Column(columnDefinition = "TEXT")
+    private String content;
+
+    private String author;           <span class="code-comment">// no annotation needed — sensible defaults apply</span>
+
+    <span class="code-comment">// A no-arg constructor is REQUIRED by JPA. Plus getters and setters.</span>
+    public Post() { }
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">⚠️ <code>jakarta</code>, not <code>javax</code></span>
+            In Spring Boot <strong>3.x</strong> the imports are <code>jakarta.persistence.*</code>. Older tutorials say <code>javax.persistence.*</code>, which was correct for Boot 2.x and will <strong>not compile</strong> today. If your IDE offers both, always pick <strong><code>jakarta</code></strong>. This is the single most common copy-paste error when following older material.
+          </div>
+        </section>
+
+        <!-- 11. ENTITY ANNOTATIONS -->
+        <section class="slide">
+          <p class="eyebrow">Entities · 2 of 3</p>
+          <h2>The entity annotations in detail</h2>
+          <table class="cmp">
+            <thead><tr><th>Annotation</th><th>What it does</th><th>Required?</th></tr></thead>
+            <tbody>
+              <tr><td><code>@Entity</code></td><td>Marks the class as mapping to a table. Without it, JPA ignores the class entirely.</td><td class="good">Yes</td></tr>
+              <tr><td><code>@Id</code></td><td>Marks the primary-key field. Every entity must have exactly one.</td><td class="good">Yes</td></tr>
+              <tr><td><code>@GeneratedValue</code></td><td>The database generates the value — you never set the id yourself.</td><td>Effectively yes</td></tr>
+              <tr><td><code>@Table(name="posts")</code></td><td>Sets the table name. Defaults to the class name if omitted.</td><td>Optional</td></tr>
+              <tr><td><code>@Column(...)</code></td><td>Controls the column's name, nullability and length.</td><td>Optional</td></tr>
+              <tr><td><code>@Transient</code></td><td>"Do <em>not</em> store this field" — a computed value, for instance.</td><td>Optional</td></tr>
+            </tbody>
+          </table>
+          <p class="deep" style="margin-top:16px;">The four <code>@GeneratedValue</code> strategies, since the choice matters:</p>
+          <table class="cmp">
+            <thead><tr><th>Strategy</th><th>How the id is produced</th><th>Use when</th></tr></thead>
+            <tbody>
+              <tr><td><code>IDENTITY</code></td><td>An auto-increment column in the database</td><td class="good">MySQL, H2, SQL Server — <strong>our choice today</strong></td></tr>
+              <tr><td><code>SEQUENCE</code></td><td>A database sequence object</td><td>PostgreSQL, Oracle — best performance for batches</td></tr>
+              <tr><td><code>AUTO</code></td><td>Let the provider decide</td><td>Convenient, but less predictable</td></tr>
+              <tr><td><code>TABLE</code></td><td>A separate table holding counters</td><td>Portable, but slow. Avoid.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why <code>Long</code> rather than <code>long</code> for the id?</span>
+            Because a <em>new</em> Post that hasn't been saved yet has <strong>no id</strong>, and only the object type <code>Long</code> can hold <code>null</code> to represent that. A primitive <code>long</code> would default to <code>0</code>, which JPA can't distinguish from a real id of zero. Always use the wrapper type for entity ids.
+          </div>
+        </section>
+
+        <!-- 12. DDL-AUTO -->
+        <section class="slide">
+          <p class="eyebrow">Entities · 3 of 3</p>
+          <h2>Who creates the table? <code>ddl-auto</code></h2>
+          <p class="deep">You never wrote a <code>CREATE TABLE</code> statement — yet the table exists. That's Hibernate reading your entity classes at startup and building the schema. The <code>spring.jpa.hibernate.ddl-auto</code> setting controls how aggressively:</p>
+          <table class="cmp">
+            <thead><tr><th>Value</th><th>What it does at startup</th><th>Use in</th></tr></thead>
+            <tbody>
+              <tr><td><code>none</code></td><td>Nothing. You manage the schema yourself.</td><td class="good"><strong>Production</strong></td></tr>
+              <tr><td><code>validate</code></td><td>Checks the schema matches your entities; fails fast if not.</td><td class="good"><strong>Production</strong></td></tr>
+              <tr><td><code>update</code></td><td>Adds missing tables and columns. Never deletes anything.</td><td>Development — <strong>our choice today</strong></td></tr>
+              <tr><td><code>create</code></td><td>Drops and recreates all tables on every start.</td><td>Testing</td></tr>
+              <tr><td><code>create-drop</code></td><td>Same, plus drops everything on shutdown.</td><td>Automated tests</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">⚠️ Never use <code>create</code> or <code>update</code> in production</span>
+            <code>create</code> would <strong>delete your entire production database</strong> on every deployment. This has genuinely happened to people. Even <code>update</code> is risky: it makes silent schema changes nobody reviewed. Real teams use <code>validate</code> plus a migration tool (<strong>Flyway</strong> or <strong>Liquibase</strong>) where every schema change is a reviewed, version-controlled file.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Watch it work</span>
+            Set <code>spring.jpa.show-sql=true</code> and Hibernate prints every statement it runs — including the <code>CREATE TABLE</code> it generates from your entity. Watching that appear in the console is the fastest way to believe that ORM is not magic.
+          </div>
+        </section>
+
+        <!-- 13. REPOSITORY -->
+        <section class="slide">
+          <p class="eyebrow">Repositories · 1 of 3</p>
+          <h2>Repositories — the best trick in Spring</h2>
+          <p class="deep">Remember those twenty lines of JDBC for a single read? Here is the entire data-access layer for our Post entity — <strong>full CRUD, and it is an interface with no methods in it</strong>:</p>
+          <pre><code>package com.tcs.training.posts.repository;
+
+import com.tcs.training.posts.entity.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+<span class="code-comment">//                                      &lt;entity type, primary key type&gt;</span>
+public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
+}</code></pre>
+          <p class="deep">That's the whole file. You write <strong>no implementation</strong>. At startup Spring Data notices the interface, generates a class implementing it, and registers that as a bean you can inject.</p>
+          <div class="steps3">
+            <div class="step-chip"><div class="stepnum">1</div><h3>You declare</h3><p>An interface extending <code>JpaRepository&lt;Post, Long&gt;</code>.</p></div>
+            <div class="step-chip"><div class="stepnum">2</div><h3>Spring generates</h3><p>A full implementation at runtime, using Hibernate underneath.</p></div>
+            <div class="step-chip"><div class="stepnum">3</div><h3>You inject &amp; use</h3><p><code>postRepository.findAll()</code> — and it just works.</p></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">You don't even need <code>@Repository</code></span>
+            Spring Data detects any interface extending <code>JpaRepository</code> automatically. Adding <code>@Repository</code> is harmless and some teams do it for clarity, but it is genuinely optional here.
+          </div>
+        </section>
+
+        <!-- 14. JPAREPOSITORY METHODS -->
+        <section class="slide">
+          <p class="eyebrow">Repositories · 2 of 3</p>
+          <h2>What you get for free</h2>
+          <p class="deep">By extending <code>JpaRepository</code>, these methods exist immediately — no code written:</p>
+          <table class="cmp">
+            <thead><tr><th>Method</th><th>What it does</th><th>Replaces the SQL</th></tr></thead>
+            <tbody>
+              <tr><td><code>save(entity)</code></td><td>Inserts if the id is null, updates if it isn't</td><td><code>INSERT</code> / <code>UPDATE</code></td></tr>
+              <tr><td><code>findAll()</code></td><td>Returns every row as a <code>List</code></td><td><code>SELECT *</code></td></tr>
+              <tr><td><code>findById(id)</code></td><td>Returns an <code>Optional&lt;Post&gt;</code></td><td><code>SELECT … WHERE id = ?</code></td></tr>
+              <tr><td><code>deleteById(id)</code></td><td>Deletes that row</td><td><code>DELETE … WHERE id = ?</code></td></tr>
+              <tr><td><code>existsById(id)</code></td><td><code>true</code> / <code>false</code></td><td><code>SELECT COUNT(*) …</code></td></tr>
+              <tr><td><code>count()</code></td><td>How many rows</td><td><code>SELECT COUNT(*)</code></td></tr>
+              <tr><td><code>saveAll(list)</code></td><td>Saves many at once</td><td>batched inserts</td></tr>
+              <tr><td><code>findAll(Pageable)</code></td><td>One page of results, sorted</td><td><code>LIMIT</code> / <code>OFFSET</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl"><code>save()</code> does double duty — and that's deliberate</span>
+            One method for both create and update. If <code>post.getId()</code> is <code>null</code>, Hibernate issues an <code>INSERT</code>; if it holds a value, an <code>UPDATE</code>. This is why our update logic will be "load the existing row, change its fields, save it" — the same <code>save()</code> call handles it.
+          </div>
+        </section>
+
+        <!-- 15. DERIVED QUERIES -->
+        <section class="slide">
+          <p class="eyebrow">Repositories · 3 of 3</p>
+          <h2>Custom queries from method names alone</h2>
+          <p class="deep">This is where Spring Data becomes genuinely surprising. Declare a method whose <strong>name describes the query</strong>, and Spring Data parses the name and writes the SQL:</p>
+          <pre><code>public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
+
+    <span class="code-comment">// SELECT * FROM posts WHERE author = ?</span>
+    List&lt;Post&gt; findByAuthor(String author);
+
+    <span class="code-comment">// SELECT * FROM posts WHERE title LIKE %?%</span>
+    List&lt;Post&gt; findByTitleContaining(String keyword);
+
+    <span class="code-comment">// SELECT * FROM posts WHERE author = ? ORDER BY title ASC</span>
+    List&lt;Post&gt; findByAuthorOrderByTitleAsc(String author);
+
+    <span class="code-comment">// SELECT COUNT(*) FROM posts WHERE author = ?</span>
+    long countByAuthor(String author);
+
+    <span class="code-comment">// SELECT * FROM posts WHERE title = ? AND author = ?</span>
+    List&lt;Post&gt; findByTitleAndAuthor(String title, String author);
+}</code></pre>
+          <p class="deep"><strong>Still no implementation.</strong> Spring Data reads the method name at startup, splits it into keywords, and generates the query.</p>
+          <table class="cmp">
+            <thead><tr><th>Keyword</th><th>Becomes</th></tr></thead>
+            <tbody>
+              <tr><td><code>findBy…</code> / <code>readBy…</code></td><td><code>SELECT … WHERE …</code></td></tr>
+              <tr><td><code>And</code> / <code>Or</code></td><td><code>AND</code> / <code>OR</code></td></tr>
+              <tr><td><code>Containing</code> / <code>Like</code></td><td><code>LIKE %value%</code></td></tr>
+              <tr><td><code>GreaterThan</code> / <code>LessThan</code> / <code>Between</code></td><td><code>&gt;</code> / <code>&lt;</code> / <code>BETWEEN</code></td></tr>
+              <tr><td><code>OrderBy…Asc</code> / <code>Desc</code></td><td><code>ORDER BY … ASC/DESC</code></td></tr>
+              <tr><td><code>IgnoreCase</code></td><td>case-insensitive comparison</td></tr>
+              <tr><td><code>Top3</code> / <code>First</code></td><td><code>LIMIT</code></td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The field names must match your entity exactly</span>
+            <code>findByAuthor</code> works because the entity has a field called <code>author</code>. Write <code>findByWriter</code> and the app <strong>fails at startup</strong> with "No property 'writer' found for type 'Post'". That's a good failure — it's caught immediately, not in production. For anything too complex to express in a name, use <code>@Query</code> with real JPQL.
+          </div>
+        </section>
+
+
+        <!-- 16. OPTIONAL -->
+        <section class="slide">
+          <p class="eyebrow">A Java detail that matters</p>
+          <h2><code>Optional</code> and <code>orElseThrow()</code></h2>
+          <p class="deep">Notice that <code>findById()</code> doesn't return a <code>Post</code> — it returns <strong><code>Optional&lt;Post&gt;</code></strong>. An <code>Optional</code> is a small box that either contains a value or is explicitly empty. Its purpose is to make "there might be nothing here" <em>impossible to ignore</em>.</p>
           <div class="panels">
             <div class="panel bad">
-              <h3>✗ Returning the Entity (User)</h3>
-              <pre><code>@GetMapping("/{id}")
-public User getUser(@PathVariable Long id) {
-    return userRepo.findById(id).get();
-}
+              <h3>❌ The old way — returning null</h3>
+              <pre><code>Post post = repo.findByIdOldStyle(5);
 
-<span class="code-comment">// The JSON that goes out:</span>
-{
-  <span class="json-key">"id"</span>: <span class="json-num">7</span>,
-  <span class="json-key">"name"</span>: <span class="json-str">"Ravi"</span>,
-  <span class="json-key">"email"</span>: <span class="json-str">"ravi@tcs.com"</span>,
-  <span class="json-key">"password"</span>: <span class="json-str">"$2a$10$x9..."</span>,  <span class="code-comment">// leaked!</span>
-  <span class="json-key">"isAdmin"</span>: <span class="json-bool">true</span>,          <span class="code-comment">// internal flag</span>
-  <span class="json-key">"failedLogins"</span>: <span class="json-num">3</span>       <span class="code-comment">// internal</span>
+<span class="code-comment">// Nothing forces you to check.
+// Forget, and you get a
+// NullPointerException later —
+// far from the real cause.</span>
+post.getTitle();</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>✅ With <code>Optional</code></h3>
+              <pre><code>Optional&lt;Post&gt; maybe = repo.findById(5L);
+
+<span class="code-comment">// You CANNOT call getTitle() directly.
+// The compiler forces you to deal
+// with the empty case first.</span>
+Post post = maybe.orElseThrow(
+    () -&gt; new PostNotFoundException(5L));</code></pre>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Method</th><th>Behaviour when empty</th></tr></thead>
+            <tbody>
+              <tr><td><code>orElseThrow(() -&gt; new X())</code></td><td>Throws your exception. <strong>The pattern we use today.</strong></td></tr>
+              <tr><td><code>orElse(defaultValue)</code></td><td>Returns the fallback you supply</td></tr>
+              <tr><td><code>isPresent()</code> / <code>isEmpty()</code></td><td>Returns <code>true</code>/<code>false</code> so you can branch</td></tr>
+              <tr><td><code>get()</code></td><td class="bad">Throws <code>NoSuchElementException</code> — <strong>avoid; it defeats the point</strong></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The one line to remember</span>
+            <pre style="margin-top:8px;"><code>Post post = postRepository.findById(id)
+        .orElseThrow(() -&gt; new PostNotFoundException(id));</code></pre>
+            Read it as: <em>"get the post with this id — and if there isn't one, throw my exception."</em> After this line, <code>post</code> is <strong>guaranteed</strong> to be non-null, so the rest of the method needs no defensive checks. This single line replaces every <code>if (x == null)</code> you wrote in Session 2.
+          </div>
+        </section>
+
+        <!-- 17. LAYERED ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">Structure · 1 of 6</p>
+          <h2>The full layered architecture</h2>
+          <p class="deep">In Session 1 we introduced layers as a diagram. Today you'll actually build all of them. Each layer talks <strong>only to its neighbour</strong> — never skipping.</p>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">Controller</span><span class="desc"><strong>Handles HTTP.</strong> Reads the request, calls the service, sets the status code. Knows nothing about the database.</span></div>
+            <div class="stack-row l2"><span class="layer">Service</span><span class="desc"><strong>Holds business logic.</strong> Rules, validation, DTO↔entity conversion, transactions. Knows nothing about HTTP.</span></div>
+            <div class="stack-row l3"><span class="layer">Repository</span><span class="desc"><strong>Talks to the database.</strong> Nothing but data access.</span></div>
+            <div class="stack-row l4"><span class="layer">Entity / DTO</span><span class="desc"><strong>Carries the data.</strong> The entity mirrors the table; the DTO is what crosses the API boundary.</span></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Today's project has one package per responsibility, all under the base package:</p>
+          <div class="tree">com.tcs.training.posts          <span class="c">← base package (main class here)</span>
+ ├── controller     <span class="c">PostController          — HTTP</span>
+ ├── service        <span class="c">PostService (interface)
+ │                  PostServiceImpl         — business logic</span>
+ ├── repository     <span class="c">PostRepository          — data access</span>
+ ├── entity         <span class="c">Post                    — the table</span>
+ ├── dto            <span class="c">PostDTO                 — the API shape</span>
+ └── exception      <span class="c">PostNotFoundException
+                    GlobalExceptionHandler  — error handling</span></div>
+          <div class="keybox">
+            <span class="lbl">Why the strict one-way flow?</span>
+            Because it makes change <strong>local</strong>. Swap H2 for MySQL → only the repository layer's configuration is affected. Add a rule like "titles must be unique" → only the service changes. Move from REST to a message queue → only the controller is replaced. A layer you can change without touching the others is a layer that doesn't cost you anything to maintain.
+          </div>
+        </section>
+
+        <!-- 18. WHY NOT RETURN ENTITIES -->
+        <section class="slide">
+          <p class="eyebrow">Structure · 2 of 6</p>
+          <h2>Why not just return the entity?</h2>
+          <p class="deep">It would be simpler. In Session 2 we returned <code>Student</code> objects directly and everything worked. So why add another class? Consider a realistic <code>User</code> entity:</p>
+          <pre><code>@Entity
+public class User {
+    @Id private Long id;
+    private String username;
+    private String email;
+    private String passwordHash;     <span class="code-comment">// 🚨 a password hash!</span>
+    private String panNumber;        <span class="code-comment">// 🚨 sensitive personal data</span>
+    private boolean isAdmin;         <span class="code-comment">// 🚨 internal privilege flag</span>
+    private LocalDateTime lastLogin;
+    private int failedLoginAttempts; <span class="code-comment">// 🚨 internal security detail</span>
+}</code></pre>
+          <p class="deep">Return that from a <code>@GetMapping</code> and Jackson serialises <strong>every field it can reach</strong>. Your public API has just published password hashes and PAN numbers to anyone who calls it.</p>
+          <table class="cmp">
+            <thead><tr><th>Problem</th><th>What goes wrong</th></tr></thead>
+            <tbody>
+              <tr><td class="bad"><strong>1 · Security leak</strong></td><td>Every field is exposed, including ones you'd never intend to publish. The most serious of the five.</td></tr>
+              <tr><td class="bad"><strong>2 · Tight coupling</strong></td><td>Your API's shape becomes your table's shape. Rename a column and every client breaks.</td></tr>
+              <tr><td class="bad"><strong>3 · Over-fetching</strong></td><td>A list page needs a title and an author; you send twenty fields per row.</td></tr>
+              <tr><td class="bad"><strong>4 · Wrong shape</strong></td><td>Clients often want combined or computed values (<code>fullName</code>, <code>commentCount</code>) that no single table holds.</td></tr>
+              <tr><td class="bad"><strong>5 · Lazy-loading errors</strong></td><td>Entities with relationships can throw <code>LazyInitializationException</code> during serialisation, or recurse infinitely.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The principle</span>
+            Your <strong>database schema is an internal implementation detail</strong>. Your <strong>API is a public contract</strong>. Tying them together means you can never change one without breaking the other. Keeping them separate is what a DTO is for.
+          </div>
+        </section>
+
+        <!-- 19. WHAT IS A DTO -->
+        <section class="slide">
+          <p class="eyebrow">Structure · 3 of 6</p>
+          <h2>What is a DTO?</h2>
+          <p class="deep">A <span class="term">DTO</span> — Data Transfer Object — is a simple class whose only job is to <strong>carry data across a boundary</strong>. It has fields, getters and setters, and no logic. It defines exactly the shape your API exposes: no more, no less.</p>
+          <div class="flow">
+            <div class="flow-box warn">Database <span class="sm">posts table</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">Entity <span class="sm">Post · all columns</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Service converts <span class="sm">picks what to expose</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">DTO <span class="sm">PostDTO · public shape</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">Client <span class="sm">receives JSON</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">Applied to that dangerous <code>User</code>:</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>❌ The entity — internal</h3>
+              <pre><code>class User {
+    Long id;
+    String username;
+    String email;
+    String passwordHash;      <span class="code-comment">🚨</span>
+    String panNumber;         <span class="code-comment">🚨</span>
+    boolean isAdmin;          <span class="code-comment">🚨</span>
+    int failedLoginAttempts;  <span class="code-comment">🚨</span>
 }</code></pre>
             </div>
             <div class="panel good">
-              <h3>✓ Returning a DTO (UserDTO)</h3>
-              <pre><code>@GetMapping("/{id}")
-public UserDTO getUser(@PathVariable Long id) {
-    return userService.getUser(id);
-}
+              <h3>✅ The DTO — public</h3>
+              <pre><code>class UserDTO {
+    Long id;
+    String username;
+    String email;
 
-<span class="code-comment">// The JSON that goes out:</span>
-{
-  <span class="json-key">"id"</span>: <span class="json-num">7</span>,
-  <span class="json-key">"name"</span>: <span class="json-str">"Ravi"</span>,
-  <span class="json-key">"email"</span>: <span class="json-str">"ravi@tcs.com"</span>,
-  <span class="json-key">"role"</span>: <span class="json-str">"USER"</span>
-}
-
-<span class="code-comment">// Only what the client needs.</span></code></pre>
-            </div>
-          </div>
-          <div class="warnbox">
-            <span class="lbl">The core problem</span>
-            Your database table and your API response are <strong>two different things</strong> with two different audiences. Letting one dictate the other couples them together: change a column and you accidentally change (or break) your public API. The fix is a dedicated object for transfer — a <span class="term">DTO</span>.
-          </div>
-        </section>
-
-        <!-- 5. WHAT IS A DTO -->
-        <section class="slide">
-          <p class="eyebrow">The solution</p>
-          <h2>What is a DTO?</h2>
-          <p class="deep">A <strong>DTO</strong> — <em>Data Transfer Object</em> — is a plain Java class whose only job is to carry data between layers, especially across the boundary between your application and the outside world. It has no JPA annotations and no business logic. It carries <em>only what the client needs to send or receive</em>. Three reasons make it worth the extra class:</p>
-          <div class="cards c3">
-            <div class="card">
-              <div class="ic">🔒</div>
-              <h3>Security</h3>
-              <p>Hide sensitive fields. Passwords, internal flags and audit columns live on the Entity but never appear on the DTO — so they can't leak through the API.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🎯</div>
-              <h3>Flexibility</h3>
-              <p>Shape the response to the client's needs. One screen wants a summary, another wants detail — different DTOs, same Entity. Not every response needs every field.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🔗</div>
-              <h3>Decoupling</h3>
-              <p>Your DB schema can change without breaking the API contract. Rename a column or split a table — map it in the service, and clients never notice.</p>
+    <span class="code-comment">// The sensitive fields simply
+    // don't exist here, so they
+    // cannot leak. Safe by
+    // construction.</span>
+}</code></pre>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">One-line definition to remember</span>
-            <strong>The Entity maps to the database. The DTO travels over the wire.</strong> They often have similar fields, but they exist for completely different reasons — and keeping them separate is what makes an API clean and safe to evolve.
+            <span class="lbl">The safety property that makes this worth the extra class</span>
+            The DTO is safe <strong>by construction</strong>, not by discipline. Someone adds a <code>creditCardNumber</code> field to the entity next year — it does <em>not</em> appear in the API, because the DTO doesn't mention it. Compare the alternative (<code>@JsonIgnore</code> on each sensitive field), which relies on every future developer remembering. Allow-lists beat block-lists.
           </div>
         </section>
 
-        <!-- 6. LAYERED ARCHITECTURE DIAGRAM -->
+        <!-- 20. ENTITY VS DTO -->
         <section class="slide">
-          <p class="eyebrow">The architectural anchor of this session</p>
-          <h2>Layered architecture</h2>
-          <p class="deep">A professional Spring Boot app is split into <strong>layers</strong>, each with one clear job. A request flows down through them and the response flows back up. This separation is what makes the code testable, maintainable, and easy for a team to work on in parallel.</p>
-          <div class="flow vert">
-            <div class="flow-box">Client <span class="sm">browser · Postman · mobile app — sends an HTTP request</span></div>
-            <span class="flow-arrow">▼ &nbsp; HTTP request (JSON)</span>
-            <div class="flow-box"><span class="pill">@RestController</span> Controller <span class="sm">receives the request, validates input, calls the Service with a DTO</span></div>
-            <span class="flow-arrow">▼ &nbsp; DTO</span>
-            <div class="flow-box alt"><span class="pill">@Service</span> Service <span class="sm">business logic lives here · maps DTO ↔ Entity · decides what happens</span></div>
-            <span class="flow-arrow">▼ &nbsp; Entity</span>
-            <div class="flow-box alt"><span class="pill">@Repository</span> Repository <span class="sm">talks to the database using the Entity · Spring Data writes the SQL</span></div>
-            <span class="flow-arrow">▼ &nbsp; SQL</span>
-            <div class="flow-box green">Database <span class="sm">stores and retrieves the actual data (H2 today)</span></div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">Single Responsibility, layer by layer</span>
-            The <strong>Controller</strong> only deals with HTTP. The <strong>Service</strong> only deals with business rules. The <strong>Repository</strong> only deals with the database. No layer reaches past its neighbour — and that discipline is exactly what keeps a growing codebase from turning into spaghetti.
-          </div>
-        </section>
-
-        <!-- 7. ENTITY vs DTO SIDE BY SIDE -->
-        <section class="slide">
-          <p class="eyebrow">Two classes, two purposes</p>
+          <p class="eyebrow">Structure · 4 of 6</p>
           <h2>Entity vs DTO — side by side</h2>
           <table class="cmp">
-            <thead>
-              <tr><th>Aspect</th><th>Entity (<code>Post</code>)</th><th class="hl">DTO (<code>PostDTO</code>)</th></tr>
-            </thead>
+            <thead><tr><th></th><th>Entity</th><th>DTO</th></tr></thead>
             <tbody>
-              <tr><td><strong>Where it lives</strong></td><td>Mapped to a database table</td><td class="hl">Travels between client and service</td></tr>
-              <tr><td><strong>Annotations</strong></td><td><code>@Entity</code>, <code>@Id</code>, <code>@GeneratedValue</code> (JPA)</td><td class="hl">None from JPA — a plain class with getters/setters</td></tr>
-              <tr><td><strong>Exposure</strong></td><td>Internal — never sent to clients</td><td class="hl">External-facing — this is what clients see</td></tr>
-              <tr><td><strong>Contains</strong></td><td>All columns, even sensitive/internal ones</td><td class="hl">Only the fields the client needs</td></tr>
+              <tr><td><strong>Represents</strong></td><td>A database table</td><td>The API's public shape</td></tr>
+              <tr><td><strong>Annotations</strong></td><td><code>@Entity</code>, <code>@Id</code>, <code>@Column</code></td><td>None (or validation annotations)</td></tr>
+              <tr><td><strong>Lives in package</strong></td><td><code>…posts.entity</code></td><td><code>…posts.dto</code></td></tr>
+              <tr><td><strong>Which layers see it</strong></td><td>Repository &amp; service only</td><td>Service &amp; controller only</td></tr>
+              <tr><td><strong>Contains all fields?</strong></td><td class="good">Yes — mirrors the table</td><td>No — only what's safe to expose</td></tr>
+              <tr><td><strong>Changes when…</strong></td><td>The database schema changes</td><td>The API contract changes</td></tr>
+              <tr><td><strong>Reaches the client?</strong></td><td class="bad">Never</td><td class="good">Always</td></tr>
             </tbody>
           </table>
-          <div class="panels" style="margin-top:18px;">
-            <div class="panel">
-              <h3 style="color:var(--mac-accent);">Post.java (Entity)</h3>
-              <pre><code>@Entity
-@Table(name = "posts")
-public class Post {
-    @Id
-    @GeneratedValue(strategy =
-        GenerationType.IDENTITY)
-    private Long id;
-    private String title;
-    private String description;
-    private String content;
-
-    <span class="code-comment">// + getters and setters</span>
-    <span class="code-comment">// (generate in your IDE)</span>
-}</code></pre>
-            </div>
-            <div class="panel">
-              <h3 style="color:var(--mac-accent);">PostDTO.java (DTO)</h3>
-              <pre><code>public class PostDTO {
-
-    private Long id;
-    private String title;
-    private String description;
-    private String content;
-
-    <span class="code-comment">// No JPA annotations.</span>
-    <span class="code-comment">// + getters and setters.</span>
-}</code></pre>
-            </div>
+          <div class="keybox">
+            <span class="lbl">The boundary rule — commit this to memory</span>
+            <strong>Entities never leave the service layer. DTOs never enter the repository layer.</strong> The service is the only place that knows about both, and its job is to convert between them. If you find yourself importing an entity class into a controller, something has gone wrong.
+          </div>
+          <div class="note">
+            <span class="lbl">Is this overkill for a small project?</span>
+            Honest answer: for a two-table hobby project, arguably yes — and plenty of small apps skip DTOs. But the habit costs little and the failure mode is severe (leaked credentials, or an API you can't evolve). Every professional codebase you join will use them, so learn the pattern here where the stakes are zero.
           </div>
         </section>
 
-        <!-- 8. DTO MAPPING — THE CONVERSION -->
+        <!-- 21. DTO MAPPING -->
         <section class="slide">
-          <p class="eyebrow">How DTO and Entity talk to each other</p>
-          <h2>DTO mapping — the conversion</h2>
-          <p class="deep">Because the Controller speaks DTO and the Repository speaks Entity, <strong>the Service sits in the middle and converts between them</strong>. We write two small helper methods for this — one each way.</p>
-          <pre><code><span class="code-comment">// Entity  ->  DTO  (on the way OUT to the client)</span>
-private PostDTO mapToDTO(Post post) {
+          <p class="eyebrow">Structure · 5 of 6</p>
+          <h2>Converting between entity and DTO</h2>
+          <p class="deep">Something has to copy the fields across, and that something is the <strong>service layer</strong> — the only layer that legitimately knows about both types. Two small private methods do all the work:</p>
+          <pre><code><span class="code-comment">// ---- Entity → DTO : going OUT to the client ----</span>
+private PostDTO toDTO(Post post) {
     PostDTO dto = new PostDTO();
     dto.setId(post.getId());
     dto.setTitle(post.getTitle());
-    dto.setDescription(post.getDescription());
     dto.setContent(post.getContent());
+    dto.setAuthor(post.getAuthor());
     return dto;
 }
 
-<span class="code-comment">// DTO  ->  Entity  (on the way IN from the client)</span>
-private Post mapToEntity(PostDTO dto) {
+<span class="code-comment">// ---- DTO → Entity : coming IN from the client ----</span>
+private Post toEntity(PostDTO dto) {
     Post post = new Post();
+    <span class="code-comment">// Note: we deliberately do NOT copy the id.
+    // The DATABASE assigns ids — never the client.</span>
     post.setTitle(dto.getTitle());
-    post.setDescription(dto.getDescription());
     post.setContent(dto.getContent());
+    post.setAuthor(dto.getAuthor());
     return post;
 }</code></pre>
-          <p class="deep" style="margin-top:6px;">The full round-trip, both directions:</p>
-          <div class="flow">
-            <div class="flow-box">Incoming JSON</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box"><span class="pill">@RequestBody</span> PostDTO</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">mapToEntity()</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">Post saved to DB</div>
-          </div>
-          <div class="flow">
-            <div class="flow-box green">Post from DB</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">mapToDTO()</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box">PostDTO returned</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box">JSON response</div>
-          </div>
-          <div class="note">
-            <span class="lbl">Doing this by hand vs automatically</span>
-            We map by hand today so the conversion is <em>visible</em> — you can see exactly which fields cross the boundary. In larger projects teams use libraries like <strong>MapStruct</strong> or <strong>ModelMapper</strong> to generate these mappers automatically, but the concept is identical.
-          </div>
-        </section>
-
-        <!-- 9. GETTERS, SETTERS & CONSTRUCTORS -->
-        <section class="slide">
-          <p class="eyebrow">The boilerplate every class needs</p>
-          <h2>Getters, Setters &amp; Constructors</h2>
-          <p class="deep">Both our Entity and our DTO are plain Java classes with <strong>private</strong> fields — and <em>private</em> means nothing outside the class can touch them directly. So for anything else to read or write a field, we give it a pair of small methods: a <strong>getter</strong> that returns the value and a <strong>setter</strong> that changes it. This is standard Java boilerplate — and two frameworks depend on it completely:</p>
-          <div class="cards">
-            <div class="card">
-              <div class="ic">🔄</div>
-              <h3>Jackson (JSON)</h3>
-              <p>Serialises objects to JSON and back <em>through these methods</em>. It calls <code>getTitle()</code> to build the <code>"title"</code> key, and <code>setTitle(...)</code> to fill the object from an incoming request.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🗃️</div>
-              <h3>JPA / Hibernate</h3>
-              <p>Needs a <strong>no-argument constructor</strong> plus getters and setters to load rows into your Entity and save them back. No accessors → no persistence.</p>
-            </div>
-          </div>
-          <div class="panels" style="margin-top:16px;">
-            <div class="panel bad">
-              <h3>✗ Fields only — Jackson can't read them</h3>
-              <pre><code>public class Post {
-    private Long id;
-    private String title;
-    <span class="code-comment">// no getters/setters →</span>
-    <span class="code-comment">// JSON comes back empty,</span>
-    <span class="code-comment">// incoming data never binds</span>
-}</code></pre>
-            </div>
-            <div class="panel good">
-              <h3>✓ With getters &amp; setters</h3>
-              <pre><code>public class Post {
-    private Long id;
-    private String title;
-
-    public Long getId() { return id; }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getTitle() {
-        return title;
-    }
-    public void setTitle(String title) {
-        this.title = title;
-    }
-}</code></pre>
-            </div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">Let your IDE write them — one click, no library</span>
-            You never type these by hand. <strong>IntelliJ:</strong> <code>Alt+Insert</code> → <em>Getter and Setter</em> → tick all fields. <strong>Eclipse:</strong> right-click → <em>Source → Generate Getters and Setters</em>. <strong>VS Code:</strong> right-click → <em>Source Action</em>. Four fields become eight methods in seconds — no extra dependency, works on any machine.
-          </div>
-        </section>
-
-        <!-- 10. WITHOUT CUSTOM EXCEPTION HANDLING -->
-        <section class="slide">
-          <p class="eyebrow">Why exception handling matters</p>
-          <h2>What happens without custom exception handling?</h2>
-          <p class="deep">In Session 2, asking for a missing id just returned <code>null</code> or a blank body. If your code throws instead, Spring's default is an ugly, leaky error. Here's what a client sees today when something goes wrong — and what we want them to see instead.</p>
-          <div class="panels">
-            <div class="panel bad">
-              <h3>✗ The default (unhelpful)</h3>
-              <div class="err-mock">
-                <div class="em-top">⚠️ Response <span class="em-badge s5">500</span></div>
-                <pre style="margin:0; border-radius:0; border:none;"><code>{
-  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-06-23T10:02..."</span>,
-  <span class="json-key">"status"</span>: <span class="json-num">500</span>,
-  <span class="json-key">"error"</span>: <span class="json-str">"Internal Server Error"</span>,
-  <span class="json-key">"trace"</span>: <span class="json-str">"java.util.NoSuch...
-    at PostService.get(Post...
-    at ...300 more lines..."</span>,
-  <span class="json-key">"path"</span>: <span class="json-str">"/api/posts/5"</span>
-}</code></pre>
-              </div>
-              <p style="font-size:14px; margin-top:8px;" class="muted">Wrong status (it's not the server's fault), and a stack trace leaks internals.</p>
-            </div>
-            <div class="panel good">
-              <h3>✓ The target (clean)</h3>
-              <div class="err-mock">
-                <div class="em-top">✅ Response <span class="em-badge s4">404</span></div>
-                <pre style="margin:0; border-radius:0; border:none;"><code>{
-  <span class="json-key">"timestamp"</span>: <span class="json-str">"2026-06-23T10:02..."</span>,
-  <span class="json-key">"status"</span>: <span class="json-num">404</span>,
-  <span class="json-key">"error"</span>: <span class="json-str">"Not Found"</span>,
-  <span class="json-key">"message"</span>:
-    <span class="json-str">"Post not found with id = 5"</span>,
-  <span class="json-key">"path"</span>: <span class="json-str">"/api/posts/5"</span>
-}</code></pre>
-              </div>
-              <p style="font-size:14px; margin-top:8px;" class="muted">Correct <strong>404</strong>, a clear human message, no internals leaked.</p>
-            </div>
-          </div>
-          <div class="keybox">
-            <span class="lbl">The goal</span>
-            When a record isn't found, the client should get a <strong>404 Not Found</strong> with a message like <em>"Post not found with id = 5"</em> — not a 500 with a wall of stack trace. We get there with a custom exception.
-          </div>
-        </section>
-
-        <!-- 11. CUSTOM EXCEPTION — HOW IT WORKS -->
-        <section class="slide">
-          <p class="eyebrow">Building the clean 404</p>
-          <h2>Custom exception — how it works</h2>
-          <p class="deep">Three small pieces turn an ugly 500 into a clean 404. Each is just a few lines:</p>
+          <p class="deep">Every service method then follows the same three-step shape:</p>
           <div class="steps3">
-            <div class="step-chip">
-              <div class="stepnum">1</div>
-              <h3>Extend RuntimeException</h3>
-              <p>Create a class that extends <code>RuntimeException</code> and takes a message in its constructor, passing it to <code>super(message)</code>.</p>
-            </div>
-            <div class="step-chip">
-              <div class="stepnum">2</div>
-              <h3>Annotate @ResponseStatus</h3>
-              <p>Put <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> on the class. Spring reads it and sets the HTTP response code to 404 automatically.</p>
-            </div>
-            <div class="step-chip">
-              <div class="stepnum">3</div>
-              <h3>Throw it</h3>
-              <p>In the service, throw it with <code>orElseThrow(...)</code> when a record is missing. Spring turns the exception into the response.</p>
-            </div>
-          </div>
-          <pre><code><span class="code-comment">// Step 1 + Step 2: the exception class</span>
-@ResponseStatus(HttpStatus.NOT_FOUND)   <span class="code-comment">// &lt;-- tells Spring: respond 404</span>
-public class ResourceNotFoundException extends RuntimeException {
-
-    public ResourceNotFoundException(String message) {
-        super(message);                 <span class="code-comment">// the message the client will see</span>
-    }
-}
-
-<span class="code-comment">// Step 3: throwing it from the service</span>
-Post post = postRepository.findById(id)
-        .orElseThrow(() -&gt; new ResourceNotFoundException(
-                "Post not found with id = " + id));</code></pre>
-        </section>
-
-        <!-- 12. OPTIONAL & orElseThrow -->
-        <section class="slide">
-          <p class="eyebrow">The clean way to handle "might not exist"</p>
-          <h2>Optional and orElseThrow()</h2>
-          <p class="deep">When you call <code>findById(id)</code>, Spring Data returns an <strong><code>Optional&lt;Post&gt;</code></strong> — a container that <em>may or may not</em> hold a value. It exists to force you to handle the "not found" case, preventing the dreaded <code>NullPointerException</code>.</p>
-          <div class="flow">
-            <div class="flow-box">findById(id)</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box alt">Optional&lt;Post&gt;</div>
-            <span class="flow-arrow">→</span>
-            <div class="flow-box green">present → return the Post</div>
-          </div>
-          <div class="flow" style="margin-top:8px;">
-            <div class="flow-box alt" style="visibility:hidden;">Optional&lt;Post&gt;</div>
-            <span class="flow-arrow" style="visibility:hidden;">→</span>
-            <div class="flow-box warn">empty → throw ResourceNotFoundException</div>
-          </div>
-          <pre><code>Post post = postRepository.findById(id)
-        .orElseThrow(() -&gt; new ResourceNotFoundException(
-                "Post not found with id = " + id));
-
-<span class="code-comment">// Reads almost like English:</span>
-<span class="code-comment">// "find by id, or else throw this exception."</span>
-<span class="code-comment">// If found -> 'post' holds it. If not -> exception is thrown.</span></code></pre>
-          <div class="warnbox">
-            <span class="lbl">Common mistake</span>
-            Don't call <code>.get()</code> directly on an Optional — if it's empty it throws a generic <code>NoSuchElementException</code> with no useful message. Always prefer <code>orElseThrow()</code> so you control the exception <em>and</em> the message the client receives.
-          </div>
-        </section>
-
-        <!-- 13. SPRING SECURITY -->
-        <section class="slide">
-          <p class="eyebrow">A first taste — demo only</p>
-          <h2>Spring Security — what it gives you</h2>
-          <p class="deep">Just by adding <strong>one dependency</strong> to the classpath, Spring Security locks down your entire application with sensible defaults — before you write a single line of security code. Here's what happens automatically:</p>
-          <div class="cards c3">
-            <div class="card">
-              <div class="ic">🚧</div>
-              <h3>Blocks everything</h3>
-              <p>Every endpoint now requires authentication. Hit any URL and you're stopped until you log in.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🔑</div>
-              <h3>Login page</h3>
-              <p>A default login form appears in the browser — no HTML written by you. Username defaults to <code>user</code>.</p>
-            </div>
-            <div class="card">
-              <div class="ic">🎲</div>
-              <h3>Generated password</h3>
-              <p>A random password is printed in the console on startup. You use it to log in the first time.</p>
-            </div>
-          </div>
-          <p class="deep" style="margin-top:14px;">You override the defaults with three lines in <code>application.properties</code>:</p>
-          <pre><code>spring.security.user.name=admin
-spring.security.user.password=admin123
-<span class="code-comment"># (the generated password is no longer used once these are set)</span></code></pre>
-          <div class="warnbox">
-            <span class="lbl">This slide is a demo walkthrough — no lab exercise</span>
-            We'll add the dependency and watch the login page appear live. That's it. <strong>Full security</strong> — JWT tokens, role-based access, custom config — is a dedicated later session. For now, just see how little it takes to switch protection on.
-          </div>
-        </section>
-
-        <!-- 14. MONOLITHIC ARCHITECTURE -->
-        <section class="slide">
-          <p class="eyebrow">Setting up the bigger picture</p>
-          <h2>Monolithic architecture — the problem</h2>
-          <p class="deep">Everything we've built so far is a <strong>monolith</strong>: one application, one deployable unit, all modules bundled together. That's perfectly fine to start with — but as a system grows, the monolith starts to hurt.</p>
-          <div class="flow vert" style="max-width:520px; margin:18px auto;">
-            <div class="flow-box warn" style="min-width:340px;">One Big Application
-              <span class="sm">User Management · Orders · Payments · Inventory — all deployed together as a single unit</span>
-            </div>
-            <span class="flow-arrow">▼ deployed to</span>
-            <div class="flow-box green">One Server / One Database</div>
-          </div>
-          <div class="cards c3">
-            <div class="card"><div class="ic">💥</div><h3>One failure = total outage</h3><p>If the Payments module crashes, it can take the <em>whole</em> application down with it. There's no isolation.</p></div>
-            <div class="card"><div class="ic">📈</div><h3>Scale everything or nothing</h3><p>Only Orders is under heavy load? Too bad — you must duplicate the entire app to scale that one part.</p></div>
-            <div class="card"><div class="ic">🐢</div><h3>Risky deployments</h3><p>A one-line change to Inventory means rebuilding and redeploying the <em>entire</em> application. Releases get slow and scary.</p></div>
-          </div>
-        </section>
-
-        <!-- 15. MICROSERVICES -->
-        <section class="slide">
-          <p class="eyebrow">The alternative</p>
-          <h2>Microservices architecture — the solution</h2>
-          <p class="deep">Microservices break that one big app into <strong>many small, independent services</strong>, each owning one business capability and its own database. They communicate over the network (usually REST). Compare directly with the monolith:</p>
-          <div class="flow">
-            <div class="flow-box alt">User Service <span class="sm">+ its own DB</span></div>
-            <div class="flow-box alt">Order Service <span class="sm">+ its own DB</span></div>
-            <div class="flow-box alt">Payment Service <span class="sm">+ its own DB</span></div>
-            <div class="flow-box alt">Inventory Service <span class="sm">+ its own DB</span></div>
-          </div>
-          <div class="cards c3">
-            <div class="card"><div class="ic">🚀</div><h3>Independent deployment</h3><p>Update the Payment service and deploy just that one — the rest keep running untouched.</p></div>
-            <div class="card"><div class="ic">📊</div><h3>Independent scaling</h3><p>Order traffic spikes? Run more copies of <em>only</em> the Order service. Pay for what you actually need.</p></div>
-            <div class="card"><div class="ic">🛡️</div><h3>Failure isolation</h3><p>If Payments goes down, Users and Inventory keep serving. One failure no longer means total outage.</p></div>
+            <div class="step-chip"><div class="stepnum">1</div><h3>Receive a DTO</h3><p>The controller hands you the public shape.</p></div>
+            <div class="step-chip"><div class="stepnum">2</div><h3>Convert &amp; work with the entity</h3><p>Save, load or modify through the repository.</p></div>
+            <div class="step-chip"><div class="stepnum">3</div><h3>Return a DTO</h3><p>Convert the result back before it leaves the service.</p></div>
           </div>
           <div class="note">
-            <span class="lbl">The trade-off (honest framing)</span>
-            Microservices aren't free — they add network calls, distributed data, and operational complexity. They shine for <strong>large systems and large teams</strong>. A small project is often better off as a well-structured monolith. Knowing <em>when</em> to use each is the real skill.
+            <span class="lbl">Yes, this is repetitive — and there are tools for that</span>
+            Hand-written mapping is honest and completely transparent, which is why we do it today: you can see exactly what's happening. Real projects often use <strong>MapStruct</strong> (generates the mapping code at compile time — fast and type-safe) or <strong>ModelMapper</strong> (reflection-based, less code but slower). Learn the manual version first; then the tools are obviously just shortcuts for it.
           </div>
         </section>
 
-        <!-- 16. SCALING -->
+        <!-- 22. SERVICE INTERFACE -->
         <section class="slide">
-          <p class="eyebrow">Two ways to handle more load</p>
+          <p class="eyebrow">Structure · 6 of 6</p>
+          <h2>Why a service <em>interface</em> plus an implementation?</h2>
+          <p class="deep">Today you'll write two files where Session 2 had one: <code>PostService</code> (an interface) and <code>PostServiceImpl</code> (the class that implements it). This is standard practice in Spring projects, and here's the reasoning:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The interface — the contract</h3>
+              <pre><code>public interface PostService {
+    List&lt;PostDTO&gt; getAllPosts();
+    PostDTO getPostById(Long id);
+    PostDTO createPost(PostDTO dto);
+    PostDTO updatePost(Long id, PostDTO dto);
+    void deletePost(Long id);
+}
+<span class="code-comment">// WHAT the service can do.
+// No hint of HOW.</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3>The implementation — the how</h3>
+              <pre><code>@Service
+public class PostServiceImpl
+        implements PostService {
+
+    private final PostRepository repo;
+    <span class="code-comment">// ... the actual logic, using JPA</span>
+}
+<span class="code-comment">// @Service goes on the IMPL,
+// because that's the real bean.</span></code></pre>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:14px;">The controller then depends on the <strong>interface</strong>, never the implementation:</p>
+          <pre><code>public PostController(PostService postService) {   <span class="code-comment">// the interface</span>
+    this.postService = postService;                <span class="code-comment">// Spring injects the Impl</span>
+}</code></pre>
+          <table class="cmp">
+            <thead><tr><th>Benefit</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Swap implementations</strong></td><td>Write <code>CachedPostServiceImpl</code> later; the controller doesn't change a line.</td></tr>
+              <tr><td><strong>Testable</strong></td><td>Pass a fake implementation into the controller in a test — no database needed.</td></tr>
+              <tr><td><strong>Readable contract</strong></td><td>The interface is a one-screen summary of everything the service does.</td></tr>
+              <tr><td><strong>Enables AOP</strong></td><td>Spring can wrap the bean in a proxy to add transactions, security or logging.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">A fair counter-argument</span>
+            Some experienced developers argue that an interface with exactly one implementation is unnecessary ceremony, and they have a point. But because it's near-universal in the Spring codebases you'll join — and because it's what makes the "depend on abstractions" idea from Session 1 concrete — we use it here.
+          </div>
+        </section>
+
+        <!-- 23. WITHOUT EXCEPTION HANDLING -->
+        <section class="slide">
+          <p class="eyebrow">Errors · 1 of 4</p>
+          <h2>What happens without custom error handling</h2>
+          <p class="deep">Suppose the service does the naive thing and lets a missing post blow up. A client requests <code>GET /api/posts/999</code>, and this is what they receive:</p>
+          <div class="err-mock">
+            <div class="em-top"><span class="em-badge s5">500</span> <span class="em-status">Internal Server Error</span></div>
+            <div style="padding:12px 14px; font-family:var(--mac-mono); font-size:13px; line-height:1.6;">
+              {<br>
+              &nbsp;&nbsp;"timestamp": "2026-09-05T10:32:14.882+00:00",<br>
+              &nbsp;&nbsp;"status": 500,<br>
+              &nbsp;&nbsp;"error": "Internal Server Error",<br>
+              &nbsp;&nbsp;"trace": "java.util.NoSuchElementException: No value present\n\tat
+              java.base/java.util.Optional.get(Optional.java:143)\n\tat
+              com.tcs.training.posts.service.PostServiceImpl.getPostById(PostServiceImpl.java:41)…",<br>
+              &nbsp;&nbsp;"path": "/api/posts/999"<br>
+              }
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>What's wrong</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td class="bad"><strong>Wrong status code</strong></td><td><code>500</code> says <em>"my server is broken."</em> It isn't — the caller asked for something that doesn't exist. That's a <code>404</code>.</td></tr>
+              <tr><td class="bad"><strong>Useless message</strong></td><td>"No value present" tells the client nothing actionable. Which value? Which post?</td></tr>
+              <tr><td class="bad"><strong>Leaks internals</strong></td><td>The stack trace publishes your package names, class names, line numbers and framework versions — a genuine gift to an attacker.</td></tr>
+              <tr><td class="bad"><strong>Unusable by clients</strong></td><td>A mobile app can't show "No value present" to a user, and can't reliably branch on it.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">What we want instead</span>
+            <pre style="margin-top:8px;"><code>HTTP 404 Not Found
+
+{
+  "timestamp": "2026-09-05T10:32:14",
+  "status": 404,
+  "error": "Not Found",
+  "message": "Post not found with id: 999",
+  "path": "/api/posts/999"
+}</code></pre>
+            Correct status code, a message a human can read, and <strong>nothing</strong> about your internals. Two small classes get us there.
+          </div>
+        </section>
+
+        <!-- 24. CUSTOM EXCEPTION -->
+        <section class="slide">
+          <p class="eyebrow">Errors · 2 of 4</p>
+          <h2>Step 1 — a custom exception</h2>
+          <p class="deep">First, an exception that means one specific thing. It's a tiny class:</p>
+          <pre><code>package com.tcs.training.posts.exception;
+
+<span class="code-comment">// extends RuntimeException (unchecked), so we don't have to
+// declare "throws" on every method in the call chain.</span>
+public class PostNotFoundException extends RuntimeException {
+
+    public PostNotFoundException(Long id) {
+        super("Post not found with id: " + id);   <span class="code-comment">// the message clients will see</span>
+    }
+}</code></pre>
+          <p class="deep">Now the service can be blunt about failure, and it reads like a sentence:</p>
+          <pre><code>@Override
+public PostDTO getPostById(Long id) {
+    Post post = postRepository.findById(id)
+            .orElseThrow(() -&gt; new PostNotFoundException(id));
+    return toDTO(post);
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Look at what disappeared</span>
+            No <code>if</code>. No <code>null</code> check. No <code>ResponseEntity.notFound()</code> in the controller. The method states the happy path, and the failure case is one clause. Compare Session 2, where <em>every</em> controller method carried an <code>if (x == null)</code> branch.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Why <code>RuntimeException</code> rather than <code>Exception</code>?</span>
+            A <strong>checked</strong> exception (extending <code>Exception</code>) must be declared with <code>throws</code> on every method that might propagate it, and caught or re-declared all the way up. That noise would spread through your whole codebase. An <strong>unchecked</strong> exception (extending <code>RuntimeException</code>) travels up silently until something handles it — which is exactly what we want, because the handler is a single global class.
+          </div>
+        </section>
+
+        <!-- 25. GLOBAL HANDLER -->
+        <section class="slide">
+          <p class="eyebrow">Errors · 3 of 4</p>
+          <h2>Step 2 — one global handler</h2>
+          <p class="deep">Throwing the exception isn't enough by itself — something must turn it into a proper HTTP response. That's <code>@RestControllerAdvice</code>: one class that catches exceptions from <strong>every controller in the application</strong>.</p>
+          <pre><code>package com.tcs.training.posts.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+@RestControllerAdvice     <span class="code-comment">// "watch EVERY controller"</span>
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PostNotFoundException.class)      <span class="code-comment">// catch this type…</span>
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleNotFound(
+            PostNotFoundException ex) {
+
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 404);
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());          <span class="code-comment">// our friendly text</span>
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.NOT_FOUND);   <span class="code-comment">// → 404</span>
+    }
+
+    @ExceptionHandler(Exception.class)                 <span class="code-comment">// safety net for anything else</span>
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleEverythingElse(Exception ex) {
+        Map&lt;String, Object&gt; body = new HashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 500);
+        body.put("message", "An unexpected error occurred");   <span class="code-comment">// no stack trace leaked</span>
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">The flow, end to end</span>
+            Controller calls service → service throws <code>PostNotFoundException</code> → it travels up past the controller → Spring finds the matching <code>@ExceptionHandler</code> → that method builds a <code>404</code> with a clean message → the client receives it. <strong>The controller contains no error-handling code at all.</strong>
+          </div>
+        </section>
+
+        <!-- 26. HANDLER OPTIONS -->
+        <section class="slide">
+          <p class="eyebrow">Errors · 4 of 4</p>
+          <h2>Three ways to map exceptions to statuses</h2>
+          <p class="deep">You'll see all three in real code. Know when each is appropriate:</p>
+          <table class="cmp">
+            <thead><tr><th>Approach</th><th>How</th><th>Scope</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>1 · <code>@ResponseStatus</code> on the exception</strong></td>
+                <td><code>@ResponseStatus(HttpStatus.NOT_FOUND)</code> above the exception class</td>
+                <td>Wherever it's thrown</td>
+                <td>Simplest. But you can't customise the response body.</td>
+              </tr>
+              <tr>
+                <td><strong>2 · <code>@ExceptionHandler</code> in a controller</strong></td>
+                <td>A handler method inside the controller itself</td>
+                <td class="bad">That one controller only</td>
+                <td>Leads to duplication across controllers.</td>
+              </tr>
+              <tr>
+                <td><strong>3 · <code>@RestControllerAdvice</code></strong></td>
+                <td>A separate class holding all handlers</td>
+                <td class="good"><strong>Every controller</strong></td>
+                <td class="good"><strong>✅ Recommended.</strong> One place, full control of the body. What we use.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="deep" style="margin-top:16px;">A realistic handler class maps several exception types:</p>
+          <table class="cmp">
+            <thead><tr><th>Exception</th><th>Maps to</th><th>Meaning</th></tr></thead>
+            <tbody>
+              <tr><td><code>PostNotFoundException</code></td><td><code>404</code></td><td>No such resource</td></tr>
+              <tr><td><code>MethodArgumentNotValidException</code></td><td><code>400</code></td><td><code>@Valid</code> checks failed</td></tr>
+              <tr><td><code>DuplicateResourceException</code></td><td><code>409</code></td><td>Clashes with existing data</td></tr>
+              <tr><td><code>AccessDeniedException</code></td><td><code>403</code></td><td>Authenticated, but not permitted</td></tr>
+              <tr><td><code>Exception</code> <span class="muted">(catch-all)</span></td><td><code>500</code></td><td>Something unexpected — log it fully, expose nothing</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">Log the detail, return the summary</span>
+            In the catch-all handler, <strong>log the full stack trace on the server</strong> (so you can debug it) but return only a generic message to the client. Detailed errors are for your logs; opaque errors are for the outside world.
+          </div>
+        </section>
+
+        <!-- 27. VALIDATION -->
+        <section class="slide">
+          <p class="eyebrow">Guarding the input</p>
+          <h2>Bean Validation — rejecting bad data early</h2>
+          <p class="deep">Right now a client can POST a post with an empty title and we'd store it happily. Rather than writing <code>if</code> checks, declare the rules as annotations on the DTO and let Spring enforce them.</p>
+          <pre><code>public class PostDTO {
+
+    private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(min = 3, max = 200, message = "Title must be 3–200 characters")
+    private String title;
+
+    @NotBlank(message = "Content is required")
+    private String content;
+
+    @NotBlank(message = "Author is required")
+    private String author;
+}</code></pre>
+          <p class="deep">Then add <strong><code>@Valid</code></strong> in the controller, and Spring checks the rules before your method even runs:</p>
+          <pre><code>@PostMapping
+public ResponseEntity&lt;PostDTO&gt; create(@Valid @RequestBody PostDTO dto) {
+    <span class="code-comment">// If validation fails, this method is NEVER entered.
+    // Spring throws MethodArgumentNotValidException instead.</span>
+    return ResponseEntity.status(HttpStatus.CREATED).body(postService.createPost(dto));
+}</code></pre>
+          <table class="cmp">
+            <thead><tr><th>Annotation</th><th>Rule</th></tr></thead>
+            <tbody>
+              <tr><td><code>@NotNull</code></td><td>Must not be null (but <code>""</code> is allowed)</td></tr>
+              <tr><td><code>@NotBlank</code></td><td>Must not be null, empty, or only whitespace <span class="muted">— usually what you want for text</span></td></tr>
+              <tr><td><code>@Size(min=, max=)</code></td><td>Length of a String or size of a collection</td></tr>
+              <tr><td><code>@Email</code></td><td>Must look like an email address</td></tr>
+              <tr><td><code>@Min</code> / <code>@Max</code></td><td>Numeric bounds</td></tr>
+              <tr><td><code>@Pattern(regexp=)</code></td><td>Must match a regular expression</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Two things to remember</span>
+            <strong>One:</strong> you need the <code>spring-boot-starter-validation</code> dependency, and the imports are <code>jakarta.validation.constraints.*</code>. <strong>Two:</strong> <code>@Valid</code> in the controller is what triggers the check — the annotations on the DTO do nothing on their own. Add a handler for <code>MethodArgumentNotValidException</code> in your global advice and you get clean <code>400</code> responses listing exactly which fields failed.
+          </div>
+        </section>
+
+        <!-- 28. TRANSACTIONAL -->
+        <section class="slide">
+          <p class="eyebrow">Data integrity</p>
+          <h2><code>@Transactional</code> — all or nothing</h2>
+          <p class="deep">A <span class="term">transaction</span> is a group of database operations that must <strong>all succeed or all be undone</strong>. The classic example is a bank transfer:</p>
+          <pre><code>@Transactional
+public void transfer(Long fromId, Long toId, BigDecimal amount) {
+    Account from = accountRepo.findById(fromId).orElseThrow();
+    Account to   = accountRepo.findById(toId).orElseThrow();
+
+    from.setBalance(from.getBalance().subtract(amount));   <span class="code-comment">// step 1</span>
+    to.setBalance(to.getBalance().add(amount));            <span class="code-comment">// step 2</span>
+
+    accountRepo.save(from);
+    accountRepo.save(to);
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">What happens if the app crashes between step 1 and step 2?</span>
+            <strong>Without</strong> <code>@Transactional</code>: the money has left the first account and never arrived in the second. It has simply vanished. <strong>With</strong> <code>@Transactional</code>: Spring rolls the whole thing back, and both balances return to how they were. Nobody loses money.
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Usage</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td><code>@Transactional</code></td><td>Commit at the end; roll back automatically if a <code>RuntimeException</code> escapes.</td></tr>
+              <tr><td><code>@Transactional(readOnly = true)</code></td><td>A hint for read-only methods. Lets the database and Hibernate optimise.</td></tr>
+              <tr><td>On the class</td><td>Applies to every method in it.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Where to put it, and one gotcha</span>
+            Put it on <strong>service methods</strong>, not on controllers or repositories — the service is where a complete business operation lives. Spring Data already wraps each individual repository call in its own transaction, so single-call methods are fine without it. <strong>The gotcha:</strong> it works via a proxy, so calling one <code>@Transactional</code> method <em>from another method in the same class</em> bypasses it entirely. That surprises everyone once.
+          </div>
+        </section>
+
+        <!-- 29. SPRING SECURITY -->
+        <section class="slide">
+          <p class="eyebrow">A look ahead</p>
+          <h2>Spring Security — a first look</h2>
+          <p class="deep">Right now anyone who can reach your API can delete every post. Add <strong>one dependency</strong> and that changes immediately:</p>
+          <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+          <p class="deep">Restart, and with <strong>zero lines of configuration</strong>:</p>
+          <ul>
+            <li><strong>Every endpoint now requires authentication.</strong> An unauthenticated request gets <code>401 Unauthorized</code>.</li>
+            <li>A login form appears at <code>/login</code> for browser requests.</li>
+            <li>A user named <code>user</code> is created, with a <strong>random password printed in the startup console</strong>.</li>
+            <li>CSRF protection and secure default headers are switched on.</li>
+          </ul>
+          <pre><code>Using generated security password: 8f2a1c4e-9b3d-4a7f-b2e1-6c8d9a0f3b5c
+
+This generated password is for development use only.</code></pre>
+          <table class="cmp">
+            <thead><tr><th>Concept</th><th>Question it answers</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Authentication</strong></td><td><em>Who are you?</em></td><td>Username + password, or a JWT token</td></tr>
+              <tr><td><strong>Authorization</strong></td><td><em>What are you allowed to do?</em></td><td>Only <code>ADMIN</code> may call <code>DELETE</code></td></tr>
+              <tr><td><strong>Filter chain</strong></td><td>Where the checks happen</td><td>Before your controller is ever called</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Today: observe, don't configure</span>
+            Security is a large topic — token-based auth, role hierarchies, method-level rules, OAuth2. In today's bonus lab you'll add the dependency, <strong>watch every endpoint start returning 401</strong>, log in with the generated password, and then remove it again. Feeling that "secure by default" behaviour is the goal; configuring it properly deserves its own session.
+          </div>
+        </section>
+
+
+        <!-- 30. THE MONOLITH -->
+        <section class="slide">
+          <p class="eyebrow">Looking ahead to Session 4 · 1 of 4</p>
+          <h2>The monolith, and where it starts hurting</h2>
+          <p class="deep">Everything we've built is a <span class="term">monolith</span>: <strong>one application, one deployable unit, one database</strong>. And that is genuinely the right choice for most projects. The problems only appear at scale.</p>
+          <div class="twocol">
+            <div class="colbox b">
+              <h3>✅ Where a monolith wins</h3>
+              <ul style="text-align:left; font-size:15.5px;">
+                <li>Simple to build, run and debug</li>
+                <li>One deployment, one thing to monitor</li>
+                <li>No network calls between components</li>
+                <li>Transactions across the whole app are easy</li>
+                <li><strong>The right default for a small team</strong></li>
+              </ul>
+            </div>
+            <div class="colbox a">
+              <h3>⚠️ Where it starts hurting</h3>
+              <ul style="text-align:left; font-size:15.5px;">
+                <li>One bug can bring down <em>everything</em></li>
+                <li>A one-line fix means redeploying the whole app</li>
+                <li>Can't scale one busy part independently</li>
+                <li>The whole codebase is locked to one language and framework version</li>
+                <li>50 developers editing one codebase → constant conflicts</li>
+              </ul>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">A concrete example of the scaling problem</span>
+            Imagine an e-commerce monolith where <strong>Search</strong> handles a thousand requests a second while <strong>Invoicing</strong> handles ten a day. They're in the same application, so to give Search more capacity you must run <strong>more copies of everything</strong> — including nine idle Invoicing modules per copy. You're paying for capacity you can't direct where it's needed.
+          </div>
+        </section>
+
+        <!-- 31. MICROSERVICES -->
+        <section class="slide">
+          <p class="eyebrow">Looking ahead to Session 4 · 2 of 4</p>
+          <h2>Microservices — the alternative</h2>
+          <p class="deep">A <span class="term">microservices</span> architecture splits the application into <strong>several small, independent services</strong>, each owning one business capability and its own data, and each deployable on its own.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>Monolith — one unit</h3>
+              <ul>
+                <li>One JAR containing everything</li>
+                <li>Users + Products + Orders + Payments</li>
+                <li>One shared database</li>
+                <li>Deploy all of it, or none of it</li>
+                <li>Scale all of it, or none of it</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>Microservices — many units</h3>
+              <ul>
+                <li>User Service &nbsp;·&nbsp; own DB &nbsp;·&nbsp; own deploy</li>
+                <li>Product Service &nbsp;·&nbsp; own DB</li>
+                <li>Order Service &nbsp;·&nbsp; own DB</li>
+                <li>Payment Service &nbsp;·&nbsp; own DB</li>
+                <li>Scale and release each one separately</li>
+              </ul>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Benefit</th><th>What it gives you</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Independent deployment</strong></td><td>Fix Payments without touching, testing or redeploying Search.</td></tr>
+              <tr><td><strong>Targeted scaling</strong></td><td>Run five copies of Search and one of Invoicing. Pay only for what's busy.</td></tr>
+              <tr><td><strong>Fault isolation</strong></td><td>Payments failing shouldn't stop people browsing products.</td></tr>
+              <tr><td><strong>Technology freedom</strong></td><td>Each service can use the language and database that suits it.</td></tr>
+              <tr><td><strong>Team autonomy</strong></td><td>Small teams own a service end to end and release on their own schedule.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The honest trade-off — please remember this one</span>
+            Microservices don't remove complexity; they <strong>move it</strong> out of your code and into the <em>spaces between</em> your services. You inherit a new set of problems: network failures, service discovery, distributed transactions, tracing a request across five hops, and far more deployment machinery. Session 4 is entirely about the tools that manage those new problems. <strong>Start with a monolith; split it when the pain is real</strong> — not because microservices sound modern.
+          </div>
+        </section>
+
+        <!-- 32. SCALING -->
+        <section class="slide">
+          <p class="eyebrow">Looking ahead to Session 4 · 3 of 4</p>
           <h2>Horizontal vs vertical scaling</h2>
-          <p class="deep">When traffic grows, you have two options to keep up. They sound similar but are fundamentally different in cost and ceiling.</p>
+          <p class="deep">"Scaling" means handling more load. There are exactly two ways to do it, and the difference explains why statelessness kept coming up in Session 2.</p>
           <div class="twocol">
             <div class="colbox a">
-              <h3>⬆️ Vertical scaling (scale up)</h3>
-              <div class="flow vert" style="margin-top:6px;">
-                <div class="flow-box">1 server · 4 GB</div>
-                <span class="flow-arrow">▼ add resources</span>
-                <div class="flow-box warn">1 server · 64 GB + more CPU</div>
-              </div>
-              <p style="font-size:14.5px; margin-top:10px;">Make a <strong>single machine</strong> more powerful. Simple, but there's a hard <strong>ceiling</strong> (you can't add RAM forever) and big machines get expensive fast. Still one point of failure.</p>
+              <h3>⬆️ Vertical — a bigger machine</h3>
+              <p>Add more CPU and RAM to the <em>one</em> server. 4 cores → 32 cores.</p>
+              <ul style="text-align:left; font-size:15px;">
+                <li>✅ Simple — no code changes at all</li>
+                <li>❌ There's always a physical ceiling</li>
+                <li>❌ Cost rises steeply, not linearly</li>
+                <li>❌ Usually needs downtime to resize</li>
+                <li>❌ Still a <strong>single point of failure</strong></li>
+              </ul>
             </div>
             <div class="colbox b">
-              <h3>➡️ Horizontal scaling (scale out)</h3>
-              <div class="flow" style="margin-top:6px; justify-content:center;">
-                <div class="flow-box green">server</div>
-                <div class="flow-box green">server</div>
-                <div class="flow-box green">server</div>
-              </div>
-              <p style="font-size:14.5px; margin-top:10px;">Add <strong>more machines</strong> running the same service, behind a load balancer. No real ceiling, cost-effective with commodity hardware, and naturally fault-tolerant.</p>
+              <h3>➡️ Horizontal — more machines</h3>
+              <p>Run <em>more copies</em> of the app behind a load balancer. 1 instance → 10 instances.</p>
+              <ul style="text-align:left; font-size:15px;">
+                <li>✅ Effectively unlimited</li>
+                <li>✅ Cost scales linearly</li>
+                <li>✅ Add or remove copies with no downtime</li>
+                <li>✅ <strong>No single point of failure</strong></li>
+                <li>⚠️ Requires the app to be <strong>stateless</strong></li>
+              </ul>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">Why this matters for microservices</span>
-            <strong>Microservices are designed for horizontal scaling.</strong> Because each service is small and stateless, you can spin up as many copies as you need and spread traffic across them — exactly the model the cloud is built for.
-          </div>
-        </section>
-
-        <!-- 17. LOAD BALANCING + HIGH AVAILABILITY -->
-        <section class="slide">
-          <p class="eyebrow">Making scale-out actually work</p>
-          <h2>Load balancing &amp; high availability</h2>
-          <p class="deep">If you run three copies of a service, something has to decide which copy each request goes to. That's a <strong>load balancer</strong> — it sits in front and distributes incoming traffic evenly across the instances.</p>
-          <div class="flow vert" style="max-width:560px; margin:16px auto;">
-            <div class="flow-box">Clients</div>
-            <span class="flow-arrow">▼ requests</span>
-            <div class="flow-box alt" style="min-width:280px;">Load Balancer <span class="sm">distributes traffic evenly</span></div>
-            <span class="flow-arrow">▼ routes to one of</span>
-            <div class="flow" style="justify-content:center; margin-top:0;">
-              <div class="flow-box green">Instance 1</div>
-              <div class="flow-box green">Instance 2</div>
-              <div class="flow-box green">Instance 3</div>
-            </div>
-          </div>
-          <div class="cards">
-            <div class="card"><div class="ic">⚖️</div><h3>Load balancing</h3><p>Spreads requests so no single instance is overwhelmed — and removes the single point of failure.</p></div>
-            <div class="card"><div class="ic">♻️</div><h3>High availability</h3><p>If Instance 2 dies, the load balancer simply stops sending it traffic. Instances 1 and 3 keep serving — users never notice.</p></div>
+            <span class="lbl">Why that last point ties back to Session 2</span>
+            Horizontal scaling only works if <strong>any copy can serve any request</strong>. That requires the app to hold no per-user state in memory — which is exactly the REST <em>stateless</em> constraint. It also explains today's session: with the data in a <strong>shared database</strong> rather than an in-memory list, ten copies of your app all see the same posts. <strong>You could not scale Session 2's app horizontally; you can scale today's.</strong>
           </div>
           <div class="note">
-            <span class="lbl">Tools you'll meet later</span>
-            In the Spring world this is handled by <strong>Spring Cloud</strong> — with <strong>Eureka</strong> (a registry where services find each other) and an <strong>API Gateway</strong> (a smart front door that routes and load-balances). Just names for now; you'll use them in a later session.
+            <span class="lbl">In practice</span>
+            Teams do both: vertical scaling to a sensible machine size, then horizontal scaling from there. Cloud platforms make horizontal scaling nearly automatic — which is why "is my app stateless?" is such an important question.
           </div>
         </section>
 
-        <!-- 18. FULL ARCHITECTURE AT A GLANCE -->
+        <!-- 33. LOAD BALANCING -->
         <section class="slide">
-          <p class="eyebrow">Putting it in perspective</p>
-          <h2>Full architecture at a glance</h2>
-          <p class="deep">Here's the payoff. <strong>Everything you've built across Sessions 1–3 — the layered Post API — is <em>one</em> service in a picture like this.</strong> The greyed-out boxes are future territory; the highlighted one is what you can build today.</p>
-          <div class="flow vert" style="max-width:640px; margin:18px auto;">
-            <div class="flow-box">Clients (Web / Mobile)</div>
-            <span class="flow-arrow">▼</span>
-            <div class="flow-box alt" style="min-width:300px;">API Gateway <span class="sm">single entry point · routing · security</span></div>
-            <span class="flow-arrow">▼ routes to services</span>
-            <div class="flow" style="justify-content:center; margin-top:0;">
-              <div class="flow-box green" style="border-width:3px;">✅ Post Service <span class="sm">what you built</span></div>
-              <div class="flow-box" style="opacity:0.45;">User Service <span class="sm">later</span></div>
-              <div class="flow-box" style="opacity:0.45;">Payment Service <span class="sm">later</span></div>
+          <p class="eyebrow">Looking ahead to Session 4 · 4 of 4</p>
+          <h2>Load balancing &amp; high availability</h2>
+          <p class="deep">If you're running ten copies of a service, something must decide <strong>which copy gets each request</strong>. That's a <span class="term">load balancer</span>.</p>
+          <div class="flow">
+            <div class="flow-box green">Clients</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Load Balancer <span class="sm">distributes the traffic</span></div>
+            <span class="flow-arrow">→</span>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <div class="flow-box">Instance 1 <span class="sm">:8080</span></div>
+              <div class="flow-box">Instance 2 <span class="sm">:8081</span></div>
+              <div class="flow-box">Instance 3 <span class="sm">:8082</span></div>
             </div>
           </div>
+          <p class="deep" style="margin-top:18px;">It does two jobs at once:</p>
+          <table class="cmp">
+            <thead><tr><th>Job</th><th>How it works</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Distribute load</strong></td><td>Spread requests across instances so none is overwhelmed. The simplest strategy is <strong>round robin</strong> — take each in turn, then start again.</td></tr>
+              <tr><td><strong>Provide high availability</strong></td><td><strong>Health checks:</strong> the balancer periodically asks each instance "are you alive?" (this is what <code>/actuator/health</code> is for). If one stops answering, it's removed from rotation and users never notice.</td></tr>
+            </tbody>
+          </table>
           <div class="keybox">
-            <span class="lbl">The takeaway</span>
-            You're not just building toy apps — you're building the <strong>fundamental unit</strong> of a real distributed system. A clean, layered, well-behaved service is exactly what slots into an architecture like this. Master the one service, and the system is just many of them, cooperating.
+            <span class="lbl">High availability, defined</span>
+            <span class="term">High availability</span> means <strong>no single failure takes the system down</strong>. With one instance, one crash equals total outage. With three plus health checks, one crash means the other two absorb the traffic — degraded capacity, but the service stays up. In Session 4 you'll run three instances of one service and watch requests round-robin between them live.
           </div>
         </section>
 
-        <!-- 19. WHAT'S COMING NEXT -->
+        <!-- 34. FULL ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">The big picture</p>
+          <h2>Where today fits</h2>
+          <p class="deep">Today's work sits inside <em>one</em> of the service boxes below. Session 4 builds everything around it.</p>
+          <div class="flow">
+            <div class="flow-box green">Client <span class="sm">app / browser</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">API Gateway <span class="sm">single entry point · Session 4</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">Service <span class="sm">controller → service → repository · TODAY</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box warn">Database <span class="sm">H2 / MySQL · TODAY</span></div>
+          </div>
+          <p class="deep" style="margin-top:20px;">And zooming into that one service — everything you'll write in today's lab:</p>
+          <div class="stack">
+            <div class="stack-row l1"><span class="layer">PostController</span><span class="desc">Receives HTTP, returns DTOs and status codes. Six endpoints.</span></div>
+            <div class="stack-row l2"><span class="layer">PostService / Impl</span><span class="desc">Business logic, entity ↔ DTO conversion, throws <code>PostNotFoundException</code>.</span></div>
+            <div class="stack-row l3"><span class="layer">PostRepository</span><span class="desc">An empty interface extending <code>JpaRepository</code>. Full CRUD, no implementation.</span></div>
+            <div class="stack-row l4"><span class="layer">Post entity + H2</span><span class="desc">The class that maps to the <code>posts</code> table, created for you by Hibernate.</span></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Plus one class beside all of them</span>
+            <code>GlobalExceptionHandler</code> sits outside the request flow, watching <em>every</em> controller. When any of them lets an exception escape, it converts it into a clean JSON response with the right status code.
+          </div>
+        </section>
+
+        <!-- 35. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Save yourself some pain</p>
+          <h2>Common mistakes with JPA</h2>
+          <table class="cmp">
+            <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Importing <code>javax.persistence.*</code></td><td class="bad">Won't compile — the package doesn't exist</td><td class="good">Use <code>jakarta.persistence.*</code> in Spring Boot 3.x.</td></tr>
+              <tr><td>No <code>@Entity</code> on the class</td><td class="bad"><code>Not a managed type: class Post</code></td><td class="good">Add <code>@Entity</code>, and make sure the class is under the base package.</td></tr>
+              <tr><td>No <code>@Id</code> field</td><td class="bad">Startup fails: no identifier specified</td><td class="good">Every entity needs exactly one <code>@Id</code>.</td></tr>
+              <tr><td>Missing no-arg constructor</td><td class="bad">Hibernate can't instantiate the entity</td><td class="good">Add <code>public Post() { }</code>.</td></tr>
+              <tr><td>Missing getters/setters</td><td class="bad">Empty JSON, or unpopulated objects</td><td class="good">Generate them — needed by both Hibernate and Jackson.</td></tr>
+              <tr><td>Setting the id manually before save</td><td class="bad">Unexpected updates, or key conflicts</td><td class="good">Let <code>@GeneratedValue</code> do it. Never copy the id from a DTO.</td></tr>
+              <tr><td>Calling <code>.get()</code> on an <code>Optional</code></td><td class="bad"><code>NoSuchElementException</code> → 500</td><td class="good">Use <code>.orElseThrow(() -&gt; new …Exception(id))</code>.</td></tr>
+              <tr><td>Derived query names a field that doesn't exist</td><td class="bad"><code>No property 'writer' found for type 'Post'</code></td><td class="good">Match the entity's field names exactly.</td></tr>
+              <tr><td>Returning the entity from a controller</td><td>Works, but leaks internals</td><td class="good">Convert to a DTO in the service layer.</td></tr>
+              <tr><td><code>ddl-auto=create</code> in production</td><td class="bad">🚨 Your data is deleted on every deploy</td><td class="good"><code>validate</code> or <code>none</code>, plus Flyway/Liquibase migrations.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 36. LAB PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Your turn</p>
+          <h2>What you'll build in the lab</h2>
+          <p class="deep">A properly layered <strong>Post API</strong> backed by a real database, in a project whose base package is <span class="pill">com.tcs.training.posts</span>. Seven files, each with one clear job.</p>
+          <table class="cmp">
+            <thead><tr><th>Lab</th><th>File</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>Setup</td><td><code>application.properties</code></td><td>Point Spring at H2 and switch on the console</td></tr>
+              <tr><td>1</td><td><code>entity/Post.java</code></td><td>The class that becomes the <code>posts</code> table</td></tr>
+              <tr><td>2</td><td><code>repository/PostRepository.java</code></td><td>Full CRUD from an empty interface</td></tr>
+              <tr><td>3</td><td><code>dto/PostDTO.java</code></td><td>The public shape, with validation rules</td></tr>
+              <tr><td>4</td><td><code>exception/PostNotFoundException.java</code><br><code>exception/GlobalExceptionHandler.java</code></td><td>Clean <code>404</code>s instead of ugly <code>500</code>s</td></tr>
+              <tr><td>5</td><td><code>service/PostService.java</code> + <code>PostServiceImpl.java</code></td><td>Business logic and entity ↔ DTO conversion</td></tr>
+              <tr><td>6</td><td><code>controller/PostController.java</code></td><td>Six REST endpoints, with no error handling in them</td></tr>
+              <tr><td>7</td><td>—</td><td>Test everything in Swagger UI and browse the H2 console</td></tr>
+              <tr><td>Bonus</td><td>—</td><td>Add Spring Security and watch every endpoint return <code>401</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">One thing to watch for</span>
+            You'll create <strong>six packages</strong> today. Every single one must sit under <code>com.tcs.training.posts</code>. The lab prints the full path above every file — follow those banners and the golden rule takes care of itself.
+          </div>
+        </section>
+
+        <!-- 37. RECAP FLASHCARDS -->
+        <section class="slide">
+          <p class="eyebrow">Check yourself</p>
+          <h2>Quick recap — tap each card to reveal</h2>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q · JPA, Hibernate, Spring Data JPA — what's the difference? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>JPA</strong> is the specification (interfaces and annotations, no code). <strong>Hibernate</strong> is the implementation that actually generates SQL. <strong>Spring Data JPA</strong> sits on top and gives you repositories with no implementation of your own. One starter brings all three.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What does extending <code>JpaRepository&lt;Post, Long&gt;</code> give you? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Full CRUD for free — <code>save</code>, <code>findAll</code>, <code>findById</code>, <code>deleteById</code>, <code>existsById</code>, <code>count</code>, plus paging and sorting. Spring generates the implementation at startup; you write an empty interface.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why not return entities directly from a controller? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">It leaks every field (including password hashes), ties your API contract to your database schema, over-fetches, and can trigger lazy-loading errors. A DTO exposes only what's safe — and stays safe when someone adds a sensitive field later.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What single line replaces every <code>if (x == null)</code> check? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><code>repository.findById(id).orElseThrow(() -&gt; new PostNotFoundException(id));</code> — after it, the variable is guaranteed non-null, and the global handler turns the exception into a clean 404.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What does <code>@RestControllerAdvice</code> do? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Declares one class that catches exceptions from <strong>every</strong> controller in the app, and converts each into a proper HTTP response with the right status code and a clean body. Controllers end up with no error-handling code at all.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why is <code>ddl-auto=create</code> dangerous in production? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">It <strong>drops and recreates every table on each startup</strong> — deleting all production data. Use <code>validate</code> or <code>none</code> with Flyway or Liquibase migrations instead.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why must an app be stateless to scale horizontally? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">Because any of the ten copies must be able to serve any request. If a copy holds user data in its own memory, requests routed elsewhere would find it missing. Sharing a <strong>database</strong> instead of an in-memory list is exactly what fixed this today.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What does <code>@Transactional</code> guarantee? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">That a group of database operations either <strong>all commit or all roll back</strong>. If a <code>RuntimeException</code> escapes the method, Spring undoes everything — so a half-finished bank transfer can't leave money in limbo.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 38. CHEATSHEET -->
+        <section class="slide">
+          <p class="eyebrow">Take this away</p>
+          <h2>Session 3 cheat sheet</h2>
+          <div class="anno-grid">
+            <div class="anno-cell"><span class="ac-tag">@Entity</span><span class="ac-def">This class maps to a database table.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Table(name="posts")</span><span class="ac-def">Sets the table name explicitly.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Id</span><span class="ac-def">Marks the primary-key field.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@GeneratedValue(IDENTITY)</span><span class="ac-def">The database assigns the id.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Column(nullable=false)</span><span class="ac-def">Column constraints.</span></div>
+            <div class="anno-cell"><span class="ac-tag">JpaRepository&lt;T, ID&gt;</span><span class="ac-def">Extend it and get full CRUD free.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Service</span><span class="ac-def">On the <em>Impl</em> class, not the interface.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Transactional</span><span class="ac-def">All-or-nothing database work.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@Valid + @NotBlank</span><span class="ac-def">Reject bad input before your method runs.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RestControllerAdvice</span><span class="ac-def">One handler for every controller's exceptions.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@ExceptionHandler(X.class)</span><span class="ac-def">Handle exception type X.</span></div>
+            <div class="anno-cell"><span class="ac-tag">.orElseThrow(...)</span><span class="ac-def">Unwrap an <code>Optional</code> or throw.</span></div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Property</th><th>Value</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td><code>spring.datasource.url</code></td><td><code>jdbc:h2:mem:testdb</code></td><td>In-memory H2 database</td></tr>
+              <tr><td><code>spring.h2.console.enabled</code></td><td><code>true</code></td><td>Web console at <code>/h2-console</code></td></tr>
+              <tr><td><code>spring.jpa.hibernate.ddl-auto</code></td><td><code>update</code></td><td>Build tables from entities (dev only)</td></tr>
+              <tr><td><code>spring.jpa.show-sql</code></td><td><code>true</code></td><td>Print the generated SQL</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 39. SESSION 4 PREVIEW -->
         <section class="slide">
           <p class="eyebrow">Where we're headed</p>
-          <h2>What's coming next</h2>
-          <p class="deep">Today you saw teasers of Spring Security and microservices. Future sessions turn those previews into hands-on skills:</p>
+          <h2>Coming up in Session 4</h2>
+          <p class="deep">You now know how to build <em>one</em> well-structured service. Session 4 asks the next question: <strong>what happens when you have several, and they need to find and talk to each other?</strong></p>
           <div class="cards">
-            <div class="card"><div class="ic">🔐</div><h3>Spring Security deep-dive</h3><p>Move past the default login page to real authentication: <strong>JWT</strong> tokens, <strong>role-based access</strong> control, and securing specific endpoints by role.</p></div>
-            <div class="card"><div class="ic">☁️</div><h3>Spring Cloud basics</h3><p><strong>Eureka</strong> service registry so services can find each other, and an <strong>API Gateway</strong> as the single front door for routing and load balancing.</p></div>
-            <div class="card"><div class="ic">🔁</div><h3>Inter-service communication</h3><p>How one microservice calls another — building on the <code>RestTemplate</code> idea from Session 2, plus modern clients like <strong>OpenFeign</strong>.</p></div>
-            <div class="card"><div class="ic">🗄️</div><h3>Database per service</h3><p>Why each microservice owns its own data, and the patterns that keep data consistent across services.</p></div>
+            <div class="card"><div class="ic">📖</div><h3>Service Registry (Eureka)</h3><p>A phone book for services. Each one registers itself, so nobody hardcodes an address.</p></div>
+            <div class="card"><div class="ic">🚪</div><h3>API Gateway</h3><p>One front door for every service, handling routing, auth and rate limiting in one place.</p></div>
+            <div class="card"><div class="ic">⚖️</div><h3>Load balancing, live</h3><p>Run three copies of one service and watch requests round-robin between them.</p></div>
+            <div class="card"><div class="ic">🔌</div><h3>Resilience</h3><p>Circuit breakers, config servers and distributed tracing — the tools that make it survivable.</p></div>
           </div>
-          <p class="muted" style="margin-top:14px;">Everything connects: today's clean layered service is the foundation every one of these topics builds on.</p>
-        </section>
-
-        <!-- 20. RECAP + CHEATSHEET -->
-        <section class="slide">
-          <p class="eyebrow">Your closing cheatsheet</p>
-          <h2>Session recap + annotation cheatsheet</h2>
-          <p class="deep">Five concepts from today, in plain English:</p>
-          <ul class="checklist">
-            <li><strong>DTO</strong> — a plain class that carries only what the client needs; keeps the Entity hidden.</li>
-            <li><strong>Layered architecture</strong> — Controller → Service → Repository, each with one job.</li>
-            <li><strong>Custom exception</strong> — your own <code>RuntimeException</code> with a meaningful message.</li>
-            <li><strong>@ResponseStatus</strong> — maps that exception to the right HTTP code (e.g. 404) automatically.</li>
-            <li><strong>orElseThrow()</strong> — clean way to throw when an Optional is empty; no null checks.</li>
-          </ul>
-          <div class="anno-grid" style="margin-top:18px;">
-            <div class="anno-cell"><span class="ac-tag">@Entity</span><span class="ac-def">Marks a class as a database table (JPA).</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">Marks the web layer; each method returns data straight as the HTTP response body.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@Repository</span><span class="ac-def">Marks the data-access layer; gives CRUD with no boilerplate.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@Service</span><span class="ac-def">Marks the business-logic layer; managed by Spring.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span><span class="ac-def">Sets the HTTP status code for a response or exception.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@Autowired</span><span class="ac-def">Injects a dependency (e.g. the repository into the service).</span></div>
+          <div class="keybox">
+            <span class="lbl">A heads-up on the format</span>
+            Session 4's lab is different: instead of one project you'll run <strong>four Spring Boot applications at once</strong> (six, once we scale one of them). Make sure your machine has a few gigabytes of RAM free, and come with today's concepts solid — each of those four apps is just a small version of what you built today.
           </div>
         </section>
 
-        <!-- 21. CLOSING (cover-style) -->
+        <!-- 40. CLOSING -->
         <section class="slide">
           <div class="cover">
-            <span class="badge">End of Session 3 Theory</span>
+            <span class="badge">End of Session 3 — Theory</span>
             <h1>Let's build it.</h1>
-            <div class="sub">Open the lab sheet and we'll build the layered Post API together — Entity, DTO, custom exception, Service, and Controller.</div>
-            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Spring Security deep-dive &amp; Spring Cloud.</div>
+            <div class="sub">Seven files, four layers, and a real database. Open the lab sheet.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 4 — microservices with Spring Cloud.</div>
           </div>
         </section>
 
@@ -1146,8 +2004,8 @@ spring.security.user.password=admin123
           <span>Spring Boot · Session 3</span>
         </div>
 
-        <!-- Slide counter -->
-        <div class="slide-counter" id="slideCounter">1 of 21</div>
+        <!-- Slide counter (JavaScript keeps this in sync) -->
+        <div class="slide-counter" id="slideCounter">1 of 40</div>
       </div>
     </div>
   </div>
@@ -1192,6 +2050,7 @@ spring.security.user.password=admin123
       state.index = next;
       render();
       var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
       if (activeSlide && !reduceMotion) {
         state.isTransitioning = true;
         activeSlide.classList.remove('animating');
@@ -1208,9 +2067,7 @@ spring.security.user.password=admin123
     function next() { goTo(state.index + 1); }
     function prev() { goTo(state.index - 1); }
 
-    /* ============================================================
-       Flash cards (Session 2 recap) — click to reveal the answer.
-       ============================================================ */
+    /* Flash cards: click to reveal the answer. */
     function initFlashCards() {
       var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
       cards.forEach(function (card) {
@@ -1235,11 +2092,24 @@ spring.security.user.password=admin123
       navNext.addEventListener('click', next);
       navPrev.addEventListener('click', prev);
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight') { next(); }
-        else if (e.key === 'ArrowLeft') { prev(); }
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
       });
 
       initFlashCards();
+
+      // Architecture diagram resilience: only reveal the text fallback if the
+      // diagram element is genuinely absent (never measure width — slides are
+      // hidden at init and would report zero width, falsely triggering it).
+      try {
+        var container = document.getElementById('archContainer');
+        if (container && !container.querySelector('.arch')) {
+          container.classList.add('arch-failed');
+        }
+      } catch (e) { /* leave the CSS diagram in place */ }
+
       render();
     }
 

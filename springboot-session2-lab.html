@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session2-theory.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -223,6 +224,7 @@
       letter-spacing: 0.03em;
     }
     .exp-body { padding: 14px 24px 24px; }
+    .exp-body h3 { font-size: 19px; }
 
     /* === Checklist items === */
     .check {
@@ -292,6 +294,45 @@
       font-size: 16.5px;
     }
     .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .muted { color: var(--mac-text-muted); }
+
+    /* Status-code badge, used in expected-output headings */
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s2 { background: #49cc90; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s5 { background: #f93e3e; }
+
+    /* === THE GOLDEN RULE box — the single most important lab callout === */
+    .golden {
+      border: 2px solid #ff9f0a;
+      background: linear-gradient(135deg,#fffaf0,#fff3dc);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 16.5px;
+      box-shadow: 0 3px 14px rgba(255,159,10,0.18);
+    }
+    .golden .lbl {
+      font-weight: 800; color: #b8860b; display: block; margin-bottom: 8px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .golden code { background: rgba(184,134,11,0.12) !important; color: #8a6100 !important; }
+    .golden .rule {
+      background: #fff; border: 1px dashed #e4c48a; border-radius: 8px;
+      padding: 10px 14px; margin: 10px 0; font-weight: 600;
+    }
 
     /* Code blocks with copy button */
     .codewrap { position: relative; margin: 14px 0; }
@@ -310,6 +351,8 @@
       line-height: 1.6;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
     .copy-btn {
       position: absolute;
@@ -355,6 +398,7 @@
     details.exp.lab5 { border-left-color: #00c7be; }
     details.exp.lab6 { border-left-color: #bf5af2; }
     details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.lab8 { border-left-color: #30b0c7; }
     details.exp.bonus { border-left-color: #ff375f; }
     details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
     details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
@@ -363,6 +407,7 @@
     details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
     details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
     details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#eaf8fb,#d9f1f6); }
     details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
     details.exp.lab2 .lab-tag { background:#5e5ce6; }
     details.exp.lab3 .lab-tag { background:#28c840; }
@@ -370,9 +415,10 @@
     details.exp.lab5 .lab-tag { background:#00c7be; }
     details.exp.lab6 .lab-tag { background:#bf5af2; }
     details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.lab8 .lab-tag { background:#30b0c7; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
-    /* === File banner: tells the beginner EXACTLY which file to create/edit === */
+    /* === File banner: tells the beginner EXACTLY which file to create === */
     .filebar {
       display: flex; align-items: center; gap: 10px;
       background: #1e1e2e; color: #f8f8f2;
@@ -390,7 +436,7 @@
     }
     .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
 
-    /* === "Now run / test it" purple callout === */
+    /* === "Now run it" box — explicit run instructions === */
     .runbox {
       border: 1px solid #d8b4fe;
       border-left: 5px solid #bf5af2;
@@ -401,7 +447,7 @@
     .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
     .runbox ol { margin: 6px 0 0; padding-left: 22px; }
     .runbox ol li { margin: 6px 0; }
-    .runbox .kbd {
+    .kbd, .runbox .kbd {
       font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
       border: 1px solid var(--mac-border); border-bottom-width: 2px;
       border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
@@ -416,7 +462,68 @@
     .dothis ol { margin: 0; padding-left: 22px; }
     .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
 
-    /* HTTP verb badge in summaries */
+    /* Spring Initializr recipe card */
+    .newproj {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .newproj .lbl {
+      font-weight:700; color: var(--mac-accent); display:block;
+      margin: 0 0 8px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .newproj table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 15.5px; }
+    .newproj th, .newproj td { border: 1px solid var(--mac-border); padding: 7px 12px; text-align: left; vertical-align: top; }
+    .newproj th { background: rgba(10,132,255,0.08); width: 32%; font-weight: 700; }
+    .newproj tr.keyrow td, .newproj tr.keyrow th { background: rgba(255,159,10,0.14); font-weight: 700; }
+
+    /* Property annotation list */
+    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
+    .prop-row {
+      display: grid; grid-template-columns: 1fr; gap: 2px;
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 10px 14px; background: #fafafc;
+    }
+    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
+    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* Version compatibility warning box */
+    .vercompat {
+      border: 2px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .vercompat h3 { margin: 0 0 6px; color: #b8860b; font-size: 18px; }
+    .vercompat table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+    .vercompat th, .vercompat td { border: 1px solid #e4c48a; padding: 9px 13px; text-align: left; }
+    .vercompat th { background: rgba(254,188,46,0.18); }
+    .vercompat code { font-family: var(--mac-mono); }
+
+    /* Architecture reminder box */
+    .arch-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
+    }
+    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
+    .arch-node.reg { border-color: #ff9f0a; }
+    .arch-node.svc { border-color: #28c840; }
+    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
+
+    /* HTTP verb badges */
     .verb-badge {
       font-family: var(--mac-mono);
       font-size: 12px;
@@ -431,7 +538,7 @@
     .verb-badge.put { background: #fca130; }
     .verb-badge.del { background: #f93e3e; }
 
-    /* Reference + Quick reference card */
+    /* Reference block (green) */
     .ref-block {
       border: 1px solid var(--mac-border);
       border-left: 5px solid #28c840;
@@ -456,6 +563,7 @@
     .ref-block[open] > summary .chevron { transform: rotate(90deg); }
     .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
 
+    /* Quick reference card */
     .qref {
       background: linear-gradient(135deg, #1e1e2e, #2a2a40);
       color: #f8f8f2;
@@ -471,6 +579,48 @@
     }
     .qref th { background: rgba(255,255,255,0.08); }
     .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
+
+    /* Test part / H2 console mockups */
+    .testpart { border: 1px solid var(--mac-border); border-radius: 10px; margin: 14px 0; overflow: hidden; }
+    .testpart .tp-head {
+      background: var(--mac-titlebar); padding: 10px 16px; font-weight: 700; font-size: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .testpart .tp-body { padding: 8px 16px 16px; }
+    .h2-mock {
+      border: 1px solid var(--mac-border); border-radius: 8px; overflow: hidden; margin-top: 8px;
+      font-family: var(--mac-mono); font-size: 13.5px;
+    }
+    .h2-mock .h2-top { background:#0a3d62; color:#fff; padding:6px 12px; font-weight:700; }
+    .h2-mock .h2-row { padding: 6px 12px; border-bottom: 1px solid var(--mac-border); background:#fff; }
+    .h2-mock .h2-row:last-child { border-bottom: none; }
+
+    /* Eureka dashboard mockup */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin: 12px 0;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+
+    /* Console log mock */
+    .logmock {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 12px 16px; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.7; overflow-x: auto;
+    }
+    .logmock .hit { color: #a6e22e; }
+    .logmock .port { color: #fd9353; }
+    .logmock .dim { color: #6b7089; }
   </style>
 </head>
 <body>
@@ -486,10 +636,10 @@
 
       <!-- ===== HERO (non-sticky) ===== -->
       <header class="lab-hero">
-        <div class="hero-icon">🔗</div>
+        <div class="hero-icon">🔌</div>
         <div>
           <h1>Spring Boot — Session 2 Hands-on Lab</h1>
-          <p class="section-intro">Build a complete Student CRUD REST API, endpoint by endpoint. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+          <p class="section-intro">Build a complete REST API with all four CRUD verbs, proper status codes and JSON. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
 
@@ -509,38 +659,41 @@
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">How to use this sheet</span>
-          This is your hands-on companion for Spring Boot Session 2 — the theory stays on the main screen while
-          you build here on your machine. We'll write the Student CRUD API one endpoint at a time: write a method,
-          run it, test it, then move on. Click a lab heading to expand it, use the <strong>Copy</strong> button on
-          any snippet instead of retyping, and tick each checkbox as you go. The progress bar at the top fills as
-          you complete steps. If you fall behind, the <strong>Complete Controller Reference</strong> at the bottom
-          has the whole file — paste it, run it, and you're back with the group.
+          Today you build a <strong>complete Student API</strong> — all four CRUD operations — one endpoint at a time.
+          Work top to bottom; each lab adds methods to the same two files, and every snippet is the
+          <strong>whole file</strong> so you can always paste over what you had. Use the <strong>Copy</strong> button
+          rather than retyping, and tick each checkbox as you go. All testing is done in
+          <strong>Swagger UI</strong> — a page your own app generates, so there is <strong>nothing to install</strong>
+          and it runs in the browser you already have. If you fall behind, the
+          <strong>Complete Files Reference</strong> at the bottom has every finished file.
         </div>
       </section>
 
-      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <!-- ===== PROGRESS TRACKER ===== -->
       <div class="section-band">Today's checklist</div>
       <section class="section">
         <details class="exp" open>
-          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <summary><span class="chevron">▶</span> 9-step progress tracker</summary>
           <div class="exp-body">
-            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
+            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when everything is done.</p>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>1 · Project created</strong> — new project from Spring Initializr with Web, DevTools &amp; Swagger.</span></label>
+              <span class="ctext"><strong>1 · Project created &amp; base package verified</strong> — <code>com.tcs.training.students</code>.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>2 · Student bean done</strong> — the <code>Student</code> model class compiles.</span></label>
+              <span class="ctext"><strong>2 · Swagger UI loads</strong> at <code>localhost:8080/swagger-ui.html</code> — your testing tool is ready.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>3 · First GET works</strong> — single hardcoded student returned as JSON.</span></label>
+              <span class="ctext"><strong>3 · <code>Student</code> model class</strong> written, with getters, setters and a no-arg constructor.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>4 · List GET works</strong> — a JSON array of students comes back.</span></label>
+              <span class="ctext"><strong>4 · <code>StudentService</code></strong> holding an in-memory list, injected into the controller.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>5 · PathVariable works</strong> — <code>/students/{id}</code> returns one student.</span></label>
+              <span class="ctext"><strong>5 · <code>GET /api/students</code></strong> returns a JSON array.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>6 · RequestParam works</strong> — <code>/students/search?name=</code> filters the list.</span></label>
+              <span class="ctext"><strong>6 · <code>GET /api/students/{id}</code></strong> returns one student, and <code>404</code> for a missing id.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>7 · POST works</strong> — sending JSON creates a student, returns 201.</span></label>
+              <span class="ctext"><strong>7 · <code>GET /api/students/search?grade=A</code></strong> filters the list.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>8 · PUT/DELETE works</strong> — update and remove a student by ID.</span></label>
+              <span class="ctext"><strong>8 · <code>POST /api/students</code></strong> creates a student and returns <code>201 Created</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · <code>PUT</code> and <code>DELETE</code></strong> both working with correct status codes.</span></label>
           </div>
         </details>
       </section>
@@ -551,30 +704,36 @@
         <details class="exp" open>
           <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
           <div class="exp-body">
-            <p>Verify each item before starting. Tick it once the check passes — the "ready" badge at the top lights up when all three are green.</p>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>A Spring Boot project</strong> — either your Session 1 <code>springboot-demo</code>, or a fresh one (we create a fresh one in Setup below)
-                <span class="verify">If reusing Session 1's project, you only need to add the Swagger dependency.</span>
+              <span class="ctext"><strong>JDK 17+ and your IDE</strong> working from Session 1
+                <span class="verify">Verify with <code>java -version</code>. Nothing new to install for the JDK.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman installed</strong> (or you'll use Swagger in the browser)
-                <span class="verify">Postman is free from postman.com. Swagger needs no install — it comes from a dependency.</span>
+              <span class="ctext"><strong>A web browser</strong> — Chrome, Edge, Firefox, anything
+                <span class="verify">That is the <em>whole</em> tooling requirement. Swagger UI is a page your own application generates, so there is nothing to download, no account and no separate app to learn.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>DevTools dependency added</strong> — gives you auto-restart on save
-                <span class="verify">Verify: edit a file and save while the app runs — the console should show a quick restart.</span>
+              <span class="ctext"><strong>Session 1 concepts clear</strong> — beans, injection, and the golden rule
+                <span class="verify">If "controllers must live under the main class's package" doesn't sound familiar, re-read Session 1's golden rule slide before starting.</span>
               </span>
             </label>
-            <div class="observe">
-              <span class="lbl">Why DevTools matters today</span>
-              We're going to edit the controller many times. With <code>spring-boot-devtools</code> on the classpath,
-              Spring Boot <strong>auto-restarts</strong> the app every time you save — no more stop/run between each
-              endpoint. It only triggers on classpath changes, so it's fast.
+            <div class="concept">
+              <span class="lbl">Why Swagger UI, and not Postman?</span>
+              A browser address bar can only ever send a <code>GET</code>, so from Lab 6 (creating data with
+              <code>POST</code>) you need a proper API client. Many teams use <strong>Postman</strong>, but it's a
+              separate install. <strong>Swagger UI</strong> is better for us for three reasons:
+              <ul style="margin:8px 0 0;">
+                <li><strong>Nothing to install</strong> — you add one dependency and your app serves the page itself.</li>
+                <li><strong>It reads your code.</strong> Every endpoint you write appears automatically, with the
+                    request body pre-filled from your <code>Student</code> class. Nothing to type by hand.</li>
+                <li><strong>It shows you everything at once</strong> — the status code, the response body, the
+                    response headers, <em>and</em> the equivalent <code>curl</code> command.</li>
+              </ul>
             </div>
           </div>
         </details>
@@ -583,58 +742,153 @@
       <!-- ===== PROJECT SETUP ===== -->
       <div class="section-band">Project setup</div>
       <section class="section">
-        <details class="exp" open>
-          <summary><span class="chevron">▶</span> Create the project + enable Swagger</summary>
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">SETUP</span><span class="chevron">▶</span> Create the Project &amp; Verify Your Base Package</summary>
           <div class="exp-body">
-            <ol class="steps">
-              <li><strong>Go to Spring Initializr</strong> at <code>https://start.spring.io</code> (or reuse Session 1's project).</li>
-              <li><strong>Fill in the fields:</strong>
-                <ul>
-                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code> &nbsp;·&nbsp; Java: <code>17</code></li>
-                  <li>Group: <code>com.tcs.training</code> &nbsp;·&nbsp; Artifact: <code>student-api</code></li>
-                </ul>
-              </li>
-              <li><strong>Add these dependencies:</strong>
-                <ul>
-                  <li><code>Spring Web</code> (<code>spring-boot-starter-web</code>)</li>
-                  <li><code>Spring Boot DevTools</code> (<code>spring-boot-devtools</code>)</li>
-                  <li>Swagger is <em>not</em> in Initializr — add it to <code>pom.xml</code> manually (next step).</li>
-                </ul>
-              </li>
-              <li><strong>Add the Swagger (springdoc) dependency to <code>pom.xml</code></strong> — freshers often mistype the artifact ID, so copy it exactly:
-                <div class="codewrap"><pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
-    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
-    &lt;version&gt;2.6.0&lt;/version&gt;
-&lt;/dependency&gt;</code></pre></div>
-              </li>
-              <li><strong>(Optional) set a friendly Swagger path</strong> in <code>src/main/resources/application.properties</code>:
-                <div class="codewrap"><pre><code>springdoc.swagger-ui.path=/swagger-ui.html</code></pre></div>
-                The default UI is always available at <code>/swagger-ui/index.html</code> too.
-              </li>
-              <li><strong>Run the app</strong> and open the empty Swagger UI in your browser:
-                <div class="codewrap"><pre><code>http://localhost:8080/swagger-ui/index.html</code></pre></div>
-              </li>
-            </ol>
-            <div class="expected">
-              <span class="lbl">Expected — before any endpoints</span>
-              Swagger UI loads and shows the page title and an empty (or near-empty) list of operations. Once you
-              add controller methods, refresh this page and they'll appear automatically.
+            <div class="newproj">
+              <span class="lbl">📦 Generate the project on Spring Initializr</span>
+              This is a <strong>brand new project</strong>, not Session 1's. Open <code>https://start.spring.io</code>
+              and fill it in exactly like this:
+              <table>
+                <tr><th>Project</th><td><code>Maven</code></td></tr>
+                <tr><th>Language</th><td><code>Java</code></td></tr>
+                <tr><th>Spring Boot</th><td>the default <strong>3.x</strong> release (avoid SNAPSHOT / M / RC)</td></tr>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>students</code></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.students</code> &nbsp;← <strong>read this field before you click Generate</strong></td></tr>
+                <tr><th>Packaging</th><td><code>Jar</code></td></tr>
+                <tr><th>Java</th><td><code>17</code> (or <code>21</code>)</td></tr>
+                <tr><th>Dependencies</th><td><code>Spring Web</code> — that's all</td></tr>
+              </table>
+              Click <strong>Generate</strong>, unzip, and import into your IDE
+              (IntelliJ: File → Open → pick <code>pom.xml</code>. Eclipse: File → Import → Maven → Existing Maven Projects).
+            </div>
+
+            <div class="golden">
+              <span class="lbl">⚠️ The Golden Rule — verify it now, before writing any code</span>
+              <p style="margin-top:0;">Spring only finds classes in the main class's package <strong>or below it</strong>.
+              Open <code>StudentsApplication.java</code> and read its first line:</p>
+              <div class="codewrap"><pre><code>package com.tcs.training.students;   ←  your base package</code></pre></div>
+              <div class="rule">
+                Everything you create today goes in:<br>
+                <code>com.tcs.training.students.model</code> &nbsp;✅ &nbsp;
+                <code>com.tcs.training.students.service</code> &nbsp;✅ &nbsp;
+                <code>com.tcs.training.students.controller</code> &nbsp;✅<br>
+                <code>com.tcs.training.model</code> &nbsp;❌ — a <em>sibling</em>, never scanned → silent <strong>404 Whitelabel</strong>
+              </div>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><strong>The first line of <code>StudentsApplication.java</code> reads
+                <code>package com.tcs.training.students;</code></strong>
+                  <span class="verify">If it says something different, you typed a different Artifact. Use
+                  <em>your</em> value everywhere this sheet says <code>com.tcs.training.students</code> — or
+                  re-generate with Artifact <code>students</code>. Note it down either way.</span>
+                </span>
+              </label>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — create your three packages now</span>
+              <ol>
+                <li>Right-click the package <code>com.tcs.training.students</code> (the one holding
+                    <code>StudentsApplication.java</code>) → <strong>New → Package</strong>.</li>
+                <li>Create <code>com.tcs.training.students.model</code></li>
+                <li>Create <code>com.tcs.training.students.service</code></li>
+                <li>Create <code>com.tcs.training.students.controller</code></li>
+                <li>Check all three folders appear <strong>next to</strong> <code>StudentsApplication.java</code> in the
+                    project tree — not above it. ✅</li>
+              </ol>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Project runs and the Swagger UI page loads at <code>/swagger-ui/index.html</code>.</span></label>
+              <span class="ctext">All three packages created, sitting beside <code>StudentsApplication.java</code>.</span>
+            </label>
+
+            <h3>Now add Swagger UI — your testing tool</h3>
+            <div class="concept">
+              <span class="lbl">Why this goes in now, not at the end</span>
+              Swagger UI is how you'll test <em>every</em> endpoint today, so we set it up before writing any code.
+              It isn't offered on the Initializr page (it's a third-party library), so you add it to
+              <code>pom.xml</code> by hand — <strong>one dependency, and you're done</strong>.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>pom.xml</code>.</li>
+                <li>Find the existing <code>&lt;dependencies&gt;</code> block — it already contains
+                    <code>spring-boot-starter-web</code>.</li>
+                <li>Paste the dependency below <strong>inside</strong> that block, just before the closing
+                    <code>&lt;/dependencies&gt;</code>.</li>
+                <li>Save. IntelliJ downloads it automatically; if not, click the small Maven <strong>reload</strong>
+                    icon that appears (Eclipse: right-click the project → Maven → Update Project).</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Keep that version number</span>
+              Unlike the Spring starters, springdoc is <strong>not</strong> managed by the Spring Boot parent POM, so
+              it needs an explicit <code>&lt;version&gt;</code>. <strong>2.8.6</strong> is tested against Spring Boot
+              3.5.x, which is what Initializr gives you. Older versions such as 2.5.x <em>fail at startup</em> on Boot
+              3.5 with a <code>ControllerAdviceBean</code> error — so if you hit that, check this number first.
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it and confirm Swagger UI works</span>
+              <ol>
+                <li>Run <code>StudentsApplication</code>.</li>
+                <li>Wait for <strong>"Tomcat started on port 8080"</strong> in the console.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span> in your browser.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the Swagger UI page loads</span>
+              You'll see the Swagger header, a title reading <strong>"OpenAPI definition"</strong>, and a
+              <strong>Servers</strong> dropdown showing <code>http://localhost:8080</code>.
+              <br><br>
+              Below that it will say <strong>"No operations defined in spec!"</strong> — and that is
+              <strong>exactly right</strong>. We haven't written a controller yet, so there are no endpoints to
+              document. From Lab 3 onwards, each endpoint you write will appear on this page automatically.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Swagger UI loads at <code>/swagger-ui.html</code> and reports "No operations defined in spec!".</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Two other URLs worth knowing</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>What it is</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/swagger-ui.html</code></td><td>The interactive page. Redirects to <code>/swagger-ui/index.html</code> — either works</td></tr>
+                  <tr><td><code>/v3/api-docs</code></td><td>The raw <strong>OpenAPI</strong> specification as JSON — the machine-readable contract Swagger UI reads</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Common issues</h3>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
                 <tr>
-                  <td>Swagger UI shows 404</td>
-                  <td>Wrong artifact ID, or the dependency didn't download.</td>
-                  <td>Check the artifact is exactly <code>springdoc-openapi-starter-webmvc-ui</code>, then reload Maven and restart.</td>
+                  <td><strong>404</strong> at <code>/swagger-ui.html</code></td>
+                  <td>The dependency wasn't downloaded, or the app wasn't restarted.</td>
+                  <td>Refresh Maven, then restart. Also try <code>/swagger-ui/index.html</code>.</td>
                 </tr>
                 <tr>
-                  <td>Maven can't find the springdoc version</td>
-                  <td>Version mismatch with your Spring Boot version.</td>
-                  <td>Use a 2.x springdoc version for Spring Boot 3.x. Try <code>2.6.0</code> or check Maven Central for a compatible one.</td>
+                  <td>App fails to start after adding the dependency</td>
+                  <td>springdoc version too old for your Spring Boot version.</td>
+                  <td>Use <code>2.8.6</code> (or newer <code>2.8.x</code>) with Spring Boot 3.5.x.</td>
+                </tr>
+                <tr>
+                  <td>An <code>INFO</code> line saying <code>Failed to set up a Bean Validation provider</code></td>
+                  <td>springdoc pulls in the validation <em>API</em> but no implementation.</td>
+                  <td><strong>Harmless — ignore it.</strong> It's INFO, not an error. Session 3 adds the real validation starter.</td>
                 </tr>
               </tbody>
             </table>
@@ -642,561 +896,182 @@
         </details>
       </section>
 
-      <!-- ===== THE LABS ===== -->
-      <div class="section-band">The labs — build the API</div>
-
-      <!-- ===== LAB 1: STUDENT BEAN ===== -->
+      <!-- ===== LAB 1: MODEL ===== -->
+      <div class="section-band">The labs</div>
       <section class="section">
-        <details class="exp lab1" open>
-          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create the Student Bean</summary>
+        <details class="exp lab1">
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> The <code>Student</code> Model Class</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              A <strong>bean</strong> here just means a plain Java class that holds data — our <code>Student</code>.
-              It has private fields, a constructor, and getters/setters. Spring's Jackson library uses the getters
-              to turn a <code>Student</code> into JSON, and the setters to turn incoming JSON back into a
-              <code>Student</code>.
+              <span class="lbl">Concept — why this class needs getters, setters and a no-arg constructor</span>
+              This class is the <strong>shape of our data</strong>. Jackson (the JSON library that came with
+              <code>spring-boot-starter-web</code>) uses it in both directions, and each direction needs something
+              different:
+              <ul style="margin:8px 0 0;">
+                <li><strong>Going out</strong> (Java → JSON), Jackson calls your <strong>getters</strong>. The JSON key
+                    comes from the getter name: <code>getName()</code> becomes <code>"name"</code>. No getter means the
+                    field silently vanishes from the response.</li>
+                <li><strong>Coming in</strong> (JSON → Java), Jackson first calls the <strong>no-argument
+                    constructor</strong> to make an empty object, then calls the <strong>setters</strong> to fill it.
+                    Miss either and you get a 400, or an object where every field is <code>null</code>.</li>
+              </ul>
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>In your IDE, find the package <code>com.tcs.training</code> (where the main class lives).</li>
-                <li>Right-click it → <strong>New → Package</strong> → name it <code>com.tcs.training.model</code>.</li>
-                <li>Right-click the new <code>model</code> package → <strong>New → Class</strong> → name
-                    <code>Student</code> → Finish.</li>
-                <li><strong>Replace the entire file</strong> with the code below
-                    (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>, Delete, then paste).</li>
-                <li>Save. Nothing to run yet — the controller in Lab 2 will use it.</li>
+                <li>Right-click the package <code>com.tcs.training.students.model</code> →
+                    <strong>New → Class</strong>.</li>
+                <li>Name it <code>Student</code> — capital S, no <code>.java</code> extension.</li>
+                <li>Select all in the new file, delete, and paste the <strong>whole file</strong> below.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/model/Student.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.model;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/model/Student.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.model;
 
 public class Student {
 
     private int id;
-    private String firstName;
-    private String lastName;
+    private String name;
     private String email;
+    private String grade;
 
-    // No-arg constructor (Jackson needs this to build objects from JSON)
+    // ---- No-argument constructor: REQUIRED by Jackson to read JSON in ----
     public Student() {
     }
 
-    // Parameterized constructor (handy for hardcoding test data)
-    public Student(int id, String firstName, String lastName, String email) {
+    // ---- Convenience constructor, for creating our sample data ----
+    public Student(int id, String name, String email, String grade) {
         this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
+        this.email = email;
+        this.grade = grade;
+    }
+
+    // ---- Getters: Jackson uses these to BUILD the JSON going out ----
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    // ---- Setters: Jackson uses these to FILL the object coming in ----
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
         this.email = email;
     }
 
-    // Getters and setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-
-    public String getFirstName() { return firstName; }
-    public void setFirstName(String firstName) { this.firstName = firstName; }
-
-    public String getLastName() { return lastName; }
-    public void setLastName(String lastName) { this.lastName = lastName; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
 }</code></pre></div>
+
             <div class="observe">
-              <span class="lbl">Why we write getters/setters by hand</span>
-              You <em>could</em> use Lombok's <code>@Data</code> to generate these automatically — but we're writing
-              them manually today so you see exactly what they do. Jackson calls <code>getFirstName()</code> to
-              produce the <code>"firstName"</code> JSON key. The names matter.
+              <span class="lbl">Don't type getters and setters by hand — ever</span>
+              Every IDE writes them for you. Type just the four fields, then:
+              <strong>IntelliJ</strong> → <span class="kbd">Alt</span>+<span class="kbd">Insert</span> →
+              "Getter and Setter" → select all fields.
+              <strong>Eclipse</strong> → right-click → Source → "Generate Getters and Setters".
+              <strong>VS Code</strong> → right-click → Source Action → "Generate Getters and Setters".
+              Doing it by hand is slow and typo-prone.
             </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              The class compiles with no errors. There's nothing to run yet — the controller in Lab 2 will use it.
+              <span class="lbl">Expected result</span>
+              The file compiles with no red markers. There's nothing to run yet — this class holds data and does
+              nothing on its own.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>Student.java</code> created in the <code>model</code> package and compiling cleanly.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>Student.java</code> created in <code>com.tcs.training.model</code> and compiles.</span></label>
+
+            <div class="concept">
+              <span class="lbl">Why is <code>id</code> an <code>int</code> and not a <code>String</code>?</span>
+              Because ids are numbers we generate and compare. It also gives us free input validation: request
+              <code>/api/students/abc</code> and Spring returns <strong>400 Bad Request</strong> automatically,
+              because <code>"abc"</code> can't be converted to an <code>int</code>. You didn't write that check.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 2: CONTROLLER + FIRST GET ===== -->
+      <!-- ===== LAB 2: SERVICE ===== -->
       <section class="section">
         <details class="exp lab2">
-          <summary><span class="lab-tag">LAB 2</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Controller + Your First GET Endpoint</summary>
+          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> The <code>StudentService</code> — Our In-Memory Store</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@RestController</code> marks this class as a REST handler whose return values become JSON.
-              <code>@RequestMapping("/students")</code> at the <strong>class level</strong> means every method's URL
-              starts with <code>/students</code> — you don't repeat it on each method.
+              <span class="lbl">Concept — why a separate service class at all?</span>
+              We could keep the list inside the controller, and plenty of tutorials do. We won't, for one concrete
+              reason: <strong>in Session 3 we swap this list for a real database</strong>. Because the controller will
+              only ever talk to <code>StudentService</code> — never to the list itself — that swap means rewriting
+              <em>this</em> class and <strong>leaving the controller completely untouched</strong>. That's the layered
+              architecture from Session 1 earning its keep.
+              <br><br>
+              Note also that a <code>@Service</code> bean is a <strong>singleton</strong> — one instance for the whole
+              application — so there is <em>one</em> shared list that every request sees. That's what makes it behave
+              like a tiny database while the app is running.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.controller</code>.</li>
-                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
-                    name <code>StudentController</code> → Finish.</li>
-                <li>Replace the file's contents with the code below.</li>
-                <li>Right-click your <strong>main application class</strong> (the one with
-                    <code>@SpringBootApplication</code>) → <strong>Run As → Java Application</strong>. Wait for
-                    "Tomcat started on port 8080".</li>
-                <li>Open <code>http://localhost:8080/students</code> in your browser.</li>
-                <li>Open Swagger at <code>http://localhost:8080/swagger-ui/index.html</code> — your endpoint should be listed.</li>
-              </ol>
-              <p style="margin:8px 0 0;font-size:15px;">💡 With <strong>DevTools</strong> on the classpath, every <em>save</em> triggers an auto-restart in a couple of seconds — no need to stop &amp; re-run between labs.</p>
-            </div>
-
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
-
-import com.tcs.training.model.Student;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-@RestController
-@RequestMapping("/students")   // class-level prefix: every method starts with /students
-public class StudentController {
-
-    @GetMapping   // maps GET /students
-    public Student getStudent() {
-        return new Student(1, "Ravi", "Sharma", "ravi@tcs.com");
-    }
-}</code></pre></div>
-            <div class="expected">
-              <span class="lbl">Expected response — GET /students</span>
-              <div class="codewrap"><pre><code>{
-  "id": 1,
-  "firstName": "Ravi",
-  "lastName": "Sharma",
-  "email": "ravi@tcs.com"
-}</code></pre></div>
-            </div>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>Browser shows an error page / "Whitelabel Error"</td>
-                  <td>Forgot <code>@RestController</code>, so Spring doesn't register the class.</td>
-                  <td>Add <code>@RestController</code> above the class and re-run.</td>
-                </tr>
-                <tr>
-                  <td>404 at <code>/students</code></td>
-                  <td>Controller is outside <code>com.tcs.training</code>, so component scanning misses it.</td>
-                  <td>Move it into a sub-package of the main class's package.</td>
-                </tr>
-              </tbody>
-            </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>GET /students</code> returns the Ravi Sharma JSON, and it appears in Swagger.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== LAB 3: GET ALL ===== -->
-      <section class="section">
-        <details class="exp lab3">
-          <summary><span class="lab-tag">LAB 3</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> GET All Students (a JSON array)</summary>
-          <div class="exp-body">
-            <p>Now return a <code>List&lt;Student&gt;</code>. We'll keep a shared list as a field on the controller so
-            the later POST/PUT/DELETE labs can modify the same data.</p>
-
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Open <code>StudentController.java</code> (the file you created in Lab 2) — we are <strong>editing</strong>, not replacing.</li>
-                <li>Add the three <code>import java.util.*</code> lines to the existing imports at the top of the file.</li>
-                <li>Add the <code>private List&lt;Student&gt; students = ...</code> <strong>field</strong> as the first thing inside the class body (right after <code>public class StudentController {</code>).</li>
-                <li>Add the new <code>getAllStudents()</code> <strong>method</strong> below the existing <code>getStudent()</code> method.</li>
-                <li>Save — DevTools auto-restarts the app — then open <code>http://localhost:8080/students/all</code>.</li>
-              </ol>
-              <p style="margin:8px 0 0;font-size:15px;">📌 Got lost merging? Scroll to the bottom of this sheet — the <strong>"Complete StudentController.java"</strong> reference shows the whole file at the end of all labs.</p>
-            </div>
-
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add field + method</span></div>
-            <div class="codewrap"><pre><code>import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-// ...inside the class, add this field:
-private List&lt;Student&gt; students = new ArrayList&lt;&gt;(Arrays.asList(
-        new Student(1, "Ravi", "Sharma", "ravi@tcs.com"),
-        new Student(2, "Anita", "Verma", "anita@tcs.com"),
-        new Student(3, "Karan", "Patel", "karan@tcs.com")
-));
-
-@GetMapping("/all")   // maps GET /students/all
-public List&lt;Student&gt; getAllStudents() {
-    return students;
-}</code></pre></div>
-            <div class="expected">
-              <span class="lbl">Expected response — GET /students/all</span>
-              <div class="codewrap"><pre><code>[
-  { "id": 1, "firstName": "Ravi",  "lastName": "Sharma", "email": "ravi@tcs.com" },
-  { "id": 2, "firstName": "Anita", "lastName": "Verma",  "email": "anita@tcs.com" },
-  { "id": 3, "firstName": "Karan", "lastName": "Patel",  "email": "karan@tcs.com" }
-]</code></pre></div>
-            </div>
-            <div class="observe">
-              <span class="lbl">Observation</span>
-              You returned a Java <code>List</code> and the client received a <strong>JSON array</strong>. You wrote
-              no conversion code — <strong>Jackson</strong> serialized it automatically. That's the auto-magic of
-              <code>@RestController</code>.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>GET /students/all</code> returns a JSON array of three students.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== LAB 4: GET BY ID (PathVariable) ===== -->
-      <section class="section">
-        <details class="exp lab4">
-          <summary><span class="lab-tag">LAB 4</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> GET by ID with @PathVariable</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@PathVariable</code> pulls a value out of the URL path. In <code>/students/{id}</code> the
-              <code>{id}</code> placeholder is bound to the method's <code>int id</code> parameter. So
-              <code>/students/2</code> calls the method with <code>id = 2</code>.
-            </div>
-
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Add the <code>import org.springframework.web.bind.annotation.PathVariable;</code> line to the imports at the top.</li>
-                <li>Add the <code>getStudentById</code> <strong>method</strong> inside the class body, below the previous methods.</li>
-                <li>Save → DevTools restarts → test in the browser.</li>
+                <li>Right-click <code>com.tcs.training.students.service</code> → <strong>New → Class</strong>.</li>
+                <li>Name it <code>StudentService</code>.</li>
+                <li>Paste the whole file below.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PathVariable;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/service/StudentService.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.service;
 
-@GetMapping("/{id}")   // maps GET /students/{id}
-public Student getStudentById(@PathVariable int id) {
-    for (Student s : students) {
-        if (s.getId() == id) {
-            return s;
-        }
-    }
-    return null;   // (Session 3: we'll return a proper 404 instead)
-}</code></pre></div>
-            <div class="expected">
-              <span class="lbl">Expected — GET /students/2</span>
-              <div class="codewrap"><pre><code>{ "id": 2, "firstName": "Anita", "lastName": "Verma", "email": "anita@tcs.com" }</code></pre></div>
-            </div>
-            <div class="tryit">
-              <span class="lbl">Try it yourself</span>
-              Add a second endpoint <code>@GetMapping("/name/{firstName}")</code> that finds a student by first name.
-              Bind it with <code>@PathVariable String firstName</code> and compare with <code>equalsIgnoreCase</code>.
-              Expected: <code>/students/name/Karan</code> returns Karan's record.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>GET /students/{id}</code> returns the matching student.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== LAB 5: RequestParam ===== -->
-      <section class="section">
-        <details class="exp lab5">
-          <summary><span class="lab-tag">LAB 5</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Search with @RequestParam</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@RequestParam</code> reads a <strong>query parameter</strong> — the part of the URL after the
-              <code>?</code>. In <code>/students/search?name=Ravi</code>, the <code>name</code> query value is bound
-              to the method parameter.
-            </div>
-
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Add the <code>import org.springframework.web.bind.annotation.RequestParam;</code> line to the imports.</li>
-                <li>Add the <code>searchByName</code> <strong>method</strong> inside the class body.</li>
-                <li>Save → DevTools restarts → test the search URL.</li>
-              </ol>
-            </div>
-
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.RequestParam;
-
-@GetMapping("/search")   // maps GET /students/search?name=...
-public List&lt;Student&gt; searchByName(@RequestParam String name) {
-    List&lt;Student&gt; result = new ArrayList&lt;&gt;();
-    for (Student s : students) {
-        if (s.getFirstName().equalsIgnoreCase(name)) {
-            result.add(s);
-        }
-    }
-    return result;
-}</code></pre></div>
-            <div class="expected">
-              <span class="lbl">Expected — GET /students/search?name=Ravi</span>
-              <div class="codewrap"><pre><code>[ { "id": 1, "firstName": "Ravi", "lastName": "Sharma", "email": "ravi@tcs.com" } ]</code></pre></div>
-            </div>
-            <div class="observe">
-              <span class="lbl">PathVariable vs RequestParam — when to use which</span>
-              Use <strong>@PathVariable</strong> for identifying a specific resource — it's part of the resource's
-              identity: <code>/students/1</code>. Use <strong>@RequestParam</strong> for filtering, searching, or
-              optional criteria: <code>/students/search?name=Ravi</code>. Rule of thumb: identity in the path,
-              filters in the query.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>GET /students/search?name=Ravi</code> returns the matching student(s).</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== LAB 6: POST ===== -->
-      <section class="section">
-        <details class="exp lab6">
-          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge post">POST</span><span class="chevron">▶</span> Create with @RequestBody (201 Created)</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@RequestBody</code> maps the incoming JSON in the request body straight into a Java
-              <code>Student</code> object — Jackson deserializes it. <code>@ResponseStatus(HttpStatus.CREATED)</code>
-              makes the endpoint return <strong>201 Created</strong> instead of the default 200.
-            </div>
-
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Add the four new <code>import</code> lines (HttpStatus, PostMapping, RequestBody, ResponseStatus) to the imports.</li>
-                <li>Add the <code>addStudent</code> <strong>method</strong> inside the class body.</li>
-                <li>Save → DevTools restarts → test in Postman or Swagger.</li>
-              </ol>
-            </div>
-
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add POST method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@PostMapping                              // maps POST /students
-@ResponseStatus(HttpStatus.CREATED)       // returns 201 instead of 200
-public String addStudent(@RequestBody Student student) {
-    students.add(student);
-    return "Student created with id " + student.getId();
-}</code></pre></div>
-            <p><strong>Exact JSON to paste into the Postman body:</strong></p>
-            <div class="codewrap"><pre><code>{
-  "id": 4,
-  "firstName": "Priya",
-  "lastName": "Mehta",
-  "email": "priya@tcs.com"
-}</code></pre></div>
-
-            <div class="runbox">
-              <span class="lbl">▶ How to send a POST request in Postman (click-by-click)</span>
-              <ol>
-                <li>Open Postman → click the <strong>+</strong> tab to open a new request.</li>
-                <li>Change the method dropdown from <code>GET</code> to <strong><code>POST</code></strong>.</li>
-                <li>Paste the URL: <code>http://localhost:8080/students</code></li>
-                <li>Click the <strong>Body</strong> tab → select the <strong>raw</strong> radio button → on the dropdown to its right pick <strong>JSON</strong>.</li>
-                <li>Paste the JSON above into the body text area.</li>
-                <li>Click <strong>Send</strong>.</li>
-              </ol>
-            </div>
-            <div class="expected">
-              <span class="lbl">Expected</span>
-              Postman's response panel shows status <strong>201 Created</strong> and the body
-              <code>Student created with id 4</code>. Call <code>GET /students/all</code> again — Priya is now in the list.
-            </div>
-            <div class="observe">
-              <span class="lbl">Also try it in Swagger</span>
-              Expand the <code>POST /students</code> operation, click <strong>Try it out</strong>, paste the same JSON
-              into the request body box, and hit <strong>Execute</strong>. Swagger shows the 201 response — no Postman needed.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>POST /students</code> with JSON body returns 201 and adds the student.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== LAB 7: PUT + DELETE ===== -->
-      <section class="section">
-        <details class="exp lab7">
-          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Update &amp; Delete by ID</summary>
-          <div class="exp-body">
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Add <code>import org.springframework.web.bind.annotation.PutMapping;</code> and
-                    <code>import org.springframework.web.bind.annotation.DeleteMapping;</code> to your imports.</li>
-                <li>Add <strong>both</strong> the <code>updateStudent</code> and <code>deleteStudent</code>
-                    methods (shown below) inside the class body.</li>
-                <li>Save → DevTools restarts → test in Postman.</li>
-              </ol>
-            </div>
-
-            <h3 style="margin-top:0;">PUT — update an existing student</h3>
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>@PutMapping("/{id}")</code> combines both ideas: <code>@PathVariable</code> tells us <em>which</em>
-              student to update, and <code>@RequestBody</code> carries the new data.
-            </div>
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add PUT method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PutMapping;
-
-@PutMapping("/{id}")   // maps PUT /students/{id}
-public Student updateStudent(@PathVariable int id, @RequestBody Student updated) {
-    for (int i = 0; i &lt; students.size(); i++) {
-        if (students.get(i).getId() == id) {
-            updated.setId(id);          // keep the id from the URL
-            students.set(i, updated);   // replace the old record
-            return updated;
-        }
-    }
-    return null;   // (Session 3: return a proper 404)
-}</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Test in Postman — PUT</span>
-              Method <code>PUT</code>, URL <code>http://localhost:8080/students/2</code>, Body → raw → JSON:
-              <code>{ "firstName": "Anita", "lastName": "Singh", "email": "anita.singh@tcs.com" }</code>. The response
-              shows the updated record; <code>GET /students/all</code> confirms student 2 changed.
-            </div>
-
-            <div class="runbox">
-              <span class="lbl">▶ Postman steps for PUT and DELETE</span>
-              <ol>
-                <li><strong>PUT:</strong> set method to <code>PUT</code>, URL <code>http://localhost:8080/students/2</code>, Body → raw → JSON, paste the body above, then <strong>Send</strong>.</li>
-                <li><strong>DELETE:</strong> set method to <code>DELETE</code>, URL <code>http://localhost:8080/students/3</code>. No body needed. <strong>Send</strong>.</li>
-                <li>After each, run a quick <code>GET</code> on <code>http://localhost:8080/students/all</code> to confirm the change in the list.</li>
-              </ol>
-            </div>
-
-            <h3 style="margin-top:24px;">DELETE — remove a student</h3>
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add DELETE method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.DeleteMapping;
-
-@DeleteMapping("/{id}")   // maps DELETE /students/{id}
-public String deleteStudent(@PathVariable int id) {
-    students.removeIf(s -&gt; s.getId() == id);
-    return "Student " + id + " deleted";
-}</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Test in Postman — DELETE</span>
-              Method <code>DELETE</code>, URL <code>http://localhost:8080/students/3</code>. Response:
-              <code>Student 3 deleted</code>. Call <code>GET /students/all</code> — Karan is gone.
-            </div>
-            <div class="expected">
-              <span class="lbl">Alternative: 204 No Content</span>
-              Instead of returning a string, you can return <code>void</code> and annotate the method with
-              <code>@ResponseStatus(HttpStatus.NO_CONTENT)</code> to send a clean <strong>204</strong> — the
-              conventional REST response for a successful delete with no body.
-            </div>
-            <div class="warnbox" style="border-left:4px solid var(--tl-yellow); background:rgba(254,188,46,0.1); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0;">
-              <span style="font-weight:700; color:#b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;">Important</span>
-              These changes only persist <strong>while the app is running</strong>. Restart it and your edits are gone —
-              the data lives in an in-memory list. In <strong>Session 3</strong> we connect to a real database so changes survive.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>PUT</code> updates a student and <code>DELETE</code> removes one by ID.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== BONUS: ResponseEntity ===== -->
-      <section class="section">
-        <details class="exp bonus">
-          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> ResponseEntity — do this if you finish early</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              <code>ResponseEntity&lt;T&gt;</code> lets you control the full HTTP response — status code, headers and
-              body. Here we refactor "GET by ID" to return <strong>200 OK</strong> when the student exists and a clean
-              <strong>404 Not Found</strong> when it doesn't. This previews Session 3's exception handling without going deep.
-            </div>
-
-            <div class="dothis">
-              <span class="lbl">Where to paste this in StudentController.java</span>
-              <ol>
-                <li>Add <code>import org.springframework.http.ResponseEntity;</code> to the imports.</li>
-                <li>Add the new <code>getByIdEntity</code> method below the existing methods. It uses a different
-                    path (<code>/entity/{id}</code>) so it doesn't clash with Lab 4's <code>/{id}</code>.</li>
-                <li>Save → DevTools restarts → test both <code>/students/entity/1</code> (200) and
-                    <code>/students/entity/999</code> (404).</li>
-              </ol>
-            </div>
-
-            <div class="filebar"><span class="fb-icon">✏️</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">EDIT — add bonus method</span></div>
-            <div class="codewrap"><pre><code>import org.springframework.http.ResponseEntity;
-
-@GetMapping("/entity/{id}")   // a ResponseEntity version of GET by id
-public ResponseEntity&lt;Student&gt; getByIdEntity(@PathVariable int id) {
-    for (Student s : students) {
-        if (s.getId() == id) {
-            return ResponseEntity.ok(s);          // 200 + the student
-        }
-    }
-    return ResponseEntity.notFound().build();     // 404, no body
-}</code></pre></div>
-            <div class="expected">
-              <span class="lbl">Expected</span>
-              <code>/students/entity/1</code> → status <strong>200</strong> with the student JSON.
-              <code>/students/entity/999</code> → status <strong>404 Not Found</strong> with an empty body — far
-              cleaner than the <code>null</code> our earlier method returned.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Bonus: a <code>ResponseEntity</code> endpoint returns 200 for a valid ID and 404 for an invalid one.</span></label>
-          </div>
-        </details>
-      </section>
-
-      <!-- ===== COMPLETE CONTROLLER REFERENCE ===== -->
-      <div class="section-band">Catch-up safety net</div>
-      <section class="section">
-        <details class="ref-block">
-          <summary><span class="chevron">▶</span> ✅ Complete StudentController.java (end-of-lab)</summary>
-          <div class="exp-body">
-            <p>The entire controller as it looks after all the labs. If you fell behind, paste this, run it, and
-            you're caught up with the group.</p>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/StudentController.java</span><span class="fb-tag">CATCH-UP — paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
-
-import com.tcs.training.model.Student;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import com.tcs.training.students.model.Student;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-@RestController
-@RequestMapping("/students")
-public class StudentController {
+// @Service = "Spring, create ONE of these and manage it."
+// Because it is a singleton, the list below is shared by every request.
+@Service
+public class StudentService {
 
-    private List&lt;Student&gt; students = new ArrayList&lt;&gt;(Arrays.asList(
-            new Student(1, "Ravi", "Sharma", "ravi@tcs.com"),
-            new Student(2, "Anita", "Verma", "anita@tcs.com"),
-            new Student(3, "Karan", "Patel", "karan@tcs.com")
-    ));
+    private final List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+    private int nextId = 1;
 
-    // Lab 2 — single hardcoded student
-    @GetMapping("/first")
-    public Student getStudent() {
-        return new Student(1, "Ravi", "Sharma", "ravi@tcs.com");
+    // Constructor: seed three students so our GET endpoints have something
+    // to return straight away.
+    public StudentService() {
+        students.add(new Student(nextId++, "Amit Shah",  "amit@tcs.com",  "A"));
+        students.add(new Student(nextId++, "Neha Patel", "neha@tcs.com",  "B"));
+        students.add(new Student(nextId++, "Ravi Kumar", "ravi@tcs.com",  "A"));
     }
 
-    // Lab 3 — all students
-    @GetMapping("/all")
-    public List&lt;Student&gt; getAllStudents() {
+    // ---- READ ALL ----
+    public List&lt;Student&gt; findAll() {
         return students;
     }
 
-    // Lab 4 — by id
-    @GetMapping("/{id}")
-    public Student getStudentById(@PathVariable int id) {
+    // ---- READ ONE: returns null if there is no such id ----
+    public Student findById(int id) {
         for (Student s : students) {
             if (s.getId() == id) {
                 return s;
@@ -1205,84 +1080,1337 @@ public class StudentController {
         return null;
     }
 
-    // Lab 5 — search by first name
-    @GetMapping("/search")
-    public List&lt;Student&gt; searchByName(@RequestParam String name) {
+    // ---- FILTER by grade (case-insensitive) ----
+    public List&lt;Student&gt; findByGrade(String grade) {
         List&lt;Student&gt; result = new ArrayList&lt;&gt;();
         for (Student s : students) {
-            if (s.getFirstName().equalsIgnoreCase(name)) {
+            if (s.getGrade().equalsIgnoreCase(grade)) {
                 result.add(s);
             }
         }
         return result;
     }
 
-    // Lab 6 — create
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public String addStudent(@RequestBody Student student) {
+    // ---- CREATE: we assign the id, never the client ----
+    public Student save(Student student) {
+        student.setId(nextId++);
         students.add(student);
-        return "Student created with id " + student.getId();
+        return student;
     }
 
-    // Lab 7 — update
-    @PutMapping("/{id}")
-    public Student updateStudent(@PathVariable int id, @RequestBody Student updated) {
-        for (int i = 0; i &lt; students.size(); i++) {
-            if (students.get(i).getId() == id) {
-                updated.setId(id);
-                students.set(i, updated);
-                return updated;
-            }
+    // ---- UPDATE: returns null if the id doesn't exist ----
+    public Student update(int id, Student updated) {
+        Student existing = findById(id);
+        if (existing == null) {
+            return null;
         }
-        return null;
+        existing.setName(updated.getName());
+        existing.setEmail(updated.getEmail());
+        existing.setGrade(updated.getGrade());
+        return existing;
     }
 
-    // Lab 7 — delete
-    @DeleteMapping("/{id}")
-    public String deleteStudent(@PathVariable int id) {
-        students.removeIf(s -&gt; s.getId() == id);
-        return "Student " + id + " deleted";
-    }
-
-    // Bonus — ResponseEntity
-    @GetMapping("/entity/{id}")
-    public ResponseEntity&lt;Student&gt; getByIdEntity(@PathVariable int id) {
-        for (Student s : students) {
-            if (s.getId() == id) {
-                return ResponseEntity.ok(s);
-            }
+    // ---- DELETE: returns true if something was actually removed ----
+    public boolean delete(int id) {
+        Student existing = findById(id);
+        if (existing == null) {
+            return false;
         }
-        return ResponseEntity.notFound().build();
+        students.remove(existing);
+        return true;
     }
 }</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              Compiles cleanly. Still nothing to run — no endpoint exposes it yet. That's Lab 3.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>StudentService.java</code> created with <code>@Service</code> on the class.</span>
+              </label>
+            </div>
+
             <div class="observe">
-              <span class="lbl">Note on URL collisions</span>
-              In this combined reference the single-student demo from Lab 2 is mapped to <code>/students/first</code>
-              so it doesn't clash with <code>GET /students/{id}</code>. When two GET mappings would match the same
-              path, Spring needs them to be distinct — a good thing to be aware of.
+              <span class="lbl">Read the method signatures — they're a deliberate design</span>
+              <code>findById</code> returns <strong><code>null</code></strong> when nothing is found, and
+              <code>delete</code> returns <strong><code>false</code></strong>. Those return values are how the
+              controller will know to send a <code>404</code> instead of a <code>200</code>. It works, but it's
+              clumsy — every caller must remember to check. In Session 3 we replace it with a
+              <strong>custom exception</strong> and a single global handler, which is far cleaner.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== QUICK REFERENCE CARD ===== -->
+
+      <!-- ===== LAB 3: GET ALL ===== -->
+      <section class="section">
+        <details class="exp lab3">
+          <summary><span class="lab-tag">LAB 3</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> The Controller &amp; <code>GET</code> All Students</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — three things happening at once</span>
+              <ul style="margin:8px 0 0;">
+                <li><code>@RequestMapping("/api/students")</code> on the <strong>class</strong> sets the prefix for
+                    every method inside. So a bare <code>@GetMapping</code> with no path answers
+                    <code>/api/students</code> exactly.</li>
+                <li>The <strong>constructor</strong> asks for a <code>StudentService</code>. Spring finds the bean it
+                    created from your <code>@Service</code> class and passes it in — dependency injection, exactly as
+                    in Session 1.</li>
+                <li>The method returns <code>List&lt;Student&gt;</code>, and Jackson turns that into a
+                    <strong>JSON array</strong>. You write no conversion code.</li>
+              </ul>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training.students.controller</code> → <strong>New → Class</strong>.</li>
+                <li>Name it <code>StudentController</code>.</li>
+                <li>Paste the whole file below.</li>
+                <li>Run <code>StudentsApplication</code> and wait for "Tomcat started on port 8080".</li>
+                <li>Open <code>http://localhost:8080/api/students</code> in your browser — a GET works fine there.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/controller/StudentController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.controller;
+
+import com.tcs.training.students.model.Student;
+import com.tcs.training.students.service.StudentService;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/students")     // shared prefix for every method below
+public class StudentController {
+
+    private final StudentService service;
+
+    // Constructor injection. No @Autowired needed — only one constructor.
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
+    // GET /api/students   ->  the whole list, as a JSON array
+    @GetMapping
+    public List&lt;Student&gt; getAllStudents() {
+        return service.findAll();
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it — and meet Swagger UI properly</span>
+              <ol>
+                <li><strong>Stop</strong> any previous run (the red square).</li>
+                <li><strong>Run</strong> <code>StudentsApplication</code>.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span></li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — your endpoint has appeared, on its own</span>
+              Where it said "No operations defined in spec!" a minute ago, you now have a clickable row:
+              <div class="dash-mock">
+                <div class="dm-top">📘 Swagger UI &nbsp;·&nbsp; http://localhost:8080/swagger-ui.html</div>
+                <table>
+                  <thead><tr><th>Verb</th><th>Path</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">GET</td><td><code>/api/students</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <strong>You wrote no documentation.</strong> Swagger read your controller at startup and generated
+              that. Every endpoint you add today will show up the same way.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>GET /api/students</code> appears as a row in Swagger UI.</span>
+              </label>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — the four clicks you'll repeat all session</span>
+              <ol>
+                <li><strong>Click the row</strong> (<code>GET /api/students</code>) to expand it.</li>
+                <li>Click <strong>"Try it out"</strong> — the button at the top right of the panel that just opened.</li>
+                <li>Click the big blue <strong>Execute</strong> button.</li>
+                <li>Scroll down to the <strong>Responses</strong> section and read the result.</li>
+              </ol>
+              <strong>Learn this four-click rhythm now</strong> — expand → Try it out → Execute → read. Every lab from
+              here is that same loop with different values.
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — <code>200</code> and three students</span>
+              In the Responses panel you'll see <strong>Code <code>200</code></strong> and this response body:
+              <div class="codewrap"><pre><code>[
+  { "id": 1, "name": "Amit Shah",  "email": "amit@tcs.com", "grade": "A" },
+  { "id": 2, "name": "Neha Patel", "email": "neha@tcs.com", "grade": "B" },
+  { "id": 3, "name": "Ravi Kumar", "email": "ravi@tcs.com", "grade": "A" }
+]</code></pre></div>
+              Note the <strong>square brackets</strong> — returning a Java <code>List</code> produced a JSON array
+              automatically.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Executing it in Swagger UI returns <code>200</code> with all three students.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Three things in that response panel worth noticing</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>The status code is displayed prominently</strong> (<code>200</code>). Get into the habit of
+                    reading it <em>before</em> the body — it tells you whether to debug your request or your server.</li>
+                <li><strong>Response headers</strong> are listed underneath, including
+                    <code>content-type: application/json</code>. That's Spring telling the client what it sent.</li>
+                <li><strong>A "Curl" box</strong> shows the exact command equivalent to what you just clicked. That's
+                    genuinely useful — it's how you'd script this, or paste it to a colleague.</li>
+              </ol>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Also try the plain URL</span>
+              A <code>GET</code> works fine straight in the address bar too:
+              <code>http://localhost:8080/api/students</code>. Worth seeing once, so you know Swagger isn't doing
+              anything magic — it's just sending an ordinary HTTP request. From Lab 6 the address bar stops being
+              enough, which is exactly why we set Swagger up.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">🚨 Endpoint missing from Swagger UI, or a 404? Work through these in order</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Did you restart?</strong> Swagger reads your controllers <em>at startup</em>, so a new
+                    endpoint is invisible until you restart — then <strong>hard-refresh the page</strong>
+                    (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>).</li>
+                <li><strong>Check the package line.</strong> It must be
+                    <code>package com.tcs.training.students.controller;</code> — with <code>.students.</code> in the
+                    middle. Missing that means Spring never scanned the file, so there's nothing for Swagger to find.</li>
+                <li><strong>Is <code>@RestController</code> there?</strong> Not <code>@Controller</code> — that would
+                    treat your return value as a page name.</li>
+                <li><strong>Check the URL</strong> if you're calling it directly: <code>/api/students</code> — plural,
+                    and with the <code>/api</code> prefix from the class-level annotation.</li>
+              </ol>
+              💡 <strong>Swagger UI is itself a diagnostic:</strong> if your endpoint isn't listed on that page, Spring
+              never registered it — so the problem is your class, not your URL.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 4: GET BY ID ===== -->
+      <section class="section">
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> <code>GET</code> One Student — and a Proper <code>404</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — <code>@PathVariable</code> and <code>ResponseEntity</code></span>
+              <code>@GetMapping("/{id}")</code> declares a <strong>slot</strong> in the path. Request
+              <code>/api/students/2</code> and Spring puts <code>2</code> into the method's <code>id</code> parameter,
+              converting the text to an <code>int</code> for you.
+              <br><br>
+              The interesting part is what happens when the id <em>doesn't</em> exist. Returning <code>null</code>
+              would give the caller <code>200 OK</code> with an empty body — a lie, because we're saying "success"
+              about a failure. Instead we return <strong><code>ResponseEntity</code></strong>, which lets us choose
+              the status code: <code>200</code> with the student, or <code>404</code> with nothing.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>StudentController.java</code>.</li>
+                <li>Select all, delete, and paste the <strong>whole updated file</strong> below — it keeps Lab 3's
+                    method and adds the new one.</li>
+                <li>Restart the app.</li>
+                <li>Try both URLs in the expected-output table — including the one that fails.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/controller/StudentController.java</span><span class="fb-tag">replace the whole file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.controller;
+
+import com.tcs.training.students.model.Student;
+import com.tcs.training.students.service.StudentService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    private final StudentService service;
+
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
+    // GET /api/students
+    @GetMapping
+    public List&lt;Student&gt; getAllStudents() {
+        return service.findAll();
+    }
+
+    // ---- NEW ----
+    // GET /api/students/2   ->  200 + that student
+    // GET /api/students/99  ->  404, empty body
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) {
+        Student student = service.findById(id);
+
+        if (student == null) {
+            return ResponseEntity.notFound().build();   // 404 Not Found
+        }
+        return ResponseEntity.ok(student);              // 200 OK + body
+    }
+}</code></pre></div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Stop the app, then run it again.</li>
+                <li>Refresh <span class="kbd">http://localhost:8080/swagger-ui.html</span> — a
+                    <strong>second row</strong> has appeared: <code>GET /api/students/{id}</code>.</li>
+                <li>Expand it → <strong>Try it out</strong>. Notice you now get an <strong>input box labelled
+                    <code>id</code></strong>, because your method has a <code>@PathVariable</code>.</li>
+                <li>Type <code>2</code> → <strong>Execute</strong>. Then repeat with <code>99</code>, then
+                    <code>abc</code>.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected output — three different outcomes from one endpoint</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>You type</th><th>Code</th><th>Response body</th></tr></thead>
+                <tbody>
+                  <tr><td><code>2</code></td><td><code>200</code></td><td><code>{"id":2,"name":"Neha Patel","email":"neha@tcs.com","grade":"B"}</code></td></tr>
+                  <tr><td><code>99</code></td><td><code>404</code></td><td><em>empty — no such student</em></td></tr>
+                  <tr><td><code>abc</code></td><td><code>400</code></td><td>type-conversion error</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Id <code>2</code> returns <code>200</code> with the student; id <code>99</code> returns <code>404</code>.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">This is where Swagger UI earns its keep over a browser</span>
+              Try <code>/api/students/99</code> in the address bar and you get a <strong>blank white page</strong> —
+              the browser renders the empty body and <em>hides the status code from you</em>. It looks broken, and you
+              can't tell <code>404</code> from a crash.
+              <br><br>
+              In Swagger UI the same request shows <strong><code>404</code> in large text</strong>, so the outcome is
+              unmistakable. Since half of good API design <em>is</em> choosing the right status code, you need a tool
+              that shows them to you.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">That third row is worth pausing on</span>
+              <code>/api/students/abc</code> gives <strong>400 Bad Request</strong>, and you wrote no validation for
+              it. Because the parameter is declared <code>int</code>, Spring tried to convert <code>"abc"</code>,
+              failed, and correctly reported a <em>client</em> error. Free type-safety at the edge of your API.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Why <code>404</code> and not an empty <code>200</code>?</span>
+              A status code is a <strong>promise to the caller</strong>. <code>200</code> means "here is what you asked
+              for" — so returning <code>200</code> with nothing forces every client to write "if the body is empty,
+              it probably didn't exist" guesswork. <code>404</code> says it plainly, and the client can branch on the
+              code alone. Getting this right is much of what separates a usable API from an annoying one.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">💡 Where to find the curl equivalent</span>
+              After any <strong>Execute</strong>, Swagger UI shows a <strong>Curl</strong> box containing the exact
+              command it just ran — for example:
+              <div class="codewrap"><pre><code>curl -X 'GET' \
+  'http://localhost:8080/api/students/2' \
+  -H 'accept: application/json'</code></pre></div>
+              You never have to write these by hand. Copy one when you want to script a call or share a reproduction
+              with a colleague.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: SEARCH ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="verb-badge get">GET</span><span class="chevron">▶</span> Filtering With <code>@RequestParam</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — why this is a query parameter, not a path variable</span>
+              Apply the test from the theory deck: <em>is this value needed to identify the resource?</em> A grade
+              isn't — <code>/api/students</code> is perfectly meaningful without it. The grade merely
+              <strong>narrows</strong> the list. So it belongs after the <code>?</code> as a query parameter:
+              <code>/api/students/search?grade=A</code>. Ids identify (path); filters narrow (query).
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li>Add the <strong>two imports</strong> and the <strong>one new method</strong> below to
+                    <code>StudentController.java</code>. (Or paste the complete file from the reference section at the
+                    bottom.)</li>
+                <li>Restart, then try the three URLs.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.RequestParam;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add this method inside the class</span><span class="fb-tag">add this method</span></div>
+            <div class="codewrap"><pre><code>    // GET /api/students/search?grade=A
+    // 'required = false' + a default means the parameter is optional.
+    @GetMapping("/search")
+    public List&lt;Student&gt; searchByGrade(
+            @RequestParam(defaultValue = "A") String grade) {
+        return service.findByGrade(grade);
+    }</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Order matters here — put <code>/search</code> ABOVE <code>/{id}</code></span>
+              <code>@GetMapping("/{id}")</code> is a wildcard: it would happily match the literal path
+              <code>/search</code> too, and then fail trying to turn <code>"search"</code> into an <code>int</code>.
+              Spring's matching prefers the more specific literal path, so this normally resolves correctly — but
+              declaring <code>/search</code> <strong>before</strong> <code>/{id}</code> in the file makes the intent
+              obvious to the next reader and avoids surprises. If you get a strange 400 on
+              <code>/api/students/search</code>, this is the cause.
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Stop, restart the app, and refresh Swagger UI.</li>
+                <li>Expand <code>GET /api/students/search</code> → <strong>Try it out</strong>.</li>
+                <li>Notice the <code>grade</code> box is <strong>pre-filled with <code>A</code></strong> — Swagger read
+                    your <code>defaultValue = "A"</code> straight from the code.</li>
+                <li><strong>Execute</strong> with <code>A</code>, then <code>B</code>, then <code>Z</code>, then clear
+                    the box entirely and execute again.</li>
+              </ol>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Value in the <code>grade</code> box</th><th>Response</th></tr></thead>
+                <tbody>
+                  <tr><td><code>A</code></td><td>Amit and Ravi — a 2-item array</td></tr>
+                  <tr><td><code>B</code></td><td>Neha only — a 1-item array</td></tr>
+                  <tr><td><code>Z</code></td><td><code>[]</code> — an <strong>empty array</strong>, with status <code>200</code></td></tr>
+                  <tr><td><em>left empty</em></td><td>Grade A students (the <code>defaultValue</code>)</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Filtering works, and an unknown grade returns an empty array rather than an error.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">Why is an empty list <code>200</code> and not <code>404</code>?</span>
+              Because the question <em>"which students have grade Z?"</em> has a perfectly valid answer:
+              <strong>none</strong>. The collection exists; it's just empty right now. That's a success, so
+              <code>200</code> with <code>[]</code> is correct. Contrast Lab 4: <em>"give me student 99"</em> has no
+              valid answer at all, because that resource doesn't exist — hence <code>404</code>.
+              <strong>Empty collection → 200. Missing single item → 404.</strong>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Stretch goal</span>
+              Add a second filter so you can search by name fragment:
+              <code>/api/students/search?grade=A&amp;name=am</code>. You'll need another
+              <code>@RequestParam(required = false) String name</code> and a
+              <code>toLowerCase().contains(...)</code> check in the service. Real APIs combine filters exactly like
+              this.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 6: POST ===== -->
+      <section class="section">
+        <details class="exp lab6">
+          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge post">POST</span><span class="chevron">▶</span> Creating Data With <code>@RequestBody</code> and <code>201</code></summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — your first write operation</span>
+              Everything so far has been read-only, and all input came from the URL. A whole student record is far too
+              much for a URL, so the client sends <strong>JSON in the request body</strong> instead.
+              <code>@RequestBody Student student</code> tells Spring: <em>take the JSON body, hand it to Jackson, and
+              give me back a filled-in <code>Student</code> object.</em> Jackson uses the no-arg constructor and the
+              setters you wrote in Lab 1 — which is exactly why they were needed.
+              <br><br>
+              And because this <em>creates</em> something, the correct status code is <strong><code>201
+              Created</code></strong>, not <code>200</code>.
+            </div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ From here on, the address bar will not work</span>
+              A browser address bar can only send <code>GET</code> — there is no way to choose a verb or attach a body.
+              <strong>This is the moment Swagger UI becomes essential</strong> rather than merely convenient.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the imports and the new method below to <code>StudentController.java</code>.</li>
+                <li>Restart the app, then refresh Swagger UI.</li>
+                <li>A <strong>green <code>POST /api/students</code></strong> row has appeared. Expand it →
+                    <strong>Try it out</strong>.</li>
+                <li>You now get a <strong>Request body</strong> editor, <strong>already filled in</strong> with an
+                    example. Replace it with the JSON below (or just edit the placeholder values).</li>
+                <li>Click <strong>Execute</strong>.</li>
+                <li>Then run <code>GET /api/students</code> again to confirm your new student is in the list.</li>
+              </ol>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">The request body is pre-filled from your own class — read this bit</span>
+              When you click "Try it out", Swagger offers you something like:
+              <div class="codewrap"><pre><code>{
+  "id": 0,
+  "name": "string",
+  "email": "string",
+  "grade": "string"
+}</code></pre></div>
+              <strong>It built that from your <code>Student</code> class</strong> — one entry per field, with a
+              placeholder for each type (<code>0</code> for the <code>int</code>, <code>"string"</code> for each
+              <code>String</code>). It is a template, not real data: <strong>replace the values.</strong>
+              <br><br>
+              💡 <strong>What about <code>"id": 0</code>?</strong> Leave it or delete it — either works. Your
+              <code>save()</code> method calls <code>setId(nextId++)</code>, so <strong>the server overwrites whatever
+              id you send.</strong> That's deliberate: clients must never choose their own ids, or two clients could
+              pick the same one.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
+            <div class="codewrap"><pre><code>import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add this method inside the class</span><span class="fb-tag">add this method</span></div>
+            <div class="codewrap"><pre><code>    // POST /api/students   + a JSON body
+    // @RequestBody: Jackson converts the incoming JSON into a Student object.
+    @PostMapping
+    public ResponseEntity&lt;Student&gt; createStudent(@RequestBody Student student) {
+        Student saved = service.save(student);
+
+        // 201 Created is the correct code for a successful creation,
+        // and we return the saved object so the client learns its new id.
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">Swagger UI → POST /api/students → Request body</span><span class="fb-tag">replace the example with this</span></div>
+            <div class="codewrap"><pre><code>{
+  "name": "Priya Desai",
+  "email": "priya@tcs.com",
+  "grade": "A"
+}</code></pre></div>
+
+            <div class="observe">
+              <span class="lbl">Notice: no <code>"id"</code> in the request</span>
+              The <strong>server</strong> assigns ids, never the client — that's why <code>save()</code> calls
+              <code>setId(nextId++)</code>. If a client could choose its own id it might collide with an existing
+              record. Send an <code>"id"</code> anyway and our service simply overwrites it, which is exactly the
+              right behaviour.
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected output — <code>201 Created</code></span>
+              <div class="codewrap"><pre><code>{
+  "id": 4,
+  "name": "Priya Desai",
+  "email": "priya@tcs.com",
+  "grade": "A"
+}</code></pre></div>
+              Check <strong>both</strong> things: the status code reads <code>201 Created</code> (top right in
+              Swagger UI's response panel), and the body now contains <code>"id": 4</code> — assigned by your service.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>POST</code> returns <code>201 Created</code> with the new student and its server-assigned id.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>GET /api/students</code> now shows <strong>four</strong> students.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">💡 Look at the Curl box — Swagger set a header for you</span>
+              After executing, the Curl box shows:
+              <div class="codewrap"><pre><code>curl -X 'POST' \
+  'http://localhost:8080/api/students' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{ "name": "Priya Desai", "email": "priya@tcs.com", "grade": "A" }'</code></pre></div>
+              Notice <code>-H 'Content-Type: application/json'</code>. That header tells the server
+              <em>"my body is JSON"</em>, and <strong>without it Spring rejects the request with
+              <code>415 Unsupported Media Type</code></strong>.
+              <br><br>
+              <strong>Swagger UI sets it automatically</strong>, because it knows from your code that the endpoint
+              consumes JSON — which is why you will not hit <code>415</code> today. But you <em>will</em> hit it the
+              first time you use another tool and forget the header, so it's worth knowing the name of that error and
+              what causes it.
+            </div>
+
+            <h3>Common issues</h3>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>415</strong> Unsupported Media Type</td>
+                  <td>The <code>Content-Type: application/json</code> header is missing. Swagger UI sets it for you, so this only appears if you're using another tool.</td>
+                  <td>With curl, add <code>-H "Content-Type: application/json"</code>. In Postman it's Body → raw → JSON.</td>
+                </tr>
+                <tr>
+                  <td><strong>400</strong> Bad Request</td>
+                  <td>Malformed JSON — a trailing comma, single quotes, or a missing brace.</td>
+                  <td>Keys and strings in <strong>double</strong> quotes; no comma after the last pair.</td>
+                </tr>
+                <tr>
+                  <td><strong>405</strong> Method Not Allowed</td>
+                  <td>You sent GET (or forgot to change the verb) to the POST endpoint.</td>
+                  <td>Set the verb dropdown to <code>POST</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>201</code>, but every field is <code>null</code></td>
+                  <td>Your <code>Student</code> class is missing setters, or the JSON keys don't match the field names.</td>
+                  <td>Check for setters, and that the keys are exactly <code>name</code>, <code>email</code>, <code>grade</code>.</td>
+                </tr>
+                <tr>
+                  <td>New student disappears after a restart</td>
+                  <td>Working as designed — the list lives in memory.</td>
+                  <td>Nothing to fix. Session 3 adds a real database.</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="tryit">
+              <span class="lbl">Try it — feel the "not idempotent" problem</span>
+              Click <strong>Execute</strong> on the same POST <strong>three times</strong>, then
+              <code>GET /api/students</code>. You now have <strong>three identical Priyas</strong> with different ids.
+              That's <code>POST</code> not being idempotent, exactly as the theory said — and it's why a mobile app
+              can't blindly retry a failed POST after a dropped connection.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 7: PUT + DELETE ===== -->
+      <section class="section">
+        <details class="exp lab7">
+          <summary><span class="lab-tag">LAB 7</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Update &amp; Delete — Completing CRUD</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — the last two operations</span>
+              <ul style="margin:8px 0 0;">
+                <li><strong><code>PUT /api/students/5</code></strong> needs <em>both</em> kinds of input: a
+                    <code>@PathVariable</code> to say <strong>which</strong> student, and a
+                    <code>@RequestBody</code> to say <strong>what</strong> the new values are. Returns
+                    <code>200</code> with the updated object, or <code>404</code>.</li>
+                <li><strong><code>DELETE /api/students/5</code></strong> needs only the id and sends no body back —
+                    so the right code is <strong><code>204 No Content</code></strong>: "it worked, and there's
+                    nothing to show you." Note the return type <code>ResponseEntity&lt;Void&gt;</code>, since there's
+                    no body type.</li>
+              </ul>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the imports and both methods below to <code>StudentController.java</code>.</li>
+                <li>Restart the app, then refresh Swagger UI. <strong>Two more rows</strong> appear — an orange
+                    <code>PUT</code> and a red <code>DELETE</code>.</li>
+                <li><strong>Test PUT:</strong> expand <code>PUT /api/students/{id}</code> → Try it out →
+                    <code>id</code> = <code>2</code> → replace the request body with the JSON below →
+                    <strong>Execute</strong>.</li>
+                <li><strong>Test DELETE:</strong> expand <code>DELETE /api/students/{id}</code> → Try it out →
+                    <code>id</code> = <code>3</code> → <strong>Execute</strong>. Notice there's
+                    <strong>no request body box at all</strong> — Swagger knows a <code>DELETE</code> doesn't take one.</li>
+                <li>Run <code>GET /api/students</code> to confirm both changes took effect.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
+            <div class="codewrap"><pre><code>import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add both methods inside the class</span><span class="fb-tag">add these methods</span></div>
+            <div class="codewrap"><pre><code>    // PUT /api/students/2   + a JSON body
+    // Needs BOTH: the id (which student) and the body (the new values).
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; updateStudent(@PathVariable int id,
+                                                 @RequestBody Student student) {
+        Student updated = service.update(id, student);
+
+        if (updated == null) {
+            return ResponseEntity.notFound().build();   // 404 — no such id
+        }
+        return ResponseEntity.ok(updated);              // 200 + updated object
+    }
+
+    // DELETE /api/students/3   (no body, in or out)
+    // ResponseEntity&lt;Void&gt; because there is no body type to declare.
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; deleteStudent(@PathVariable int id) {
+        boolean removed = service.delete(id);
+
+        if (!removed) {
+            return ResponseEntity.notFound().build();   // 404 — no such id
+        }
+        return ResponseEntity.noContent().build();      // 204 No Content
+    }</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">Swagger UI → PUT /api/students/{id} → Request body</span><span class="fb-tag">replace the example with this</span></div>
+            <div class="codewrap"><pre><code>{
+  "name": "Neha Patel",
+  "email": "neha.patel@tcs.com",
+  "grade": "A"
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Request</th><th>Status</th><th>Body</th></tr></thead>
+                <tbody>
+                  <tr><td><code>PUT /api/students/2</code> + body</td><td><code>200 OK</code></td><td>Neha, now with the new email and grade A</td></tr>
+                  <tr><td><code>PUT /api/students/99</code> + body</td><td><code>404 Not Found</code></td><td><em>empty</em></td></tr>
+                  <tr><td><code>DELETE /api/students/3</code></td><td><code>204 No Content</code></td><td><em>empty — this is correct</em></td></tr>
+                  <tr><td><code>DELETE /api/students/3</code> <em>again</em></td><td><code>404 Not Found</code></td><td><em>empty</em></td></tr>
+                  <tr><td><code>GET /api/students</code></td><td><code>200 OK</code></td><td>Ravi (id 3) is gone; Neha is updated</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>PUT</code> returns <code>200</code> with the updated student, and <code>404</code> for a bad id.</span>
+              </label>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>DELETE</code> returns <code>204 No Content</code>, and the student is gone from <code>GET</code>.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Row 4 shows idempotency in action — this is the interview answer</span>
+              Delete student 3 → <code>204</code>. Delete student 3 again → <code>404</code>. The
+              <strong>status differs</strong>, but the <strong>state of the server is identical</strong>: student 3 is
+              gone either way. That's what <em>idempotent</em> means, and it's why retrying a failed
+              <code>DELETE</code> is always safe. Compare Lab 6, where sending the same <code>POST</code> three times
+              gave you three extra records.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">💡 Notice how the UI adapts to each verb</span>
+              Swagger UI builds each panel from <em>your method signature</em>:
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Endpoint</th><th>What Swagger shows you</th><th>Because…</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET /api/students</code></td><td>Just an Execute button</td><td>no parameters</td></tr>
+                  <tr><td><code>GET /api/students/{id}</code></td><td>An <code>id</code> box</td><td><code>@PathVariable</code></td></tr>
+                  <tr><td><code>GET .../search</code></td><td>A <code>grade</code> box, pre-filled <code>A</code></td><td><code>@RequestParam(defaultValue="A")</code></td></tr>
+                  <tr><td><code>POST /api/students</code></td><td>A request-body editor</td><td><code>@RequestBody</code></td></tr>
+                  <tr><td><code>PUT /api/students/{id}</code></td><td><strong>Both</strong> an id box and a body editor</td><td>it has both annotations</td></tr>
+                  <tr><td><code>DELETE /api/students/{id}</code></td><td>An id box, <strong>no</strong> body editor</td><td>no <code>@RequestBody</code></td></tr>
+                </tbody>
+              </table>
+              You never configured any of that. <strong>The form is generated from your code</strong> — which is also
+              why a wrong annotation shows up here as a wrong-looking form.
+            </div>
+
+            <div class="concept">
+              <span class="lbl">🎉 You now have a complete REST API</span>
+              Six endpoints covering all four CRUD operations, with correct status codes throughout. Anyone — a React
+              dashboard, an Android app, a Python script — can now use your service without knowing a single thing
+              about your Java code. That's what building an API means.
+            </div>
+          </div>
+        </details>
+      </section>
+
+
+      <!-- ===== BONUS: DOCUMENTING THE API ===== -->
+      <div class="section-band">If you finish early</div>
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Make Your API Document Itself Properly</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — from "it works" to "someone else can use it"</span>
+              Swagger UI already lists your endpoints, but it's guessing the labels from your method names, and the
+              page title still says the generic <strong>"OpenAPI definition"</strong>. Real teams add a few annotations
+              so the page reads like actual documentation.
+              <br><br>
+              This matters more than it sounds: a front-end developer should be able to open your Swagger page and use
+              your entire API <strong>without asking you a single question</strong>. Getting there costs about ten
+              minutes.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the two imports below to <code>StudentController.java</code>.</li>
+                <li>Add <code>@Tag</code> on the <strong>class</strong>, and an <code>@Operation</code> above
+                    <strong>each</strong> method.</li>
+                <li>Restart and refresh Swagger UI.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
+            <div class="codewrap"><pre><code>import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — annotate the class and its methods</span><span class="fb-tag">pattern to apply</span></div>
+            <div class="codewrap"><pre><code>@RestController
+@RequestMapping("/api/students")
+@Tag(name = "Students", description = "Create, read, update and delete students")
+public class StudentController {
+
+    // ... constructor unchanged ...
+
+    @Operation(summary = "Get all students")
+    @GetMapping
+    public List&lt;Student&gt; getAllStudents() {
+        return service.findAll();
+    }
+
+    @Operation(summary = "Search students by grade")
+    @GetMapping("/search")
+    public List&lt;Student&gt; searchByGrade(
+            @RequestParam(defaultValue = "A") String grade) {
+        return service.findByGrade(grade);
+    }
+
+    @Operation(summary = "Get one student by id")
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Create a new student")
+    @PostMapping
+    public ResponseEntity&lt;Student&gt; createStudent(@RequestBody Student student) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Update an existing student")
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; updateStudent(@PathVariable int id,
+                                                 @RequestBody Student student) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Delete a student")
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; deleteStudent(@PathVariable int id) {
+        // ... unchanged ...
+    }
+}</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Watch the import — it is <code>v3</code>, and it is <em>not</em> a Spring package</span>
+              The correct package is <code>io.swagger.v3.oas.annotations</code>. Your IDE may also offer
+              <code>io.swagger.annotations</code> (that's the old Swagger 2 package) — <strong>pick the
+              <code>v3</code> one.</strong>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the page now reads like documentation</span>
+              <div class="dash-mock">
+                <div class="dm-top">📘 Swagger UI</div>
+                <table>
+                  <thead><tr><th>Verb</th><th>Path</th><th>Summary</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">GET</td><td><code>/api/students</code></td><td>Get all students</td></tr>
+                    <tr><td class="app">POST</td><td><code>/api/students</code></td><td>Create a new student</td></tr>
+                    <tr><td class="app">GET</td><td><code>/api/students/search</code></td><td>Search students by grade</td></tr>
+                    <tr><td class="app">GET</td><td><code>/api/students/{id}</code></td><td>Get one student by id</td></tr>
+                    <tr><td class="app">PUT</td><td><code>/api/students/{id}</code></td><td>Update an existing student</td></tr>
+                    <tr><td class="app">DELETE</td><td><code>/api/students/{id}</code></td><td>Delete a student</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              All six endpoints are now grouped under a heading reading
+              <strong>"Students — Create, read, update and delete students"</strong>, and each row carries your own
+              description instead of a guessed one.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">My endpoint descriptions and the "Students" group heading appear in Swagger UI.</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">One thing that will look odd — and it's fine</span>
+              The rows are <strong>grouped by path</strong>, not in the order you wrote them, so the three
+              <code>/{id}</code> operations sit together. Swagger organises by resource, which is usually what a reader
+              wants. Nothing is wrong with your code.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Stretch goal 1 — document the status codes</span>
+              Right now Swagger claims every endpoint returns <code>200</code>, because that's the default assumption.
+              You know better. Add <code>@ApiResponses</code> to tell the truth:
+              <div class="codewrap"><pre><code>import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Operation(summary = "Get one student by id")
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Student found"),
+    @ApiResponse(responseCode = "404", description = "No student with that id")
+})
+@GetMapping("/{id}")
+public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) { ... }</code></pre></div>
+              Restart and expand that endpoint — the Responses table now lists <strong>both</strong> outcomes, so a
+              caller knows to handle the <code>404</code> before they write a line of code.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Stretch goal 2 — name your API and look at the raw contract</span>
+              Add these to <code>application.properties</code> to title the page:
+              <div class="codewrap"><pre><code>springdoc.swagger-ui.path=/swagger-ui.html
+spring.application.name=students</code></pre></div>
+              Then open <span class="kbd">http://localhost:8080/v3/api-docs</span>. That JSON is the
+              <strong>OpenAPI specification</strong> — the machine-readable contract Swagger UI is rendering. Find your
+              <code>Student</code> schema inside it under <code>components.schemas</code>, and notice it lists exactly
+              the four fields of your class.
+              <br><br>
+              💡 <strong>Why that file matters in industry:</strong> front-end teams feed it into a code generator and
+              get a fully typed client (TypeScript, Java, Python) for your API <em>automatically</em>. That's the real
+              payoff of documenting from code — the docs aren't just readable, they're <em>executable</em>.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE REFERENCE ===== -->
+      <div class="section-band">Reference</div>
+      <section class="section">
+        <details class="ref-block">
+          <summary><span class="chevron">▶</span> ✅ Complete Files Reference — the finished files</summary>
+          <div class="exp-body">
+            <p>If you fell behind, or want to check your work, here is everything exactly as it should look at the end
+            of the session. Paste each one over yours in full.</p>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">pom.xml — the two dependencies you need</span><span class="fb-tag">inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Swagger UI — your testing tool. Needs an explicit version:
+     springdoc is not managed by the Spring Boot parent POM. --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/model/Student.java</span><span class="fb-tag">file 1 of 3 — complete</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.model;
+
+public class Student {
+
+    private int id;
+    private String name;
+    private String email;
+    private String grade;
+
+    public Student() {
+    }
+
+    public Student(int id, String name, String email, String grade) {
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.grade = grade;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getGrade() {
+        return grade;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setGrade(String grade) {
+        this.grade = grade;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/service/StudentService.java</span><span class="fb-tag">file 2 of 3 — complete</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.service;
+
+import com.tcs.training.students.model.Student;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+public class StudentService {
+
+    private final List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+    private int nextId = 1;
+
+    public StudentService() {
+        students.add(new Student(nextId++, "Amit Shah",  "amit@tcs.com", "A"));
+        students.add(new Student(nextId++, "Neha Patel", "neha@tcs.com", "B"));
+        students.add(new Student(nextId++, "Ravi Kumar", "ravi@tcs.com", "A"));
+    }
+
+    public List&lt;Student&gt; findAll() {
+        return students;
+    }
+
+    public Student findById(int id) {
+        for (Student s : students) {
+            if (s.getId() == id) {
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public List&lt;Student&gt; findByGrade(String grade) {
+        List&lt;Student&gt; result = new ArrayList&lt;&gt;();
+        for (Student s : students) {
+            if (s.getGrade().equalsIgnoreCase(grade)) {
+                result.add(s);
+            }
+        }
+        return result;
+    }
+
+    public Student save(Student student) {
+        student.setId(nextId++);
+        students.add(student);
+        return student;
+    }
+
+    public Student update(int id, Student updated) {
+        Student existing = findById(id);
+        if (existing == null) {
+            return null;
+        }
+        existing.setName(updated.getName());
+        existing.setEmail(updated.getEmail());
+        existing.setGrade(updated.getGrade());
+        return existing;
+    }
+
+    public boolean delete(int id) {
+        Student existing = findById(id);
+        if (existing == null) {
+            return false;
+        }
+        students.remove(existing);
+        return true;
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/controller/StudentController.java</span><span class="fb-tag">file 3 of 3 — complete</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.students.controller;
+
+import com.tcs.training.students.model.Student;
+import com.tcs.training.students.service.StudentService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    private final StudentService service;
+
+    public StudentController(StudentService service) {
+        this.service = service;
+    }
+
+    // GET /api/students
+    @GetMapping
+    public List&lt;Student&gt; getAllStudents() {
+        return service.findAll();
+    }
+
+    // GET /api/students/search?grade=A
+    // Declared BEFORE /{id} so the literal path is unambiguous to readers.
+    @GetMapping("/search")
+    public List&lt;Student&gt; searchByGrade(
+            @RequestParam(defaultValue = "A") String grade) {
+        return service.findByGrade(grade);
+    }
+
+    // GET /api/students/2
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) {
+        Student student = service.findById(id);
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(student);
+    }
+
+    // POST /api/students
+    @PostMapping
+    public ResponseEntity&lt;Student&gt; createStudent(@RequestBody Student student) {
+        Student saved = service.save(student);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+    // PUT /api/students/2
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; updateStudent(@PathVariable int id,
+                                                 @RequestBody Student student) {
+        Student updated = service.update(id, student);
+        if (updated == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(updated);
+    }
+
+    // DELETE /api/students/3
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; deleteStudent(@PathVariable int id) {
+        boolean removed = service.delete(id);
+        if (!removed) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.noContent().build();
+    }
+}</code></pre></div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TROUBLESHOOTING ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> 🔧 Troubleshooting Guide</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>415</strong> Unsupported Media Type on POST/PUT</td>
+                  <td>No <code>Content-Type: application/json</code> header. <strong>The most common Session 2 error.</strong></td>
+                  <td>Swagger UI sets this header for you — so if you see 415, you're using a different tool. With curl add <code>-H "Content-Type: application/json"</code>.</td>
+                </tr>
+                <tr>
+                  <td><strong>400</strong> Bad Request on POST/PUT</td>
+                  <td>Malformed JSON, or a value that can't convert (e.g. text where an <code>int</code> is expected).</td>
+                  <td>Double quotes on all keys and strings; no trailing comma; check field names match exactly.</td>
+                </tr>
+                <tr>
+                  <td><strong>404</strong> Whitelabel on every endpoint</td>
+                  <td>The controller is outside the scanned packages, or you didn't restart.</td>
+                  <td>Restart. Then confirm the file's first line is <code>package com.tcs.training.students.controller;</code> — with <code>.students.</code> present.</td>
+                </tr>
+                <tr>
+                  <td><strong>404</strong> on one endpoint only</td>
+                  <td>Path mismatch. Remember the real path is class prefix + method path.</td>
+                  <td>Class has <code>/api/students</code>, so the method should be <code>@GetMapping("/{id}")</code> — <em>not</em> the full path again.</td>
+                </tr>
+                <tr>
+                  <td><strong>405</strong> Method Not Allowed</td>
+                  <td>Right path, wrong verb.</td>
+                  <td>Use the row for the verb you mean — in Swagger UI each verb is a separate coloured row.</td>
+                </tr>
+                <tr>
+                  <td>Response is <code>{}</code> or fields are missing</td>
+                  <td>The <code>Student</code> class has no getters — Jackson can't read the values out.</td>
+                  <td>Generate getters (IntelliJ: <span class="kbd">Alt</span>+<span class="kbd">Insert</span>).</td>
+                </tr>
+                <tr>
+                  <td><code>201</code> returned, but all fields <code>null</code></td>
+                  <td>No setters, or no no-arg constructor — Jackson couldn't populate the object.</td>
+                  <td>Add both. Confirm the JSON keys match the field names exactly (case-sensitive).</td>
+                </tr>
+                <tr>
+                  <td><code>Ambiguous mapping</code> at startup</td>
+                  <td>Two methods claim the same verb + path.</td>
+                  <td>Each verb+path pair must be unique. <code>/search</code> and <code>/{id}</code> are distinct — that's fine.</td>
+                </tr>
+                <tr>
+                  <td><strong>400</strong> on <code>/api/students/search</code></td>
+                  <td><code>@GetMapping("/{id}")</code> matched first and tried to parse <code>"search"</code> as an <code>int</code>.</td>
+                  <td>Declare the <code>/search</code> method <strong>above</strong> the <code>/{id}</code> method in the file.</td>
+                </tr>
+                <tr>
+                  <td><strong>404</strong> at <code>/swagger-ui.html</code></td>
+                  <td>The springdoc dependency isn't on the classpath, or Maven hasn't refreshed.</td>
+                  <td>Check <code>pom.xml</code>, refresh Maven, restart. Also try <code>/swagger-ui/index.html</code>.</td>
+                </tr>
+                <tr>
+                  <td>Swagger UI says <strong>"No operations defined in spec!"</strong></td>
+                  <td>Spring found no controllers — either you haven't written one yet, or it's outside the scanned packages.</td>
+                  <td>Expected before Lab 3. After that, check the controller's <code>package</code> line starts <code>com.tcs.training.students</code>.</td>
+                </tr>
+                <tr>
+                  <td>A new endpoint is missing from Swagger UI</td>
+                  <td>Swagger reads controllers <strong>at startup</strong>; the browser also caches the page.</td>
+                  <td>Restart the app, then <strong>hard-refresh</strong> (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>).</td>
+                </tr>
+                <tr>
+                  <td>App won't start after adding springdoc</td>
+                  <td>springdoc version too old for your Spring Boot version.</td>
+                  <td>Use <code>2.8.6</code> or newer <code>2.8.x</code> with Spring Boot 3.5.x.</td>
+                </tr>
+                <tr>
+                  <td><code>INFO … Failed to set up a Bean Validation provider</code> at startup</td>
+                  <td>springdoc brings the validation API without an implementation.</td>
+                  <td><strong>Harmless.</strong> It's an INFO line, not an error. Ignore it.</td>
+                </tr>
+                <tr>
+                  <td>All data resets on restart</td>
+                  <td>The list lives in memory. Expected behaviour.</td>
+                  <td>Nothing to fix — Session 3 introduces a real database.</td>
+                </tr>
+                <tr>
+                  <td><code>Port 8080 was already in use</code></td>
+                  <td>Session 1's app is probably still running.</td>
+                  <td>Stop it, or set <code>server.port=8081</code> in <code>application.properties</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="golden">
+              <span class="lbl">⚠️ The Session 2 debugging order</span>
+              <div class="rule">
+                1 · What <strong>status code</strong> came back? (4xx = my request, 5xx = my server code) &nbsp;→&nbsp;
+                2 · Did I <strong>restart and hard-refresh</strong> Swagger UI? &nbsp;→&nbsp;
+                3 · Is the <strong>full path</strong> right (class prefix + method path)? &nbsp;→&nbsp;
+                4 · Did I <strong>restart</strong> after editing?
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== SELF CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> ✅ Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <p>Answer these out loud before Session 3. Explaining them is the real test.</p>
+            <ol class="steps">
+              <li>Why can't you test <code>POST</code> from a browser address bar, and what did you use instead?</li>
+              <li>Where did Swagger UI's pre-filled request body come from, and why can you ignore the <code>"id"</code> in it?</li>
+              <li>What exactly does <code>@RequestBody</code> do, and which two things must your model class have for it to work?</li>
+              <li>Why does <code>POST</code> return <code>201</code> but <code>DELETE</code> return <code>204</code>?</li>
+              <li>Why does searching for grade Z return <code>200</code> with <code>[]</code>, while <code>/students/99</code> returns <code>404</code>?</li>
+              <li>You get <strong>415 Unsupported Media Type</strong>. What did you forget?</li>
+              <li>What's the difference between <code>4xx</code> and <code>5xx</code>, and who fixes each?</li>
+              <li>Which of our endpoints are idempotent, and how did the double-DELETE prove it?</li>
+              <li>The class says <code>@RequestMapping("/api/students")</code> and a method says <code>@GetMapping("/{id}")</code>. What's the full URL?</li>
+              <li>Why is all the data lost on restart, and which layer will we change in Session 3 to fix it?</li>
+              <li>Why did we put the list in <code>StudentService</code> rather than in the controller?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all ten self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
       <section class="section">
         <div class="qref">
-          <h2>Quick reference — annotation cheatsheet</h2>
+          <h2>Quick Reference Card — Session 2</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>Your API</h3>
+              <table>
+                <thead><tr><th>Verb + path</th><th>Success</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET /api/students</code></td><td><code>200</code> + array</td></tr>
+                  <tr><td><code>GET /api/students/{id}</code></td><td><code>200</code> / <code>404</code></td></tr>
+                  <tr><td><code>GET /api/students/search?grade=A</code></td><td><code>200</code> + array</td></tr>
+                  <tr><td><code>POST /api/students</code></td><td><code>201</code> + object</td></tr>
+                  <tr><td><code>PUT /api/students/{id}</code></td><td><code>200</code> / <code>404</code></td></tr>
+                  <tr><td><code>DELETE /api/students/{id}</code></td><td><code>204</code> / <code>404</code></td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Project</h3>
+              <table>
+                <tbody>
+                  <tr><td>Group</td><td><code>com.tcs.training</code></td></tr>
+                  <tr><td>Artifact</td><td><code>students</code></td></tr>
+                  <tr><td><strong>Base package</strong></td><td><code>com.tcs.training.students</code></td></tr>
+                  <tr><td><strong>Swagger UI</strong></td><td><code>/swagger-ui.html</code></td></tr>
+                  <tr><td>OpenAPI spec</td><td><code>/v3/api-docs</code></td></tr>
+                  <tr><td>springdoc version</td><td><code>2.8.6</code></td></tr>
+                  <tr><td>Main class</td><td><code>StudentsApplication</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Annotations</h3>
+              <table>
+                <thead><tr><th>Annotation</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td><code>@RestController</code></td><td><code>@Controller</code> + <code>@ResponseBody</code></td></tr>
+                  <tr><td><code>@RequestMapping</code></td><td>Class-level path prefix</td></tr>
+                  <tr><td><code>@GetMapping</code></td><td>Read</td></tr>
+                  <tr><td><code>@PostMapping</code></td><td>Create</td></tr>
+                  <tr><td><code>@PutMapping</code></td><td>Update</td></tr>
+                  <tr><td><code>@DeleteMapping</code></td><td>Remove</td></tr>
+                  <tr><td><code>@PathVariable</code></td><td>Value inside the path</td></tr>
+                  <tr><td><code>@RequestParam</code></td><td>Value after the <code>?</code></td></tr>
+                  <tr><td><code>@RequestBody</code></td><td>JSON body → object</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Status codes</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>200</code> OK</td><td>GET / PUT worked</td></tr>
+                  <tr><td><code>201</code> Created</td><td>POST worked</td></tr>
+                  <tr><td><code>204</code> No Content</td><td>DELETE worked</td></tr>
+                  <tr><td><code>400</code> Bad Request</td><td>Malformed input</td></tr>
+                  <tr><td><code>404</code> Not Found</td><td>No such resource</td></tr>
+                  <tr><td><code>405</code></td><td>Wrong verb for that path</td></tr>
+                  <tr><td><code>415</code></td><td>Missing Content-Type header</td></tr>
+                  <tr><td><code>500</code></td><td>Your code threw</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">ResponseEntity shortcuts</h3>
           <table>
-            <thead><tr><th>Annotation</th><th>Where it goes</th><th>What it does</th></tr></thead>
+            <thead><tr><th>Code</th><th>Produces</th></tr></thead>
             <tbody>
-              <tr><td><code>@RestController</code></td><td>Class</td><td>Marks a REST controller; auto-serializes return values to JSON</td></tr>
-              <tr><td><code>@RequestMapping</code></td><td>Class or Method</td><td>Defines a URI prefix (class) or path (method)</td></tr>
-              <tr><td><code>@GetMapping</code></td><td>Method</td><td>Maps HTTP GET requests</td></tr>
-              <tr><td><code>@PostMapping</code></td><td>Method</td><td>Maps HTTP POST requests</td></tr>
-              <tr><td><code>@PutMapping</code></td><td>Method</td><td>Maps HTTP PUT requests</td></tr>
-              <tr><td><code>@DeleteMapping</code></td><td>Method</td><td>Maps HTTP DELETE requests</td></tr>
-              <tr><td><code>@PathVariable</code></td><td>Parameter</td><td>Binds a URI path segment to a method parameter</td></tr>
-              <tr><td><code>@RequestParam</code></td><td>Parameter</td><td>Binds a query parameter to a method parameter</td></tr>
-              <tr><td><code>@RequestBody</code></td><td>Parameter</td><td>Deserializes request-body JSON into a Java object</td></tr>
-              <tr><td><code>@ResponseStatus</code></td><td>Method</td><td>Sets the response HTTP status code</td></tr>
+              <tr><td><code>ResponseEntity.ok(obj)</code></td><td><code>200</code> + body</td></tr>
+              <tr><td><code>ResponseEntity.status(HttpStatus.CREATED).body(obj)</code></td><td><code>201</code> + body</td></tr>
+              <tr><td><code>ResponseEntity.noContent().build()</code></td><td><code>204</code>, no body</td></tr>
+              <tr><td><code>ResponseEntity.notFound().build()</code></td><td><code>404</code>, no body</td></tr>
+              <tr><td><code>ResponseEntity.badRequest().body(msg)</code></td><td><code>400</code> + message</td></tr>
             </tbody>
           </table>
         </div>
@@ -1292,11 +2420,13 @@ public class StudentController {
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">Coming up in Session 3</span>
-          You'll make this API production-shaped. We'll add proper <strong>exception handling</strong> with
-          <code>@ControllerAdvice</code> (clean 404s when a student ID isn't found), then swap the in-memory list for
-          a real <strong>H2 database</strong> using Spring Data JPA — mapping <code>Student</code> to a table with
-          <code>@Entity</code> and doing real CRUD through a <code>@Repository</code>. Bring today's
-          <code>student-api</code> project; we build straight on top of it.
+          Two things about today's API are unsatisfying, and next session fixes both. <strong>One:</strong> the data
+          vanishes on restart — we'll add <strong>Spring Data JPA</strong> and an <strong>H2 database</strong>, and
+          your data will survive. <strong>Two:</strong> those <code>if (x == null) return notFound()</code> checks are
+          repetitive — we'll replace them with a <strong>custom exception</strong> and one global handler. Along the
+          way you'll meet <strong>DTOs</strong> (why exposing your database classes directly is a bad idea), a proper
+          <strong>service interface</strong>, and validation. Bring this project; the controller you wrote today
+          barely changes, which is the whole point of layering.
         </div>
         <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
           Spring Boot — Session 2 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
@@ -1322,7 +2452,7 @@ public class StudentController {
     }
 
     /* ============================================================
-       Progress tracker + readiness.
+       Progress tracker + prerequisite readiness badge.
        ============================================================ */
     var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
 
@@ -1341,7 +2471,7 @@ public class StudentController {
     }
 
     /* ============================================================
-       Copy buttons.
+       Copy buttons on every code block.
        ============================================================ */
     function flash(btn, cls, label) {
       var original = btn.getAttribute('data-label') || 'Copy';

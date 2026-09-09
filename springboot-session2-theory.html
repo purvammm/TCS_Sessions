@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session2-lab.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -120,7 +121,7 @@
     }
     .slide-footer .who { font-weight: 600; color: var(--mac-text); }
 
-    /* Transition animation. Reduced-motion fallback below. */
+    /* Transition animation, with reduced-motion fallback below. */
     .slide.animating { animation: slideIn var(--slide-anim) ease both; }
     @keyframes slideIn {
       from { opacity: 0; transform: translateX(28px); }
@@ -132,6 +133,7 @@
 
     .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
     .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; }
     .slide .eyebrow {
       text-transform: uppercase;
       letter-spacing: 0.12em;
@@ -146,8 +148,16 @@
     .slide .muted { color: var(--mac-text-muted); }
     .slide strong { font-weight: 700; }
     .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(10,132,255,0.1);
+      color: var(--mac-accent);
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
 
-    /* Callout / key-point box */
+    /* Callout / key-point boxes */
     .keybox {
       border-left: 4px solid var(--mac-accent);
       background: rgba(10,132,255,0.06);
@@ -180,6 +190,17 @@
     .slide .deep { font-size: 16.5px; line-height: 1.62; }
     .term { font-weight: 700; color: var(--mac-accent); }
 
+    /* Plain-English analogy box */
+    .analogy {
+      border-left: 4px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f5ebff);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #8e2fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+
     /* Cover slide */
     .cover {
       display: flex;
@@ -208,7 +229,6 @@
     /* Cards */
     .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
     .cards.c3 { grid-template-columns: repeat(3, 1fr); }
-    .cards.c4 { grid-template-columns: repeat(4, 1fr); }
     .card {
       border: 1px solid var(--mac-border);
       border-radius: 12px;
@@ -253,9 +273,27 @@
     table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
     table.cmp td.good { background: rgba(40,200,64,0.10); }
     table.cmp td.bad { background: rgba(255,95,87,0.08); }
-    table.cmp th.hl { background: rgba(10,132,255,0.16); color: var(--mac-accent); }
-    table.cmp td.hl { background: rgba(10,132,255,0.07); }
     table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    /* Highlighted row — draws the eye to the one field that matters */
+    table.cmp tr.keyrow td { background: rgba(255,159,10,0.16); font-weight: 600; }
+    table.cmp tr.keyrow td:first-child { font-weight: 700; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: #f3f8ff;
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
 
     /* Generic flow diagram */
     .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
@@ -277,17 +315,39 @@
     .flow.vert { flex-direction: column; align-items: stretch; }
     .flow.vert .flow-arrow { text-align: center; }
 
-    /* Two-column diagram comparison (web app vs web service) */
-    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
-    .twocol .colbox {
-      border: 1px solid var(--mac-border);
-      border-radius: 12px;
-      padding: 16px 18px 20px;
-      background: #fafafc;
+    /* IoC container visual */
+    .ioc {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 22px;
+      background: #f6faff;
+      position: relative;
     }
-    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
-    .twocol .colbox.a h3 { color: #b8860b; }
-    .twocol .colbox.b h3 { color: #1a9e34; }
+    .ioc::before {
+      content: "Spring IoC Container";
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .ioc-beans { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .bean {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 13px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .bean .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .bean .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .ioc-inject { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
 
     /* Before / after split */
     .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
@@ -301,6 +361,42 @@
     .ba-col li { font-size: 14.5px; margin: 5px 0; }
     .ba-mid { font-size: 30px; color: var(--mac-accent); }
 
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 150px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #0a84ff; }
+    .stack-row.l2 { border-left-color: #5e5ce6; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Two-column diagram comparison */
+    .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 16px; }
+    .twocol .colbox {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px 20px;
+      background: #fafafc;
+    }
+    .twocol .colbox h3 { margin: 0 0 12px; font-size: 17px; text-align: center; }
+    .twocol .colbox.a h3 { color: #b8860b; }
+    .twocol .colbox.b h3 { color: #1a9e34; }
+
     /* Annotation unpack */
     .anno-map { display: grid; gap: 10px; margin-top: 14px; }
     .anno-row { display: grid; grid-template-columns: 240px 1fr; gap: 14px; align-items: center; }
@@ -313,7 +409,6 @@
       border-radius: 8px;
       text-align: center;
     }
-
     /* Annotation grid (preview + recap) */
     .anno-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
     .anno-cell {
@@ -354,6 +449,7 @@
     .json-num { color: #fd9353; }
     .json-bool { color: #ff6188; }
     .json-punc { color: #f8f8f2; }
+    .code-comment { color: #6b7089; }
 
     /* Flash cards (recap) */
     .flashwrap { display: grid; gap: 14px; margin-top: 18px; }
@@ -408,6 +504,112 @@
     .verb.del { background: #f93e3e; }
     .swagger-mock .path { font-family: var(--mac-mono); font-size: 13px; }
 
+    /* Error-response mockup */
+    .err-mock {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 8px;
+      background: #fff;
+      font-size: 13.5px;
+    }
+    .err-mock .em-top {
+      background: #1b1b1b; color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .err-mock .em-status { font-family: var(--mac-mono); }
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s5 { background: #f93e3e; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s2 { background: #49cc90; }
+
+    /* Step chips (numbered horizontal steps) */
+    .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .steps4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 16px; }
+    .step-chip {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafc;
+      position: relative;
+    }
+    .step-chip .stepnum {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--mac-accent); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 15px; margin-bottom: 10px;
+    }
+    .step-chip h3 { margin: 0 0 6px; font-size: 16px; }
+    .step-chip p { font-size: 14.5px; margin: 0; }
+
+    /* Round-robin visual */
+    .rr { display: grid; grid-template-columns: 160px 1fr; gap: 14px; align-items: center; margin-top: 16px; }
+    .rr .req { font-family: var(--mac-mono); font-weight: 700; font-size: 15px; text-align: right; color: var(--mac-text); }
+    .rr .target { display: flex; gap: 10px; }
+    .rr-inst {
+      border: 2px solid var(--mac-border); border-radius: 10px;
+      padding: 8px 14px; font-family: var(--mac-mono); font-size: 14px; font-weight: 600;
+      background: #fafafc; min-width: 92px; text-align: center;
+    }
+    .rr-inst.hit { border-color: #28c840; background: #eefcf1; color: #1a9e34; box-shadow: 0 0 0 3px rgba(40,200,64,0.15); }
+
+    /* Circuit breaker states */
+    .cb { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+    .cb-state { border-radius: 12px; padding: 16px 18px; border: 2px solid; }
+    .cb-state h3 { margin: 0 0 6px; font-size: 18px; font-family: var(--mac-mono); }
+    .cb-state p { font-size: 14.5px; margin: 0; }
+    .cb-state.closed { border-color: #28c840; background: #eefcf1; }
+    .cb-state.closed h3 { color: #1a9e34; }
+    .cb-state.open { border-color: var(--tl-red); background: #fff0ef; }
+    .cb-state.open h3 { color: var(--tl-red); }
+    .cb-state.half { border-color: #ff9f0a; background: #fff6ea; }
+    .cb-state.half h3 { color: #b8860b; }
+
+    /* Dashboard mockup (Eureka) */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin-top: 10px;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+      display:flex; align-items:center; gap:8px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+    .port {
+      display: inline-block;
+      background: rgba(94,92,230,0.12);
+      color: #5e5ce6;
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+    .tree .hl { color: #1a9e34; font-weight: 700; }
+
     /* Code blocks */
     .slide pre {
       margin: 12px 0;
@@ -424,6 +626,8 @@
       line-height: 1.5;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
 
     .checklist { list-style: none; padding: 0; margin-top: 12px; }
@@ -514,10 +718,10 @@
         <!-- 1. COVER -->
         <section class="slide active">
           <div class="cover">
-            <span class="badge">Session 2 of the Spring Boot Series</span>
-            <h1>Spring Boot</h1>
-            <div class="sub">REST Web Services — building a complete Student CRUD API, endpoint by endpoint.</div>
-            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Date: __________</div>
+            <span class="badge">Session 2 of 4 · Spring Boot Series</span>
+            <h1>REST APIs</h1>
+            <div class="sub">Web services, JSON, and building a complete CRUD API that other programs can actually use.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
           </div>
         </section>
 
@@ -525,486 +729,937 @@
         <section class="slide">
           <p class="eyebrow">What we'll cover today</p>
           <h2>Agenda</h2>
-          <p class="lead">Session 1 got an app running. Today we make it <em>talk</em> — we turn it into a REST web service that exchanges JSON data with any client. The theory is shorter than last time because the real weight of this session is the hands-on lab, where you'll build a full CRUD API yourself.</p>
+          <p class="lead">Session 1 got one endpoint answering. Today we learn the <em>rules</em> that turn a handful of endpoints into a professional API — and then build all four CRUD operations.</p>
           <ul class="agenda">
-            <li><span class="num">1</span> Quick Session 1 recap — three warm-up questions</li>
-            <li><span class="num">2</span> Web services &amp; JSON — exchanging data, not web pages</li>
-            <li><span class="num">3</span> REST vs SOAP, HTTP methods &amp; status codes</li>
-            <li><span class="num">4</span> URI design + the annotations you'll use today</li>
-            <li><span class="num">5</span> Project setup with DevTools &amp; Swagger</li>
-            <li><span class="num">6</span> Hands-on lab: build the Student CRUD API live</li>
+            <li><span class="num">1</span> Recap of Session 1 — the four things you must remember</li>
+            <li><span class="num">2</span> What a web service is, and why APIs exist at all</li>
+            <li><span class="num">3</span> JSON — the language APIs speak</li>
+            <li><span class="num">4</span> REST properly: the constraints, and REST vs SOAP</li>
+            <li><span class="num">5</span> HTTP verbs → CRUD, and choosing the right status code</li>
+            <li><span class="num">6</span> Designing URLs other developers will thank you for</li>
+            <li><span class="num">7</span> The annotations: <code>@RequestBody</code>, <code>ResponseEntity</code> &amp; friends</li>
+            <li><span class="num">8</span> Testing properly with Swagger UI</li>
+            <li><span class="num">9</span> Calling <em>other</em> APIs, then the hands-on lab</li>
           </ul>
           <div class="note">
-            <span class="lbl">How to use these slides</span>
-            This deck is written to be read on its own afterwards, not just watched. Each slide carries the full explanation of its topic, so you can revise from these slides alone. By the end you'll be able to explain what a REST API is and build one from scratch with the standard Spring Boot annotations.
+            <span class="lbl">Today's shape</span>
+            Session 1 was mostly <em>concepts</em>. Today is mostly <strong>conventions</strong> — agreements the whole industry has settled on. There's less machinery to understand and more vocabulary to absorb, so the deck leans on tables and examples you can come back to as a reference.
           </div>
         </section>
 
-        <!-- 3. SESSION 1 RECAP (flash cards) -->
+        <!-- 3. SESSION 1 RECAP -->
         <section class="slide">
-          <p class="eyebrow">Before we start something new</p>
-          <h2>Session 1 recap</h2>
-          <p class="deep">Let's warm up the brain. Read each question, decide your answer in your head, then <strong>click the card</strong> to reveal it. If all three feel obvious, you're ready for today.</p>
-          <div class="flashwrap">
-            <div class="flash">
-              <div class="q">Q1 · What does <code>@SpringBootApplication</code> do? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">It's a single annotation that combines three: <code>@Configuration</code> (declares config), <code>@EnableAutoConfiguration</code> (turns on auto-configuration based on the classpath), and <code>@ComponentScan</code> (discovers your controllers, services and other beans in this package and below). It marks the main class — the entry point that boots the whole application.</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q2 · What is <code>@RestController</code>? <span class="tap">click to reveal ▸</span></div>
-              <div class="a">An annotation that marks a class as a web request handler whose return values are written <em>directly</em> into the HTTP response body (as JSON or text), rather than being treated as the name of a view/HTML page to render. It's what makes a class serve data to API clients.</div>
-            </div>
-            <div class="flash">
-              <div class="q">Q3 · What port does Spring Boot start on by default? <span class="tap">click to reveal ▸</span></div>
-              <div class="a"><strong>Port 8080.</strong> The embedded Tomcat server starts there automatically — you saw the line "Tomcat started on port 8080" in your console. You can change it with <code>server.port=</code> in <code>application.properties</code>.</div>
-            </div>
+          <p class="eyebrow">Before we move on</p>
+          <h2>Session 1 recap — the four essentials</h2>
+          <div class="cards">
+            <div class="card"><div class="ic">⚙️</div><h3>Boot removes setup</h3><p>Auto-configuration, embedded Tomcat, starters and Actuator. You run a <code>main</code> method and a web server appears.</p></div>
+            <div class="card"><div class="ic">🫘</div><h3>Beans live in a container</h3><p>A bean is an object <em>Spring</em> created. Annotate a class with <code>@Service</code> and ask for it in a constructor — Spring hands it over.</p></div>
+            <div class="card"><div class="ic">📁</div><h3>The golden rule</h3><p>Every class must sit in the main class's package <strong>or below it</strong>, or component scanning never finds it.</p></div>
+            <div class="card"><div class="ic">🌐</div><h3>Mappings answer requests</h3><p><code>@RestController</code> plus <code>@GetMapping("/hello")</code> is a working endpoint. <code>@PathVariable</code> and <code>@RequestParam</code> read input.</p></div>
           </div>
-        </section>
-
-        <!-- 4. WHAT IS A WEB SERVICE -->
-        <section class="slide">
-          <p class="eyebrow">The core idea of today</p>
-          <h2>What is a web service?</h2>
-          <p class="deep">A <strong>web service</strong> is a way for two applications to exchange data over a network, regardless of what language or platform either one is written in. The key word is <strong>data</strong> — a web service does not return a web page for a human to look at. It returns raw, structured data (usually JSON) for <em>another program</em> to read and use.</p>
           <div class="keybox">
-            <span class="lbl">The one distinction that matters</span>
-            A traditional web app returns <strong>HTML</strong> — a page meant for a human's eyes in a browser. A web service returns <strong>data</strong> (JSON/XML) — meant for another application to consume. Same server technology underneath, completely different audience.
+            <span class="lbl">Today's project base package</span>
+            The lab uses a fresh project with Group <code>com.tcs.training</code> and Artifact <code>students</code>, giving the base package <span class="pill">com.tcs.training.students</span>. Every class goes underneath that. The golden rule hasn't gone anywhere — it applies in all four sessions.
           </div>
+        </section>
+
+        <!-- 4. WHY APIS EXIST -->
+        <section class="slide">
+          <p class="eyebrow">Foundations · 1 of 4</p>
+          <h2>Why do APIs exist at all?</h2>
+          <p class="deep">In Session 1 your endpoint returned text to a <em>browser</em>. But a browser is only one possible caller. Consider a company with a single database of students and four different things that need it:</p>
+          <div class="cards">
+            <div class="card"><h3>📱 A mobile app</h3><p>Written in Kotlin or Swift. Can't talk to your database directly, and shouldn't.</p></div>
+            <div class="card"><h3>💻 A web dashboard</h3><p>Written in React. Runs in the user's browser — nowhere near your server.</p></div>
+            <div class="card"><h3>🏢 A partner company</h3><p>Different language, different servers, and definitely no access to your database.</p></div>
+            <div class="card"><h3>🤖 A nightly report script</h3><p>Written in Python by someone in the analytics team.</p></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Four callers, four languages, none of them able to reach into your database. So you put <strong>one program in the middle</strong> that owns the data and exposes a set of agreed URLs. Everyone talks to <em>that</em>. It's the only thing that has to know about the database.</p>
+          <div class="keybox">
+            <span class="lbl">Definition</span>
+            An <span class="term">API</span> (Application Programming Interface) is <strong>a contract that lets one program use another program's functionality</strong>. A <span class="term">web service</span> is an API you reach <strong>over the network using HTTP</strong>. That's the whole distinction: all web services are APIs; not all APIs are web services.
+          </div>
+        </section>
+
+        <!-- 5. WEB APP VS WEB SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">Foundations · 2 of 4</p>
+          <h2>Web application vs web service</h2>
+          <p class="deep">Both live on a server and answer HTTP requests. The difference is <strong>who the answer is for</strong> — and it changes everything about what you return.</p>
           <div class="twocol">
             <div class="colbox a">
-              <h3>Traditional Web App</h3>
-              <div class="flow vert" style="margin-top:6px;">
-                <div class="flow-box">Browser</div>
-                <span class="flow-arrow">▼ request</span>
-                <div class="flow-box alt">Server</div>
-                <span class="flow-arrow">▼ returns</span>
-                <div class="flow-box warn">HTML page <span class="sm">for human eyes</span></div>
-              </div>
+              <h3>Web application → for humans</h3>
+              <p>Returns <strong>HTML</strong> — a page with layout, colours and buttons, meant to be looked at.</p>
+              <pre style="margin-top:10px;"><code>&lt;h1&gt;Student List&lt;/h1&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;td&gt;Amit&lt;/td&gt;&lt;td&gt;A&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+              <p class="muted" style="font-size:15px;">Spring annotation: <code>@Controller</code> (returns a view name).</p>
             </div>
             <div class="colbox b">
-              <h3>Web Service</h3>
-              <div class="flow vert" style="margin-top:6px;">
-                <div class="flow-box">App / Mobile / Frontend</div>
-                <span class="flow-arrow">▼ request</span>
-                <div class="flow-box alt">Server</div>
-                <span class="flow-arrow">▼ returns</span>
-                <div class="flow-box green">JSON / XML data <span class="sm">for a program</span></div>
-              </div>
+              <h3>Web service → for programs</h3>
+              <p>Returns <strong>data</strong> — usually JSON. No layout, no styling; the caller decides how to display it.</p>
+              <pre style="margin-top:10px;"><code>[
+  { "name": "Amit", "grade": "A" }
+]</code></pre>
+              <p class="muted" style="font-size:15px;">Spring annotation: <code>@RestController</code> (returns the body itself).</p>
             </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why "data, not layout" is the smarter choice</span>
+            Return JSON and the <em>same</em> endpoint serves the mobile app, the React dashboard, the partner company and the Python script — each rendering it however suits them. Return HTML and you've baked in one presentation that only a browser can use. This separation is why virtually all modern backends are built as web services. <strong>Everything in this course uses <code>@RestController</code>.</strong>
           </div>
         </section>
 
-        <!-- 5. JSON SYNTAX -->
+        <!-- 6. THE CONVERSATION -->
         <section class="slide">
-          <p class="eyebrow">The language of modern APIs</p>
-          <h2>JSON syntax</h2>
-          <p class="deep"><strong>JSON</strong> (JavaScript Object Notation) is the format your API will send and receive. It's lightweight, human-readable, and every language can parse it. You'll be looking at exactly this in Postman in about 20 minutes — so let's make it land now. A single Student looks like this:</p>
-          <pre><code>{
-  <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">1</span><span class="json-punc">,</span>
-  <span class="json-key">"firstName"</span><span class="json-punc">:</span> <span class="json-str">"Ravi"</span><span class="json-punc">,</span>
-  <span class="json-key">"lastName"</span><span class="json-punc">:</span> <span class="json-str">"Sharma"</span><span class="json-punc">,</span>
-  <span class="json-key">"email"</span><span class="json-punc">:</span> <span class="json-str">"ravi@tcs.com"</span><span class="json-punc">,</span>
-  <span class="json-key">"active"</span><span class="json-punc">:</span> <span class="json-bool">true</span>
+          <p class="eyebrow">Foundations · 3 of 4</p>
+          <h2>One request, one response — in full</h2>
+          <p class="deep">Let's look at an actual HTTP exchange, byte for byte, so the vocabulary on the following slides has something concrete to attach to. Here a client creates a new student:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>⬆️ The request the client sends</h3>
+              <pre><code>POST /api/students HTTP/1.1        <span class="code-comment">← verb + path</span>
+Host: localhost:8080
+Content-Type: application/json     <span class="code-comment">← "my body IS json"</span>
+Accept: application/json           <span class="code-comment">← "send json back"</span>
+
+{                                  <span class="code-comment">← the BODY starts here</span>
+  "name": "Amit Shah",
+  "email": "amit@tcs.com",
+  "grade": "A"
 }</code></pre>
-          <ul>
-            <li><strong>Curly braces <code>{ }</code></strong> wrap an object — one record, like one student.</li>
-            <li><strong>Key–value pairs</strong> — the <span class="json-key">"key"</span> (always a quoted string) is followed by a <strong>colon</strong> <code>:</code> then the value.</li>
-            <li><strong>Commas</strong> separate the pairs — every pair except the last one ends with a comma.</li>
-            <li><strong>Value types:</strong> <span class="json-str">strings</span> in quotes, <span class="json-num">numbers</span> bare, <span class="json-bool">booleans</span> as <code>true</code>/<code>false</code>.</li>
-          </ul>
-          <p class="deep">Square brackets <code>[ ]</code> make an <strong>array</strong> — an ordered list. A response with several students is an array of objects:</p>
-          <pre><code><span class="json-punc">[</span>
-  { <span class="json-key">"id"</span>: <span class="json-num">1</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Ravi"</span>,  <span class="json-key">"lastName"</span>: <span class="json-str">"Sharma"</span> }<span class="json-punc">,</span>
-  { <span class="json-key">"id"</span>: <span class="json-num">2</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Anita"</span>, <span class="json-key">"lastName"</span>: <span class="json-str">"Verma"</span> }<span class="json-punc">,</span>
-  { <span class="json-key">"id"</span>: <span class="json-num">3</span>, <span class="json-key">"firstName"</span>: <span class="json-str">"Karan"</span>, <span class="json-key">"lastName"</span>: <span class="json-str">"Patel"</span> }
+            </div>
+            <div class="panel">
+              <h3>⬇️ The response your server sends</h3>
+              <pre><code>HTTP/1.1 201 Created               <span class="code-comment">← status code</span>
+Content-Type: application/json
+
+{                                  <span class="code-comment">← the BODY</span>
+  "id": 4,                         <span class="code-comment">← server assigned this</span>
+  "name": "Amit Shah",
+  "email": "amit@tcs.com",
+  "grade": "A"
+}</code></pre>
+            </div>
+          </div>
+          <table class="cmp">
+            <thead><tr><th>Part</th><th>What it is</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Method / verb</strong></td><td>The kind of operation: <code>POST</code> here, meaning "create".</td></tr>
+              <tr><td><strong>Path</strong></td><td>Which resource: <code>/api/students</code>.</td></tr>
+              <tr><td><strong>Headers</strong></td><td>Metadata <em>about</em> the message — its format, what format you want back, credentials.</td></tr>
+              <tr><td><strong>Body</strong></td><td>The actual data. <code>GET</code> and <code>DELETE</code> normally have none; <code>POST</code> and <code>PUT</code> do.</td></tr>
+              <tr><td><strong>Status code</strong></td><td>Three digits summarising the outcome. <code>201</code> = created successfully.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 7. KEY TERMINOLOGY -->
+        <section class="slide">
+          <p class="eyebrow">Foundations · 4 of 4</p>
+          <h2>The vocabulary you'll hear all day</h2>
+          <table class="cmp">
+            <thead><tr><th>Term</th><th>Meaning</th><th>Example</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Resource</strong></td><td>A "thing" your API exposes. Always a <em>noun</em>.</td><td>a student, a post, an order</td></tr>
+              <tr><td><strong>Collection</strong></td><td>All resources of one type.</td><td><code>/api/students</code></td></tr>
+              <tr><td><strong>Endpoint</strong></td><td>One verb + path combination your app answers.</td><td><code>GET /api/students/5</code></td></tr>
+              <tr><td><strong>Payload / body</strong></td><td>The data carried inside a request or response.</td><td>the JSON block above</td></tr>
+              <tr><td><strong>Header</strong></td><td>Metadata about the message, not the data itself.</td><td><code>Content-Type: application/json</code></td></tr>
+              <tr><td><strong>Query parameter</strong></td><td>An extra value after the <code>?</code>, usually to filter or sort.</td><td><code>/api/students?grade=A</code></td></tr>
+              <tr><td><strong>Stateless</strong></td><td>The server remembers nothing between requests. Each one stands alone.</td><td>every request re-sends its token</td></tr>
+              <tr><td><strong>Idempotent</strong></td><td>Doing it repeatedly has the same effect as doing it once.</td><td><code>DELETE</code> ✅, <code>POST</code> ❌</td></tr>
+              <tr><td><strong>Safe</strong></td><td>Changes nothing on the server. Read-only.</td><td><code>GET</code> ✅</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Idempotent — worth a second look, it comes up in interviews</span>
+            Delete student 5, and student 5 is gone. Delete student 5 again — still gone, nothing extra happened. That's <strong>idempotent</strong>. But <code>POST /api/students</code> twice creates <strong>two</strong> students. That's why a mobile app can safely retry a failed <code>DELETE</code> or <code>PUT</code> after a dropped connection, but must be careful about retrying a <code>POST</code>.
+          </div>
+        </section>
+
+        <!-- 8. JSON SYNTAX -->
+        <section class="slide">
+          <p class="eyebrow">JSON · 1 of 3</p>
+          <h2>JSON — the language APIs speak</h2>
+          <p class="deep"><span class="term">JSON</span> (JavaScript Object Notation) is just <strong>text in an agreed shape</strong>. Every language can read and write it, which is exactly why it won. There are only two structures to learn:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>An object — curly braces</h3>
+              <pre><code><span class="json-punc">{</span>
+  <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">1</span><span class="json-punc">,</span>
+  <span class="json-key">"name"</span><span class="json-punc">:</span> <span class="json-str">"Amit Shah"</span><span class="json-punc">,</span>
+  <span class="json-key">"active"</span><span class="json-punc">:</span> <span class="json-bool">true</span>
+<span class="json-punc">}</span></code></pre>
+              <p style="font-size:15px;">A set of <strong>key: value</strong> pairs. Maps to a Java <strong>object</strong>.</p>
+            </div>
+            <div class="panel">
+              <h3>An array — square brackets</h3>
+              <pre><code><span class="json-punc">[</span>
+  <span class="json-punc">{</span> <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">1</span><span class="json-punc">,</span> <span class="json-key">"name"</span><span class="json-punc">:</span> <span class="json-str">"Amit"</span> <span class="json-punc">},</span>
+  <span class="json-punc">{</span> <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">2</span><span class="json-punc">,</span> <span class="json-key">"name"</span><span class="json-punc">:</span> <span class="json-str">"Neha"</span> <span class="json-punc">}</span>
 <span class="json-punc">]</span></code></pre>
-          <div class="note">
-            <span class="lbl">You won't write this by hand</span>
-            Spring Boot uses a library called <strong>Jackson</strong> to automatically convert your Java <code>Student</code> objects into JSON on the way out, and JSON back into Java objects on the way in. You return a <code>Student</code>; the client receives JSON. That conversion is called <span class="term">serialization</span>.
-          </div>
-        </section>
-
-        <!-- 6. KEY TERMINOLOGY -->
-        <section class="slide">
-          <p class="eyebrow">Vocabulary you'll hear all the time</p>
-          <h2>Key web service terminology</h2>
-          <p class="deep">Four terms come up constantly when people talk about services. Each is simple — here's the one-line definition plus an everyday analogy so it sticks.</p>
-          <div class="cards">
-            <div class="card">
-              <div class="ic">🍽️</div>
-              <h3>Service Provider</h3>
-              <p>The application that <strong>offers</strong> the service and answers requests. <em>Analogy: the kitchen that cooks the food.</em> Your Spring Boot API is the provider today.</p>
-            </div>
-            <div class="card">
-              <div class="ic">📱</div>
-              <h3>Service Consumer</h3>
-              <p>The application that <strong>calls</strong> the service and uses its data. <em>Analogy: the customer who orders.</em> Postman, a browser, or a mobile app are consumers.</p>
-            </div>
-            <div class="card">
-              <div class="ic">⏳</div>
-              <h3>Synchronous</h3>
-              <p>The consumer <strong>waits</strong> for the response before doing anything else. <em>Analogy: standing at the counter until your order is handed over.</em></p>
-            </div>
-            <div class="card">
-              <div class="ic">🔔</div>
-              <h3>Asynchronous</h3>
-              <p>The consumer <strong>doesn't wait</strong> — it carries on and is notified later. <em>Analogy: taking a buzzer and sitting down until it goes off.</em></p>
+              <p style="font-size:15px;">An ordered list. Maps to a Java <strong><code>List</code></strong>.</p>
             </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">Loose coupling — the superpower</span>
-            Because the two sides only agree on the <strong>data format and the URLs</strong>, neither cares what language the other is written in. A Python app, a React frontend and an Android phone can all call the same Java API. Change one side's internals and the other doesn't break. That independence is called <span class="term">loose coupling</span>, and it's why web services scale across teams and technologies.
-          </div>
-        </section>
-
-        <!-- 7. REST vs SOAP -->
-        <section class="slide">
-          <p class="eyebrow">Two styles of web service</p>
-          <h2>REST vs SOAP</h2>
-          <p class="deep">There are two main ways to build web services. <strong>SOAP</strong> is the older, heavier, XML-based standard. <strong>REST</strong> is the lighter, more flexible style that dominates modern APIs — and the one you'll use today. SOAP isn't the villain; it's just from an earlier era.</p>
-          <table class="cmp">
-            <thead>
-              <tr><th>Aspect</th><th>SOAP</th><th class="hl">REST</th></tr>
-            </thead>
-            <tbody>
-              <tr><td><strong>What it is</strong></td><td>A strict <em>protocol</em> with rigid rules</td><td class="hl">An <em>architectural style</em> with guidelines</td></tr>
-              <tr><td><strong>Data format</strong></td><td>XML only</td><td class="hl">JSON (usually), XML, others</td></tr>
-              <tr><td><strong>Speed / weight</strong></td><td>Heavier, more verbose</td><td class="hl">Lightweight and fast</td></tr>
-              <tr><td><strong>Complexity</strong></td><td>Higher — lots of ceremony</td><td class="hl">Lower — easy to learn</td></tr>
-              <tr><td><strong>Contract (WSDL)</strong></td><td>Required — a formal WSDL file</td><td class="hl">Not required</td></tr>
-              <tr><td><strong>Transport</strong></td><td>Uses plain HTTP verbs over standard URLs</td><td class="hl">Uses HTTP methods (GET/POST/PUT/DELETE) fully</td></tr>
-            </tbody>
-          </table>
-          <div class="note">
-            <span class="lbl">Where each lives today</span>
-            In industry, <strong>REST is the standard for modern APIs</strong> — web, mobile, microservices. SOAP still exists in legacy banking, payments and large enterprise/government systems where its strict contracts and built-in security were valued. You'll meet REST everywhere; you'll meet SOAP occasionally in older codebases.
-          </div>
-        </section>
-
-        <!-- 8. REST PRINCIPLES -->
-        <section class="slide">
-          <p class="eyebrow">What makes an API "RESTful"</p>
-          <h2>The six REST principles</h2>
-          <p class="deep">REST is defined by a set of constraints. You don't need to memorise all six today, but knowing they exist helps you understand <em>why</em> REST APIs are built the way they are.</p>
+          <p class="deep" style="margin-top:16px;">The rules are strict, and breaking them causes a <strong>400 Bad Request</strong>:</p>
           <ul>
-            <li><strong>Stateless</strong> — every request carries everything the server needs to handle it. The server keeps <em>no memory</em> of previous requests. This is the big one: it's why REST scales so well, because any server can handle any request.</li>
-            <li><strong>Client–Server</strong> — the client (UI) and server (data) are separate and evolve independently. Neither needs to know the other's internals.</li>
-            <li><strong>Uniform Interface</strong> — a consistent, predictable way to access resources: same URL patterns, same HTTP methods, every time.</li>
-            <li><strong>Cacheable</strong> — responses can declare whether they may be stored and reused, reducing repeated work.</li>
-            <li><strong>Layered System</strong> — there can be intermediaries (load balancers, gateways, caches) between client and server without either side knowing.</li>
-            <li><strong>Code on Demand</strong> <span class="muted">(optional)</span> — the server may send executable code to the client. Rarely used; the only optional constraint.</li>
+            <li><strong>Keys must be in double quotes.</strong> <code>{"name": "Amit"}</code> ✅ &nbsp; <code>{name: "Amit"}</code> ❌</li>
+            <li><strong>Strings use double quotes only</strong> — never single. <code>'Amit'</code> ❌</li>
+            <li><strong>No trailing comma</strong> after the last pair. <code>{"a":1,}</code> ❌</li>
+            <li><strong>No comments.</strong> JSON has no <code>//</code> or <code>/* */</code>.</li>
           </ul>
-          <div class="keybox">
-            <span class="lbl">If you remember one thing</span>
-            <strong>Stateless.</strong> Each request stands alone — the server doesn't remember who you are between calls. That's the principle that shapes how REST APIs are designed and why they handle huge traffic gracefully.
-          </div>
         </section>
 
-        <!-- 9. HTTP METHODS -> CRUD -->
+        <!-- 9. JSON TYPES -->
         <section class="slide">
-          <p class="eyebrow">Verbs that map to actions</p>
-          <h2>HTTP methods → CRUD</h2>
-          <p class="deep">REST uses the standard HTTP methods as <strong>verbs</strong> that describe what you want to do to a resource. The four you'll use map directly onto the four database operations known as <strong>CRUD</strong> — Create, Read, Update, Delete.</p>
+          <p class="eyebrow">JSON · 2 of 3</p>
+          <h2>JSON data types, and how they map to Java</h2>
           <table class="cmp">
-            <thead>
-              <tr><th>HTTP method</th><th>CRUD operation</th><th>Meaning</th><th>Student API example</th></tr>
-            </thead>
+            <thead><tr><th>JSON type</th><th>Example</th><th>Java equivalent</th></tr></thead>
             <tbody>
-              <tr><td class="hl"><code>GET</code></td><td><strong>Read</strong></td><td>Fetch existing data</td><td><code>GET /students</code> — list all students</td></tr>
-              <tr><td class="hl"><code>POST</code></td><td><strong>Create</strong></td><td>Add new data</td><td><code>POST /students</code> — add a new student</td></tr>
-              <tr><td class="hl"><code>PUT</code></td><td><strong>Update</strong></td><td>Modify existing data</td><td><code>PUT /students/{id}</code> — update student 1</td></tr>
-              <tr><td class="hl"><code>DELETE</code></td><td><strong>Delete</strong></td><td>Remove data</td><td><code>DELETE /students/{id}</code> — remove student 1</td></tr>
+              <tr><td><strong>String</strong></td><td><code>"Amit Shah"</code></td><td><code>String</code></td></tr>
+              <tr><td><strong>Number</strong></td><td><code>42</code> &nbsp;·&nbsp; <code>3.14</code></td><td><code>int</code>, <code>long</code>, <code>double</code>, <code>BigDecimal</code></td></tr>
+              <tr><td><strong>Boolean</strong></td><td><code>true</code> &nbsp;·&nbsp; <code>false</code> <span class="muted">(lower-case)</span></td><td><code>boolean</code></td></tr>
+              <tr><td><strong>Null</strong></td><td><code>null</code></td><td><code>null</code></td></tr>
+              <tr><td><strong>Object</strong></td><td><code>{ "city": "Ahmedabad" }</code></td><td>a class, e.g. <code>Address</code></td></tr>
+              <tr><td><strong>Array</strong></td><td><code>[ "A", "B", "C" ]</code></td><td><code>List&lt;String&gt;</code></td></tr>
             </tbody>
           </table>
-          <div class="note">
-            <span class="lbl">Real-world framing</span>
-            Think of a student record: you <strong>GET</strong> it to view, <strong>POST</strong> a new one when a student enrols, <strong>PUT</strong> to fix their email, and <strong>DELETE</strong> when they leave. Same noun (<code>/students</code>), different verb for each action. That's the whole mental model of a REST API.
+          <p class="deep" style="margin-top:16px;">Objects and arrays can nest freely, and Java classes mirror that nesting exactly:</p>
+          <pre><code><span class="json-punc">{</span>
+  <span class="json-key">"id"</span><span class="json-punc">:</span> <span class="json-num">1</span><span class="json-punc">,</span>
+  <span class="json-key">"name"</span><span class="json-punc">:</span> <span class="json-str">"Amit Shah"</span><span class="json-punc">,</span>
+  <span class="json-key">"address"</span><span class="json-punc">:</span> <span class="json-punc">{</span>                       <span class="code-comment">← a nested OBJECT  → an Address field</span>
+    <span class="json-key">"city"</span><span class="json-punc">:</span> <span class="json-str">"Ahmedabad"</span><span class="json-punc">,</span>
+    <span class="json-key">"pincode"</span><span class="json-punc">:</span> <span class="json-str">"380015"</span>
+  <span class="json-punc">},</span>
+  <span class="json-key">"subjects"</span><span class="json-punc">:</span> <span class="json-punc">[</span><span class="json-str">"Java"</span><span class="json-punc">,</span> <span class="json-str">"SQL"</span><span class="json-punc">],</span>    <span class="code-comment">← an ARRAY  → List&lt;String&gt;</span>
+  <span class="json-key">"active"</span><span class="json-punc">:</span> <span class="json-bool">true</span>
+<span class="json-punc">}</span></code></pre>
+          <div class="warnbox">
+            <span class="lbl">Dates are the one awkward case</span>
+            JSON has no date type, so dates travel as strings. The convention is <strong>ISO-8601</strong>: <code>"2026-09-05"</code> or <code>"2026-09-05T10:32:14"</code>. Spring handles <code>LocalDate</code> and <code>LocalDateTime</code> in that format by default — stick to it and everything just works.
           </div>
         </section>
 
-        <!-- 10. HTTP STATUS CODES -->
+        <!-- 10. JACKSON -->
         <section class="slide">
-          <p class="eyebrow">How the server reports the outcome</p>
-          <h2>HTTP status codes</h2>
-          <p class="deep">Every HTTP response carries a numeric <strong>status code</strong> telling the client what happened. There are dozens, but you only need these five for today's work. They're grouped: <strong>2xx</strong> = success, <strong>4xx</strong> = the client made a mistake, <strong>5xx</strong> = the server broke.</p>
-          <div class="status-list">
-            <div class="status-row">
-              <div class="status-badge s2">200<br>OK</div>
-              <div class="sd"><strong>Success.</strong> The request worked. Spring Boot returns this by default for a successful GET that returns data.</div>
-            </div>
-            <div class="status-row">
-              <div class="status-badge s2">201<br>Created</div>
-              <div class="sd"><strong>Resource created.</strong> Used after a successful POST. You'll set it yourself with <code>@ResponseStatus(HttpStatus.CREATED)</code> in the lab.</div>
-            </div>
-            <div class="status-row">
-              <div class="status-badge s4">400<br>Bad Request</div>
-              <div class="sd"><strong>Client error.</strong> The request was malformed — e.g. invalid JSON in the body. Spring returns this when it can't parse what you sent.</div>
-            </div>
-            <div class="status-row">
-              <div class="status-badge s4">404<br>Not Found</div>
-              <div class="sd"><strong>Not found.</strong> The URL or resource doesn't exist — e.g. asking for a student ID that isn't there.</div>
-            </div>
-            <div class="status-row">
-              <div class="status-badge s5">500<br>Server Error</div>
-              <div class="sd"><strong>Server crashed.</strong> Something threw an unhandled exception inside your code. We'll learn to handle these gracefully in Session 3.</div>
-            </div>
+          <p class="eyebrow">JSON · 3 of 3</p>
+          <h2>You never write JSON by hand</h2>
+          <p class="deep">This is the part beginners find surprising. You do <strong>not</strong> build JSON strings in your code. You return a Java object, and a library called <span class="term">Jackson</span> — already included with <code>spring-boot-starter-web</code> — converts it. The conversion runs automatically in both directions.</p>
+          <div class="flow">
+            <div class="flow-box green">Java object <span class="sm">Student</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Jackson <span class="sm">serialize</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box">JSON text <span class="sm">in the response</span></div>
+          </div>
+          <div class="flow">
+            <div class="flow-box">JSON text <span class="sm">in the request body</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Jackson <span class="sm">deserialize</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Java object <span class="sm">Student</span></div>
+          </div>
+          <p class="deep" style="margin-top:18px;">Two rules make it work, and forgetting them causes most JSON bugs:</p>
+          <table class="cmp">
+            <thead><tr><th>Direction</th><th>What Jackson needs on your class</th><th>If it's missing</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Java → JSON</strong> (going out)</td><td><strong>Getters.</strong> The JSON key comes from the getter name: <code>getName()</code> → <code>"name"</code>.</td><td class="bad">Field silently missing from the JSON, or an empty <code>{}</code>.</td></tr>
+              <tr><td><strong>JSON → Java</strong> (coming in)</td><td>A <strong>no-argument constructor</strong> plus <strong>setters</strong>.</td><td class="bad">A 400 error, or all fields arrive <code>null</code>.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The practical takeaway for the lab</span>
+            Your data classes need a <strong>no-arg constructor, getters and setters</strong>. Every IDE generates these for you — IntelliJ: <span class="pill">Alt+Insert</span> → Getter and Setter. Don't type them by hand.
           </div>
         </section>
 
-        <!-- 11. URI DESIGN -->
+        <!-- 11. WHAT IS REST -->
         <section class="slide">
-          <p class="eyebrow">What makes a good endpoint</p>
-          <h2>URI design principles</h2>
-          <p class="deep">A <strong>URI</strong> (the path part of a URL) names a <em>resource</em>. The golden rule of REST: <strong>URIs are nouns, HTTP methods are verbs.</strong> Don't put the action in the URL — let the HTTP method (GET/POST/PUT/DELETE) say what you're doing. The URL just names <em>what</em> you're acting on.</p>
-          <div class="ba">
-            <div class="ba-col after">
-              <h3>✓ Good (nouns)</h3>
-              <ul>
-                <li><code>/students</code> — the collection</li>
-                <li><code>/students/{id}</code> — one student by ID</li>
-                <li><code>/students?name=John</code> — filter with a query parameter</li>
-              </ul>
-            </div>
-            <div class="ba-mid">vs</div>
-            <div class="ba-col before">
-              <h3>✗ Bad (verbs in URL)</h3>
-              <ul>
-                <li><code>/getStudent</code> — verb belongs in the method</li>
-                <li><code>/deleteStudentById</code> — redundant &amp; clumsy</li>
-                <li><code>/student/fetch</code> — action in the path</li>
-              </ul>
-            </div>
+          <p class="eyebrow">REST · 1 of 4</p>
+          <h2>REST, defined properly</h2>
+          <p class="deep"><span class="term">REST</span> — Representational State Transfer — is an <strong>architectural style</strong> described by Roy Fielding in 2000. It is not a library, a protocol or a Spring feature. It's a set of design agreements that, if you follow them, make your API predictable to anyone who has used any other REST API.</p>
+          <p class="deep">The core idea in one sentence:</p>
+          <div class="keybox" style="font-size:19px;">
+            <span class="lbl">The REST idea</span>
+            Expose your data as <strong>resources at URLs</strong>, and use <strong>HTTP's existing verbs</strong> to act on them.
+          </div>
+          <p class="deep">Look at what that buys you. One URL, four completely different operations — and no reader has to guess what any of them do:</p>
+          <table class="cmp">
+            <thead><tr><th>Request</th><th>What it means</th></tr></thead>
+            <tbody>
+              <tr><td><code><strong>GET</strong> /api/students/5</code></td><td>Give me student 5</td></tr>
+              <tr><td><code><strong>PUT</strong> /api/students/5</code></td><td>Update student 5 with the data in my body</td></tr>
+              <tr><td><code><strong>DELETE</strong> /api/students/5</code></td><td>Remove student 5</td></tr>
+              <tr><td><code><strong>POST</strong> /api/students</code></td><td>Create a new student from the data in my body</td></tr>
+            </tbody>
+          </table>
+          <p class="deep">The path never changes meaning — it always identifies <em>which</em> data. The verb carries the intent. That's REST.</p>
+        </section>
+
+        <!-- 12. SIX CONSTRAINTS -->
+        <section class="slide">
+          <p class="eyebrow">REST · 2 of 4</p>
+          <h2>The six REST constraints</h2>
+          <p class="deep">Fielding listed six rules. An API that follows them is called "RESTful". Spring Boot gives you most of them for free — but you should know what they are and why they matter.</p>
+          <div class="cards">
+            <div class="card"><h3>1 · Client–Server</h3><p>The client (UI) and server (data) are separate and can be developed, deployed and scaled independently.</p></div>
+            <div class="card"><h3>2 · Stateless</h3><p>Every request carries everything needed to understand it. The server stores no session between calls.</p></div>
+            <div class="card"><h3>3 · Cacheable</h3><p>Responses say whether they may be cached, so repeated reads needn't hit the server at all.</p></div>
+            <div class="card"><h3>4 · Uniform Interface</h3><p>The same small set of verbs and conventions everywhere, so an unfamiliar API still feels familiar.</p></div>
+            <div class="card"><h3>5 · Layered System</h3><p>Gateways, load balancers and caches may sit in between; the client can't tell and doesn't care.</p></div>
+            <div class="card"><h3>6 · Code on Demand <span class="muted">(optional)</span></h3><p>The server may send executable code (e.g. JavaScript). Rarely used in practice.</p></div>
           </div>
           <div class="keybox">
-            <span class="lbl">The pattern to internalise</span>
-            Use <strong>plural nouns</strong> for collections (<code>/students</code>), a <strong>path segment</strong> to identify one item (<code>/students/5</code>), and <strong>query parameters</strong> for filtering or optional criteria (<code>?name=John</code>). The verb is never in the URL — it's the HTTP method.
+            <span class="lbl">Number 2 is the one that matters most — and here's why</span>
+            Because the server keeps <strong>no memory of you</strong>, any copy of the server can handle any request. That means you can run ten identical copies behind a load balancer and requests can land on any of them. <strong>Statelessness is what makes horizontal scaling possible</strong> — and it's precisely what Session 4 exploits when we run three instances of one service. Stateless design today is what lets you scale tomorrow.
           </div>
         </section>
 
-        <!-- 12. ANNOTATIONS OVERVIEW (preview grid) -->
+        <!-- 13. REST VS SOAP -->
         <section class="slide">
-          <p class="eyebrow">Your toolkit for the lab</p>
+          <p class="eyebrow">REST · 3 of 4</p>
+          <h2>REST vs SOAP</h2>
+          <p class="deep">Before REST won, the standard was <strong>SOAP</strong> — a heavyweight, XML-based protocol. You'll still meet it in banking, telecom and older enterprise systems, so it's worth knowing the contrast.</p>
+          <table class="cmp">
+            <thead><tr><th></th><th>REST</th><th>SOAP</th></tr></thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td class="good">An architectural <em>style</em> — a set of conventions</td><td>A strict <em>protocol</em> with a formal specification</td></tr>
+              <tr><td><strong>Data format</strong></td><td class="good">JSON (usually), or anything you like</td><td>XML only</td></tr>
+              <tr><td><strong>Message size</strong></td><td class="good">Small and light</td><td>Large — envelope, header and body wrappers</td></tr>
+              <tr><td><strong>Readability</strong></td><td class="good">Easy to read by eye</td><td>Verbose and hard to scan</td></tr>
+              <tr><td><strong>Contract</strong></td><td>Optional (OpenAPI / Swagger)</td><td class="good">Mandatory and machine-readable (WSDL)</td></tr>
+              <tr><td><strong>Transport</strong></td><td>HTTP only</td><td class="good">HTTP, SMTP, JMS, TCP…</td></tr>
+              <tr><td><strong>Built-in transactions</strong></td><td>No</td><td class="good">Yes (WS-* standards)</td></tr>
+              <tr><td><strong>Best suited to</strong></td><td class="good">Web &amp; mobile apps, microservices, public APIs</td><td>Banking, telecom, formal enterprise integration</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The honest summary</span>
+            REST won because it is <strong>simpler and lighter</strong>, and because mobile apps and browsers handle JSON effortlessly. SOAP is not "bad" — its rigidity is a genuine advantage when you need guaranteed contracts and built-in transaction support. But for new projects, REST is the default, and it's what we build all four sessions on.
+          </div>
+        </section>
+
+        <!-- 14. HTTP METHODS TO CRUD -->
+        <section class="slide">
+          <p class="eyebrow">REST · 4 of 4</p>
+          <h2>HTTP verbs → CRUD → Spring</h2>
+          <p class="deep"><span class="term">CRUD</span> stands for Create, Read, Update, Delete — the four things you do to almost any data. Each maps to one HTTP verb and one Spring annotation. <strong>Learn this table; today's lab is literally this table.</strong></p>
+          <table class="cmp">
+            <thead><tr><th>CRUD</th><th>Verb</th><th>Spring annotation</th><th>Path</th><th>Body?</th><th>Success code</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Create</strong></td><td><code>POST</code></td><td><code>@PostMapping</code></td><td><code>/api/students</code></td><td class="good">Yes</td><td><code>201 Created</code></td></tr>
+              <tr><td><strong>Read all</strong></td><td><code>GET</code></td><td><code>@GetMapping</code></td><td><code>/api/students</code></td><td>No</td><td><code>200 OK</code></td></tr>
+              <tr><td><strong>Read one</strong></td><td><code>GET</code></td><td><code>@GetMapping("/{id}")</code></td><td><code>/api/students/5</code></td><td>No</td><td><code>200 OK</code></td></tr>
+              <tr><td><strong>Update</strong></td><td><code>PUT</code></td><td><code>@PutMapping("/{id}")</code></td><td><code>/api/students/5</code></td><td class="good">Yes</td><td><code>200 OK</code></td></tr>
+              <tr><td><strong>Delete</strong></td><td><code>DELETE</code></td><td><code>@DeleteMapping("/{id}")</code></td><td><code>/api/students/5</code></td><td>No</td><td><code>204 No Content</code></td></tr>
+            </tbody>
+          </table>
+          <p class="deep" style="margin-top:16px;">Note the pattern in the paths: <strong>operations on the collection</strong> use <code>/api/students</code>, and <strong>operations on one item</strong> add its id — <code>/api/students/5</code>.</p>
+          <div class="note">
+            <span class="lbl">PUT vs PATCH</span>
+            <code>PUT</code> means <strong>replace the whole thing</strong> — send every field, and anything you omit gets wiped. <code>PATCH</code> means <strong>change only these fields</strong> — send just what's different. <code>PUT</code> is simpler and far more common; we use <code>PUT</code> today and you should default to it until you have a reason not to.
+          </div>
+        </section>
+
+        <!-- 15. SAFE AND IDEMPOTENT -->
+        <section class="slide">
+          <p class="eyebrow">Getting the verbs right</p>
+          <h2>Safe, idempotent, and why it matters</h2>
+          <p class="deep">Two properties of each verb decide whether a browser may pre-fetch it, whether a proxy may cache it, and whether a mobile app may safely retry it after a dropped connection.</p>
+          <table class="cmp">
+            <thead><tr><th>Verb</th><th>Safe? <span class="muted">(changes nothing)</span></th><th>Idempotent? <span class="muted">(repeat = same result)</span></th><th>Consequence</th></tr></thead>
+            <tbody>
+              <tr><td><code>GET</code></td><td class="good">✅ Yes</td><td class="good">✅ Yes</td><td>Cacheable; safe to retry or pre-fetch freely.</td></tr>
+              <tr><td><code>POST</code></td><td class="bad">❌ No</td><td class="bad">❌ No</td><td><strong>Retrying creates a duplicate.</strong> This is why browsers warn "confirm form resubmission".</td></tr>
+              <tr><td><code>PUT</code></td><td class="bad">❌ No</td><td class="good">✅ Yes</td><td>Safe to retry — you'd just set the same values again.</td></tr>
+              <tr><td><code>DELETE</code></td><td class="bad">❌ No</td><td class="good">✅ Yes</td><td>Safe to retry — already-deleted stays deleted.</td></tr>
+              <tr><td><code>PATCH</code></td><td class="bad">❌ No</td><td>⚠️ Depends</td><td>Idempotent if you set absolute values; not if you say "add 1".</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">The rule this gives you — and it's a real-world rule</span>
+            <strong>Never use <code>GET</code> for anything that changes data.</strong> A URL like <code>GET /deleteStudent/5</code> looks harmless but is genuinely dangerous: browsers pre-fetch links, crawlers follow them, and proxies cache them. People have wiped production data this way. If it changes something, use <code>POST</code>, <code>PUT</code>, <code>PATCH</code> or <code>DELETE</code>.
+          </div>
+        </section>
+
+
+        <!-- 16. STATUS CODE FAMILIES -->
+        <section class="slide">
+          <p class="eyebrow">Status codes · 1 of 2</p>
+          <h2>Status codes: the five families</h2>
+          <p class="deep">Every response carries a three-digit code. You don't need to memorise all of them — you need to know what the <strong>first digit</strong> means, because that alone tells you who has the problem.</p>
+          <div class="status-list">
+            <div class="status-row"><div class="status-badge" style="background:#8fa3b8;">1xx</div><div class="sd"><strong>Informational</strong> — "still working on it." You'll rarely see these.</div></div>
+            <div class="status-row"><div class="status-badge s2">2xx</div><div class="sd"><strong>Success</strong> — it worked. <code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code>.</div></div>
+            <div class="status-row"><div class="status-badge" style="background:#5e5ce6;">3xx</div><div class="sd"><strong>Redirection</strong> — "it lives somewhere else now."</div></div>
+            <div class="status-row"><div class="status-badge s4">4xx</div><div class="sd"><strong>Client error</strong> — <em>the caller</em> did something wrong. Bad JSON, wrong id, no permission. <strong>Fix the request.</strong></div></div>
+            <div class="status-row"><div class="status-badge s5">5xx</div><div class="sd"><strong>Server error</strong> — <em>your code</em> broke. An unhandled exception, a database that's down. <strong>Fix the server.</strong></div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">4xx vs 5xx — the most useful distinction in debugging</span>
+            <strong>4xx means it's the caller's fault; 5xx means it's yours.</strong> When a client reports "your API returned 400", the answer is usually "check what you sent me." When it returns 500, that's your bug and it belongs in your logs. Getting this right saves enormous amounts of finger-pointing — and returning 500 for a bad user input is a genuine API design fault, not a cosmetic one.
+          </div>
+        </section>
+
+        <!-- 17. THE CODES YOU'LL USE -->
+        <section class="slide">
+          <p class="eyebrow">Status codes · 2 of 2</p>
+          <h2>The codes you'll actually use</h2>
+          <table class="cmp">
+            <thead><tr><th>Code</th><th>Name</th><th>Use it when</th></tr></thead>
+            <tbody>
+              <tr><td class="good"><code>200</code></td><td>OK</td><td>A <code>GET</code> or <code>PUT</code> succeeded and you're returning data.</td></tr>
+              <tr><td class="good"><code>201</code></td><td>Created</td><td>A <code>POST</code> created something new. Best practice: also return the new object.</td></tr>
+              <tr><td class="good"><code>204</code></td><td>No Content</td><td>It worked but there's nothing to send back — the classic <code>DELETE</code> response.</td></tr>
+              <tr><td class="bad"><code>400</code></td><td>Bad Request</td><td>The body is malformed, or a required field is missing/invalid.</td></tr>
+              <tr><td class="bad"><code>401</code></td><td>Unauthorized</td><td>You haven't logged in. (Badly named — it means <em>unauthenticated</em>.)</td></tr>
+              <tr><td class="bad"><code>403</code></td><td>Forbidden</td><td>You <em>are</em> logged in, but you're not allowed to do this.</td></tr>
+              <tr><td class="bad"><code>404</code></td><td>Not Found</td><td>No resource at that path — wrong URL, or that id doesn't exist.</td></tr>
+              <tr><td class="bad"><code>405</code></td><td>Method Not Allowed</td><td>The path exists but not for that verb — e.g. POST to a <code>@GetMapping</code>.</td></tr>
+              <tr><td class="bad"><code>409</code></td><td>Conflict</td><td>It clashes with existing state — a duplicate email, for instance.</td></tr>
+              <tr><td class="bad"><code>415</code></td><td>Unsupported Media Type</td><td><strong>The <code>Content-Type: application/json</code> header is missing.</strong> Swagger UI sets it for you.</td></tr>
+              <tr><td><code>500</code></td><td>Internal Server Error</td><td>An unhandled exception escaped your code. Always a bug worth fixing.</td></tr>
+            </tbody>
+          </table>
+          <div class="warnbox">
+            <span class="lbl">401 vs 403, since everyone mixes them up</span>
+            <code>401</code> = <em>"I don't know who you are"</em> → log in. &nbsp;&nbsp; <code>403</code> = <em>"I know exactly who you are, and you're not allowed"</em> → no amount of logging in will help.
+          </div>
+        </section>
+
+        <!-- 18. URI DESIGN -->
+        <section class="slide">
+          <p class="eyebrow">Design</p>
+          <h2>Designing URLs properly</h2>
+          <p class="deep">Your URLs are your API's public face. They're read by other developers, hard to change once published, and a good set makes an API feel obvious. The rules are simple:</p>
+          <table class="cmp">
+            <thead><tr><th>Rule</th><th>❌ Avoid</th><th>✅ Prefer</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Nouns, not verbs</strong> — HTTP already has the verb</td><td class="bad"><code>/getStudent/5</code><br><code>/createStudent</code></td><td class="good"><code>GET /students/5</code><br><code>POST /students</code></td></tr>
+              <tr><td><strong>Plural for collections</strong> — consistent and reads naturally</td><td class="bad"><code>/student</code></td><td class="good"><code>/students</code></td></tr>
+              <tr><td><strong>Lower-case with hyphens</strong></td><td class="bad"><code>/StudentRecords</code><br><code>/student_records</code></td><td class="good"><code>/student-records</code></td></tr>
+              <tr><td><strong>Nest to show ownership</strong></td><td class="bad"><code>/getCoursesForStudent?id=5</code></td><td class="good"><code>GET /students/5/courses</code></td></tr>
+              <tr><td><strong>Query params for filtering, paths for identity</strong></td><td class="bad"><code>/students/gradeA</code></td><td class="good"><code>/students?grade=A</code></td></tr>
+              <tr><td><strong>No file extensions</strong> — headers handle format</td><td class="bad"><code>/students.json</code></td><td class="good"><code>/students</code></td></tr>
+              <tr><td><strong>Version your API</strong></td><td class="bad"><code>/students</code> <span class="muted">(then break it later)</span></td><td class="good"><code>/api/v1/students</code></td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Path or query parameter? The test</span>
+            Ask: <em>"is this value required to identify the thing?"</em> If yes → <strong>path</strong> (<code>/students/5</code> — without the 5 there's no request to make). If it merely narrows or sorts a list → <strong>query</strong> (<code>/students?grade=A&amp;sort=name</code> — still meaningful without it). This maps exactly onto <code>@PathVariable</code> and <code>@RequestParam</code>.
+          </div>
+        </section>
+
+        <!-- 19. ANNOTATIONS TODAY -->
+        <section class="slide">
+          <p class="eyebrow">The code</p>
           <h2>Annotations you'll use today</h2>
-          <p class="deep">Here's everything you'll write in the hands-on lab, all in one place. Don't worry about the details yet — we'll unpack the important ones over the next few slides, and you'll use each one in code. Just know what's coming.</p>
-          <div class="anno-grid preview">
-            <div class="anno-cell"><span class="ac-tag">@RestController</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestMapping</span></div>
-            <div class="anno-cell"><span class="ac-tag">@GetMapping</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PostMapping</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PutMapping</span></div>
-            <div class="anno-cell"><span class="ac-tag">@DeleteMapping</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PathVariable</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestParam</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestBody</span></div>
-            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span></div>
+          <div class="anno-grid">
+            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">Marks the class as a REST handler. Its methods return data, not view names.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestMapping("/api/students")</span><span class="ac-def">Class-level base path. Every method's path is appended to it.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@GetMapping</span><span class="ac-def">Handle HTTP GET — read data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PostMapping</span><span class="ac-def">Handle HTTP POST — create something.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PutMapping</span><span class="ac-def">Handle HTTP PUT — update something.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@DeleteMapping</span><span class="ac-def">Handle HTTP DELETE — remove something.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PathVariable</span><span class="ac-def">Read a value from inside the path: <code>/students/<strong>5</strong></code>.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestParam</span><span class="ac-def">Read a value from after the <code>?</code>: <code>?grade=<strong>A</strong></code>.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestBody</span><span class="ac-def"><strong>New today.</strong> Convert the JSON body into a Java object.</span></div>
+            <div class="anno-cell"><span class="ac-tag">ResponseEntity&lt;T&gt;</span><span class="ac-def"><strong>New today.</strong> Not an annotation — a return type that lets you set the status code and headers.</span></div>
           </div>
-          <p class="muted" style="margin-top:16px;">Ten annotations — that's the entire surface area of building a REST controller. You already know <code>@RestController</code> from Session 1.</p>
+          <div class="keybox">
+            <span class="lbl">Only two genuinely new things today</span>
+            You already know six of these from Session 1. Today adds <strong><code>@RequestBody</code></strong> (data coming <em>in</em>) and <strong><code>ResponseEntity</code></strong> (control over what goes <em>out</em>). Everything else is repetition — which is exactly how it should feel.
+          </div>
         </section>
 
-        <!-- 13. @RestController unpacked -->
+        <!-- 20. @RestController UNPACKED -->
         <section class="slide">
-          <p class="eyebrow">A closer look</p>
-          <h2>@RestController unpacked</h2>
-          <p class="deep">You used <code>@RestController</code> in Session 1, but here's what it actually <em>is</em> under the hood. It's a convenience annotation that bundles two others together:</p>
+          <p class="eyebrow">The code</p>
+          <h2><code>@RestController</code>, unpacked</h2>
+          <p class="deep">Like <code>@SpringBootApplication</code>, this is shorthand. It is exactly two annotations combined:</p>
           <div class="anno-map">
             <div class="anno-row">
-              <div class="anno-tag">@RestController</div>
-              <div>= <strong>@Controller</strong> &nbsp;+&nbsp; <strong>@ResponseBody</strong></div>
+              <div class="anno-tag">@Controller</div>
+              <div>Makes it a <strong>bean</strong> that handles web requests — so component scanning picks it up and the DispatcherServlet can route to it.</div>
+            </div>
+            <div class="anno-row">
+              <div class="anno-tag">@ResponseBody</div>
+              <div>Says <strong>"my return value IS the response body"</strong> — convert it to JSON and send it — rather than "my return value is the name of an HTML page to render".</div>
             </div>
           </div>
-          <p class="deep" style="margin-top:18px;"><code>@ResponseBody</code> is the important half: it tells Spring to take whatever your method returns and write it <strong>directly into the HTTP response body as JSON</strong> (via Jackson), instead of treating the return value as the name of an HTML page to render. With a plain <code>@Controller</code> you'd have to add <code>@ResponseBody</code> to every single method:</p>
+          <p class="deep" style="margin-top:18px;">That second one explains a classic beginner error. Watch what happens with the wrong annotation:</p>
           <div class="panels">
             <div class="panel bad">
-              <h3>✗ Plain @Controller</h3>
+              <h3>❌ <code>@Controller</code> alone</h3>
               <pre><code>@Controller
 public class StudentController {
 
-    @GetMapping("/students")
-    @ResponseBody  // needed on
-    public List&lt;Student&gt; all() {
-        return students;
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello!";
     }
-    // ...and on every
-    // other method too
 }</code></pre>
+              <p style="font-size:15px;">Spring reads <code>"Hello!"</code> as <strong>the name of a page</strong>, hunts for a template called <code>Hello!</code>, fails, and you get a <strong>500 error</strong> or a Whitelabel page.</p>
             </div>
             <div class="panel good">
-              <h3>✓ @RestController</h3>
+              <h3>✅ <code>@RestController</code></h3>
               <pre><code>@RestController
 public class StudentController {
 
-    @GetMapping("/students")
-    // no @ResponseBody needed
-    public List&lt;Student&gt; all() {
-        return students;
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello!";
     }
-    // applies to ALL methods
-    // automatically
 }</code></pre>
-            </div>
-          </div>
-        </section>
-
-        <!-- 14. @RequestMapping at class level -->
-        <section class="slide">
-          <p class="eyebrow">Keeping URLs DRY</p>
-          <h2>@RequestMapping at class level</h2>
-          <p class="deep">Putting <code>@RequestMapping("/students")</code> on the <strong>class</strong> sets a common URL prefix for every method inside. Each method's mapping is then <em>relative</em> to that prefix. This keeps your code clean and your URLs consistent — you write <code>/students</code> once instead of repeating it everywhere.</p>
-          <div class="ba">
-            <div class="ba-col before">
-              <h3>Without class-level mapping</h3>
-              <pre style="margin:0;"><code>@GetMapping("/students")
-@GetMapping("/students/all")
-@GetMapping("/students/{id}")
-@PostMapping("/students")
-@PutMapping("/students/{id}")</code></pre>
-            </div>
-            <div class="ba-mid">→</div>
-            <div class="ba-col after">
-              <h3>With @RequestMapping("/students")</h3>
-              <pre style="margin:0;"><code>// class: @RequestMapping("/students")
-@GetMapping
-@GetMapping("/all")
-@GetMapping("/{id}")
-@PostMapping
-@PutMapping("/{id}")</code></pre>
+              <p style="font-size:15px;">Spring sends <code>Hello!</code> as the response body. Correct — and the same reasoning applies to objects, which become JSON.</p>
             </div>
           </div>
           <div class="keybox">
-            <span class="lbl">How the URL is assembled</span>
-            Spring joins the class prefix and the method path: class <code>/students</code> + method <code>/{id}</code> = the full endpoint <code>/students/{id}</code>. Change the prefix in one place and every endpoint moves with it.
+            <span class="lbl">Rule of thumb</span>
+            Building an <strong>API</strong>? <code>@RestController</code>, always. Rendering <strong>HTML pages</strong> server-side (with Thymeleaf or JSP)? <code>@Controller</code>. We use <code>@RestController</code> exclusively in this course.
           </div>
         </section>
 
-        <!-- 15. TESTING TOOLS -->
+        <!-- 21. CLASS-LEVEL REQUESTMAPPING -->
         <section class="slide">
-          <p class="eyebrow">How you'll call your API</p>
-          <h2>Testing tools: Postman + Swagger</h2>
-          <p class="deep">You can't easily test a POST or PUT from a browser address bar — browsers only do GET. So we use proper API testing tools. You'll use both today; they complement each other.</p>
-          <div class="cards">
-            <div class="card">
-              <div class="ic">🚀</div>
-              <h3>Postman</h3>
-              <p>A dedicated desktop app for calling APIs. Full control: pick the HTTP method, set headers, paste a JSON body. This is the industry-standard tool teams use daily. Best for testing POST/PUT/DELETE with custom bodies.</p>
-            </div>
-            <div class="card">
-              <div class="ic">📖</div>
-              <h3>Swagger UI</h3>
-              <p>A browser-based tester that is <strong>auto-generated from your annotations</strong> — zero setup. Add one dependency and Spring builds a live, interactive page listing every endpoint with "Try it out" buttons. Great for quick checks and sharing.</p>
-            </div>
-          </div>
-          <p class="deep" style="margin-top:14px;">Once the Swagger dependency is added, you reach the UI at:</p>
-          <pre><code>http://localhost:8080/swagger-ui/index.html</code></pre>
-          <div class="swagger-mock">
-            <div class="sm-top">📖 Swagger UI — student-controller</div>
-            <div class="sm-row"><span class="verb get">GET</span><span class="path">/students/all</span></div>
-            <div class="sm-row"><span class="verb get">GET</span><span class="path">/students/{id}</span></div>
-            <div class="sm-row"><span class="verb post">POST</span><span class="path">/students</span></div>
-            <div class="sm-row"><span class="verb put">PUT</span><span class="path">/students/{id}</span></div>
-            <div class="sm-row" style="border-bottom:none;"><span class="verb del">DELETE</span><span class="path">/students/{id}</span></div>
-          </div>
-          <p class="muted" style="margin-top:10px;">This list builds itself from your controller — no manual documentation needed.</p>
-        </section>
-
-        <!-- 16. RESPONSEENTITY -->
-        <section class="slide">
-          <p class="eyebrow">Taking control of the response</p>
-          <h2>ResponseEntity</h2>
-          <p class="deep">By default, when you return a <code>Student</code> from a method, Spring sends it back with status <strong>200 OK</strong>. But sometimes you need control over the <em>full</em> HTTP response — the status code, the headers, and the body. That's what <code>ResponseEntity&lt;T&gt;</code> gives you: it's a wrapper around the entire response.</p>
+          <p class="eyebrow">The code</p>
+          <h2><code>@RequestMapping</code> at class level</h2>
+          <p class="deep">Every endpoint for one resource shares a path prefix. Rather than repeating it on every method, declare it once on the class — the method paths are then <strong>appended</strong> to it.</p>
           <div class="panels">
             <div class="panel bad">
-              <h3>Raw return (always 200)</h3>
-              <pre><code>@GetMapping("/{id}")
-public Student getById(
-        @PathVariable int id) {
-    return findStudent(id);
-    // status is always 200,
-    // even if not found
+              <h3>❌ Repetitive</h3>
+              <pre><code>@RestController
+public class StudentController {
+
+    @GetMapping("/api/students")
+    @GetMapping("/api/students/{id}")
+    @PostMapping("/api/students")
+    @PutMapping("/api/students/{id}")
+    @DeleteMapping("/api/students/{id}")
+    <span class="code-comment">// /api/students typed 5 times.
+    // Change the prefix → edit 5 lines.</span>
 }</code></pre>
             </div>
             <div class="panel good">
-              <h3>ResponseEntity (you choose)</h3>
-              <pre><code>@GetMapping("/{id}")
-public ResponseEntity&lt;Student&gt; getById(
-        @PathVariable int id) {
-    Student s = findStudent(id);
-    if (s != null)
-        return ResponseEntity.ok(s);   // 200
-    return ResponseEntity
-            .notFound().build();        // 404
+              <h3>✅ Prefix declared once</h3>
+              <pre><code>@RestController
+@RequestMapping("/api/students")
+public class StudentController {
+
+    @GetMapping             <span class="code-comment">→ /api/students</span>
+    @GetMapping("/{id}")    <span class="code-comment">→ /api/students/5</span>
+    @PostMapping            <span class="code-comment">→ /api/students</span>
+    @PutMapping("/{id}")    <span class="code-comment">→ /api/students/5</span>
+    @DeleteMapping("/{id}") <span class="code-comment">→ /api/students/5</span>
+    <span class="code-comment">// One place to change the prefix.</span>
 }</code></pre>
             </div>
           </div>
-          <div class="keybox">
-            <span class="lbl">When to reach for it</span>
-            Use <code>ResponseEntity</code> when you need to return different status codes depending on the outcome — <strong>201 Created</strong> after a POST, <strong>404 Not Found</strong> when something's missing, or to attach custom headers. It's the professional way to build precise REST responses.
-          </div>
-        </section>
-
-        <!-- 17. RESTTEMPLATE -->
-        <section class="slide">
-          <p class="eyebrow">Calling another service (trainer demo)</p>
-          <h2>RestTemplate</h2>
-          <p class="deep">So far your app is the <em>provider</em> — it answers requests. But sometimes a Spring Boot app needs to be a <em>consumer</em> too, calling <strong>another</strong> REST API from inside its own code. <code>RestTemplate</code> is Spring's classic synchronous client for exactly that.</p>
-          <pre><code>RestTemplate restTemplate = new RestTemplate();
-
-// Call another service and map its JSON straight into a Student
-Student student = restTemplate.getForObject(
-        "http://localhost:8080/students/1",
-        Student.class);
-
-System.out.println(student.getFirstName());</code></pre>
-          <ul>
-            <li><code>getForObject(url, Type.class)</code> sends a GET request and converts the JSON response directly into a Java object.</li>
-            <li>It's <strong>synchronous</strong> — your code waits for the response before continuing.</li>
-            <li>There are matching methods: <code>postForObject</code>, <code>put</code>, <code>delete</code>, and more.</li>
-          </ul>
           <div class="warnbox">
-            <span class="lbl">Trainer demo only — don't code this today</span>
-            We'll see this in action as a quick demonstration. It becomes far more relevant in a <strong>microservices</strong> context, where many small services call each other — a topic for a later session. For now, just understand what it's <em>for</em>.
+            <span class="lbl">Two things that catch people out</span>
+            <strong>One:</strong> the full path is always <em>class prefix + method path</em>. If your class says <code>/api/students</code> and your method says <code>/api/students/{id}</code>, the real URL becomes <code>/api/students/api/students/5</code> — and you'll get a confusing 404. <strong>Two:</strong> a bare <code>@GetMapping</code> with no value maps to the class path exactly, which is precisely what you want for "get all".
           </div>
         </section>
 
-        <!-- 18. SESSION 3 PREVIEW -->
+        <!-- 22. @RequestBody -->
         <section class="slide">
-          <p class="eyebrow">Where we're headed next</p>
-          <h2>Coming up in Session 3</h2>
-          <p class="deep">Today's data lives in a list in memory — it vanishes when the app stops, and asking for a missing ID just returns nothing useful. Session 3 fixes both:</p>
-          <div class="cards">
-            <div class="card"><div class="ic">🛡️</div><h3>Exception handling</h3><p>What happens when a student ID isn't found? With <code>@ControllerAdvice</code> and custom error responses, you'll return clean <strong>404</strong> messages instead of ugly stack traces.</p></div>
-            <div class="card"><div class="ic">🗄️</div><h3>JPA + H2 database</h3><p>Swap the in-memory list for a real database. Your data survives restarts — proper persistence with Spring Data JPA and an H2 database.</p></div>
-            <div class="card"><div class="ic">🏷️</div><h3>@Entity</h3><p>Map your <code>Student</code> class straight to a database table with a single annotation.</p></div>
-            <div class="card"><div class="ic">🔗</div><h3>@Repository</h3><p>Real CRUD with persistence and almost no boilerplate — Spring writes the SQL for you.</p></div>
+          <p class="eyebrow">The code · new today</p>
+          <h2><code>@RequestBody</code> — data coming in</h2>
+          <p class="deep">Until now every input arrived through the URL, which is fine for an id but hopeless for a whole student record. To <em>create</em> something, the client sends JSON in the <strong>request body</strong>, and <code>@RequestBody</code> is what turns that JSON into a Java object.</p>
+          <pre><code>@PostMapping
+public Student create(@RequestBody Student student) {
+    <span class="code-comment">// 'student' is a fully-populated Java object.
+    // Jackson parsed the JSON body and filled it in — you wrote no parsing code.</span>
+    return service.save(student);
+}</code></pre>
+          <div class="flow">
+            <div class="flow-box">Client sends JSON <span class="sm">in the request body</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box alt">Jackson parses it <span class="sm">using your setters</span></div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-box green">Your method gets a <code>Student</code> <span class="sm">ready to use</span></div>
           </div>
-          <p class="muted" style="margin-top:14px;">Everything you build today carries forward — Session 3 upgrades it from a demo into a real, persistent application.</p>
+          <p class="deep" style="margin-top:18px;">The JSON keys are matched to your class's fields <strong>by name</strong>:</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The JSON sent</h3>
+              <pre><code><span class="json-punc">{</span>
+  <span class="json-key">"name"</span><span class="json-punc">:</span> <span class="json-str">"Amit Shah"</span><span class="json-punc">,</span>
+  <span class="json-key">"email"</span><span class="json-punc">:</span> <span class="json-str">"amit@tcs.com"</span><span class="json-punc">,</span>
+  <span class="json-key">"grade"</span><span class="json-punc">:</span> <span class="json-str">"A"</span>
+<span class="json-punc">}</span></code></pre>
+            </div>
+            <div class="panel">
+              <h3>The object you receive</h3>
+              <pre><code>student.getName()   <span class="code-comment">→ "Amit Shah"</span>
+student.getEmail()  <span class="code-comment">→ "amit@tcs.com"</span>
+student.getGrade()  <span class="code-comment">→ "A"</span>
+student.getId()     <span class="code-comment">→ null (not sent)</span></code></pre>
+            </div>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two failure modes you will definitely hit in the lab</span>
+            <strong>415 Unsupported Media Type</strong> → the <code>Content-Type: application/json</code> header is missing. Swagger UI sets it automatically, so you'll only meet this with other tools. <strong>400 Bad Request</strong> → your JSON is malformed (a trailing comma, single quotes, a missing brace). Both are <em>client</em> errors, which is why they're 4xx.
+          </div>
         </section>
 
-        <!-- 19. ANNOTATIONS RECAP -->
+        <!-- 23. RESPONSEENTITY -->
         <section class="slide">
-          <p class="eyebrow">Your closing cheatsheet</p>
-          <h2>Annotations recap</h2>
-          <p class="deep">The same ten annotations from the preview — now with a one-line definition next to each. Keep this slide as your revision anchor; this is the entire vocabulary of building a REST controller in Spring Boot.</p>
+          <p class="eyebrow">The code · new today</p>
+          <h2><code>ResponseEntity</code> — control what goes out</h2>
+          <p class="deep">Returning a plain object always produces <code>200 OK</code>. But we established that a <code>POST</code> should return <code>201</code>, a <code>DELETE</code> should return <code>204</code>, and a missing id should return <code>404</code>. <code>ResponseEntity&lt;T&gt;</code> is the wrapper that lets you set <strong>status code, headers and body</strong> yourself.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>Plain return — always 200</h3>
+              <pre><code>@PostMapping
+public Student create(
+        @RequestBody Student s) {
+    return service.save(s);
+}
+<span class="code-comment">// Works, but returns 200 OK.
+// A creation should say 201 Created.</span></code></pre>
+            </div>
+            <div class="panel good">
+              <h3>With <code>ResponseEntity</code></h3>
+              <pre><code>@PostMapping
+public ResponseEntity&lt;Student&gt; create(
+        @RequestBody Student s) {
+    Student saved = service.save(s);
+    return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(saved);
+}
+<span class="code-comment">// 201 Created + the new object.</span></code></pre>
+            </div>
+          </div>
+          <p class="deep" style="margin-top:14px;">There are convenient shortcuts for the common cases:</p>
+          <table class="cmp">
+            <thead><tr><th>Code</th><th>Produces</th><th>Typical use</th></tr></thead>
+            <tbody>
+              <tr><td><code>ResponseEntity.ok(obj)</code></td><td><code>200</code> + body</td><td>A successful GET or PUT</td></tr>
+              <tr><td><code>ResponseEntity.status(HttpStatus.CREATED).body(obj)</code></td><td><code>201</code> + body</td><td>A successful POST</td></tr>
+              <tr><td><code>ResponseEntity.noContent().build()</code></td><td><code>204</code>, no body</td><td>A successful DELETE</td></tr>
+              <tr><td><code>ResponseEntity.notFound().build()</code></td><td><code>404</code>, no body</td><td>That id doesn't exist</td></tr>
+              <tr><td><code>ResponseEntity.badRequest().body(msg)</code></td><td><code>400</code> + message</td><td>Invalid input</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">The classic pattern: found or not found</span>
+            <pre style="margin-top:8px;"><code>@GetMapping("/{id}")
+public ResponseEntity&lt;Student&gt; getById(@PathVariable int id) {
+    Student found = service.findById(id);
+    if (found == null) {
+        return ResponseEntity.notFound().build();   <span class="code-comment">// 404</span>
+    }
+    return ResponseEntity.ok(found);                <span class="code-comment">// 200 + the student</span>
+}</code></pre>
+            You'll write exactly this in the lab. In Session 3 we replace the <code>if</code> with a cleaner approach — a custom exception and a global handler.
+          </div>
+        </section>
+
+        <!-- 24. A COMPLETE CONTROLLER -->
+        <section class="slide">
+          <p class="eyebrow">Putting it together</p>
+          <h2>A complete CRUD controller</h2>
+          <p class="deep">Everything from the last several slides, in one class. This is the shape of the file you'll build across today's labs — read it as a map of where you're going.</p>
+          <pre><code>@RestController
+@RequestMapping("/api/students")          <span class="code-comment">// shared prefix</span>
+public class StudentController {
+
+    private final StudentService service;
+
+    public StudentController(StudentService service) {   <span class="code-comment">// constructor injection</span>
+        this.service = service;
+    }
+
+    <span class="code-comment">// READ ALL   ·  GET /api/students</span>
+    @GetMapping
+    public List&lt;Student&gt; getAll() {
+        return service.findAll();
+    }
+
+    <span class="code-comment">// READ ONE   ·  GET /api/students/5</span>
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; getById(@PathVariable int id) {
+        Student s = service.findById(id);
+        return (s == null) ? ResponseEntity.notFound().build()
+                           : ResponseEntity.ok(s);
+    }
+
+    <span class="code-comment">// SEARCH     ·  GET /api/students/search?grade=A</span>
+    @GetMapping("/search")
+    public List&lt;Student&gt; search(@RequestParam String grade) {
+        return service.findByGrade(grade);
+    }
+
+    <span class="code-comment">// CREATE     ·  POST /api/students  + JSON body</span>
+    @PostMapping
+    public ResponseEntity&lt;Student&gt; create(@RequestBody Student student) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.save(student));
+    }
+
+    <span class="code-comment">// UPDATE     ·  PUT /api/students/5  + JSON body</span>
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; update(@PathVariable int id,
+                                          @RequestBody Student student) {
+        Student updated = service.update(id, student);
+        return (updated == null) ? ResponseEntity.notFound().build()
+                                 : ResponseEntity.ok(updated);
+    }
+
+    <span class="code-comment">// DELETE     ·  DELETE /api/students/5</span>
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; delete(@PathVariable int id) {
+        return service.delete(id) ? ResponseEntity.noContent().build()
+                                  : ResponseEntity.notFound().build();
+    }
+}</code></pre>
+        </section>
+
+        <!-- 25. WHERE DATA LIVES TODAY -->
+        <section class="slide">
+          <p class="eyebrow">An honest limitation</p>
+          <h2>Where does today's data live?</h2>
+          <p class="deep">We have no database yet — that's Session 3. So today the students live in an ordinary <strong><code>ArrayList</code> held in memory</strong>, inside a <code>@Service</code> bean.</p>
+          <pre><code>@Service
+public class StudentService {
+
+    <span class="code-comment">// Just a list in memory. Remember: the @Service bean is a SINGLETON,
+    // so there is ONE list shared by every request — which is what makes
+    // it behave like a tiny database for the duration of the run.</span>
+    private final List&lt;Student&gt; students = new ArrayList&lt;&gt;();
+    private int nextId = 1;
+    ...
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The consequence — and it's the whole motivation for Session 3</span>
+            <strong>Restart the app and every student you created is gone.</strong> The list lived in memory, and memory is wiped when the process ends. That's not a bug in the lab; it's the honest limit of what we've built. Session 3 fixes it with a real database, and you'll appreciate <em>why</em> we need one far more having felt this.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The good news: the controller won't change</span>
+            Because the controller only talks to <code>StudentService</code> and never to the list, swapping the list for a real database means <strong>rewriting the service and leaving the controller untouched</strong>. That is the layered architecture from Session 1 paying off — and you'll see it happen for real next session.
+          </div>
+        </section>
+
+        <!-- 26. WHY YOU NEED A CLIENT -->
+        <section class="slide">
+          <p class="eyebrow">Testing · 1 of 2</p>
+          <h2>Why a browser isn't enough any more</h2>
+          <p class="deep">Here's a problem: typing a URL into a browser <strong>can only ever send a <code>GET</code></strong>. There's no way to choose a verb or attach a body, so you cannot test <code>POST</code>, <code>PUT</code> or <code>DELETE</code> from the address bar. From today you need a proper <span class="term">API client</span>.</p>
+          <p class="deep">There are two common choices, and we use the second:</p>
+          <table class="cmp">
+            <thead><tr><th></th><th>Postman</th><th>Swagger UI &nbsp;<span class="muted">(our choice)</span></th></tr></thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td>A separate desktop application</td><td class="good">A page <em>your own app</em> generates and serves</td></tr>
+              <tr><td><strong>Install</strong></td><td>Download and set up</td><td class="good">One dependency in <code>pom.xml</code> — nothing to install</td></tr>
+              <tr><td><strong>Knows your endpoints?</strong></td><td class="bad">No — you type every URL by hand</td><td class="good">Yes — it reads your controllers automatically</td></tr>
+              <tr><td><strong>Request body</strong></td><td class="bad">You write the JSON yourself</td><td class="good">Pre-filled from your Java class</td></tr>
+              <tr><td><strong>Content-Type header</strong></td><td class="bad">You must set it (Body → raw → JSON)</td><td class="good">Set for you</td></tr>
+              <tr><td><strong>Doubles as documentation</strong></td><td class="bad">No</td><td class="good">Yes — that's its main job</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Why this matters beyond convenience</span>
+            Because Swagger UI is <strong>generated from your code</strong>, it can't drift out of date and it can't disagree with what your app actually does. If an endpoint isn't on the page, Spring never registered it — which makes it a <strong>diagnostic tool as well as a test client</strong>.
+          </div>
+        </section>
+
+        <!-- 27. SWAGGER -->
+        <section class="slide">
+          <p class="eyebrow">Testing · 2 of 2</p>
+          <h2>Swagger UI — documentation that tests itself</h2>
+          <p class="deep">Add <strong>one dependency</strong> and Spring Boot inspects your controllers and generates a live, browsable, <em>interactive</em> documentation page. No writing docs; no keeping them in sync.</p>
+          <pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+          <p class="deep">Restart, then open <span class="pill">http://localhost:8080/swagger-ui.html</span>:</p>
+          <div class="swagger-mock">
+            <div class="sm-top">📘 Swagger UI &nbsp;·&nbsp; students</div>
+            <div class="sm-row"><span class="verb get">GET</span><span class="path">/api/students</span><span class="muted" style="margin-left:auto;">Get all students</span></div>
+            <div class="sm-row"><span class="verb post">POST</span><span class="path">/api/students</span><span class="muted" style="margin-left:auto;">Create a student</span></div>
+            <div class="sm-row"><span class="verb get">GET</span><span class="path">/api/students/{id}</span><span class="muted" style="margin-left:auto;">Get one student</span></div>
+            <div class="sm-row"><span class="verb put">PUT</span><span class="path">/api/students/{id}</span><span class="muted" style="margin-left:auto;">Update a student</span></div>
+            <div class="sm-row"><span class="verb del">DELETE</span><span class="path">/api/students/{id}</span><span class="muted" style="margin-left:auto;">Delete a student</span></div>
+          </div>
+          <p class="deep" style="margin-top:16px;">Click any row → <strong>"Try it out"</strong> → fill the fields → <strong>Execute</strong>. It sends the real request to your running app and shows you the real response, including the status code, the response headers and an equivalent <code>curl</code> command.</p>
+          <div class="keybox">
+            <span class="lbl">Why teams love this</span>
+            The docs are <strong>generated from the code</strong>, so they can't drift out of date. A front-end developer can explore your entire API and try every endpoint without asking you a single question. The underlying standard is called <span class="term">OpenAPI</span>; Swagger UI is the page that renders it.
+          </div>
+        </section>
+
+        <!-- 28. CONSUMING APIS -->
+        <section class="slide">
+          <p class="eyebrow">The other direction</p>
+          <h2>Calling someone else's API</h2>
+          <p class="deep">So far your app has <em>answered</em> requests. Often it also needs to <em>make</em> them — fetching an exchange rate, or in Session 4, calling another microservice. Spring gives you a client for that.</p>
+          <pre><code>@Service
+public class ExchangeRateService {
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    public Student fetchStudent(int id) {
+        String url = "http://localhost:8081/api/students/" + id;
+
+        <span class="code-comment">// Sends a GET, receives JSON, and converts it straight into a
+        // Student object — the same Jackson conversion, in reverse.</span>
+        return restTemplate.getForObject(url, Student.class);
+    }
+}</code></pre>
+          <table class="cmp">
+            <thead><tr><th>Method</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>getForObject(url, Class)</code></td><td>GET, and give me the body as this type</td></tr>
+              <tr><td><code>postForObject(url, body, Class)</code></td><td>POST my object as JSON, give me the reply</td></tr>
+              <tr><td><code>put(url, body)</code></td><td>PUT my object</td></tr>
+              <tr><td><code>delete(url)</code></td><td>DELETE</td></tr>
+              <tr><td><code>exchange(...)</code></td><td>Full control — custom headers, any verb, full response</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">A note on what's current</span>
+            <code>RestTemplate</code> is in <strong>maintenance mode</strong> — still fully supported and everywhere in existing code, which is why you must recognise it. For new code, Spring recommends <strong><code>RestClient</code></strong> (modern, same synchronous style) or <strong><code>WebClient</code></strong> (for reactive/async work). In Session 4 you'll see <code>RestTemplate</code> gain a superpower: add <code>@LoadBalanced</code> and it can call a service <em>by name</em> instead of by URL, letting Eureka find the address for it.
+          </div>
+        </section>
+
+        <!-- 29. COMMON MISTAKES -->
+        <section class="slide">
+          <p class="eyebrow">Save yourself some pain</p>
+          <h2>Common mistakes in REST APIs</h2>
+          <table class="cmp">
+            <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
+            <tbody>
+              <tr><td>Missing <code>Content-Type: application/json</code></td><td class="bad"><strong>415</strong> Unsupported Media Type</td><td class="good">Swagger UI sets it for you. With curl: add <code>-H "Content-Type: application/json"</code>.</td></tr>
+              <tr><td>Malformed JSON — trailing comma, single quotes</td><td class="bad"><strong>400</strong> Bad Request</td><td class="good">Double quotes on keys and strings; no comma after the last pair.</td></tr>
+              <tr><td>Sending POST to a <code>@GetMapping</code></td><td class="bad"><strong>405</strong> Method Not Allowed</td><td class="good">Match the annotation to the verb.</td></tr>
+              <tr><td>Class prefix repeated in the method path</td><td class="bad"><strong>404</strong> on a URL that looks right</td><td class="good">The real path is class + method. Use <code>@GetMapping("/{id}")</code>, not the full path again.</td></tr>
+              <tr><td>Data class has no getters</td><td class="bad">Response is <code>{}</code> or fields go missing</td><td class="good">Generate getters — Jackson reads values through them.</td></tr>
+              <tr><td>Data class has no no-arg constructor</td><td class="bad"><strong>400</strong>, or every field <code>null</code></td><td class="good">Add a public no-argument constructor for Jackson to use.</td></tr>
+              <tr><td>Returning <code>200</code> for everything</td><td>Works, but misleads callers</td><td class="good">Use <code>ResponseEntity</code>: <code>201</code> create, <code>204</code> delete, <code>404</code> missing.</td></tr>
+              <tr><td>Returning <code>500</code> for bad user input</td><td>Callers think your server is broken</td><td class="good"><code>4xx</code> is <em>their</em> mistake; <code>5xx</code> is yours. Choose deliberately.</td></tr>
+              <tr><td>Verbs in the URL — <code>/getStudent/5</code></td><td>Works, but isn't REST</td><td class="good"><code>GET /students/5</code>. The verb is the HTTP method.</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 30. LAB PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Your turn</p>
+          <h2>What you'll build in the lab</h2>
+          <p class="deep">A complete <strong>Student API</strong> with all four CRUD operations, in a fresh project whose base package is <span class="pill">com.tcs.training.students</span>.</p>
+          <table class="cmp">
+            <thead><tr><th>Lab</th><th>Endpoint</th><th>What you'll learn</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>—</td><td>The <code>Student</code> model class, with getters, setters and a no-arg constructor</td></tr>
+              <tr><td>2</td><td>—</td><td>The <code>StudentService</code> — an in-memory store, injected into the controller</td></tr>
+              <tr><td>3</td><td><code>GET /api/students</code></td><td>Return a <code>List</code> → a JSON array</td></tr>
+              <tr><td>4</td><td><code>GET /api/students/{id}</code></td><td><code>@PathVariable</code> + <code>404</code> when it's missing</td></tr>
+              <tr><td>5</td><td><code>GET /api/students/search?grade=A</code></td><td><code>@RequestParam</code> for filtering</td></tr>
+              <tr><td>6</td><td><code>POST /api/students</code></td><td><code>@RequestBody</code> + <code>201 Created</code> — your first write</td></tr>
+              <tr><td>7</td><td><code>PUT</code> &amp; <code>DELETE /api/students/{id}</code></td><td>Update and remove, with <code>200</code> / <code>204</code> / <code>404</code></td></tr>
+              <tr><td>Bonus</td><td><code>/swagger-ui.html</code></td><td>Interactive docs generated from your own code</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Nothing to install before you start</span>
+            The lab sets up <strong>Swagger UI</strong> in the very first step — one dependency in <code>pom.xml</code>, and your app serves its own test page at <code>/swagger-ui.html</code>. From Lab 6 onwards a browser address bar is no longer enough (you'll be sending POST, PUT and DELETE), and Swagger UI is what you'll use instead.
+          </div>
+        </section>
+
+        <!-- 31. RECAP FLASHCARDS -->
+        <section class="slide">
+          <p class="eyebrow">Check yourself</p>
+          <h2>Quick recap — tap each card to reveal</h2>
+          <div class="flashwrap">
+            <div class="flash">
+              <div class="q">Q · What's the difference between a web application and a web service? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">A web <strong>application</strong> returns <strong>HTML</strong> for humans to look at (<code>@Controller</code>). A web <strong>service</strong> returns <strong>data</strong>, usually JSON, for other programs to consume (<code>@RestController</code>).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Which HTTP verbs are idempotent, and why does it matter? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><code>GET</code>, <code>PUT</code> and <code>DELETE</code> — repeating them has the same effect as doing them once. <code>POST</code> is <strong>not</strong>, which is why calling it twice creates two records and why retries after a dropped connection are risky.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What do 4xx and 5xx tell you? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>4xx = the caller's fault</strong> (bad JSON, wrong id, no permission) — fix the request. <strong>5xx = your server's fault</strong> (an unhandled exception) — fix the code. Never return 5xx for bad user input.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What two things does <code>@RestController</code> combine? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><code>@Controller</code> (makes it a request-handling bean) + <code>@ResponseBody</code> (my return value <em>is</em> the response body, converted to JSON — not the name of a page).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · You send valid JSON and get 415. What did you forget? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">The <code>Content-Type: application/json</code> header. Swagger UI sets it for you automatically — so if you hit 415, you're using a tool that doesn't, and you must add the header yourself.</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · What must a class have for Jackson to convert it both ways? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a"><strong>Getters</strong> for going out (Java → JSON), and a <strong>no-argument constructor plus setters</strong> for coming in (JSON → Java).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Path variable or query parameter? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">If the value is needed to <strong>identify</strong> the resource → path (<code>/students/5</code>). If it merely <strong>filters or sorts</strong> a list → query (<code>/students?grade=A</code>).</div>
+            </div>
+            <div class="flash">
+              <div class="q">Q · Why does today's data vanish on restart? <span class="tap">tap to reveal ▾</span></div>
+              <div class="a">It lives in an <code>ArrayList</code> in memory inside a singleton bean, and memory is wiped when the process ends. Session 3 replaces it with a real database.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 32. ANNOTATION CHEATSHEET -->
+        <section class="slide">
+          <p class="eyebrow">Take this away</p>
+          <h2>Session 2 cheat sheet</h2>
           <div class="anno-grid">
-            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">Marks a REST controller; auto-serializes return values to JSON.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestMapping</span><span class="ac-def">Sets a URL prefix (on a class) or path (on a method).</span></div>
-            <div class="anno-cell"><span class="ac-tag">@GetMapping</span><span class="ac-def">Maps HTTP GET requests — read data.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PostMapping</span><span class="ac-def">Maps HTTP POST requests — create data.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PutMapping</span><span class="ac-def">Maps HTTP PUT requests — update data.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@DeleteMapping</span><span class="ac-def">Maps HTTP DELETE requests — remove data.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@PathVariable</span><span class="ac-def">Binds a URL path segment (e.g. <code>{id}</code>) to a parameter.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestParam</span><span class="ac-def">Binds a query parameter (e.g. <code>?name=</code>) to a parameter.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@RequestBody</span><span class="ac-def">Deserializes the request body JSON into a Java object.</span></div>
-            <div class="anno-cell"><span class="ac-tag">@ResponseStatus</span><span class="ac-def">Sets the HTTP status code the method returns (e.g. 201).</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RestController</span><span class="ac-def">= <code>@Controller</code> + <code>@ResponseBody</code>. Returns data.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestMapping("/api/x")</span><span class="ac-def">Class-level path prefix.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@GetMapping / @PostMapping</span><span class="ac-def">Read / create.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PutMapping / @DeleteMapping</span><span class="ac-def">Update / remove.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@PathVariable</span><span class="ac-def">Value from inside the path.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestParam</span><span class="ac-def">Value from after the <code>?</code>.</span></div>
+            <div class="anno-cell"><span class="ac-tag">@RequestBody</span><span class="ac-def">JSON body → Java object.</span></div>
+            <div class="anno-cell"><span class="ac-tag">ResponseEntity&lt;T&gt;</span><span class="ac-def">Set status code, headers and body.</span></div>
           </div>
+          <table class="cmp">
+            <thead><tr><th>Operation</th><th>Request</th><th>Returns</th></tr></thead>
+            <tbody>
+              <tr><td>Read all</td><td><code>GET /api/students</code></td><td><code>200</code> + JSON array</td></tr>
+              <tr><td>Read one</td><td><code>GET /api/students/5</code></td><td><code>200</code> + object, or <code>404</code></td></tr>
+              <tr><td>Filter</td><td><code>GET /api/students/search?grade=A</code></td><td><code>200</code> + JSON array</td></tr>
+              <tr><td>Create</td><td><code>POST /api/students</code> + body</td><td><code>201</code> + the new object</td></tr>
+              <tr><td>Update</td><td><code>PUT /api/students/5</code> + body</td><td><code>200</code> + updated, or <code>404</code></td></tr>
+              <tr><td>Delete</td><td><code>DELETE /api/students/5</code></td><td><code>204</code>, or <code>404</code></td></tr>
+            </tbody>
+          </table>
         </section>
 
-        <!-- 20. CLOSING -->
+        <!-- 33. SESSION 3 PREVIEW -->
+        <section class="slide">
+          <p class="eyebrow">Where we're headed</p>
+          <h2>Coming up in Session 3</h2>
+          <p class="deep">Today's API works but forgets everything on restart, and all our logic sits in two classes. Next session fixes both — this is the session where the code starts looking genuinely professional.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🗄️</div><h3>A real database</h3><p>Spring Data JPA and an H2 database. Your data survives restarts, and you write almost no SQL.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>DTOs</h3><p>Why exposing your database classes directly is a bad idea, and what to send instead.</p></div>
+            <div class="card"><div class="ic">🏗️</div><h3>Proper layering</h3><p>Controller → Service → Repository, with an interface between the service and its implementation.</p></div>
+            <div class="card"><div class="ic">🚨</div><h3>Real error handling</h3><p>Custom exceptions and one global handler, replacing all those <code>if (x == null)</code> checks.</p></div>
+          </div>
+          <p class="muted" style="margin-top:16px;">Also previewed: Spring Security, and our first look at the microservices ideas that Session 4 builds on.</p>
+        </section>
+
+        <!-- 34. CLOSING -->
         <section class="slide">
           <div class="cover">
-            <span class="badge">End of Session 2 Theory</span>
+            <span class="badge">End of Session 2 — Theory</span>
             <h1>Let's build it.</h1>
-            <div class="sub">Open the lab sheet and we'll write the Student CRUD API together, endpoint by endpoint.</div>
-            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — exception handling, JPA &amp; a real database.</div>
+            <div class="sub">Open the lab sheet and let's make a real API — tested entirely in Swagger UI.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — JPA, H2, DTOs &amp; exception handling.</div>
           </div>
         </section>
 
@@ -1018,8 +1673,8 @@ System.out.println(student.getFirstName());</code></pre>
           <span>Spring Boot · Session 2</span>
         </div>
 
-        <!-- Slide counter -->
-        <div class="slide-counter" id="slideCounter">1 of 20</div>
+        <!-- Slide counter (JavaScript keeps this in sync) -->
+        <div class="slide-counter" id="slideCounter">1 of 34</div>
       </div>
     </div>
   </div>
@@ -1064,6 +1719,7 @@ System.out.println(student.getFirstName());</code></pre>
       state.index = next;
       render();
       var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
       if (activeSlide && !reduceMotion) {
         state.isTransitioning = true;
         activeSlide.classList.remove('animating');
@@ -1080,9 +1736,7 @@ System.out.println(student.getFirstName());</code></pre>
     function next() { goTo(state.index + 1); }
     function prev() { goTo(state.index - 1); }
 
-    /* ============================================================
-       Flash cards (Session 1 recap) — click to reveal the answer.
-       ============================================================ */
+    /* Flash cards: click to reveal the answer. */
     function initFlashCards() {
       var cards = Array.prototype.slice.call(document.querySelectorAll('.flash'));
       cards.forEach(function (card) {
@@ -1107,11 +1761,24 @@ System.out.println(student.getFirstName());</code></pre>
       navNext.addEventListener('click', next);
       navPrev.addEventListener('click', prev);
       document.addEventListener('keydown', function (e) {
-        if (e.key === 'ArrowRight') { next(); }
-        else if (e.key === 'ArrowLeft') { prev(); }
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
       });
 
       initFlashCards();
+
+      // Architecture diagram resilience: only reveal the text fallback if the
+      // diagram element is genuinely absent (never measure width — slides are
+      // hidden at init and would report zero width, falsely triggering it).
+      try {
+        var container = document.getElementById('archContainer');
+        if (container && !container.querySelector('.arch')) {
+          container.classList.add('arch-failed');
+        }
+      } catch (e) { /* leave the CSS diagram in place */ }
+
       render();
     }
 

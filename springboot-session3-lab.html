@@ -9,7 +9,8 @@
     /*
       MacBook Theme design tokens.
       This block is the synchronization point and is copied BYTE-IDENTICALLY
-      into springboot-session3-theory.html. Do not edit one copy without the other.
+      into every file of the Spring Boot series (theory + lab).
+      Do not edit one copy without the others.
     */
     :root {
       --mac-bg: #ececee;
@@ -223,6 +224,7 @@
       letter-spacing: 0.03em;
     }
     .exp-body { padding: 14px 24px 24px; }
+    .exp-body h3 { font-size: 19px; }
 
     /* === Checklist items === */
     .check {
@@ -292,6 +294,45 @@
       font-size: 16.5px;
     }
     .concept .lbl { font-weight: 700; color: var(--mac-accent); display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .muted { color: var(--mac-text-muted); }
+
+    /* Status-code badge, used in expected-output headings */
+    .em-badge {
+      font-family: var(--mac-mono); font-weight: 700; color: #fff;
+      padding: 3px 10px; border-radius: 5px; font-size: 12px;
+    }
+    .em-badge.s2 { background: #49cc90; }
+    .em-badge.s4 { background: #fca130; }
+    .em-badge.s5 { background: #f93e3e; }
+
+    /* === THE GOLDEN RULE box — the single most important lab callout === */
+    .golden {
+      border: 2px solid #ff9f0a;
+      background: linear-gradient(135deg,#fffaf0,#fff3dc);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+      font-size: 16.5px;
+      box-shadow: 0 3px 14px rgba(255,159,10,0.18);
+    }
+    .golden .lbl {
+      font-weight: 800; color: #b8860b; display: block; margin-bottom: 8px;
+      font-size: 15px; text-transform: uppercase; letter-spacing: 0.06em;
+    }
+    .golden code { background: rgba(184,134,11,0.12) !important; color: #8a6100 !important; }
+    .golden .rule {
+      background: #fff; border: 1px dashed #e4c48a; border-radius: 8px;
+      padding: 10px 14px; margin: 10px 0; font-weight: 600;
+    }
 
     /* Code blocks with copy button */
     .codewrap { position: relative; margin: 14px 0; }
@@ -310,8 +351,9 @@
       line-height: 1.6;
       color: var(--mac-code-text);
       white-space: pre;
+      background: none;
+      padding: 0;
     }
-    .code-comment { color: #6b7089; }
     .copy-btn {
       position: absolute;
       top: 8px; right: 8px;
@@ -327,60 +369,6 @@
     .copy-btn:hover { background: rgba(255,255,255,0.22); }
     .copy-btn.ok { background: #28c840; border-color: #28c840; color: #fff; }
     .copy-btn.err { background: var(--tl-red); border-color: var(--tl-red); color: #fff; }
-
-    /* === File banner: tells the beginner EXACTLY which file to create === */
-    .filebar {
-      display: flex; align-items: center; gap: 10px;
-      background: #1e1e2e; color: #f8f8f2;
-      border-radius: 8px 8px 0 0;
-      padding: 9px 16px; margin: 18px 0 0;
-      font-family: var(--mac-mono); font-size: 14.5px;
-      border: 1px solid var(--mac-border); border-bottom: none;
-    }
-    .filebar .fb-icon { font-size: 15px; }
-    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
-    .filebar .fb-tag {
-      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
-      letter-spacing: 0.05em; text-transform: uppercase;
-      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
-    }
-    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
-
-    /* === "Now run / test it" purple callout === */
-    .runbox {
-      border: 1px solid #d8b4fe;
-      border-left: 5px solid #bf5af2;
-      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
-      border-radius: 0 10px 10px 0;
-      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
-    }
-    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
-    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
-    .runbox ol li { margin: 6px 0; }
-    .runbox .kbd {
-      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
-      border: 1px solid var(--mac-border); border-bottom-width: 2px;
-      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
-    }
-
-    /* "Do this — step by step" yellow callout used inside labs */
-    .dothis {
-      background: #fffdf3; border: 1px solid #f0e3a8;
-      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
-    }
-    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
-    .dothis ol { margin: 0; padding-left: 22px; }
-    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
-
-    /* Property annotation list (application.properties explainer) */
-    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
-    .prop-row {
-      display: grid; grid-template-columns: 1fr; gap: 2px;
-      border: 1px solid var(--mac-border); border-radius: 8px;
-      padding: 10px 14px; background: #fafafc;
-    }
-    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
-    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
 
     /* Common issues */
     table.issues { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 15.5px; }
@@ -410,6 +398,7 @@
     details.exp.lab5 { border-left-color: #00c7be; }
     details.exp.lab6 { border-left-color: #bf5af2; }
     details.exp.lab7 { border-left-color: #ff6482; }
+    details.exp.lab8 { border-left-color: #30b0c7; }
     details.exp.bonus { border-left-color: #ff375f; }
     details.exp.lab1 > summary { background: linear-gradient(135deg,#f0f7ff,#e6f1ff); }
     details.exp.lab2 > summary { background: linear-gradient(135deg,#f3f1ff,#ebe8ff); }
@@ -418,6 +407,7 @@
     details.exp.lab5 > summary { background: linear-gradient(135deg,#e9fbfa,#d8f5f3); }
     details.exp.lab6 > summary { background: linear-gradient(135deg,#f7ecff,#efdcff); }
     details.exp.lab7 > summary { background: linear-gradient(135deg,#fff0f3,#ffe1e8); }
+    details.exp.lab8 > summary { background: linear-gradient(135deg,#eaf8fb,#d9f1f6); }
     details.exp.bonus > summary { background: linear-gradient(135deg,#fff0f3,#ffe3e9); }
     details.exp.lab2 .lab-tag { background:#5e5ce6; }
     details.exp.lab3 .lab-tag { background:#28c840; }
@@ -425,9 +415,115 @@
     details.exp.lab5 .lab-tag { background:#00c7be; }
     details.exp.lab6 .lab-tag { background:#bf5af2; }
     details.exp.lab7 .lab-tag { background:#ff6482; }
+    details.exp.lab8 .lab-tag { background:#30b0c7; }
     details.exp.bonus .lab-tag { background:#ff375f; }
 
-    /* HTTP verb badge in summaries */
+    /* === File banner: tells the beginner EXACTLY which file to create === */
+    .filebar {
+      display: flex; align-items: center; gap: 10px;
+      background: #1e1e2e; color: #f8f8f2;
+      border-radius: 8px 8px 0 0;
+      padding: 9px 16px; margin: 18px 0 0;
+      font-family: var(--mac-mono); font-size: 14.5px;
+      border: 1px solid var(--mac-border); border-bottom: none;
+    }
+    .filebar .fb-icon { font-size: 15px; }
+    .filebar .fb-name { font-weight: 700; color: #a6e22e; }
+    .filebar .fb-tag {
+      margin-left: auto; font-family: var(--mac-font); font-size: 11.5px; font-weight: 700;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      background: rgba(255,255,255,0.14); color: #fff; padding: 3px 9px; border-radius: 20px;
+    }
+    .filebar + .codewrap pre { border-radius: 0 0 8px 8px; }
+
+    /* === "Now run it" box — explicit run instructions === */
+    .runbox {
+      border: 1px solid #d8b4fe;
+      border-left: 5px solid #bf5af2;
+      background: linear-gradient(135deg,#faf2ff,#f3e8ff);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px; margin: 16px 0; font-size: 16.5px;
+    }
+    .runbox .lbl { font-weight: 700; color: #8e2fd6; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .runbox ol { margin: 6px 0 0; padding-left: 22px; }
+    .runbox ol li { margin: 6px 0; }
+    .kbd, .runbox .kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+
+    /* "Do this — step by step" yellow callout used inside labs */
+    .dothis {
+      background: #fffdf3; border: 1px solid #f0e3a8;
+      border-radius: 10px; padding: 12px 18px 8px; margin: 14px 0;
+    }
+    .dothis .lbl { font-weight:700; color:#b8860b; display:block; margin:0 0 6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em; }
+    .dothis ol { margin: 0; padding-left: 22px; }
+    .dothis ol li { margin: 6px 0; font-size: 16.5px; line-height: 1.55; }
+
+    /* Spring Initializr recipe card */
+    .newproj {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16.5px;
+    }
+    .newproj .lbl {
+      font-weight:700; color: var(--mac-accent); display:block;
+      margin: 0 0 8px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;
+    }
+    .newproj table { width: 100%; border-collapse: collapse; margin: 8px 0 0; font-size: 15.5px; }
+    .newproj th, .newproj td { border: 1px solid var(--mac-border); padding: 7px 12px; text-align: left; vertical-align: top; }
+    .newproj th { background: rgba(10,132,255,0.08); width: 32%; font-weight: 700; }
+    .newproj tr.keyrow td, .newproj tr.keyrow th { background: rgba(255,159,10,0.14); font-weight: 700; }
+
+    /* Property annotation list */
+    .prop-list { display: grid; gap: 8px; margin: 14px 0; }
+    .prop-row {
+      display: grid; grid-template-columns: 1fr; gap: 2px;
+      border: 1px solid var(--mac-border); border-radius: 8px;
+      padding: 10px 14px; background: #fafafc;
+    }
+    .prop-row code { font-family: var(--mac-mono); font-size: 14px; background: none; color: var(--mac-accent); padding: 0; }
+    .prop-row .pd { font-size: 14.5px; color: var(--mac-text-muted); }
+
+    /* Version compatibility warning box */
+    .vercompat {
+      border: 2px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.08);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .vercompat h3 { margin: 0 0 6px; color: #b8860b; font-size: 18px; }
+    .vercompat table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 15px; }
+    .vercompat th, .vercompat td { border: 1px solid #e4c48a; padding: 9px 13px; text-align: left; }
+    .vercompat th { background: rgba(254,188,46,0.18); }
+    .vercompat code { font-family: var(--mac-mono); }
+
+    /* Architecture reminder box */
+    .arch-box {
+      border: 1px solid #cfe0f5;
+      background: linear-gradient(135deg,#f3f8ff,#eef3fb);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 16px 0;
+    }
+    .arch-box h3 { margin: 0 0 12px; font-size: 17px; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; }
+    .arch-flow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent); border-radius: 10px; background: #fff;
+      padding: 8px 12px; font-size: 14px; font-weight: 600; text-align: center; min-width: 96px;
+    }
+    .arch-node .p { display:block; font-family: var(--mac-mono); font-size: 12px; color: #5e5ce6; font-weight: 700; margin-top: 2px; }
+    .arch-node.reg { border-color: #ff9f0a; }
+    .arch-node.svc { border-color: #28c840; }
+    .arch-arrow { color: var(--mac-accent); font-weight: 700; font-size: 18px; }
+
+    /* HTTP verb badges */
     .verb-badge {
       font-family: var(--mac-mono);
       font-size: 12px;
@@ -442,7 +538,7 @@
     .verb-badge.put { background: #fca130; }
     .verb-badge.del { background: #f93e3e; }
 
-    /* Reference + Quick reference card */
+    /* Reference block (green) */
     .ref-block {
       border: 1px solid var(--mac-border);
       border-left: 5px solid #28c840;
@@ -467,6 +563,7 @@
     .ref-block[open] > summary .chevron { transform: rotate(90deg); }
     .ref-block[open] > summary { border-bottom: 1px solid var(--mac-border); }
 
+    /* Quick reference card */
     .qref {
       background: linear-gradient(135deg, #1e1e2e, #2a2a40);
       color: #f8f8f2;
@@ -482,8 +579,10 @@
     }
     .qref th { background: rgba(255,255,255,0.08); }
     .qref code { font-family: var(--mac-mono); color: #8fd3ff; background: none; padding: 0; }
+    .qref .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .qref h3 { margin: 0 0 4px; font-size: 16px; color: #fff; }
 
-    /* Postman / console mock for testing parts */
+    /* Test part / H2 console mockups */
     .testpart { border: 1px solid var(--mac-border); border-radius: 10px; margin: 14px 0; overflow: hidden; }
     .testpart .tp-head {
       background: var(--mac-titlebar); padding: 10px 16px; font-weight: 700; font-size: 16px;
@@ -497,6 +596,31 @@
     .h2-mock .h2-top { background:#0a3d62; color:#fff; padding:6px 12px; font-weight:700; }
     .h2-mock .h2-row { padding: 6px 12px; border-bottom: 1px solid var(--mac-border); background:#fff; }
     .h2-mock .h2-row:last-child { border-bottom: none; }
+
+    /* Eureka dashboard mockup */
+    .dash-mock {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden; margin: 12px 0;
+      background: #fff; font-size: 13.5px;
+    }
+    .dash-mock .dm-top {
+      background: linear-gradient(135deg,#1b3a5c,#10314f); color: #fff; padding: 8px 14px; font-weight: 700; font-size: 14px;
+    }
+    .dash-mock table { width: 100%; border-collapse: collapse; }
+    .dash-mock th, .dash-mock td { border-bottom: 1px solid var(--mac-border); padding: 8px 14px; text-align: left; font-size: 13.5px; }
+    .dash-mock th { background: #f3f6fa; font-weight: 700; }
+    .dash-mock td.app { font-family: var(--mac-mono); font-weight: 700; color: var(--mac-accent); }
+    .dash-mock td.up { color: #1a9e34; font-weight: 600; }
+    .dash-mock code { font-family: var(--mac-mono); font-size: 12.5px; }
+
+    /* Console log mock */
+    .logmock {
+      background: var(--mac-code-bg); color: var(--mac-code-text);
+      border-radius: 8px; padding: 12px 16px; margin: 10px 0;
+      font-family: var(--mac-mono); font-size: 13.5px; line-height: 1.7; overflow-x: auto;
+    }
+    .logmock .hit { color: #a6e22e; }
+    .logmock .port { color: #fd9353; }
+    .logmock .dim { color: #6b7089; }
   </style>
 </head>
 <body>
@@ -512,10 +636,10 @@
 
       <!-- ===== HERO (non-sticky) ===== -->
       <header class="lab-hero">
-        <div class="hero-icon">🧱</div>
+        <div class="hero-icon">🗄️</div>
         <div>
           <h1>Spring Boot — Session 3 Hands-on Lab</h1>
-          <p class="section-intro">Build a complete layered Post API with a DTO and custom exception handling — Entity → Repository → DTO → Exception → Service → Controller. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
+          <p class="section-intro">Store data for real with Spring Data JPA and H2, then add DTOs, a service layer and proper error handling. Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD.</p>
         </div>
       </header>
 
@@ -535,38 +659,59 @@
       <section class="section">
         <div class="concept" style="margin-top:18px;">
           <span class="lbl">How to use this sheet</span>
-          This is your hands-on companion for Spring Boot Session 3 — the theory stays on the main screen while you
-          build here on your machine. We'll build a proper <strong>layered Post API</strong> one file at a time:
-          Entity, Repository, DTO, custom Exception, Service, then Controller — and test the whole thing. Click a lab
-          heading to expand it, use the <strong>Copy</strong> button on any snippet instead of retyping, and tick each
-          checkbox as you go. The progress bar at the top fills as you complete steps. If you fall behind, the
-          <strong>Complete Files Reference</strong> at the bottom has every file ready to paste.
+          Today you build a properly layered <strong>Post API</strong> backed by a real database — seven Java files,
+          each with one job. Work strictly <strong>top to bottom</strong>: the files depend on each other, so
+          building them out of order will leave you with compile errors that look worse than they are.
+          Every snippet is a <strong>complete file</strong> with its full path on the banner above it. Use the
+          <strong>Copy</strong> button, tick the checkboxes, and if you fall behind the
+          <strong>Complete Files Reference</strong> at the bottom has all seven finished files.
         </div>
       </section>
 
-      <!-- ===== PROGRESS CHECKLIST ===== -->
+      <!-- ===== ARCHITECTURE MAP ===== -->
+      <div class="arch-box">
+        <h3>📌 Today's architecture — keep this in view</h3>
+        <div class="arch-flow">
+          <div class="arch-node">Client<span class="p">Swagger UI</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node">Controller<span class="p">DTOs in/out</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node svc">Service<span class="p">logic + mapping</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node reg">Repository<span class="p">JpaRepository</span></div>
+          <span class="arch-arrow">→</span>
+          <div class="arch-node">H2 Database<span class="p">posts table</span></div>
+        </div>
+        <p style="margin:12px 0 0; font-size:14.5px; color:var(--mac-text-muted);">
+          DTOs travel between the client and the service. Entities live between the service and the database.
+          <strong>The service is the only layer that knows about both</strong> — that's the whole design.
+        </p>
+      </div>
+
+      <!-- ===== PROGRESS TRACKER ===== -->
       <div class="section-band">Today's checklist</div>
       <section class="section">
         <details class="exp" open>
-          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <summary><span class="chevron">▶</span> 9-step progress tracker</summary>
           <div class="exp-body">
-            <p>Tick each milestone as you reach it. The bar at the top fills to 100% when all eight are done.</p>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>1 · Project setup done</strong> — new project with Web, JPA, H2 &amp; DevTools; <code>application.properties</code> configured.</span></label>
+              <span class="ctext"><strong>1 · Project created</strong>, base package verified as <code>com.tcs.training.posts</code>, H2 configured.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>2 · Entity + Repository created</strong> — <code>Post</code> entity and <code>PostRepository</code> compile.</span></label>
+              <span class="ctext"><strong>2 · <code>Post</code> entity</strong> written, and the <code>posts</code> table auto-created at startup.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>3 · DTO created</strong> — <code>PostDTO</code> with the same fields, no JPA annotations.</span></label>
+              <span class="ctext"><strong>3 · <code>PostRepository</code></strong> — an empty interface giving full CRUD.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>4 · Exception class created</strong> — <code>ResourceNotFoundException</code> with <code>@ResponseStatus</code>.</span></label>
+              <span class="ctext"><strong>4 · <code>PostDTO</code></strong> with validation annotations.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>5 · Service interface + impl written</strong> — all 5 methods, both mappers.</span></label>
+              <span class="ctext"><strong>5 · Exception classes</strong> — custom exception + global handler.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>6 · Controller wired</strong> — all 5 endpoints under <code>/api/posts</code>.</span></label>
+              <span class="ctext"><strong>6 · Service interface + implementation</strong>, with entity ↔ DTO mapping.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>7 · Tested POST + GET</strong> — created a record, fetched it back.</span></label>
+              <span class="ctext"><strong>7 · Controller</strong> — six endpoints, and no error handling inside it.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>8 · Tested invalid ID</strong> — the custom 404 exception message is visible.</span></label>
+              <span class="ctext"><strong>8 · All six endpoints tested</strong> in Swagger UI, including a clean <code>404</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · H2 console explored</strong> — I've seen my rows in the actual table.</span></label>
           </div>
         </details>
       </section>
@@ -577,194 +722,321 @@
         <details class="exp" open>
           <summary><span class="chevron">▶</span> Pre-requisites Check</summary>
           <div class="exp-body">
-            <p>Verify each item before starting. Tick it once the check passes — the "ready" badge at the top lights up when all three are green.</p>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>A Spring Boot project</strong> — a fresh one (we create it in Setup below), or build on top of your Session 2 <code>student-api</code> project
-                <span class="verify">A fresh project is cleanest for today since we're introducing JPA and H2 together.</span>
+              <span class="ctext"><strong>JDK 17+ and your IDE</strong> working
+                <span class="verify">Same setup as Sessions 1 and 2. Verify with <code>java -version</code>.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman installed</strong> (or use the H2 console + browser for GETs)
-                <span class="verify">Postman is free from postman.com. We need it for POST and PUT with a JSON body.</span>
+              <span class="ctext"><strong>A web browser</strong> — that's the whole tooling requirement
+                <span class="verify">All testing is done in <strong>Swagger UI</strong>, the same as Session 2. Your app generates the page itself, so there is nothing to install.</span>
               </span>
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>JDK 17 &amp; an IDE</strong> (IntelliJ or Eclipse) you can generate getters/setters in
-                <span class="verify">You'll use the IDE's <em>Generate → Getters and Setters</em> feature on the Entity and DTO — IntelliJ: <code>Alt+Insert</code>; Eclipse: right-click → Source.</span>
+              <span class="ctext"><strong>Session 2 concepts clear</strong> — CRUD verbs, status codes, <code>@RequestBody</code>
+                <span class="verify">Today reuses all of it and adds the database layer underneath.</span>
               </span>
             </label>
             <div class="observe">
-              <span class="lbl">Why getters &amp; setters matter</span>
-              The Entity and DTO have <strong>private</strong> fields, so Jackson (JSON) and JPA can only reach them
-              through public <code>getTitle()</code>/<code>setTitle()</code> methods. Missing accessors are the number-one
-              cause of "my JSON comes back empty" later on. Let the IDE generate them the moment you create each class —
-              it takes seconds and needs no extra library.
+              <span class="lbl">No database to install — genuinely</span>
+              We use <strong>H2</strong>, a complete SQL database written in Java that runs inside your application.
+              Adding the dependency <em>is</em> the installation. No MySQL, no server, no passwords to configure.
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== PROJECT SETUP ===== -->
+      <!-- ===== SETUP ===== -->
       <div class="section-band">Project setup</div>
       <section class="section">
-        <details class="exp" open>
-          <summary><span class="chevron">▶</span> Create the project + configure application.properties</summary>
+        <details class="exp lab1" open>
+          <summary><span class="lab-tag">SETUP</span><span class="chevron">▶</span> Create the Project, Verify the Package &amp; Configure H2</summary>
           <div class="exp-body">
-            <ol class="steps">
-              <li><strong>Go to Spring Initializr</strong> at <code>https://start.spring.io</code>.</li>
-              <li><strong>Fill in the fields:</strong>
-                <ul>
-                  <li>Project: <code>Maven</code> &nbsp;·&nbsp; Language: <code>Java</code> &nbsp;·&nbsp; Java: <code>17</code></li>
-                  <li>Group: <code>com.tcs.training</code> &nbsp;·&nbsp; Artifact: <code>post-api</code></li>
-                </ul>
-              </li>
-              <li><strong>Add these dependencies:</strong>
-                <ul>
-                  <li><code>Spring Web</code> (<code>spring-boot-starter-web</code>)</li>
-                  <li><code>Spring Data JPA</code> (<code>spring-boot-starter-data-jpa</code>)</li>
-                  <li><code>H2 Database</code> (<code>h2</code>)</li>
-                  <li><code>Spring Boot DevTools</code> (<code>spring-boot-devtools</code>)</li>
-                </ul>
-              </li>
-              <li><strong>Generate, unzip, open in your IDE.</strong></li>
-              <li><strong>Configure</strong> <code>src/main/resources/application.properties</code> with the block below.</li>
-            </ol>
-            <div class="codewrap"><pre><code>spring.datasource.url=jdbc:h2:mem:testdb
-spring.datasource.driverClassName=org.h2.Driver
-spring.datasource.username=sa
-spring.datasource.password=
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
-spring.h2.console.enabled=true
-spring.jpa.show-sql=true
-spring.jpa.hibernate.ddl-auto=update</code></pre></div>
-            <div class="prop-list">
-              <div class="prop-row"><code>spring.datasource.url=jdbc:h2:mem:testdb</code><span class="pd">Use an in-memory H2 database named <code>testdb</code> — lives in RAM, resets on restart.</span></div>
-              <div class="prop-row"><code>spring.datasource.driverClassName=org.h2.Driver</code><span class="pd">The JDBC driver class for H2.</span></div>
-              <div class="prop-row"><code>spring.datasource.username=sa</code><span class="pd">Default H2 username.</span></div>
-              <div class="prop-row"><code>spring.datasource.password=</code><span class="pd">Blank password — fine for an in-memory dev database.</span></div>
-              <div class="prop-row"><code>spring.jpa.database-platform=...H2Dialect</code><span class="pd">Tells Hibernate to generate SQL in H2's dialect.</span></div>
-              <div class="prop-row"><code>spring.h2.console.enabled=true</code><span class="pd">Turns on the browser-based H2 console at <code>/h2-console</code>.</span></div>
-              <div class="prop-row"><code>spring.jpa.show-sql=true</code><span class="pd">Logs every SQL statement Hibernate runs — great for learning.</span></div>
-              <div class="prop-row"><code>spring.jpa.hibernate.ddl-auto=update</code><span class="pd">Auto-creates/updates tables from your entities at startup.</span></div>
+            <div class="newproj">
+              <span class="lbl">📦 Generate the project on Spring Initializr</span>
+              A <strong>brand new project</strong> again. Open <code>https://start.spring.io</code>:
+              <table>
+                <tr><th>Project</th><td><code>Maven</code></td></tr>
+                <tr><th>Language</th><td><code>Java</code></td></tr>
+                <tr><th>Spring Boot</th><td>the default <strong>3.x</strong> release</td></tr>
+                <tr><th>Group</th><td><code>com.tcs.training</code></td></tr>
+                <tr><th>Artifact</th><td><code>posts</code></td></tr>
+                <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.posts</code> &nbsp;← <strong>read this before clicking Generate</strong></td></tr>
+                <tr><th>Packaging</th><td><code>Jar</code></td></tr>
+                <tr><th>Java</th><td><code>17</code> (or <code>21</code>)</td></tr>
+                <tr><th>Dependencies</th><td><strong>four</strong> today: <code>Spring Web</code> · <code>Spring Data JPA</code> · <code>H2 Database</code> · <code>Validation</code><br><span class="muted">(plus Swagger UI, added to <code>pom.xml</code> by hand in a moment — it isn't on the Initializr list)</span></td></tr>
+              </table>
+              Click <strong>Generate</strong>, unzip, and import into your IDE.
             </div>
-            <div class="expected">
-              <span class="lbl">Expected</span>
-              The app starts with no errors. The console shows Hibernate booting and the line about the H2 console being available. Nothing to test yet — we add the entity next.
+
+            <div class="observe">
+              <span class="lbl">Finding those four dependencies</span>
+              Click "Add Dependencies" and search for each one: type <em>"Spring Web"</em> → pick <strong>Spring Web</strong>;
+              <em>"JPA"</em> → pick <strong>Spring Data JPA</strong>; <em>"H2"</em> → pick <strong>H2 Database</strong>;
+              <em>"Validation"</em> → pick <strong>Validation</strong>. All four should appear in the list on the right
+              before you generate.
+            </div>
+
+            <div class="golden">
+              <span class="lbl">⚠️ The Golden Rule — you'll create SIX packages today, so verify first</span>
+              <p style="margin-top:0;">Open <code>PostsApplication.java</code> and read its first line:</p>
+              <div class="codewrap"><pre><code>package com.tcs.training.posts;   ←  your base package</code></pre></div>
+              <div class="rule">
+                All six of today's packages must sit <strong>under</strong> that:<br>
+                <code>…posts.entity</code> ✅ &nbsp; <code>…posts.repository</code> ✅ &nbsp;
+                <code>…posts.dto</code> ✅ &nbsp; <code>…posts.service</code> ✅ &nbsp;
+                <code>…posts.controller</code> ✅ &nbsp; <code>…posts.exception</code> ✅<br>
+                <code>com.tcs.training.entity</code> ❌ — a <em>sibling</em>, never scanned
+              </div>
+              <p><strong>Today the failure is louder than a 404.</strong> Put the entity outside the base package and
+              the app won't even start — you'll get <code>Not a managed type: class Post</code>, because JPA scans the
+              same packages component scanning does.</p>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><strong>First line of <code>PostsApplication.java</code> reads
+                <code>package com.tcs.training.posts;</code></strong>
+                  <span class="verify">If it differs, you typed a different Artifact — use your own value throughout,
+                  or re-generate with Artifact <code>posts</code>.</span>
+                </span>
+              </label>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — create all six packages now, in one go</span>
+              <ol>
+                <li>Right-click <code>com.tcs.training.posts</code> (the package holding
+                    <code>PostsApplication.java</code>) → <strong>New → Package</strong>.</li>
+                <li>Create each of these, one at a time:
+                    <code>…posts.entity</code>, <code>…posts.repository</code>, <code>…posts.dto</code>,
+                    <code>…posts.service</code>, <code>…posts.controller</code>, <code>…posts.exception</code></li>
+                <li>Confirm all six folders appear <strong>beside</strong> <code>PostsApplication.java</code>. ✅</li>
+              </ol>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Project created with all four dependencies and <code>application.properties</code> filled in; the app starts cleanly.</span></label>
-            <table class="issues">
-              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
-              <tbody>
-                <tr>
-                  <td>App fails: "Failed to determine a suitable driver class"</td>
-                  <td>JPA is on the classpath but no datasource is configured.</td>
-                  <td>Make sure the H2 dependency is present and the <code>spring.datasource.*</code> lines are in <code>application.properties</code>.</td>
-                </tr>
-                <tr>
-                  <td>JSON response is empty / incoming fields are all <code>null</code></td>
-                  <td>The Entity or DTO is missing getters/setters.</td>
-                  <td>Generate them in the IDE (IntelliJ <code>Alt+Insert</code>; Eclipse → Source → Generate Getters and Setters), then rebuild.</td>
-                </tr>
-              </tbody>
-            </table>
+              <span class="ctext">All six packages created, sitting beside <code>PostsApplication.java</code>.</span>
+            </label>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code># ===== H2 in-memory database =====
+spring.datasource.url=jdbc:h2:mem:postsdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
+
+# ===== H2 web console at http://localhost:8080/h2-console =====
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# ===== JPA / Hibernate =====
+# 'update' lets Hibernate build tables from your @Entity classes.
+# NEVER use 'create' or 'update' against a production database.
+spring.jpa.hibernate.ddl-auto=update
+
+# Print every SQL statement Hibernate generates — brilliant for learning.
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+# ===== App name =====
+spring.application.name=posts</code></pre></div>
+
+            <div class="prop-list">
+              <div class="prop-row"><code>spring.datasource.url=jdbc:h2:mem:postsdb</code><span class="pd">Use H2 in <strong>mem</strong>ory, with a database named <code>postsdb</code>. Nothing is written to disk.</span></div>
+              <div class="prop-row"><code>spring.h2.console.enabled=true</code><span class="pd">Switches on the browser-based SQL console. You'll use it in Lab 7.</span></div>
+              <div class="prop-row"><code>spring.jpa.hibernate.ddl-auto=update</code><span class="pd">Hibernate creates any missing tables and columns from your entities at startup. Development only.</span></div>
+              <div class="prop-row"><code>spring.jpa.show-sql=true</code><span class="pd">Prints the generated SQL to the console — the best way to see that ORM isn't magic.</span></div>
+            </div>
+
+            <h3>Add Swagger UI — your testing tool, same as Session 2</h3>
+            <div class="concept">
+              <span class="lbl">Why now</span>
+              Swagger UI is how you'll test all six endpoints today. It isn't on the Initializr list (it's a
+              third-party library), so add it to <code>pom.xml</code> by hand — <strong>one dependency</strong>, and
+              your app serves the page itself. Nothing to install.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Keep the version number</span>
+              springdoc is <strong>not</strong> managed by the Spring Boot parent POM, so it needs an explicit
+              <code>&lt;version&gt;</code>. <strong>2.8.6</strong> is tested against Spring Boot 3.5.x. Older versions
+              such as 2.5.x fail at startup on Boot 3.5 — if the app won't boot, check this number first.
+            </div>
+
+            <div class="runbox">
+              <span class="lbl">Sanity check</span>
+              <ol>
+                <li>Save <code>pom.xml</code> and let Maven refresh (IntelliJ does it automatically; Eclipse:
+                    right-click → Maven → Update Project).</li>
+                <li>Run <code>PostsApplication</code>.</li>
+                <li>Wait for <strong>"Tomcat started on port 8080"</strong>. You should <em>also</em> see H2 and
+                    Hibernate start up in the log. There's no table yet — we haven't written the entity.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span> — it should load and say
+                    <strong>"No operations defined in spec!"</strong>, which is correct: no controller yet.</li>
+                <li>Stop the app.</li>
+              </ol>
+            </div>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">App starts cleanly with all five dependencies, and Swagger UI loads at <code>/swagger-ui.html</code>.</span>
+            </label>
           </div>
         </details>
       </section>
 
-      <!-- ===== THE LABS ===== -->
-      <div class="section-band">The labs — build the layered API</div>
-
       <!-- ===== LAB 1: ENTITY ===== -->
+      <div class="section-band">The labs</div>
       <section class="section">
-        <details class="exp lab1" open>
-          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> Create the Post Entity</summary>
+        <details class="exp lab1">
+          <summary><span class="lab-tag">LAB 1</span><span class="chevron">▶</span> The <code>Post</code> Entity — a Class Becomes a Table</summary>
           <div class="exp-body">
             <div class="concept">
               <span class="lbl">Concept</span>
-              An <strong>Entity</strong> is a Java class mapped to a database table. <code>@Entity</code> marks it,
-              <code>@Id</code> marks the primary key, and <code>@GeneratedValue</code> lets the database auto-number it.
-              The fields are <code>private</code>, so we add <strong>getters and setters</strong> (let the IDE generate them) —
-              JPA and Jackson both need them.
+              An <strong>entity</strong> is a Java class that maps to a database table; each object is one row. You
+              write the class, annotate it, and <strong>Hibernate generates the <code>CREATE TABLE</code></strong> for
+              you at startup. You will not write any SQL today.
             </div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Import <code>jakarta</code>, never <code>javax</code></span>
+              In Spring Boot 3.x the JPA package is <strong><code>jakarta.persistence</code></strong>. Older tutorials
+              and Stack Overflow answers say <code>javax.persistence</code> — that was Boot 2.x and it
+              <strong>will not compile</strong>. If your IDE offers both when auto-importing, always choose
+              <code>jakarta</code>. This is the single most common error when copying older material.
+            </div>
+
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> (the package with the main class) →
-                    <strong>New → Package</strong> → name it <code>com.tcs.training.entity</code>.</li>
-                <li>Right-click the new <code>entity</code> package → <strong>New → Class</strong> →
-                    name <code>Post</code> → Finish.</li>
-                <li>Replace the file's contents with the code below
-                    (<span class="kbd">Ctrl</span>+<span class="kbd">A</span>, Delete, paste).</li>
-                <li>Save. There's nothing to run yet — the repository in Lab 2 will use this class.</li>
+                <li>Right-click <code>com.tcs.training.posts.entity</code> → <strong>New → Class</strong>.</li>
+                <li>Name it <code>Post</code>.</li>
+                <li>Paste the whole file below.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/entity/Post.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.entity;
 
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/entity/Post.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.entity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "posts")
+@Entity                       // "this class maps to a database table"
+@Table(name = "posts")        // the table will be called 'posts'
 public class Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Id                                                   // the PRIMARY KEY
+    @GeneratedValue(strategy = GenerationType.IDENTITY)   // the DB assigns it
+    private Long id;          // Long (not long) so an unsaved Post can be null
 
+    @Column(nullable = false, length = 200)               // NOT NULL, VARCHAR(200)
     private String title;
-    private String description;
+
+    @Column(nullable = false, length = 2000)
     private String content;
 
-    <span class="code-comment">// Getters and setters — generate these in your IDE</span>
-    <span class="code-comment">// (IntelliJ: Alt+Insert · Eclipse: Source → Generate Getters and Setters)</span>
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @Column(nullable = false, length = 100)
+    private String author;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    // ---- No-argument constructor: REQUIRED by JPA/Hibernate ----
+    public Post() {
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    // ---- Convenience constructor (note: no id — the DB supplies it) ----
+    public Post(String title, String content, String author) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+    // ---- Getters and setters: needed by Hibernate AND by Jackson ----
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Don't type the accessors by hand</span>
-              You write the four fields, then let the IDE generate the getters and setters: IntelliJ
-              <code>Alt+Insert</code> → <em>Getter and Setter</em>; Eclipse right-click → <em>Source → Generate Getters
-              and Setters</em>. JPA and Jackson both drive the class through these methods, so they must be present.
+
+            <div class="runbox">
+              <span class="lbl">Now run it — and watch the console carefully</span>
+              <ol>
+                <li>Run <code>PostsApplication</code>.</li>
+                <li>Scroll the console output looking for a <code>create table</code> statement.</li>
+              </ol>
             </div>
+
             <div class="expected">
-              <span class="lbl">Expected</span>
-              The class compiles with no errors. When you (re)start the app later, Hibernate will create a
-              <code>POSTS</code> table from this class automatically.
+              <span class="lbl">Expected console output — Hibernate creating your table</span>
+              <div class="logmock">Hibernate:<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="hit">create table posts (</span><br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;id bigint generated by default as identity,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;author varchar(100) not null,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;content varchar(2000) not null,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title varchar(200) not null,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;primary key (id)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;)
+              </div>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I found the <code>create table posts</code> statement in the startup log.</span>
+              </label>
             </div>
+
+            <div class="observe">
+              <span class="lbl">Read that SQL against your Java — every piece came from an annotation</span>
+              <ul style="margin:6px 0 0;">
+                <li><code>create table <strong>posts</strong></code> ← <code>@Table(name = "posts")</code></li>
+                <li><code>id bigint <strong>generated by default as identity</strong></code> ← <code>@GeneratedValue(IDENTITY)</code></li>
+                <li><code>title varchar(<strong>200</strong>) <strong>not null</strong></code> ← <code>@Column(nullable = false, length = 200)</code></li>
+                <li><code><strong>primary key (id)</strong></code> ← <code>@Id</code></li>
+              </ul>
+              You wrote annotations; Hibernate wrote SQL. That is ORM, visible in the console.
+            </div>
+
+            <h3>Common issues</h3>
             <table class="issues">
               <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
               <tbody>
-                <tr>
-                  <td>"cannot find symbol getTitle()" in the service later</td>
-                  <td>Getters/setters were never added to the Entity.</td>
-                  <td>Generate them: <strong>IntelliJ</strong> <code>Alt+Insert</code> → Getter and Setter; <strong>Eclipse</strong> right-click → Source → Generate Getters and Setters.</td>
-                </tr>
-                <tr>
-                  <td>Import errors on <code>javax.persistence.*</code></td>
-                  <td>Spring Boot 3 uses the <code>jakarta</code> namespace, not <code>javax</code>.</td>
-                  <td>Import from <code>jakarta.persistence.*</code> as shown above.</td>
-                </tr>
+                <tr><td><code>package javax.persistence does not exist</code></td><td>Wrong import package.</td><td>Change every <code>javax.persistence</code> to <code>jakarta.persistence</code>.</td></tr>
+                <tr><td><code>Not a managed type: class Post</code></td><td>Missing <code>@Entity</code>, or the class sits outside the base package.</td><td>Add <code>@Entity</code>; check the package line starts <code>com.tcs.training.posts</code>.</td></tr>
+                <tr><td><code>No identifier specified for entity</code></td><td>No <code>@Id</code> field.</td><td>Add <code>@Id</code> to the <code>id</code> field.</td></tr>
+                <tr><td>No <code>create table</code> in the log</td><td><code>show-sql</code> is off, or <code>ddl-auto</code> isn't <code>update</code>.</td><td>Re-check <code>application.properties</code> against the setup step.</td></tr>
               </tbody>
             </table>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>Post.java</code> created in <code>com.tcs.training.entity</code> and compiles.</span></label>
           </div>
         </details>
       </section>
@@ -772,44 +1044,87 @@ public class Post {
       <!-- ===== LAB 2: REPOSITORY ===== -->
       <section class="section">
         <details class="exp lab2">
-          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> Create the Repository</summary>
+          <summary><span class="lab-tag">LAB 2</span><span class="chevron">▶</span> The Repository — Full CRUD From an Empty Interface</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              A <strong>repository</strong> is the data-access layer. By extending <code>JpaRepository&lt;Post, Long&gt;</code>
-              (entity type, id type) you inherit a full set of CRUD methods — you write <em>zero</em> implementation.
+              <span class="lbl">Concept — the shortest file you'll ever write</span>
+              Remember the twenty lines of JDBC in the theory deck, just to read one row? This is the replacement.
+              You declare an <strong>interface with no methods</strong>, and at startup Spring Data <em>generates the
+              implementation</em> and registers it as a bean. The two type parameters are
+              <code>&lt;EntityType, PrimaryKeyType&gt;</code> — for us, <code>&lt;Post, Long&gt;</code>.
             </div>
+
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.repository</code>.</li>
-                <li>Right-click the new <code>repository</code> package → <strong>New → Interface</strong>
-                    (yes, an <em>Interface</em>, not a Class) → name <code>PostRepository</code> → Finish.</li>
-                <li>Replace the file's contents with the code below.</li>
-                <li>Save. Spring Data will build the implementation for you at startup.</li>
+                <li>Right-click <code>com.tcs.training.posts.repository</code> → <strong>New → Interface</strong>
+                    (<em>Interface</em>, not Class — though most IDEs let you change the kind afterwards).</li>
+                <li>Name it <code>PostRepository</code>.</li>
+                <li>Paste the whole file below.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/repository/PostRepository.java</span><span class="fb-tag">paste the WHOLE file (interface)</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.repository;
 
-import com.tcs.training.entity.Post;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/repository/PostRepository.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.repository;
+
+import com.tcs.training.posts.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.List;
+
+// JpaRepository&lt;Post, Long&gt;  =  &lt;the entity, the type of its @Id&gt;
+// Extending it gives us save, findAll, findById, deleteById, existsById,
+// count, and paging/sorting — all without writing an implementation.
 public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
-    <span class="code-comment">// No methods needed — JpaRepository provides save(), findById(),</span>
-    <span class="code-comment">// findAll(), deleteById() and many more out of the box.</span>
+
+    // ---- Derived queries: Spring Data writes the SQL from the METHOD NAME ----
+
+    // SELECT * FROM posts WHERE author = ?
+    List&lt;Post&gt; findByAuthor(String author);
+
+    // SELECT * FROM posts WHERE lower(title) LIKE %?%
+    List&lt;Post&gt; findByTitleContainingIgnoreCase(String keyword);
+
+    // SELECT COUNT(*) FROM posts WHERE author = ?
+    long countByAuthor(String author);
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">One interface, full CRUD</span>
-              This single interface gives you <code>save()</code>, <code>findById()</code>, <code>findAll()</code>,
-              <code>deleteById()</code>, <code>count()</code> and more — no implementation class required. Spring Data
-              generates it at runtime.
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              Compiles cleanly, and the app still starts. Nothing visible changes yet — nothing calls the repository
+              until Lab 5.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>PostRepository</code> created as an <strong>interface</strong> extending <code>JpaRepository&lt;Post, Long&gt;</code>.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>PostRepository.java</code> created in <code>com.tcs.training.repository</code> and compiles.</span></label>
+
+            <div class="concept">
+              <span class="lbl">Those three derived queries deserve a closer look</span>
+              You wrote no bodies, no SQL and no annotations. Spring Data reads each <strong>method name</strong> at
+              startup, splits it into keywords, and generates the query:
+              <ul style="margin:8px 0 0;">
+                <li><code>findByAuthor</code> → <code>WHERE author = ?</code></li>
+                <li><code>findByTitleContainingIgnoreCase</code> → <code>WHERE lower(title) LIKE %?%</code></li>
+                <li><code>countByAuthor</code> → <code>SELECT COUNT(*) … WHERE author = ?</code></li>
+              </ul>
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Try it — break it deliberately (30 seconds, very instructive)</span>
+              Rename <code>findByAuthor</code> to <code>findByWriter</code> and restart. The app
+              <strong>refuses to start</strong>:
+              <div class="codewrap"><pre><code>org.springframework.data.repository.query.QueryCreationException:
+Could not create query for public abstract java.util.List
+  com.tcs.training.posts.repository.PostRepository.findByWriter(java.lang.String);
+Reason: Failed to create query for method ...;
+  No property 'writer' found for type 'Post'</code></pre></div>
+              Read the last line: <strong>"No property 'writer' found for type 'Post'"</strong>. Spring Data checked
+              your method name against the entity's fields and found no match. That's a <em>good</em> failure — caught
+              at startup, not in production. <strong>Rename it back to <code>findByAuthor</code>.</strong>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I broke a derived query name, saw the startup error, and fixed it.</span>
+              </label>
+            </div>
           </div>
         </details>
       </section>
@@ -817,252 +1132,472 @@ public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
       <!-- ===== LAB 3: DTO ===== -->
       <section class="section">
         <details class="exp lab3">
-          <summary><span class="lab-tag">LAB 3</span><span class="chevron">▶</span> Create the PostDTO</summary>
+          <summary><span class="lab-tag">LAB 3</span><span class="chevron">▶</span> The <code>PostDTO</code> — Your API's Public Shape</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              The <strong>DTO</strong> carries data between the client and the service. Same fields as the entity, but
-              <em>no</em> JPA annotations — it's never mapped to the database. Add getters and setters (generate them in
-              your IDE) so Jackson can read and write it.
+              <span class="lbl">Concept — why a second class that looks almost the same?</span>
+              Our <code>Post</code> entity happens to hold nothing sensitive, so returning it directly would work. But
+              consider a <code>User</code> entity with a <code>passwordHash</code> field: return that from a controller
+              and Jackson publishes the hash to anyone who calls your API.
+              <br><br>
+              A <strong>DTO</strong> defines exactly what your API exposes — no more. It is safe
+              <strong>by construction</strong>: when someone adds a sensitive field to the entity next year, it does
+              <em>not</em> appear in the API, because the DTO doesn't mention it. We also hang our
+              <strong>validation rules</strong> here, because this is the class that receives untrusted input.
             </div>
+
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.dto</code>.</li>
-                <li>Right-click the new <code>dto</code> package → <strong>New → Class</strong> →
-                    name <code>PostDTO</code> → Finish.</li>
-                <li>Replace the file's contents with the code below.</li>
+                <li>Right-click <code>com.tcs.training.posts.dto</code> → <strong>New → Class</strong>.</li>
+                <li>Name it <code>PostDTO</code>.</li>
+                <li>Paste the whole file below.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/dto/PostDTO.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.dto;
 
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/dto/PostDTO.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+// A plain data carrier. No @Entity — this class never touches the database.
+// The validation annotations are enforced when the controller uses @Valid.
 public class PostDTO {
 
+    // Read-only from the client's point of view: we send it out, but the
+    // database assigns it, so we never copy it back into an entity.
     private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters")
     private String title;
-    private String description;
+
+    @NotBlank(message = "Content is required")
+    @Size(max = 2000, message = "Content cannot exceed 2000 characters")
     private String content;
 
-    <span class="code-comment">// Getters and setters — generate these in your IDE</span>
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @NotBlank(message = "Author is required")
+    private String author;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    // ---- No-arg constructor: required by Jackson to read incoming JSON ----
+    public PostDTO() {
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public PostDTO(Long id, String title, String content, String author) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-}</code></pre></div>
-            <div class="concept">
-              <span class="lbl">PostDTO vs Post — same fields, different purpose</span>
-              They look almost identical, and that's fine. The <strong>Entity</strong> maps to the database table and
-              may grow internal fields later (timestamps, author id, soft-delete flag). The <strong>DTO</strong> is the
-              public face — it only ever exposes what the API should return. Keeping them separate means changing the
-              table never accidentally changes your API.
-            </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>PostDTO.java</code> created in <code>com.tcs.training.dto</code> and compiles.</span></label>
-          </div>
-        </details>
-      </section>
+    // ---- Getters and setters ----
+    public Long getId() {
+        return id;
+    }
 
-      <!-- ===== LAB 4: EXCEPTION ===== -->
-      <section class="section">
-        <details class="exp lab4">
-          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Create the Custom Exception</summary>
-          <div class="exp-body">
-            <div class="concept">
-              <span class="lbl">Concept</span>
-              A <strong>custom exception</strong> lets us return a clean, meaningful error. It extends
-              <code>RuntimeException</code>, takes a message, and carries <code>@ResponseStatus(HttpStatus.NOT_FOUND)</code>
-              so Spring responds with HTTP 404 automatically when it's thrown.
-            </div>
-            <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
-              <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.exception</code>.</li>
-                <li>Right-click the new <code>exception</code> package → <strong>New → Class</strong> →
-                    name <code>ResourceNotFoundException</code> → Finish.</li>
-                <li>Replace the file's contents with the code below.</li>
-              </ol>
-            </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/exception/ResourceNotFoundException.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.exception;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+    public String getTitle() {
+        return title;
+    }
 
-@ResponseStatus(HttpStatus.NOT_FOUND)        <span class="code-comment">// &lt;-- Spring returns 404 when this is thrown</span>
-public class ResourceNotFoundException extends RuntimeException {
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public ResourceNotFoundException(String message) {
-        super(message);                      <span class="code-comment">// the message the client will see</span>
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">What @ResponseStatus does here</span>
-              It tells Spring: "whenever this exception bubbles up unhandled, set the HTTP response code to
-              <strong>404 Not Found</strong>." No try/catch, no extra config — the annotation does the wiring.
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              Compiles cleanly. Note it has <strong>no JPA annotations at all</strong> — this class is never stored.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>PostDTO</code> created with validation annotations, and no JPA annotations.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>ResourceNotFoundException.java</code> created in <code>com.tcs.training.exception</code> and compiles.</span></label>
+
+            <div class="observe">
+              <span class="lbl">Entity vs DTO — the boundary rule</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th></th><th><code>Post</code> (entity)</th><th><code>PostDTO</code></th></tr></thead>
+                <tbody>
+                  <tr><td>Represents</td><td>The <code>posts</code> table</td><td>The API's public shape</td></tr>
+                  <tr><td>Annotations</td><td><code>@Entity</code>, <code>@Id</code>, <code>@Column</code></td><td>Validation only</td></tr>
+                  <tr><td>Seen by</td><td>Service &amp; repository</td><td>Service &amp; controller</td></tr>
+                  <tr><td>Reaches the client?</td><td><strong>Never</strong></td><td><strong>Always</strong></td></tr>
+                </tbody>
+              </table>
+              <strong>Entities never leave the service layer; DTOs never enter the repository layer.</strong> The
+              service is the only place that imports both.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 5: SERVICE LAYER ===== -->
+
+      <!-- ===== LAB 4: EXCEPTIONS ===== -->
       <section class="section">
-        <details class="exp lab5">
-          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> Create the Service Layer (interface + impl)</summary>
+        <details class="exp lab4">
+          <summary><span class="lab-tag">LAB 4</span><span class="chevron">▶</span> Exception Handling — Clean <code>404</code>s Instead of Ugly <code>500</code>s</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              The <strong>service</strong> holds the business logic and does the DTO ↔ Entity mapping. We code to an
-              <strong>interface</strong> (good practice — easy to swap/test) and put the logic in an
-              <code>@Service</code> implementation. Two private helpers, <code>mapToDTO</code> and
-              <code>mapToEntity</code>, do the conversions.
+              <span class="lbl">Concept — two small classes that remove all your <code>if</code> checks</span>
+              In Session 2 every controller method carried an <code>if (x == null) return notFound()</code>. Today we
+              replace all of it with two files:
+              <ul style="margin:8px 0 0;">
+                <li><strong><code>PostNotFoundException</code></strong> — a custom exception meaning one specific
+                    thing. The service throws it and stops worrying.</li>
+                <li><strong><code>GlobalExceptionHandler</code></strong> — one class annotated
+                    <code>@RestControllerAdvice</code> that catches exceptions from <em>every</em> controller and turns
+                    them into proper HTTP responses.</li>
+              </ul>
+              The pay-off: your controller ends up with <strong>zero error-handling code</strong>.
             </div>
 
-            <h3 style="margin-top:0;">5a · The interface</h3>
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this — two files in the <code>exception</code> package</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.service</code>.</li>
-                <li>Right-click the new <code>service</code> package → <strong>New → Interface</strong> →
-                    name <code>PostService</code> → Finish. Replace its contents with file ① below.</li>
+                <li>Right-click <code>com.tcs.training.posts.exception</code> → <strong>New → Class</strong> →
+                    <code>PostNotFoundException</code>. Paste file 1.</li>
+                <li>Same package → <strong>New → Class</strong> → <code>GlobalExceptionHandler</code>. Paste file 2.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/PostService.java</span><span class="fb-tag">file ① — interface</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.service;
 
-import com.tcs.training.dto.PostDTO;
-import java.util.List;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/exception/PostNotFoundException.java</span><span class="fb-tag">file 1 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.exception;
 
-public interface PostService {
+// Extends RuntimeException (UNCHECKED), so we don't have to write
+// "throws" on every method between the service and the handler.
+public class PostNotFoundException extends RuntimeException {
 
-    PostDTO createPost(PostDTO postDTO);
-    List&lt;PostDTO&gt; getAllPosts();
-    PostDTO getPostById(Long id);
-    PostDTO updatePost(Long id, PostDTO postDTO);
-    void deletePost(Long id);
+    public PostNotFoundException(Long id) {
+        // This message is what the client will eventually see.
+        super("Post not found with id: " + id);
+    }
 }</code></pre></div>
 
-            <h3 style="margin-top:24px;">5b · The implementation</h3>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/exception/GlobalExceptionHandler.java</span><span class="fb-tag">file 2 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+// @RestControllerAdvice = "watch EVERY controller in this application".
+// When one lets an exception escape, the matching method below handles it.
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    // ---- 404: our custom exception ----
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handlePostNotFound(
+            PostNotFoundException ex) {
+
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 404);
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.NOT_FOUND);
+    }
+
+    // ---- 400: @Valid failed on a @RequestBody ----
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationErrors(
+            MethodArgumentNotValidException ex) {
+
+        // Collect every field error into a { fieldName: message } map
+        Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors().forEach(error -&gt;
+                fieldErrors.put(error.getField(), error.getDefaultMessage()));
+
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 400);
+        body.put("error", "Validation Failed");
+        body.put("fieldErrors", fieldErrors);
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.BAD_REQUEST);
+    }
+
+    // ---- 500: the safety net for anything we didn't anticipate ----
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleEverythingElse(Exception ex) {
+
+        // Log the FULL detail on the server, for us to debug...
+        ex.printStackTrace();
+
+        // ...but return only a generic message. Never leak a stack trace.
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 500);
+        body.put("error", "Internal Server Error");
+        body.put("message", "An unexpected error occurred");
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              Both files compile, and the app still starts. You can't test them until the service throws — that's
+              Lab 5, and you'll see the clean <code>404</code> in Lab 7.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Both exception classes created in the <code>exception</code> package.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">The flow, end to end — worth tracing once in your head</span>
+              <ol style="margin:6px 0 0;">
+                <li>The client requests <code>GET /api/posts/999</code>.</li>
+                <li>The controller calls <code>postService.getPostById(999L)</code>.</li>
+                <li>The service finds nothing and <strong>throws</strong> <code>PostNotFoundException</code>.</li>
+                <li>The exception travels up <em>past</em> the controller, which does nothing about it.</li>
+                <li>Spring finds the <code>@ExceptionHandler(PostNotFoundException.class)</code> method here.</li>
+                <li>That method builds a <code>404</code> with a readable message and returns it.</li>
+              </ol>
+              <strong>The controller contains no error-handling code at all</strong> — the whole point of the exercise.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Why <code>LinkedHashMap</code> rather than <code>HashMap</code> for the body?</span>
+              Because <code>LinkedHashMap</code> preserves insertion order, so the JSON always comes out as
+              <code>timestamp, status, error, message</code> — predictable and pleasant to read. A plain
+              <code>HashMap</code> would order the keys arbitrarily. A small detail, but it's the kind of thing that
+              makes an API feel considered.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== LAB 5: SERVICE ===== -->
+      <section class="section">
+        <details class="exp lab5">
+          <summary><span class="lab-tag">LAB 5</span><span class="chevron">▶</span> The Service Layer — Interface + Implementation</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept — where all the real work happens</span>
+              The service is the heart of the application, and it does three things:
+              <ul style="margin:8px 0 0;">
+                <li><strong>Business logic</strong> — the rules, and coordinating the repository.</li>
+                <li><strong>Entity ↔ DTO conversion</strong> — it is the <em>only</em> layer that knows both types.</li>
+                <li><strong>Throwing exceptions</strong> — when something doesn't exist, it says so and stops.</li>
+              </ul>
+              We write it as an <strong>interface plus an implementation</strong>: the interface is the contract
+              (<em>what</em> it can do) and the <code>Impl</code> class is the <em>how</em>. The controller will depend
+              on the <strong>interface</strong>, so we could swap the implementation later without touching it.
+              Note that <code>@Service</code> goes on the <strong>Impl</strong> — that's the class Spring instantiates.
+            </div>
+
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this — two files in the <code>service</code> package</span>
               <ol>
-                <li>Right-click the same <code>service</code> package → <strong>New → Class</strong> →
-                    name <code>PostServiceImpl</code> → Finish.</li>
-                <li>Replace its contents with file ② below — read the two private mappers
-                    (<code>mapToDTO</code>, <code>mapToEntity</code>) first; they're the heart of the DTO pattern.</li>
+                <li>Right-click <code>com.tcs.training.posts.service</code> → <strong>New → Interface</strong> →
+                    <code>PostService</code>. Paste file 1.</li>
+                <li>Same package → <strong>New → Class</strong> → <code>PostServiceImpl</code>. Paste file 2.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/service/PostServiceImpl.java</span><span class="fb-tag">file ② — implementation</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.service;
 
-import com.tcs.training.dto.PostDTO;
-import com.tcs.training.entity.Post;
-import com.tcs.training.exception.ResourceNotFoundException;
-import com.tcs.training.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/service/PostService.java</span><span class="fb-tag">file 1 of 2 — an INTERFACE — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.service;
+
+import com.tcs.training.posts.dto.PostDTO;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+// The CONTRACT: what the service can do. Notice every type here is a
+// DTO — the entity is never mentioned, because callers must not see it.
+public interface PostService {
+
+    List&lt;PostDTO&gt; getAllPosts();
+
+    PostDTO getPostById(Long id);
+
+    PostDTO createPost(PostDTO postDTO);
+
+    PostDTO updatePost(Long id, PostDTO postDTO);
+
+    void deletePost(Long id);
+
+    List&lt;PostDTO&gt; getPostsByAuthor(String author);
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/service/PostServiceImpl.java</span><span class="fb-tag">file 2 of 2 — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.service;
+
+import com.tcs.training.posts.dto.PostDTO;
+import com.tcs.training.posts.entity.Post;
+import com.tcs.training.posts.exception.PostNotFoundException;
+import com.tcs.training.posts.repository.PostRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+// @Service goes on the IMPLEMENTATION — this is the real bean.
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    <span class="code-comment">// ===== Helper mappers — the core of the DTO pattern =====</span>
+    // Constructor injection. Spring passes in the repository implementation
+    // it generated for us at startup.
+    public PostServiceImpl(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
 
-    <span class="code-comment">// Entity -> DTO  (going OUT to the client)</span>
-    private PostDTO mapToDTO(Post post) {
+    // ================= READ ALL =================
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;PostDTO&gt; getAllPosts() {
+        List&lt;PostDTO&gt; result = new ArrayList&lt;&gt;();
+        for (Post post : postRepository.findAll()) {
+            result.add(toDTO(post));          // convert every entity to a DTO
+        }
+        return result;
+    }
+
+    // ================= READ ONE =================
+    @Override
+    @Transactional(readOnly = true)
+    public PostDTO getPostById(Long id) {
+        // THE key line of today's session: get it, or throw.
+        // After this line 'post' is guaranteed non-null — no if needed.
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new PostNotFoundException(id));
+        return toDTO(post);
+    }
+
+    // ================= CREATE =================
+    @Override
+    @Transactional
+    public PostDTO createPost(PostDTO postDTO) {
+        Post saved = postRepository.save(toEntity(postDTO));
+        // 'saved' now has the id the database assigned.
+        return toDTO(saved);
+    }
+
+    // ================= UPDATE =================
+    @Override
+    @Transactional
+    public PostDTO updatePost(Long id, PostDTO postDTO) {
+        // 1. Load the existing row (or throw a clean 404)
+        Post existing = postRepository.findById(id)
+                .orElseThrow(() -&gt; new PostNotFoundException(id));
+
+        // 2. Change its fields — note we never touch the id
+        existing.setTitle(postDTO.getTitle());
+        existing.setContent(postDTO.getContent());
+        existing.setAuthor(postDTO.getAuthor());
+
+        // 3. save() issues an UPDATE, because the id is already set
+        return toDTO(postRepository.save(existing));
+    }
+
+    // ================= DELETE =================
+    @Override
+    @Transactional
+    public void deletePost(Long id) {
+        // Check first, so a missing id gives a clean 404 rather than
+        // an obscure framework exception.
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException(id);
+        }
+        postRepository.deleteById(id);
+    }
+
+    // ================= SEARCH =================
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;PostDTO&gt; getPostsByAuthor(String author) {
+        List&lt;PostDTO&gt; result = new ArrayList&lt;&gt;();
+        for (Post post : postRepository.findByAuthor(author)) {
+            result.add(toDTO(post));
+        }
+        return result;
+    }
+
+    // ============================================================
+    //  MAPPING — the only place that knows about BOTH types
+    // ============================================================
+
+    // Entity -> DTO : going OUT to the client
+    private PostDTO toDTO(Post post) {
         PostDTO dto = new PostDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
-        dto.setDescription(post.getDescription());
         dto.setContent(post.getContent());
+        dto.setAuthor(post.getAuthor());
         return dto;
     }
 
-    <span class="code-comment">// DTO -> Entity  (coming IN from the client)</span>
-    private Post mapToEntity(PostDTO dto) {
+    // DTO -> Entity : coming IN from the client
+    private Post toEntity(PostDTO dto) {
         Post post = new Post();
+        // We deliberately do NOT copy the id.
+        // The DATABASE assigns ids — never the client.
         post.setTitle(dto.getTitle());
-        post.setDescription(dto.getDescription());
         post.setContent(dto.getContent());
+        post.setAuthor(dto.getAuthor());
         return post;
     }
-
-    <span class="code-comment">// ===== Business methods =====</span>
-
-    @Override
-    public PostDTO createPost(PostDTO postDTO) {
-        Post post = mapToEntity(postDTO);   <span class="code-comment">// DTO -> Entity</span>
-        Post saved = postRepository.save(post);
-        return mapToDTO(saved);             <span class="code-comment">// Entity -> DTO</span>
-    }
-
-    @Override
-    public List&lt;PostDTO&gt; getAllPosts() {
-        return postRepository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public PostDTO getPostById(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        return mapToDTO(post);
-    }
-
-    @Override
-    public PostDTO updatePost(Long id, PostDTO postDTO) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        post.setTitle(postDTO.getTitle());
-        post.setDescription(postDTO.getDescription());
-        post.setContent(postDTO.getContent());
-        Post updated = postRepository.save(post);
-        return mapToDTO(updated);
-    }
-
-    @Override
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        postRepository.delete(post);
-    }
 }</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              Both files compile and the app starts. One endpoint short of testable — the controller is next.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Service interface and implementation created, with <code>@Service</code> on the <code>Impl</code>.</span>
+              </label>
+            </div>
+
             <div class="observe">
-              <span class="lbl">orElseThrow — read it like English</span>
-              <code>findById(id)</code> returns an <code>Optional&lt;Post&gt;</code>. <code>orElseThrow()</code> says:
-              "if a Post was found, give it to me; if not, throw this exception." No null checks, no
-              <code>NullPointerException</code> — and the client gets the clean 404 message you wrote.
+              <span class="lbl">Three details in this file worth understanding, not just copying</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong><code>.orElseThrow(...)</code></strong> — this single line replaces every
+                    <code>if (x == null)</code> from Session 2. After it, the variable cannot be null, so the rest of
+                    the method reads as a clean happy path.</li>
+                <li><strong><code>toEntity</code> never copies the id.</strong> If it did, a client could send
+                    <code>"id": 7</code> in a POST and silently overwrite somebody else's row. The database owns ids.</li>
+                <li><strong>Update loads first, then modifies.</strong> We don't build a new <code>Post</code> — we
+                    fetch the existing row and change its fields, so <code>save()</code> issues an <code>UPDATE</code>
+                    rather than an <code>INSERT</code>.</li>
+              </ol>
             </div>
-            <div class="tryit">
-              <span class="lbl">Try it yourself</span>
-              Add a method <code>long countPosts()</code> to the interface and implement it with
-              <code>postRepository.count()</code>. Wire it to a <code>GET /api/posts/count</code> endpoint in the next
-              lab and watch it return the number of rows.
+
+            <div class="concept">
+              <span class="lbl">What <code>@Transactional</code> is doing here</span>
+              Each write method is wrapped in a database transaction: if an exception escapes, everything it did is
+              rolled back. The read methods use <code>readOnly = true</code>, which is a hint that lets Hibernate and
+              the database optimise — it skips dirty-checking, since nothing can change.
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>PostService</code> interface and <code>PostServiceImpl</code> created; all five methods implemented with both mappers.</span></label>
           </div>
         </details>
       </section>
@@ -1070,285 +1605,532 @@ public class PostServiceImpl implements PostService {
       <!-- ===== LAB 6: CONTROLLER ===== -->
       <section class="section">
         <details class="exp lab6">
-          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge post">POST</span><span class="verb-badge get">GET</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> Create the Controller</summary>
+          <summary><span class="lab-tag">LAB 6</span><span class="verb-badge get">GET</span><span class="verb-badge post">POST</span><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span><span class="chevron">▶</span> The Controller — Six Endpoints, Zero Error Handling</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              The <strong>controller</strong> handles HTTP and delegates to the service. <code>@RestController</code> +
-              <code>@RequestMapping("/api/posts")</code> set the base path. <code>ResponseEntity</code> lets us return
-              precise status codes — <strong>201 Created</strong> for POST, <strong>200 OK</strong> for the rest.
+              <span class="lbl">Concept — notice what <em>isn't</em> here</span>
+              Compare this with Session 2's controller. There are <strong>no <code>if (x == null)</code>
+              checks</strong> and <strong>no <code>notFound()</code> calls</strong>, because the service throws and
+              the global handler deals with it. The controller's entire job is now: receive the request, call the
+              service, choose a success status code. That's what a thin controller looks like.
+              <br><br>
+              Also note <strong><code>@Valid</code></strong> on the POST and PUT bodies — that's what activates the
+              validation rules you declared on the DTO.
             </div>
+
             <div class="dothis">
-              <span class="lbl">Do this — step by step</span>
+              <span class="lbl">Do this</span>
               <ol>
-                <li>Right-click <code>com.tcs.training</code> → <strong>New → Package</strong> →
-                    <code>com.tcs.training.controller</code>.</li>
-                <li>Right-click the new <code>controller</code> package → <strong>New → Class</strong> →
-                    name <code>PostController</code> → Finish.</li>
-                <li>Replace the file's contents with the code below.</li>
-                <li>Right-click your <strong>main application class</strong> →
-                    <strong>Run As → Java Application</strong>. Wait for "Tomcat started on port 8080".</li>
-                <li>Lab 7 has all the test calls.</li>
+                <li>Right-click <code>com.tcs.training.posts.controller</code> → <strong>New → Class</strong>.</li>
+                <li>Name it <code>PostController</code>.</li>
+                <li>Paste the whole file below.</li>
+                <li>Run the app.</li>
               </ol>
             </div>
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">com/tcs/training/controller/PostController.java</span><span class="fb-tag">paste the WHOLE file</span></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
 
-import com.tcs.training.dto.PostDTO;
-import com.tcs.training.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/posts/controller/PostController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.controller;
+
+import com.tcs.training.posts.dto.PostDTO;
+import com.tcs.training.posts.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/posts")          <span class="code-comment">// base path: every method is relative to this</span>
+@RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
-    private PostService postService;
+    // We depend on the INTERFACE, not PostServiceImpl.
+    // Spring injects the implementation it found.
+    private final PostService postService;
 
-    <span class="code-comment">// CREATE -> 201 Created</span>
-    @PostMapping
-    public ResponseEntity&lt;PostDTO&gt; createPost(@RequestBody PostDTO postDTO) {
-        PostDTO created = postService.createPost(postDTO);
-        return new ResponseEntity&lt;&gt;(created, HttpStatus.CREATED);
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
 
-    <span class="code-comment">// READ all -> 200 OK</span>
+    // GET /api/posts
     @GetMapping
-    public List&lt;PostDTO&gt; getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity&lt;List&lt;PostDTO&gt;&gt; getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
     }
 
-    <span class="code-comment">// READ one -> 200 OK (or 404 via the service)</span>
+    // GET /api/posts/search?author=Amit
+    // Declared before /{id} so the literal path is unambiguous.
+    @GetMapping("/search")
+    public ResponseEntity&lt;List&lt;PostDTO&gt;&gt; getByAuthor(@RequestParam String author) {
+        return ResponseEntity.ok(postService.getPostsByAuthor(author));
+    }
+
+    // GET /api/posts/1
+    // No null check! If it's missing, the service throws and the
+    // GlobalExceptionHandler turns that into a clean 404.
     @GetMapping("/{id}")
     public ResponseEntity&lt;PostDTO&gt; getPostById(@PathVariable Long id) {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
-    <span class="code-comment">// UPDATE -> 200 OK (or 404 via the service)</span>
+    // POST /api/posts   + JSON body
+    // @Valid activates the @NotBlank / @Size rules on PostDTO.
+    @PostMapping
+    public ResponseEntity&lt;PostDTO&gt; createPost(@Valid @RequestBody PostDTO postDTO) {
+        PostDTO created = postService.createPost(postDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    // PUT /api/posts/1   + JSON body
     @PutMapping("/{id}")
     public ResponseEntity&lt;PostDTO&gt; updatePost(@PathVariable Long id,
-                                              @RequestBody PostDTO postDTO) {
+                                              @Valid @RequestBody PostDTO postDTO) {
         return ResponseEntity.ok(postService.updatePost(id, postDTO));
     }
 
-    <span class="code-comment">// DELETE -> 200 OK with a confirmation message</span>
+    // DELETE /api/posts/1
     @DeleteMapping("/{id}")
-    public ResponseEntity&lt;String&gt; deletePost(@PathVariable Long id) {
+    public ResponseEntity&lt;Void&gt; deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-        return ResponseEntity.ok("Post deleted successfully with id = " + id);
+        return ResponseEntity.noContent().build();     // 204
     }
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Class-level @RequestMapping</span>
-              Because <code>@RequestMapping("/api/posts")</code> sits on the class, each method only needs its suffix
-              (<code>/{id}</code>) or nothing at all. The full path is assembled for you:
-              <code>/api/posts</code> + <code>/{id}</code> = <code>/api/posts/{id}</code>.
+
+            <div class="runbox">
+              <span class="lbl">Now run it</span>
+              <ol>
+                <li>Stop any previous run, then run <code>PostsApplication</code>.</li>
+                <li>Wait for "Tomcat started on port 8080".</li>
+                <li>Visit <code>http://localhost:8080/api/posts</code> — you should get <code>[]</code>, an empty
+                    array. The table exists but has no rows yet.</li>
+              </ol>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><code>PostController.java</code> created with all five endpoints under <code>/api/posts</code>; app restarts cleanly.</span></label>
+
+            <div class="expected">
+              <span class="lbl">Expected output</span>
+              <code>GET /api/posts</code> → <code>200 OK</code> with body <code>[]</code>.
+              <br>An empty array is <strong>correct</strong>: the question "which posts exist?" has a valid answer
+              (none). We'll add data in Lab 7.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">App starts and <code>GET /api/posts</code> returns <code>[]</code> with status <code>200</code>.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">🎉 All seven files are in place. Look at what you've built</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Layer</th><th>File</th><th>Responsibility</th></tr></thead>
+                <tbody>
+                  <tr><td>Controller</td><td><code>PostController</code></td><td>HTTP only — no logic, no error handling</td></tr>
+                  <tr><td>Service</td><td><code>PostService</code> + <code>Impl</code></td><td>Logic, mapping, throwing exceptions</td></tr>
+                  <tr><td>Repository</td><td><code>PostRepository</code></td><td>Database access — an empty interface</td></tr>
+                  <tr><td>Entity</td><td><code>Post</code></td><td>Maps to the <code>posts</code> table</td></tr>
+                  <tr><td>DTO</td><td><code>PostDTO</code></td><td>The public API shape + validation</td></tr>
+                  <tr><td>Exceptions</td><td><code>PostNotFoundException</code> + <code>GlobalExceptionHandler</code></td><td>Clean errors for every controller</td></tr>
+                </tbody>
+              </table>
+              Each file has exactly one reason to change. That's the goal.
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== LAB 7: TESTING ===== -->
+      <!-- ===== LAB 7: TEST ===== -->
       <section class="section">
         <details class="exp lab7">
-          <summary><span class="lab-tag">LAB 7</span><span class="chevron">▶</span> Test Everything (H2 + Postman)</summary>
+          <summary><span class="lab-tag">LAB 7</span><span class="chevron">▶</span> Test Everything — Swagger UI &amp; the H2 Console</summary>
           <div class="exp-body">
-            <p>Four parts — verify the table, create a record, fetch it (valid &amp; invalid), then update it.</p>
+            <p>Time to prove it all works. Do these five parts in order — each depends on the previous one.</p>
 
-            <!-- Part A -->
             <div class="testpart">
-              <div class="tp-head">🗄️ Part A — Verify the H2 console</div>
+              <div class="tp-head"><span class="verb-badge post">POST</span> Part 1 · Create three posts</div>
               <div class="tp-body">
-                <ol class="steps">
-                  <li><strong>Start the app.</strong></li>
-                  <li><strong>Open</strong> <code>http://localhost:8080/h2-console</code> in the browser.</li>
-                  <li><strong>Set the JDBC URL</strong> to <code>jdbc:h2:mem:testdb</code>, username <code>sa</code>, password blank — then <strong>Connect</strong>.</li>
-                  <li><strong>Confirm</strong> the <code>POSTS</code> table exists (Hibernate created it from your entity).</li>
-                </ol>
-                <div class="h2-mock">
-                  <div class="h2-top">H2 Console — Connected to jdbc:h2:mem:testdb</div>
-                  <div class="h2-row">▾ POSTS</div>
-                  <div class="h2-row">&nbsp;&nbsp;&nbsp;ID &nbsp;BIGINT &nbsp;(PK)</div>
-                  <div class="h2-row">&nbsp;&nbsp;&nbsp;TITLE &nbsp;VARCHAR</div>
-                  <div class="h2-row">&nbsp;&nbsp;&nbsp;DESCRIPTION &nbsp;VARCHAR</div>
-                  <div class="h2-row">&nbsp;&nbsp;&nbsp;CONTENT &nbsp;VARCHAR</div>
-                </div>
+                <p>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span>. All six of your endpoints are
+                now listed. Expand <strong><code>POST /api/posts</code></strong> → <strong>Try it out</strong>, then
+                paste each body below into the <strong>Request body</strong> box and click <strong>Execute</strong>.</p>
+                <p class="muted" style="font-size:15.5px;">Swagger pre-fills an example built from your
+                <code>PostDTO</code> — replace it. You can leave or delete the <code>"id"</code> field; the database
+                assigns the real one either way.</p>
+                <div class="codewrap"><pre><code>{
+  "title": "Learning Spring Boot",
+  "content": "Today I built my first REST API with Spring Boot.",
+  "author": "Amit"
+}</code></pre></div>
+                <div class="codewrap"><pre><code>{
+  "title": "Understanding JPA",
+  "content": "ORM removes almost all the JDBC boilerplate.",
+  "author": "Neha"
+}</code></pre></div>
+                <div class="codewrap"><pre><code>{
+  "title": "Why DTOs Matter",
+  "content": "Never expose your entities directly to clients.",
+  "author": "Amit"
+}</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">Expected</span>
-                  The <code>POSTS</code> table is listed in the left tree with the four columns. It's empty for now.
+                  <span class="lbl">Expected — <code>201 Created</code> each time</span>
+                  Each response echoes your post back <strong>with an <code>id</code></strong> — 1, then 2, then 3.
+                  Those ids came from the database, not from you.
+                  <br><br>Also glance at the <strong>console</strong>: you'll see Hibernate's
+                  <code>insert into posts …</code> statements appear, because <code>show-sql</code> is on.
+                  <label class="check"><input type="checkbox" class="labstep" />
+                    <span class="ctext">Three posts created, each returning <code>201</code> with a database-assigned id.</span>
+                  </label>
                 </div>
+              </div>
+            </div>
+
+            <div class="testpart">
+              <div class="tp-head"><span class="verb-badge get">GET</span> Part 2 · Read them back</div>
+              <div class="tp-body">
+                <p>Same rhythm each time: expand the row → <strong>Try it out</strong> → fill any boxes →
+                <strong>Execute</strong>.</p>
                 <table class="issues">
-                  <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+                  <thead><tr><th>Swagger UI row</th><th>What you enter</th><th>Expected</th></tr></thead>
                   <tbody>
-                    <tr>
-                      <td>H2 console shows "Database not found" / connects to wrong DB</td>
-                      <td>JDBC URL in the console doesn't match <code>application.properties</code>.</td>
-                      <td>Type exactly <code>jdbc:h2:mem:testdb</code> in the console's JDBC URL field.</td>
-                    </tr>
-                    <tr>
-                      <td><code>/h2-console</code> returns 404</td>
-                      <td><code>spring.h2.console.enabled=true</code> missing.</td>
-                      <td>Add it to <code>application.properties</code> and restart.</td>
-                    </tr>
+                    <tr><td><code>GET /api/posts</code></td><td>nothing</td><td><code>200</code> + a 3-item JSON array</td></tr>
+                    <tr><td><code>GET /api/posts/{id}</code></td><td><code>id</code> = <code>1</code></td><td><code>200</code> + the "Learning Spring Boot" post</td></tr>
+                    <tr><td><code>GET /api/posts/search</code></td><td><code>author</code> = <code>Amit</code></td><td><code>200</code> + 2 posts (the derived query at work)</td></tr>
+                    <tr><td><code>GET /api/posts/search</code></td><td><code>author</code> = <code>Zoya</code></td><td><code>200</code> + <code>[]</code> — an empty result is still a success</td></tr>
                   </tbody>
                 </table>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext">All four read requests behave as expected, including the author search.</span>
+                </label>
               </div>
             </div>
 
-            <!-- Part B -->
             <div class="testpart">
-              <div class="tp-head"><span class="verb-badge post">POST</span> Part B — Create a record</div>
+              <div class="tp-head"><span class="em-badge s4">404</span> Part 3 · The clean 404 — the pay-off from Lab 4</div>
               <div class="tp-body">
-                <div class="runbox">
-                  <span class="lbl">▶ Postman steps for POST</span>
-                  <ol>
-                    <li>Open Postman → click the <strong>+</strong> tab to open a new request.</li>
-                    <li>Change the method dropdown from <code>GET</code> to <strong><code>POST</code></strong>.</li>
-                    <li>Paste the URL: <code>http://localhost:8080/api/posts</code></li>
-                    <li>Click the <strong>Headers</strong> tab → add a row: Key <code>Content-Type</code>, Value <code>application/json</code>.</li>
-                    <li>Click the <strong>Body</strong> tab → select <strong>raw</strong> → in the dropdown to its right pick <strong>JSON</strong>.</li>
-                    <li>Paste the JSON below into the body text area, then click <strong>Send</strong>.</li>
-                  </ol>
-                </div>
-                <div class="codewrap"><pre><code>{
-  "title": "Introduction to Spring Boot",
-  "description": "A beginner-friendly post",
-  "content": "Spring Boot simplifies Java development..."
-}</code></pre></div>
+                <p>In <code>GET /api/posts/{id}</code>, enter <code>id</code> = <strong><code>999</code></strong> and
+                Execute — a post that doesn't exist.</p>
                 <div class="expected">
-                  <span class="lbl">Expected — 201 Created</span>
-                  The response is status <strong>201</strong> and the returned <code>PostDTO</code> now has a
-                  generated <code>id</code> (e.g. <code>1</code>). Back in the H2 console run
-                  <code>SELECT * FROM POSTS</code> — your record is there.
-                </div>
-                <div class="codewrap"><pre><code>SELECT * FROM POSTS;</code></pre></div>
-              </div>
-            </div>
-
-            <!-- Part C -->
-            <div class="testpart">
-              <div class="tp-head"><span class="verb-badge get">GET</span> Part C — Valid and invalid IDs <em>(the money moment)</em></div>
-              <div class="tp-body">
-                <ol class="steps">
-                  <li><strong>GET</strong> <code>http://localhost:8080/api/posts/1</code> — expect <strong>200</strong> and the full PostDTO JSON.</li>
-                  <li><strong>GET</strong> <code>http://localhost:8080/api/posts/99</code> — expect <strong>404</strong> with your custom message.</li>
-                </ol>
-                <div class="expected">
-                  <span class="lbl">Expected — GET /api/posts/99 → 404</span>
+                  <span class="lbl">Expected — <code>404 Not Found</code> with a readable body</span>
                   <div class="codewrap"><pre><code>{
+  "timestamp": "2026-09-05T10:32:14.882",
   "status": 404,
   "error": "Not Found",
-  "message": "Post not found with id = 99",
-  "path": "/api/posts/99"
+  "message": "Post not found with id: 999"
 }</code></pre></div>
-                </div>
-                <div class="observe">
-                  <span class="lbl">This is the whole point of today</span>
-                  A missing id no longer returns <code>null</code> or a 500 stack trace — it returns a clean
-                  <strong>404</strong> with the exact message you wrote in the service. That's your custom exception
-                  and <code>@ResponseStatus</code> working together.
+                  <strong>This is the whole point of Lab 4.</strong> Without the custom exception and global handler
+                  you'd have received a <code>500</code> containing a Java stack trace with your package names and
+                  line numbers in it. Instead: the right status code, a message a human can read, and
+                  <strong>nothing</strong> about your internals.
+                  <label class="check"><input type="checkbox" class="labstep" />
+                    <span class="ctext"><code>GET /api/posts/999</code> returns a clean <code>404</code> with a readable message and no stack trace.</span>
+                  </label>
                 </div>
               </div>
             </div>
 
-            <!-- Part D -->
             <div class="testpart">
-              <div class="tp-head"><span class="verb-badge put">PUT</span> Part D — Update a record</div>
+              <div class="tp-head"><span class="em-badge s4">400</span> Part 4 · Validation in action</div>
               <div class="tp-body">
-                <ol class="steps">
-                  <li><strong>PUT</strong> <code>http://localhost:8080/api/posts/1</code>, Body → raw → JSON:</li>
-                </ol>
+                <p>Go back to <code>POST /api/posts</code> and send a deliberately invalid post — an empty title and
+                no author at all:</p>
                 <div class="codewrap"><pre><code>{
-  "title": "Introduction to Spring Boot (Updated)",
-  "description": "Now with DTOs and exception handling",
-  "content": "Spring Boot simplifies Java development even more..."
+  "title": "",
+  "content": "This should be rejected before my service ever runs."
 }</code></pre></div>
                 <div class="expected">
-                  <span class="lbl">Expected — 200 OK</span>
-                  Status <strong>200</strong> and the updated <code>PostDTO</code> comes back. Confirm in the H2
-                  console with <code>SELECT * FROM POSTS</code> — the title changed but the <code>id</code> stayed
-                  the same. Try a PUT to <code>/api/posts/99</code> too — you'll get the same clean 404.
+                  <span class="lbl">Expected — <code>400 Bad Request</code>, listing each failure</span>
+                  <div class="codewrap"><pre><code>{
+  "timestamp": "2026-09-05T10:33:02.117",
+  "status": 400,
+  "error": "Validation Failed",
+  "fieldErrors": {
+    "title": "Title is required",
+    "author": "Author is required"
+  }
+}</code></pre></div>
+                  Notice: those messages are the exact text you wrote in <code>@NotBlank(message = "…")</code> on the
+                  DTO. And your service method was <strong>never called</strong> — <code>@Valid</code> rejected the
+                  request first.
+                  <label class="check"><input type="checkbox" class="labstep" />
+                    <span class="ctext">Invalid input returns <code>400</code> with a per-field error map.</span>
+                  </label>
                 </div>
               </div>
             </div>
 
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">POST creates a record (201), GET returns it (200), GET on a missing id returns the custom 404, and PUT updates it.</span></label>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">The invalid-ID 404 shows the message <code>Post not found with id = 99</code> — custom exception confirmed.</span></label>
+            <div class="testpart">
+              <div class="tp-head"><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span> Part 5 · Update and delete</div>
+              <div class="tp-body">
+                <p>Expand <code>PUT /api/posts/{id}</code> → Try it out → <code>id</code> = <code>2</code> → paste this
+                as the request body:</p>
+                <div class="codewrap"><pre><code>{
+  "title": "Understanding JPA and Hibernate",
+  "content": "Updated: JPA is the specification, Hibernate the implementation.",
+  "author": "Neha"
+}</code></pre></div>
+                <table class="issues">
+                  <thead><tr><th>Request</th><th>Expected</th></tr></thead>
+                  <tbody>
+                    <tr><td><code>PUT /api/posts/2</code> + body</td><td><code>200</code> + the updated post (still id 2)</td></tr>
+                    <tr><td><code>PUT /api/posts/999</code> + body</td><td><code>404</code> + "Post not found with id: 999"</td></tr>
+                    <tr><td><code>DELETE /api/posts/3</code></td><td><code>204 No Content</code>, empty body</td></tr>
+                    <tr><td><code>DELETE /api/posts/3</code> <em>again</em></td><td><code>404</code> — it's already gone</td></tr>
+                    <tr><td><code>GET /api/posts</code></td><td><code>200</code> + 2 posts remaining</td></tr>
+                  </tbody>
+                </table>
+                <label class="check"><input type="checkbox" class="labstep" />
+                  <span class="ctext"><code>PUT</code> and <code>DELETE</code> both work, with correct <code>404</code>s for missing ids.</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="testpart">
+              <div class="tp-head">🗄️ Part 6 · Browse the actual database</div>
+              <div class="tp-body">
+                <p>This is the moment JPA stops feeling abstract — you're going to look at the real table.</p>
+                <div class="dothis">
+                  <span class="lbl">Do this</span>
+                  <ol>
+                    <li>With the app running, open <code>http://localhost:8080/h2-console</code> in a browser.</li>
+                    <li>Set <strong>JDBC URL</strong> to exactly <code>jdbc:h2:mem:postsdb</code>
+                        <em>(the default shown is <code>jdbc:h2:~/test</code> — you must change it)</em>.</li>
+                    <li><strong>User Name:</strong> <code>sa</code> &nbsp;·&nbsp; <strong>Password:</strong> leave empty.</li>
+                    <li>Click <strong>Connect</strong>.</li>
+                    <li>Click <strong>POSTS</strong> in the left-hand tree, then click <strong>Run</strong>.</li>
+                  </ol>
+                </div>
+                <div class="expected">
+                  <span class="lbl">Expected — your rows, in a real SQL table</span>
+                  <div class="h2-mock">
+                    <div class="h2-top">SELECT * FROM POSTS;</div>
+                    <div class="h2-row">ID | TITLE | CONTENT | AUTHOR</div>
+                    <div class="h2-row">1 | Learning Spring Boot | Today I built my first REST API… | Amit</div>
+                    <div class="h2-row">2 | Understanding JPA and Hibernate | Updated: JPA is the specification… | Neha</div>
+                  </div>
+                  <label class="check"><input type="checkbox" class="labstep" />
+                    <span class="ctext">H2 console connected, and I can see my posts as rows in the <code>POSTS</code> table.</span>
+                  </label>
+                </div>
+                <div class="tryit">
+                  <span class="lbl">Try some SQL directly</span>
+                  <div class="codewrap"><pre><code>SELECT * FROM POSTS WHERE AUTHOR = 'Amit';
+SELECT COUNT(*) FROM POSTS;
+SELECT AUTHOR, COUNT(*) FROM POSTS GROUP BY AUTHOR;</code></pre></div>
+                  These are the same queries Spring Data generated from your method names. Seeing them side by side
+                  is the clearest possible demonstration of what ORM has been doing for you.
+                </div>
+                <div class="observe">
+                  <span class="lbl">If the console shows an empty table or an error</span>
+                  Almost always the <strong>JDBC URL</strong>. It must be <code>jdbc:h2:mem:postsdb</code> — matching
+                  <code>spring.datasource.url</code> exactly. A different URL connects you to a <em>different</em>
+                  (empty) database rather than failing outright, which is why the table looks empty.
+                </div>
+              </div>
+            </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== BONUS: SPRING SECURITY ===== -->
+
+      <!-- ===== BONUS: SECURITY ===== -->
+      <div class="section-band">If you finish early</div>
       <section class="section">
         <details class="exp bonus">
-          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Spring Security — observe only (no coding)</summary>
+          <summary><span class="lab-tag">BONUS 1</span><span class="chevron">▶</span> Spring Security — Observe "Secure by Default"</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              Adding Spring Security to the classpath locks down <strong>every</strong> endpoint with a default login
-              page and a generated password — before you write any security code. This is an <em>observe-only</em>
-              section: the trainer drives, you watch.
+              <span class="lbl">Concept — no configuration required to see the effect</span>
+              Right now anyone who can reach your API can delete every post. Add <strong>one dependency</strong> and
+              that changes instantly, with <strong>zero lines of configuration</strong>. This lab is about
+              <em>observing</em> that behaviour, not configuring it — proper Spring Security deserves its own session.
             </div>
-            <ol class="steps">
-              <li><strong>Add this dependency</strong> to <code>pom.xml</code>:</li>
-            </ol>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Add the dependency below <strong>inside</strong> the existing <code>&lt;dependencies&gt;</code>
+                    block in <code>pom.xml</code>.</li>
+                <li>Let Maven download it (IntelliJ: automatic, or click the reload icon. Eclipse: right-click →
+                    Maven → Update Project).</li>
+                <li>Restart the app and <strong>watch the console for a generated password</strong>.</li>
+                <li>Try your endpoints again and see what happens.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
             <div class="codewrap"><pre><code>&lt;dependency&gt;
     &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
     &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre></div>
-            <ol class="steps" start="2">
-              <li><strong>Restart the app.</strong></li>
-              <li><strong>Navigate</strong> to <code>http://localhost:8080/api/posts</code> in the browser — a <strong>login page appears automatically</strong>.</li>
-              <li><strong>Check the console</strong> for the generated password line:
-                <div class="codewrap"><pre><code>Using generated security password: 8f3c1d2e-....-a1b2c3d4e5f6</code></pre></div>
-              </li>
-              <li><strong>Log in</strong> with username <code>user</code> and that generated password.</li>
-              <li><strong>Override the defaults</strong> — add these two lines to <code>application.properties</code>:</li>
-            </ol>
-            <div class="codewrap"><pre><code>spring.security.user.name=admin
-spring.security.user.password=admin123</code></pre></div>
-            <ol class="steps" start="7">
-              <li><strong>Restart and log in</strong> with <code>admin</code> / <code>admin123</code> — endpoints are now accessible.</li>
-            </ol>
+
+            <div class="expected">
+              <span class="lbl">Expected — a password in the startup console</span>
+              <div class="logmock"><span class="dim">INFO</span> Using generated security password:
+                <span class="hit">8f2a1c4e-9b3d-4a7f-b2e1-6c8d9a0f3b5c</span><br>
+                <span class="dim">This generated password is for development use only.</span>
+              </div>
+              <strong>Copy that value</strong> — it's different on every restart.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I found the generated security password in the startup log.</span>
+              </label>
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — everything now requires authentication</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Request</th><th>Before security</th><th>After security</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET /api/posts</code> from Swagger UI</td><td><code>200</code> + data</td><td><code>401 Unauthorized</code></td></tr>
+                  <tr><td><code>/swagger-ui.html</code> itself</td><td>opens</td><td><strong>redirected to a login page</strong> — Swagger is an endpoint too!</td></tr>
+                  <tr><td><code>GET /api/posts</code> in a browser</td><td>JSON shown</td><td>redirected to a <strong>login form</strong></td></tr>
+                  <tr><td><code>POST /api/posts</code></td><td><code>201</code></td><td><code>401</code> — or <code>403</code>, thanks to CSRF protection</td></tr>
+                  <tr><td><code>/h2-console</code></td><td>opens</td><td>blocked</td></tr>
+                </tbody>
+              </table>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Everything is now locked — including Swagger UI — with no config written by me.</span>
+              </label>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Now log in</span>
+              <ol>
+                <li>Visit <code>http://localhost:8080/swagger-ui.html</code>. You're redirected to a
+                    <strong>login form</strong> that Spring Security generated.</li>
+                <li>Username <code>user</code>, password = <strong>the value from your console</strong>.</li>
+                <li>You land back on Swagger UI, and your endpoints work again — the browser now carries a session
+                    cookie, and Swagger UI sends it with every request.</li>
+              </ol>
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I logged in through the generated form and Swagger UI works again.</span>
+              </label>
+              <div class="observe" style="margin-top:12px;">
+                <span class="lbl">💡 Why logging in once fixes Swagger UI too</span>
+                Because Swagger UI runs <strong>in your browser</strong>, it inherits your browser's session cookie.
+                That's a genuine advantage over an external client, where you'd have to configure credentials
+                separately for every request.
+                <br><br>
+                ⚠️ You may still get <strong><code>403</code></strong> on <code>POST</code>, <code>PUT</code> and
+                <code>DELETE</code> even after logging in. That's <strong>CSRF protection</strong>, which Spring
+                Security enables by default and which Swagger UI doesn't send a token for. It's the correct default for
+                a browser-based app — and one more reason real projects configure security deliberately rather than
+                leaving it on defaults.
+              </div>
+            </div>
+
             <div class="observe">
-              <span class="lbl">Note</span>
-              This is <strong>form-based</strong> security — fine for a quick lockdown. Production APIs use
-              <strong>token-based</strong> security (JWT) with roles, which is a separate, dedicated session. Today's
-              point is just how little it takes to switch protection on.
+              <span class="lbl">What Spring Security switched on for free</span>
+              <ul style="margin:6px 0 0;">
+                <li><strong>Authentication required</strong> on every endpoint — the default is "deny unless
+                    authenticated", not "allow unless protected". That ordering is deliberate: forgetting to protect
+                    an endpoint can't accidentally expose it.</li>
+                <li><strong>A default user</strong> (<code>user</code>) with a fresh random password each run.</li>
+                <li><strong>CSRF protection</strong> on state-changing verbs — which is why POST may give
+                    <code>403</code> even when authenticated.</li>
+                <li><strong>Secure response headers</strong>, and session management.</li>
+              </ul>
             </div>
-            <div class="warnbox" style="border-left:4px solid var(--tl-yellow); background:rgba(254,188,46,0.1); padding:14px 18px; border-radius:0 8px 8px 0; margin:16px 0;">
-              <span style="font-weight:700; color:#b8860b; display:block; margin-bottom:6px; font-size:15px; text-transform:uppercase; letter-spacing:0.05em;">Tip — testing after this</span>
-              Once security is on, Postman requests need <strong>Basic Auth</strong> (username + password) in the
-              Authorization tab, or they'll get <strong>401 Unauthorized</strong>. If you want to keep testing freely,
-              remove the dependency again after the demo.
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Remove the dependency before continuing</span>
+              Security will interfere with the rest of today's testing and with Session 4's labs.
+              <strong>Delete the dependency from <code>pom.xml</code></strong>, refresh Maven, and restart. Your
+              endpoints go back to being open.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">I removed the security dependency and my endpoints work openly again.</span>
+              </label>
             </div>
-            <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">Bonus: saw the auto login page, logged in with the generated password, then with custom credentials.</span></label>
           </div>
         </details>
       </section>
 
-      <!-- ===== COMPLETE FILES REFERENCE ===== -->
-      <div class="section-band">Catch-up safety net</div>
+      <!-- ===== BONUS 2: PERSISTENCE ===== -->
+      <section class="section">
+        <details class="exp bonus">
+          <summary><span class="lab-tag">BONUS 2</span><span class="chevron">▶</span> Make the Data Actually Survive a Restart</summary>
+          <div class="exp-body">
+            <div class="concept">
+              <span class="lbl">Concept</span>
+              Our H2 database is <strong>in memory</strong>, so restarting still wipes everything. H2 can also store
+              to a <strong>file on disk</strong> — and switching over is a <em>one-line</em> change with
+              <strong>zero</strong> Java modifications. That's the real lesson: the storage engine is configuration,
+              not code.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this</span>
+              <ol>
+                <li>In <code>application.properties</code>, replace the <code>spring.datasource.url</code> line with
+                    the file-based version below.</li>
+                <li>Restart, create two posts with <code>POST</code>.</li>
+                <li><strong>Stop the app completely</strong>, then start it again.</li>
+                <li><code>GET /api/posts</code> — your posts are <strong>still there</strong>.</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">change this ONE line</span></div>
+            <div class="codewrap"><pre><code># Was:  spring.datasource.url=jdbc:h2:mem:postsdb
+# Now — stored in a file under ./data/ in your project folder:
+spring.datasource.url=jdbc:h2:file:./data/postsdb</code></pre></div>
+
+            <div class="expected">
+              <span class="lbl">Expected result</span>
+              A new <code>data/</code> folder appears in your project containing <code>postsdb.mv.db</code>. Your posts
+              now survive restarts, because they're on disk rather than in RAM.
+              <br><br>To connect the H2 console now, use JDBC URL <code>jdbc:h2:file:./data/postsdb</code>.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">My data survived a full stop-and-restart of the application.</span>
+              </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">The bigger point — this is how you'd move to MySQL</span>
+              You just changed where data lives without touching a single Java file. Going to MySQL in production is
+              the same kind of change: swap the H2 dependency for the MySQL driver and edit four properties.
+              <div class="codewrap"><pre><code>spring.datasource.url=jdbc:mysql://localhost:3306/postsdb
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.database-platform=org.hibernate.dialect.MySQLDialect
+spring.jpa.hibernate.ddl-auto=validate      # NEVER create/update in production</code></pre></div>
+              Your entity, repository, service and controller stay <strong>exactly</strong> as they are. That
+              portability is what JPA bought you.
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== COMPLETE REFERENCE ===== -->
+      <div class="section-band">Reference</div>
       <section class="section">
         <details class="ref-block">
-          <summary><span class="chevron">▶</span> ✅ Complete Files Reference (all five Java files)</summary>
+          <summary><span class="chevron">▶</span> ✅ Complete Files Reference — all seven Java files + properties</summary>
           <div class="exp-body">
-            <p>Every file as it looks at the end of the lab, in build order. If you fell behind, paste these, run, and
-            you're caught up with the group.</p>
+            <p>Every file exactly as it should look at the end of the session. Paste each one over yours in full if
+            you need to catch up.</p>
 
-            <h3>1 · Post.java</h3>
-            <div class="codewrap"><pre><code>package com.tcs.training.entity;
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">src/main/resources/application.properties</span><span class="fb-tag">complete</span></div>
+            <div class="codewrap"><pre><code>spring.datasource.url=jdbc:h2:mem:postsdb
+spring.datasource.driver-class-name=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=
 
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+spring.application.name=posts</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">entity/Post.java</span><span class="fb-tag">file 1 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.entity;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -1363,161 +2145,346 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 200)
     private String title;
-    private String description;
+
+    @Column(nullable = false, length = 2000)
     private String content;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @Column(nullable = false, length = 100)
+    private String author;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public Post() {
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public Post(String title, String content, String author) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 }</code></pre></div>
 
-            <h3>2 · PostDTO.java</h3>
-            <div class="codewrap"><pre><code>package com.tcs.training.dto;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">repository/PostRepository.java</span><span class="fb-tag">file 2 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.repository;
+
+import com.tcs.training.posts.entity.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface PostRepository extends JpaRepository&lt;Post, Long&gt; {
+
+    List&lt;Post&gt; findByAuthor(String author);
+
+    List&lt;Post&gt; findByTitleContainingIgnoreCase(String keyword);
+
+    long countByAuthor(String author);
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">dto/PostDTO.java</span><span class="fb-tag">file 3 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public class PostDTO {
 
     private Long id;
+
+    @NotBlank(message = "Title is required")
+    @Size(min = 3, max = 200, message = "Title must be between 3 and 200 characters")
     private String title;
-    private String description;
+
+    @NotBlank(message = "Content is required")
+    @Size(max = 2000, message = "Content cannot exceed 2000 characters")
     private String content;
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    @NotBlank(message = "Author is required")
+    private String author;
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public PostDTO() {
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public PostDTO(Long id, String title, String content, String author) {
+        this.id = id;
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
-}</code></pre></div>
+    public Long getId() {
+        return id;
+    }
 
-            <h3>3 · ResourceNotFoundException.java</h3>
-            <div class="codewrap"><pre><code>package com.tcs.training.exception;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+    public String getTitle() {
+        return title;
+    }
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class ResourceNotFoundException extends RuntimeException {
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public ResourceNotFoundException(String message) {
-        super(message);
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }</code></pre></div>
 
-            <h3>4 · PostServiceImpl.java <span class="muted" style="font-size:14px;">(with PostService interface above it)</span></h3>
-            <div class="codewrap"><pre><code>package com.tcs.training.service;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">exception/PostNotFoundException.java</span><span class="fb-tag">file 4 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.exception;
 
-import com.tcs.training.dto.PostDTO;
+public class PostNotFoundException extends RuntimeException {
+
+    public PostNotFoundException(Long id) {
+        super("Post not found with id: " + id);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">exception/GlobalExceptionHandler.java</span><span class="fb-tag">file 5 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handlePostNotFound(
+            PostNotFoundException ex) {
+
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 404);
+        body.put("error", "Not Found");
+        body.put("message", ex.getMessage());
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationErrors(
+            MethodArgumentNotValidException ex) {
+
+        Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();
+        ex.getBindingResult().getFieldErrors().forEach(error -&gt;
+                fieldErrors.put(error.getField(), error.getDefaultMessage()));
+
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 400);
+        body.put("error", "Validation Failed");
+        body.put("fieldErrors", fieldErrors);
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleEverythingElse(Exception ex) {
+
+        ex.printStackTrace();
+
+        Map&lt;String, Object&gt; body = new LinkedHashMap&lt;&gt;();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 500);
+        body.put("error", "Internal Server Error");
+        body.put("message", "An unexpected error occurred");
+
+        return new ResponseEntity&lt;&gt;(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">service/PostService.java</span><span class="fb-tag">file 6a of 7 — interface</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.service;
+
+import com.tcs.training.posts.dto.PostDTO;
+
 import java.util.List;
 
 public interface PostService {
-    PostDTO createPost(PostDTO postDTO);
+
     List&lt;PostDTO&gt; getAllPosts();
+
     PostDTO getPostById(Long id);
+
+    PostDTO createPost(PostDTO postDTO);
+
     PostDTO updatePost(Long id, PostDTO postDTO);
+
     void deletePost(Long id);
+
+    List&lt;PostDTO&gt; getPostsByAuthor(String author);
 }</code></pre></div>
-            <div class="codewrap"><pre><code>package com.tcs.training.service;
 
-import com.tcs.training.dto.PostDTO;
-import com.tcs.training.entity.Post;
-import com.tcs.training.exception.ResourceNotFoundException;
-import com.tcs.training.repository.PostRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">service/PostServiceImpl.java</span><span class="fb-tag">file 6b of 7 — implementation</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.service;
+
+import com.tcs.training.posts.dto.PostDTO;
+import com.tcs.training.posts.entity.Post;
+import com.tcs.training.posts.exception.PostNotFoundException;
+import com.tcs.training.posts.repository.PostRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class PostServiceImpl implements PostService {
 
-    @Autowired
-    private PostRepository postRepository;
+    private final PostRepository postRepository;
 
-    private PostDTO mapToDTO(Post post) {
+    public PostServiceImpl(PostRepository postRepository) {
+        this.postRepository = postRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;PostDTO&gt; getAllPosts() {
+        List&lt;PostDTO&gt; result = new ArrayList&lt;&gt;();
+        for (Post post : postRepository.findAll()) {
+            result.add(toDTO(post));
+        }
+        return result;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PostDTO getPostById(Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -&gt; new PostNotFoundException(id));
+        return toDTO(post);
+    }
+
+    @Override
+    @Transactional
+    public PostDTO createPost(PostDTO postDTO) {
+        Post saved = postRepository.save(toEntity(postDTO));
+        return toDTO(saved);
+    }
+
+    @Override
+    @Transactional
+    public PostDTO updatePost(Long id, PostDTO postDTO) {
+        Post existing = postRepository.findById(id)
+                .orElseThrow(() -&gt; new PostNotFoundException(id));
+
+        existing.setTitle(postDTO.getTitle());
+        existing.setContent(postDTO.getContent());
+        existing.setAuthor(postDTO.getAuthor());
+
+        return toDTO(postRepository.save(existing));
+    }
+
+    @Override
+    @Transactional
+    public void deletePost(Long id) {
+        if (!postRepository.existsById(id)) {
+            throw new PostNotFoundException(id);
+        }
+        postRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List&lt;PostDTO&gt; getPostsByAuthor(String author) {
+        List&lt;PostDTO&gt; result = new ArrayList&lt;&gt;();
+        for (Post post : postRepository.findByAuthor(author)) {
+            result.add(toDTO(post));
+        }
+        return result;
+    }
+
+    private PostDTO toDTO(Post post) {
         PostDTO dto = new PostDTO();
         dto.setId(post.getId());
         dto.setTitle(post.getTitle());
-        dto.setDescription(post.getDescription());
         dto.setContent(post.getContent());
+        dto.setAuthor(post.getAuthor());
         return dto;
     }
 
-    private Post mapToEntity(PostDTO dto) {
+    private Post toEntity(PostDTO dto) {
         Post post = new Post();
         post.setTitle(dto.getTitle());
-        post.setDescription(dto.getDescription());
         post.setContent(dto.getContent());
+        post.setAuthor(dto.getAuthor());
         return post;
-    }
-
-    @Override
-    public PostDTO createPost(PostDTO postDTO) {
-        Post post = mapToEntity(postDTO);
-        Post saved = postRepository.save(post);
-        return mapToDTO(saved);
-    }
-
-    @Override
-    public List&lt;PostDTO&gt; getAllPosts() {
-        return postRepository.findAll()
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public PostDTO getPostById(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        return mapToDTO(post);
-    }
-
-    @Override
-    public PostDTO updatePost(Long id, PostDTO postDTO) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        post.setTitle(postDTO.getTitle());
-        post.setDescription(postDTO.getDescription());
-        post.setContent(postDTO.getContent());
-        Post updated = postRepository.save(post);
-        return mapToDTO(updated);
-    }
-
-    @Override
-    public void deletePost(Long id) {
-        Post post = postRepository.findById(id)
-                .orElseThrow(() -&gt; new ResourceNotFoundException(
-                        "Post not found with id = " + id));
-        postRepository.delete(post);
     }
 }</code></pre></div>
 
-            <h3>5 · PostController.java</h3>
-            <div class="codewrap"><pre><code>package com.tcs.training.controller;
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">controller/PostController.java</span><span class="fb-tag">file 7 of 7</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.posts.controller;
 
-import com.tcs.training.dto.PostDTO;
-import com.tcs.training.service.PostService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tcs.training.posts.dto.PostDTO;
+import com.tcs.training.posts.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -1525,18 +2492,20 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostController {
 
-    @Autowired
-    private PostService postService;
+    private final PostService postService;
 
-    @PostMapping
-    public ResponseEntity&lt;PostDTO&gt; createPost(@RequestBody PostDTO postDTO) {
-        PostDTO created = postService.createPost(postDTO);
-        return new ResponseEntity&lt;&gt;(created, HttpStatus.CREATED);
+    public PostController(PostService postService) {
+        this.postService = postService;
     }
 
     @GetMapping
-    public List&lt;PostDTO&gt; getAllPosts() {
-        return postService.getAllPosts();
+    public ResponseEntity&lt;List&lt;PostDTO&gt;&gt; getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity&lt;List&lt;PostDTO&gt;&gt; getByAuthor(@RequestParam String author) {
+        return ResponseEntity.ok(postService.getPostsByAuthor(author));
     }
 
     @GetMapping("/{id}")
@@ -1544,43 +2513,211 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    @PostMapping
+    public ResponseEntity&lt;PostDTO&gt; createPost(@Valid @RequestBody PostDTO postDTO) {
+        PostDTO created = postService.createPost(postDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity&lt;PostDTO&gt; updatePost(@PathVariable Long id,
-                                              @RequestBody PostDTO postDTO) {
+                                              @Valid @RequestBody PostDTO postDTO) {
         return ResponseEntity.ok(postService.updatePost(id, postDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity&lt;String&gt; deletePost(@PathVariable Long id) {
+    public ResponseEntity&lt;Void&gt; deletePost(@PathVariable Long id) {
         postService.deletePost(id);
-        return ResponseEntity.ok("Post deleted successfully with id = " + id);
+        return ResponseEntity.noContent().build();
     }
 }</code></pre></div>
-            <div class="observe">
-              <span class="lbl">Final package layout</span>
-              <code>entity/Post.java</code> · <code>repository/PostRepository.java</code> ·
-              <code>dto/PostDTO.java</code> · <code>exception/ResourceNotFoundException.java</code> ·
-              <code>service/PostService.java</code> + <code>service/PostServiceImpl.java</code> ·
-              <code>controller/PostController.java</code> — one package per layer.
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== TROUBLESHOOTING ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> 🔧 Troubleshooting Guide</summary>
+          <div class="exp-body">
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><code>package javax.persistence does not exist</code></td>
+                  <td>Copied an import from a Spring Boot 2.x tutorial.</td>
+                  <td>Use <code>jakarta.persistence.*</code>. Same for validation: <code>jakarta.validation.*</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>Not a managed type: class Post</code></td>
+                  <td>Missing <code>@Entity</code>, or the entity is outside the base package.</td>
+                  <td>Add <code>@Entity</code>. Check the file starts <code>package com.tcs.training.posts.entity;</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>No identifier specified for entity</code></td>
+                  <td>No <code>@Id</code> field.</td>
+                  <td>Add <code>@Id</code> plus <code>@GeneratedValue</code> to the <code>id</code> field.</td>
+                </tr>
+                <tr>
+                  <td><code>No property 'xyz' found for type 'Post'</code> at startup</td>
+                  <td>A derived query method names a field the entity doesn't have.</td>
+                  <td>Match the entity field names exactly — <code>findByAuthor</code>, not <code>findByWriter</code>.</td>
+                </tr>
+                <tr>
+                  <td><code>required a bean of type 'PostService'</code></td>
+                  <td><code>@Service</code> missing from <code>PostServiceImpl</code>, or it's outside the base package.</td>
+                  <td>Put <code>@Service</code> on the <strong>Impl</strong> class (not the interface) and check its package.</td>
+                </tr>
+                <tr>
+                  <td>H2 console shows an <strong>empty</strong> table</td>
+                  <td>Wrong JDBC URL — you connected to a different, empty in-memory database.</td>
+                  <td>Use exactly <code>jdbc:h2:mem:postsdb</code>, matching <code>spring.datasource.url</code>.</td>
+                </tr>
+                <tr>
+                  <td>H2 console won't load at all</td>
+                  <td><code>spring.h2.console.enabled</code> is missing, or Spring Security is still installed.</td>
+                  <td>Add the property; remove the security dependency if you added it in the bonus lab.</td>
+                </tr>
+                <tr>
+                  <td><strong>500</strong> instead of a clean <strong>404</strong></td>
+                  <td><code>@RestControllerAdvice</code> missing, or the handler class is outside the base package.</td>
+                  <td>Check the annotation and that the file is in <code>com.tcs.training.posts.exception</code>.</td>
+                </tr>
+                <tr>
+                  <td>Validation never fires — bad data is accepted</td>
+                  <td><code>@Valid</code> missing from the controller parameter, or no validation dependency.</td>
+                  <td>Add <code>@Valid</code> before <code>@RequestBody</code>, and confirm <code>spring-boot-starter-validation</code> is in <code>pom.xml</code>.</td>
+                </tr>
+                <tr>
+                  <td>All fields <code>null</code> after a POST</td>
+                  <td>The DTO has no setters or no no-arg constructor.</td>
+                  <td>Add both — Jackson needs them to populate the object.</td>
+                </tr>
+                <tr>
+                  <td><code>could not execute statement; NULL not allowed</code></td>
+                  <td>A <code>@Column(nullable = false)</code> field arrived empty.</td>
+                  <td>That's the database defending itself. Add validation so it's caught as a <code>400</code> first.</td>
+                </tr>
+                <tr>
+                  <td>No SQL appears in the console</td>
+                  <td><code>spring.jpa.show-sql</code> is not set.</td>
+                  <td>Add <code>spring.jpa.show-sql=true</code>.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="golden">
+              <span class="lbl">⚠️ The Session 3 debugging order</span>
+              <div class="rule">
+                1 · Does the app <strong>start</strong>? (startup failures are usually annotations or packages) &nbsp;→&nbsp;
+                2 · Is every file's <code>package</code> line under <code>com.tcs.training.posts</code>? &nbsp;→&nbsp;
+                3 · Are the imports <code>jakarta</code>, not <code>javax</code>? &nbsp;→&nbsp;
+                4 · What does the <strong>SQL in the console</strong> say actually happened?
+              </div>
             </div>
           </div>
         </details>
       </section>
 
-      <!-- ===== QUICK REFERENCE CARD ===== -->
+      <!-- ===== SELF CHECK ===== -->
+      <section class="section">
+        <details class="exp">
+          <summary><span class="chevron">▶</span> ✅ Self-Check — can you answer these?</summary>
+          <div class="exp-body">
+            <ol class="steps">
+              <li>What are JPA, Hibernate and Spring Data JPA, and how do they relate?</li>
+              <li>You wrote <code>PostRepository</code> as an empty interface. Where does the implementation come from?</li>
+              <li>Why does <code>@Column(nullable = false, length = 200)</code> change the generated <code>CREATE TABLE</code>?</li>
+              <li>Why not return the <code>Post</code> entity straight from the controller?</li>
+              <li>What does <code>.orElseThrow(...)</code> replace from Session 2's controller?</li>
+              <li>Which class turns <code>PostNotFoundException</code> into a <code>404</code>, and how does it see exceptions from every controller?</li>
+              <li>Why is <code>@Service</code> on <code>PostServiceImpl</code> and not on <code>PostService</code>?</li>
+              <li>Why does <code>toEntity()</code> deliberately not copy the id?</li>
+              <li>What would <code>ddl-auto=create</code> do to a production database?</li>
+              <li>Which layers would change if you moved from H2 to MySQL?</li>
+              <li>What does <code>@Valid</code> do, and what happens to the service method when validation fails?</li>
+              <li>Why can today's app be scaled horizontally when Session 2's could not?</li>
+            </ol>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext">I can confidently answer all twelve self-check questions.</span>
+            </label>
+          </div>
+        </details>
+      </section>
+
+      <!-- ===== QUICK REFERENCE ===== -->
       <section class="section">
         <div class="qref">
-          <h2>Quick reference card</h2>
+          <h2>Quick Reference Card — Session 3</h2>
+          <div class="grid" style="margin-top:14px;">
+            <div>
+              <h3>JPA annotations</h3>
+              <table>
+                <thead><tr><th>Annotation</th><th>Purpose</th></tr></thead>
+                <tbody>
+                  <tr><td><code>@Entity</code></td><td>Class maps to a table</td></tr>
+                  <tr><td><code>@Table(name=)</code></td><td>Table name</td></tr>
+                  <tr><td><code>@Id</code></td><td>Primary key</td></tr>
+                  <tr><td><code>@GeneratedValue</code></td><td>DB assigns the id</td></tr>
+                  <tr><td><code>@Column</code></td><td>Column constraints</td></tr>
+                  <tr><td><code>@Transient</code></td><td>Don't persist this field</td></tr>
+                  <tr><td><code>@Transactional</code></td><td>All-or-nothing</td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Free repository methods</h3>
+              <table>
+                <tbody>
+                  <tr><td><code>save(e)</code></td><td>insert or update</td></tr>
+                  <tr><td><code>findAll()</code></td><td>every row</td></tr>
+                  <tr><td><code>findById(id)</code></td><td><code>Optional&lt;T&gt;</code></td></tr>
+                  <tr><td><code>deleteById(id)</code></td><td>delete</td></tr>
+                  <tr><td><code>existsById(id)</code></td><td>boolean</td></tr>
+                  <tr><td><code>count()</code></td><td>row count</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div>
+              <h3>Your project</h3>
+              <table>
+                <tbody>
+                  <tr><td>Group</td><td><code>com.tcs.training</code></td></tr>
+                  <tr><td>Artifact</td><td><code>posts</code></td></tr>
+                  <tr><td><strong>Base package</strong></td><td><code>com.tcs.training.posts</code></td></tr>
+                  <tr><td>Main class</td><td><code>PostsApplication</code></td></tr>
+                  <tr><td>Packages</td><td><code>entity · repository · dto · service · controller · exception</code></td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">Your API</h3>
+              <table>
+                <thead><tr><th>Endpoint</th><th>Success</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET /api/posts</code></td><td><code>200</code> + array</td></tr>
+                  <tr><td><code>GET /api/posts/{id}</code></td><td><code>200</code> / <code>404</code></td></tr>
+                  <tr><td><code>GET /api/posts/search?author=</code></td><td><code>200</code> + array</td></tr>
+                  <tr><td><code>POST /api/posts</code></td><td><code>201</code> / <code>400</code></td></tr>
+                  <tr><td><code>PUT /api/posts/{id}</code></td><td><code>200</code> / <code>404</code></td></tr>
+                  <tr><td><code>DELETE /api/posts/{id}</code></td><td><code>204</code> / <code>404</code></td></tr>
+                </tbody>
+              </table>
+              <h3 style="margin-top:16px;">H2 console login</h3>
+              <table>
+                <tbody>
+                  <tr><td>URL</td><td><code>/h2-console</code></td></tr>
+                  <tr><td>JDBC URL</td><td><code>jdbc:h2:mem:postsdb</code></td></tr>
+                  <tr><td>User</td><td><code>sa</code></td></tr>
+                  <tr><td>Password</td><td><em>(empty)</em></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <h3 style="margin-top:18px;">Derived query keywords</h3>
           <table>
-            <thead><tr><th>Item</th><th>What it is</th><th>Key point</th></tr></thead>
+            <thead><tr><th>Method name</th><th>Generated SQL</th></tr></thead>
             <tbody>
-              <tr><td><code>DTO</code></td><td>Plain Java class for data transfer</td><td>No JPA annotations; shapes the API response</td></tr>
-              <tr><td>Getters/setters</td><td>Field accessor methods</td><td>Required by Jackson (JSON) and JPA; generate them in your IDE</td></tr>
-              <tr><td><code>@ResponseStatus</code></td><td>Method/Class annotation</td><td>Sets the HTTP status code on the response</td></tr>
-              <tr><td><code>orElseThrow()</code></td><td>Optional method</td><td>Throws an exception if the value is absent</td></tr>
-              <tr><td><code>ResourceNotFoundException</code></td><td>Custom RuntimeException</td><td>Returns 404 with a custom message</td></tr>
-              <tr><td><code>@Service</code></td><td>Stereotype annotation</td><td>Marks the business-logic layer; managed by Spring</td></tr>
-              <tr><td><code>ResponseEntity</code></td><td>Return-type wrapper</td><td>Full control over status code + body + headers</td></tr>
+              <tr><td><code>findByAuthor(String)</code></td><td><code>WHERE author = ?</code></td></tr>
+              <tr><td><code>findByTitleContainingIgnoreCase(String)</code></td><td><code>WHERE lower(title) LIKE %?%</code></td></tr>
+              <tr><td><code>findByAuthorOrderByTitleAsc(String)</code></td><td><code>WHERE author = ? ORDER BY title ASC</code></td></tr>
+              <tr><td><code>countByAuthor(String)</code></td><td><code>SELECT COUNT(*) WHERE author = ?</code></td></tr>
+              <tr><td><code>findByTitleAndAuthor(String, String)</code></td><td><code>WHERE title = ? AND author = ?</code></td></tr>
             </tbody>
           </table>
         </div>
@@ -1589,11 +2726,13 @@ public class PostController {
       <!-- ===== WHAT'S NEXT ===== -->
       <section class="section">
         <div class="concept" style="margin-top:18px;">
-          <span class="lbl">Coming up next</span>
-          You've now built a clean, layered service with a DTO and proper exception handling — the fundamental unit of
-          a real system. Next we go deeper on <strong>Spring Security</strong> (JWT tokens, role-based access) and into
-          <strong>Spring Cloud</strong> — <code>Eureka</code> for service discovery and an <strong>API Gateway</strong>
-          as the front door — turning today's single service into one piece of a microservices architecture.
+          <span class="lbl">Coming up in Session 4</span>
+          You can now build <em>one</em> well-structured service. Session 4 asks what happens when you have
+          <strong>several</strong>, and they need to find and talk to each other: a <strong>Eureka</strong> service
+          registry so nobody hardcodes addresses, an <strong>API Gateway</strong> as the single front door, and
+          <strong>live load balancing</strong> across three copies of the same service. Heads-up on the format —
+          you'll run <strong>four Spring Boot applications simultaneously</strong> (six once we scale one), so make
+          sure you have a few gigabytes of RAM free. Each of those apps is a small version of what you built today.
         </div>
         <p style="text-align:center; color:var(--mac-text-muted); margin-top:20px; font-size:14px;">
           Spring Boot — Session 3 Hands-on Lab &nbsp;·&nbsp; Presenter: <strong>Purvam Prajapati</strong>, Faculty — AHD
@@ -1619,7 +2758,7 @@ public class PostController {
     }
 
     /* ============================================================
-       Progress tracker + readiness.
+       Progress tracker + prerequisite readiness badge.
        ============================================================ */
     var allChecks, prereqChecks, progressBar, progressText, progressCount, readyBadge;
 
@@ -1638,7 +2777,7 @@ public class PostController {
     }
 
     /* ============================================================
-       Copy buttons.
+       Copy buttons on every code block.
        ============================================================ */
     function flash(btn, cls, label) {
       var original = btn.getAttribute('data-label') || 'Copy';
