@@ -738,7 +738,7 @@
             <li><span class="num">5</span> HTTP verbs → CRUD, and choosing the right status code</li>
             <li><span class="num">6</span> Designing URLs other developers will thank you for</li>
             <li><span class="num">7</span> The annotations: <code>@RequestBody</code>, <code>ResponseEntity</code> &amp; friends</li>
-            <li><span class="num">8</span> Testing properly with Postman and Swagger UI</li>
+            <li><span class="num">8</span> Testing properly with Swagger UI</li>
             <li><span class="num">9</span> Calling <em>other</em> APIs, then the hands-on lab</li>
           </ul>
           <div class="note">
@@ -1121,7 +1121,7 @@ Content-Type: application/json
               <tr><td class="bad"><code>404</code></td><td>Not Found</td><td>No resource at that path — wrong URL, or that id doesn't exist.</td></tr>
               <tr><td class="bad"><code>405</code></td><td>Method Not Allowed</td><td>The path exists but not for that verb — e.g. POST to a <code>@GetMapping</code>.</td></tr>
               <tr><td class="bad"><code>409</code></td><td>Conflict</td><td>It clashes with existing state — a duplicate email, for instance.</td></tr>
-              <tr><td class="bad"><code>415</code></td><td>Unsupported Media Type</td><td><strong>You forgot the <code>Content-Type: application/json</code> header.</strong> Extremely common in Postman.</td></tr>
+              <tr><td class="bad"><code>415</code></td><td>Unsupported Media Type</td><td><strong>The <code>Content-Type: application/json</code> header is missing.</strong> Swagger UI sets it for you.</td></tr>
               <tr><td><code>500</code></td><td>Internal Server Error</td><td>An unhandled exception escaped your code. Always a bug worth fixing.</td></tr>
             </tbody>
           </table>
@@ -1303,7 +1303,7 @@ student.getId()     <span class="code-comment">→ null (not sent)</span></code>
           </div>
           <div class="warnbox">
             <span class="lbl">Two failure modes you will definitely hit in the lab</span>
-            <strong>415 Unsupported Media Type</strong> → you didn't send the <code>Content-Type: application/json</code> header. In Postman, choose Body → raw → JSON and it's set for you. <strong>400 Bad Request</strong> → your JSON is malformed (a trailing comma, single quotes, a missing brace). Both are <em>client</em> errors, which is why they're 4xx.
+            <strong>415 Unsupported Media Type</strong> → the <code>Content-Type: application/json</code> header is missing. Swagger UI sets it automatically, so you'll only meet this with other tools. <strong>400 Bad Request</strong> → your JSON is malformed (a trailing comma, single quotes, a missing brace). Both are <em>client</em> errors, which is why they're 4xx.
           </div>
         </section>
 
@@ -1445,29 +1445,26 @@ public class StudentService {
           </div>
         </section>
 
-        <!-- 26. POSTMAN -->
+        <!-- 26. WHY YOU NEED A CLIENT -->
         <section class="slide">
           <p class="eyebrow">Testing · 1 of 2</p>
-          <h2>Postman — because a browser can't do this</h2>
-          <p class="deep">Here's a problem: typing a URL into a browser <strong>can only ever send a <code>GET</code></strong>. There's no way to send a <code>POST</code> with a JSON body, or a <code>DELETE</code>. So from today you need a proper API client, and the standard one is <strong>Postman</strong>.</p>
-          <p class="deep">Sending a <code>POST</code> in Postman, step by step:</p>
-          <div class="steps4">
-            <div class="step-chip"><div class="stepnum">1</div><h3>Pick the verb</h3><p>Choose <code>POST</code> from the dropdown to the left of the URL bar.</p></div>
-            <div class="step-chip"><div class="stepnum">2</div><h3>Enter the URL</h3><p><code>http://localhost:8080/api/students</code></p></div>
-            <div class="step-chip"><div class="stepnum">3</div><h3>Set the body</h3><p>Body tab → <strong>raw</strong> → choose <strong>JSON</strong> from the dropdown. Paste your JSON.</p></div>
-            <div class="step-chip"><div class="stepnum">4</div><h3>Send &amp; read</h3><p>Click Send. Check the <strong>status code</strong> at the top right, then the body.</p></div>
-          </div>
-          <div class="warnbox">
-            <span class="lbl">Step 3 is where everyone gets 415</span>
-            Selecting <strong>raw → JSON</strong> is what makes Postman send the <code>Content-Type: application/json</code> header. Choose "Text" by mistake and your perfectly valid JSON is rejected with <strong>415 Unsupported Media Type</strong>. If you see 415, this is almost always why.
-          </div>
+          <h2>Why a browser isn't enough any more</h2>
+          <p class="deep">Here's a problem: typing a URL into a browser <strong>can only ever send a <code>GET</code></strong>. There's no way to choose a verb or attach a body, so you cannot test <code>POST</code>, <code>PUT</code> or <code>DELETE</code> from the address bar. From today you need a proper <span class="term">API client</span>.</p>
+          <p class="deep">There are two common choices, and we use the second:</p>
+          <table class="cmp">
+            <thead><tr><th></th><th>Postman</th><th>Swagger UI &nbsp;<span class="muted">(our choice)</span></th></tr></thead>
+            <tbody>
+              <tr><td><strong>What it is</strong></td><td>A separate desktop application</td><td class="good">A page <em>your own app</em> generates and serves</td></tr>
+              <tr><td><strong>Install</strong></td><td>Download and set up</td><td class="good">One dependency in <code>pom.xml</code> — nothing to install</td></tr>
+              <tr><td><strong>Knows your endpoints?</strong></td><td class="bad">No — you type every URL by hand</td><td class="good">Yes — it reads your controllers automatically</td></tr>
+              <tr><td><strong>Request body</strong></td><td class="bad">You write the JSON yourself</td><td class="good">Pre-filled from your Java class</td></tr>
+              <tr><td><strong>Content-Type header</strong></td><td class="bad">You must set it (Body → raw → JSON)</td><td class="good">Set for you</td></tr>
+              <tr><td><strong>Doubles as documentation</strong></td><td class="bad">No</td><td class="good">Yes — that's its main job</td></tr>
+            </tbody>
+          </table>
           <div class="keybox">
-            <span class="lbl">Alternatives, if you prefer the terminal</span>
-            <code>curl</code> works everywhere and needs no install:
-            <pre style="margin-top:8px;"><code>curl -X POST http://localhost:8080/api/students \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Amit Shah","email":"amit@tcs.com","grade":"A"}'</code></pre>
-            Note the <code>-H</code> flag — that's the same Content-Type header, set by hand.
+            <span class="lbl">Why this matters beyond convenience</span>
+            Because Swagger UI is <strong>generated from your code</strong>, it can't drift out of date and it can't disagree with what your app actually does. If an endpoint isn't on the page, Spring never registered it — which makes it a <strong>diagnostic tool as well as a test client</strong>.
           </div>
         </section>
 
@@ -1479,7 +1476,7 @@ public class StudentService {
           <pre><code>&lt;dependency&gt;
     &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
     &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
-    &lt;version&gt;2.6.0&lt;/version&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
 &lt;/dependency&gt;</code></pre>
           <p class="deep">Restart, then open <span class="pill">http://localhost:8080/swagger-ui.html</span>:</p>
           <div class="swagger-mock">
@@ -1490,7 +1487,7 @@ public class StudentService {
             <div class="sm-row"><span class="verb put">PUT</span><span class="path">/api/students/{id}</span><span class="muted" style="margin-left:auto;">Update a student</span></div>
             <div class="sm-row"><span class="verb del">DELETE</span><span class="path">/api/students/{id}</span><span class="muted" style="margin-left:auto;">Delete a student</span></div>
           </div>
-          <p class="deep" style="margin-top:16px;">Click any row → <strong>"Try it out"</strong> → fill the fields → <strong>Execute</strong>. It sends the real request to your running app and shows you the real response — no Postman needed.</p>
+          <p class="deep" style="margin-top:16px;">Click any row → <strong>"Try it out"</strong> → fill the fields → <strong>Execute</strong>. It sends the real request to your running app and shows you the real response, including the status code, the response headers and an equivalent <code>curl</code> command.</p>
           <div class="keybox">
             <span class="lbl">Why teams love this</span>
             The docs are <strong>generated from the code</strong>, so they can't drift out of date. A front-end developer can explore your entire API and try every endpoint without asking you a single question. The underlying standard is called <span class="term">OpenAPI</span>; Swagger UI is the page that renders it.
@@ -1538,7 +1535,7 @@ public class ExchangeRateService {
           <table class="cmp">
             <thead><tr><th>Mistake</th><th>Symptom</th><th>Fix</th></tr></thead>
             <tbody>
-              <tr><td>Forgot <code>Content-Type: application/json</code></td><td class="bad"><strong>415</strong> Unsupported Media Type</td><td class="good">Postman: Body → raw → <strong>JSON</strong>. curl: add <code>-H "Content-Type: application/json"</code>.</td></tr>
+              <tr><td>Missing <code>Content-Type: application/json</code></td><td class="bad"><strong>415</strong> Unsupported Media Type</td><td class="good">Swagger UI sets it for you. With curl: add <code>-H "Content-Type: application/json"</code>.</td></tr>
               <tr><td>Malformed JSON — trailing comma, single quotes</td><td class="bad"><strong>400</strong> Bad Request</td><td class="good">Double quotes on keys and strings; no comma after the last pair.</td></tr>
               <tr><td>Sending POST to a <code>@GetMapping</code></td><td class="bad"><strong>405</strong> Method Not Allowed</td><td class="good">Match the annotation to the verb.</td></tr>
               <tr><td>Class prefix repeated in the method path</td><td class="bad"><strong>404</strong> on a URL that looks right</td><td class="good">The real path is class + method. Use <code>@GetMapping("/{id}")</code>, not the full path again.</td></tr>
@@ -1570,8 +1567,8 @@ public class ExchangeRateService {
             </tbody>
           </table>
           <div class="keybox">
-            <span class="lbl">Before you start: install Postman</span>
-            From Lab 6 onwards a browser is no longer enough — you'll be sending POST, PUT and DELETE. Get Postman ready now (or use <code>curl</code>, or the Swagger UI from the bonus lab).
+            <span class="lbl">Nothing to install before you start</span>
+            The lab sets up <strong>Swagger UI</strong> in the very first step — one dependency in <code>pom.xml</code>, and your app serves its own test page at <code>/swagger-ui.html</code>. From Lab 6 onwards a browser address bar is no longer enough (you'll be sending POST, PUT and DELETE), and Swagger UI is what you'll use instead.
           </div>
         </section>
 
@@ -1598,7 +1595,7 @@ public class ExchangeRateService {
             </div>
             <div class="flash">
               <div class="q">Q · You send valid JSON and get 415. What did you forget? <span class="tap">tap to reveal ▾</span></div>
-              <div class="a">The <code>Content-Type: application/json</code> header. In Postman that means choosing <strong>Body → raw → JSON</strong> rather than Text.</div>
+              <div class="a">The <code>Content-Type: application/json</code> header. Swagger UI sets it for you automatically — so if you hit 415, you're using a tool that doesn't, and you must add the header yourself.</div>
             </div>
             <div class="flash">
               <div class="q">Q · What must a class have for Jackson to convert it both ways? <span class="tap">tap to reveal ▾</span></div>
@@ -1661,7 +1658,7 @@ public class ExchangeRateService {
           <div class="cover">
             <span class="badge">End of Session 2 — Theory</span>
             <h1>Let's build it.</h1>
-            <div class="sub">Open the lab sheet, start Postman, and let's make a real API.</div>
+            <div class="sub">Open the lab sheet and let's make a real API — tested entirely in Swagger UI.</div>
             <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Next: Session 3 — JPA, H2, DTOs &amp; exception handling.</div>
           </div>
         </section>

@@ -1083,7 +1083,7 @@ Missing `spring.application.name`. It isn't cosmetic — it **is** the registry 
 <details>
 <summary><b>"Why is the port always the same when I refresh the browser?"</b></summary>
 
-**Browser caching.** Use curl or Postman. Also check Eureka actually shows `UP (3)` and that they sent at least six requests.
+**Check the Swagger UI Servers dropdown** — if it still points at `:8080` they are hitting one instance directly and bypassing the gateway. It must be set to `:9393`. Also check Eureka shows `UP (3)` and that they executed at least six times.
 </details>
 
 <details>
@@ -1134,7 +1134,7 @@ Look at how much ground this series covers, and notice how each session made the
 | Session | What it taught | What it enabled |
 |---|---|---|
 | **1 · Foundations** | Auto-configuration, embedded Tomcat, starters. Beans, DI, the IoC container. The Golden Rule. A first REST endpoint | The vocabulary for everything else |
-| **2 · REST APIs** | Web services & JSON, CRUD verbs, meaningful status codes, `@RequestBody`, `ResponseEntity`, Postman & Swagger | ⭐ **Statelessness** — which Session 4 needed |
+| **2 · REST APIs** | Web services & JSON, CRUD verbs, meaningful status codes, `@RequestBody`, `ResponseEntity`, Swagger UI | ⭐ **Statelessness** — which Session 4 needed |
 | **3 · Data & structure** | JPA/Hibernate/H2, entities, repositories, DTOs, service interfaces, custom exceptions + global handler | ⭐ **A shared database** — which Session 4 needed |
 | **4 · Microservices** | Service registry, API gateway, live load balancing, circuit breakers, config server, tracing | A system that scales and survives failure |
 

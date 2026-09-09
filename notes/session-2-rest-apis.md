@@ -64,7 +64,7 @@ Before starting, make sure these are solid. Everything today builds on them.
 - Choose the **right HTTP verb** and the **right status code** for any operation.
 - Design URLs that other developers will thank you for.
 - Build a complete **CRUD API** — create, read, update, delete.
-- Test an API with **Postman**, `curl` and **Swagger UI**.
+- Test an API with **Swagger UI** — a page your own app generates, with `curl` as a fallback.
 
 ---
 
@@ -258,7 +258,7 @@ Breaking any of these causes a **400 Bad Request**:
 | No trailing comma after the last pair | `{"a":1}` | `{"a":1,}` |
 | No comments — JSON has no `//` or `/* */` | | `{"a":1} // nope` |
 
-⚠️ **These four cause most of the `400`s you'll see in the lab.** When Postman gives you a 400 on a POST, check this list before anything else.
+⚠️ **These four cause most of the `400`s you'll see in the lab.** When you get a 400 on a POST, check this list before anything else.
 
 ## 2.3 Data types, and how they map to Java
 
@@ -488,7 +488,7 @@ When a client reports "your API returned 400", the answer is usually *"check wha
 | `404` | Not Found | No resource at that path — wrong URL, or that id doesn't exist |
 | `405` | Method Not Allowed | The path exists but not for that verb — e.g. POST to a `@GetMapping` |
 | `409` | Conflict | It clashes with existing state — a duplicate email, for instance |
-| `415` | Unsupported Media Type | ⚠️ **You forgot the `Content-Type: application/json` header.** Extremely common in Postman |
+| `415` | Unsupported Media Type | ⚠️ **The `Content-Type: application/json` header is missing.** Swagger UI sets it for you, so you'll only meet this with other tools |
 | `500` | Internal Server Error | An unhandled exception escaped your code. Always a bug worth fixing |
 
 ### ⚠️ 401 vs 403, since everyone mixes them up
@@ -670,7 +670,7 @@ The JSON keys are matched to your class's fields **by name**:
 
 | Error | Cause | Fix |
 |---|---|---|
-| **415** Unsupported Media Type | You didn't send the `Content-Type: application/json` header | In Postman: **Body → raw → JSON**. With curl: `-H "Content-Type: application/json"` |
+| **415** Unsupported Media Type | The `Content-Type: application/json` header is missing | Swagger UI sets it automatically. With curl: `-H "Content-Type: application/json"` |
 | **400** Bad Request | Your JSON is malformed — trailing comma, single quotes, missing brace | Check the four JSON rules from Part 2.2 |
 
 **Both are *client* errors**, which is why they're 4xx.
@@ -864,24 +864,75 @@ Here's a problem: **typing a URL into a browser can only ever send a `GET`.**
 
 There is no way to send a `POST` with a JSON body, or a `DELETE`. So from today you need a proper API client.
 
-## 9.2 Postman — the standard choice
+## 9.2 Swagger UI — our choice
 
-Sending a `POST` in Postman, step by step:
+There are two common API clients. We use **Swagger UI**, and it's worth understanding why.
+
+| | Postman | **Swagger UI** *(our choice)* |
+|---|---|---|
+| **What it is** | A separate desktop application | A page **your own app** generates and serves |
+| **Install** | Download and set up | One dependency in `pom.xml` — nothing to install |
+| **Knows your endpoints?** | ❌ No — you type every URL by hand | ✅ Yes — it reads your controllers automatically |
+| **Request body** | ❌ You write the JSON yourself | ✅ Pre-filled from your Java class |
+| **`Content-Type` header** | ❌ You must set it (Body → raw → JSON) | ✅ Set for you |
+| **Doubles as documentation** | ❌ No | ✅ Yes — that's its main job |
+
+### Setting it up — one dependency
+
+```xml
+<dependency>
+    <groupId>org.springdoc</groupId>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.8.6</version>
+</dependency>
+```
+
+⚠️ **That version matters.** springdoc is **not** managed by the Spring Boot parent POM, so it needs an explicit `<version>`. Use **2.8.6** (or newer 2.8.x) with Spring Boot 3.5.x — older versions such as 2.5.x *fail at startup* on Boot 3.5.
+
+Restart, then open **`http://localhost:8080/swagger-ui.html`**.
+
+### The four-click rhythm
 
 ```mermaid
 flowchart LR
-    A["1 · Pick the verb<br/><i>POST from the dropdown</i>"] --> B["2 · Enter the URL<br/><i>localhost:8080/api/students</i>"]
-    B --> C["3 · Set the body<br/><b>Body → raw → JSON</b>"]
-    C --> D["4 · Send &amp; read<br/><i>check the status code first</i>"]
+    A["1 · Expand<br/><i>click the endpoint row</i>"] --> B["2 · Try it out<br/><i>top right of the panel</i>"]
+    B --> C["3 · Fill any boxes<br/><i>path vars, params, body</i>"]
+    C --> D["4 · Execute<br/><i>then read the status code</i>"]
 ```
 
-### ⚠️ Step 3 is where everyone gets 415
+**Learn that rhythm — every test you run is the same loop with different values.**
 
-Selecting **raw → JSON** is what makes Postman send the `Content-Type: application/json` header.
+### What the response panel gives you
 
-Choose "Text" by mistake and your perfectly valid JSON is rejected with **415 Unsupported Media Type**. **If you see 415, this is almost always why.**
+| Item | Why it's useful |
+|---|---|
+| **Status code**, in large text | Read this *before* the body. It tells you whether to debug your request or your server |
+| **Response body** | Formatted JSON |
+| **Response headers** | Including `content-type` |
+| **A `curl` box** | The exact equivalent command — copy it to script the call or share a reproduction |
 
-💡 **Build the habit of reading the status code first**, in the top right of the Postman response panel — before you even look at the body. It tells you whether to debug your request or your server.
+### 💡 The form is generated from your method signature
+
+This is the part that makes Swagger UI more than a convenience:
+
+| Your code | What Swagger shows |
+|---|---|
+| no parameters | just an Execute button |
+| `@PathVariable int id` | an `id` input box |
+| `@RequestParam(defaultValue = "A")` | a `grade` box, **pre-filled with `A`** |
+| `@RequestBody Student` | a request-body editor, pre-filled from the `Student` class |
+| `@PathVariable` + `@RequestBody` | **both** an id box and a body editor |
+
+You configure none of that. Which also means **a wrong annotation shows up here as a wrong-looking form** — a free sanity check on your own code.
+
+### ⚠️ Two things that trip people up
+
+1. **New endpoints don't appear until you restart.** Swagger reads your controllers *at startup*. Restart the app, then **hard-refresh** the page (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>).
+2. **The pre-filled body contains `"id": 0`.** That's a placeholder generated from the schema, not real data. Replace the values; the `id` is ignored because the server assigns it.
+
+### 💡 Swagger UI is also a diagnostic
+
+If an endpoint **isn't listed on the page**, Spring never registered it — so the problem is your class (missing annotation, or wrong package), not your URL. That's often the fastest way to distinguish the two.
 
 ## 9.3 `curl` — if you prefer the terminal
 
@@ -905,37 +956,96 @@ curl -i -X PUT http://localhost:8080/api/students/2 \
 curl -i -X DELETE http://localhost:8080/api/students/3
 ```
 
-## 9.4 Swagger UI — documentation that tests itself
+## 9.4 The other half of the job — it's documentation too
 
-Add **one dependency** and Spring Boot inspects your controllers and generates a live, browsable, **interactive** documentation page. No writing docs; no keeping them in sync.
+Everything in 9.2 was about Swagger UI as a *test client*. But that page is really a **documentation** page that happens to be executable, and that second role is why the industry uses it.
 
-```xml
-<dependency>
-    <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.6.0</version>
-</dependency>
+### Make it read like real documentation
+
+Out of the box the labels are guessed from your method names and the title is a generic *"OpenAPI definition"*. Two annotations fix that:
+
+```java
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/api/students")
+@Tag(name = "Students", description = "Create, read, update and delete students")
+public class StudentController {
+
+    @Operation(summary = "Get all students")
+    @GetMapping
+    public List<Student> getAllStudents() { ... }
+
+    @Operation(summary = "Create a new student")
+    @PostMapping
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) { ... }
+}
 ```
 
-Restart, then open **`http://localhost:8080/swagger-ui.html`**:
+⚠️ **Watch the import** — it's `io.swagger.v3.oas.annotations`. Your IDE may also offer `io.swagger.annotations`, which is the **old Swagger 2** package. Pick the `v3` one.
 
-| Verb | Path | Description |
+The result:
+
+| Verb | Path | Summary |
 |---|---|---|
 | `GET` | `/api/students` | Get all students |
-| `POST` | `/api/students` | Create a student |
-| `GET` | `/api/students/{id}` | Get one student |
-| `PUT` | `/api/students/{id}` | Update a student |
+| `POST` | `/api/students` | Create a new student |
+| `GET` | `/api/students/search` | Search students by grade |
+| `GET` | `/api/students/{id}` | Get one student by id |
+| `PUT` | `/api/students/{id}` | Update an existing student |
 | `DELETE` | `/api/students/{id}` | Delete a student |
 
-Click any row → **"Try it out"** → fill the fields → **Execute**. It sends the real request to your running app and shows you the real response — **no Postman needed**.
+…all grouped under a **"Students"** heading with your description.
 
-### 💡 Why teams love this
+> 📌 The rows are grouped **by path**, not in the order you declared them, so the three `/{id}` operations sit together. That's Swagger organising by resource — nothing is wrong with your code.
 
-The docs are **generated from the code**, so they *can't* drift out of date. A front-end developer can explore your entire API and try every endpoint **without asking you a single question**.
+### Document the status codes too
 
-📖 The underlying standard is called **OpenAPI**; Swagger UI is the page that renders it. `/v3/api-docs` gives you the raw spec as JSON — front-end teams feed that into code generators to produce a typed client automatically.
+By default Swagger claims every endpoint returns `200`. You know better — say so:
 
-⚠️ If `/swagger-ui.html` 404s, try `/swagger-ui/index.html` — some versions serve it there.
+```java
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Student found"),
+    @ApiResponse(responseCode = "404", description = "No student with that id")
+})
+@GetMapping("/{id}")
+public ResponseEntity<Student> getStudentById(@PathVariable int id) { ... }
+```
+
+Now a caller knows to handle the `404` **before writing a line of code**.
+
+### 📖 OpenAPI — the standard underneath
+
+Swagger UI is only the *renderer*. The actual artefact is an **OpenAPI** specification, served as JSON at **`/v3/api-docs`**:
+
+```json
+{
+  "openapi": "3.1.0",
+  "paths": { "/api/students": { "get": { "summary": "Get all students", ... } } },
+  "components": { "schemas": { "Student": {
+      "type": "object",
+      "properties": {
+        "id":    { "type": "integer", "format": "int32" },
+        "name":  { "type": "string" },
+        "email": { "type": "string" },
+        "grade": { "type": "string" }
+      } } } }
+}
+```
+
+Notice the `Student` schema lists exactly the four fields of your Java class — **that's where Swagger's pre-filled request body comes from.**
+
+### 💡 Why teams care about that JSON file
+
+| Benefit | What it means |
+|---|---|
+| **Can't drift out of date** | It's generated from the code, every startup |
+| **Self-service for consumers** | A front-end developer can explore and try your whole API without asking you anything |
+| **Machine-readable** | Feed it to a code generator and get a fully typed client (TypeScript, Java, Python) **automatically** |
+| **Contract testing** | Tools can verify your API still matches the agreed spec |
+
+That last-but-one point is the real payoff of documenting from code: the docs aren't just readable, they're **executable**.
 
 ---
 
@@ -984,7 +1094,7 @@ public class StudentLookupService {
 
 | Mistake | Symptom | Fix |
 |---|---|---|
-| Forgot `Content-Type: application/json` | **415** Unsupported Media Type | Postman: Body → raw → **JSON**. curl: add `-H "Content-Type: application/json"` |
+| Missing `Content-Type: application/json` | **415** Unsupported Media Type | Swagger UI sets it for you. With curl: add `-H "Content-Type: application/json"` |
 | Malformed JSON — trailing comma, single quotes | **400** Bad Request | Double quotes on keys and strings; no comma after the last pair |
 | Sending POST to a `@GetMapping` | **405** Method Not Allowed | Match the annotation to the verb |
 | Class prefix repeated in the method path | **404** on a URL that looks right | Real path is class + method. Use `@GetMapping("/{id}")`, not the full path again |
@@ -1050,7 +1160,7 @@ A web **application** returns **HTML** for humans to look at (`@Controller`). A 
 <details>
 <summary><b>5. You send valid JSON and get 415. What did you forget?</b></summary>
 
-The `Content-Type: application/json` header. In Postman that means choosing **Body → raw → JSON** rather than Text.
+The `Content-Type: application/json` header. Swagger UI sets it automatically — so if you hit 415 you're using a tool that doesn't, and must add it yourself.
 </details>
 
 <details>
@@ -1113,7 +1223,8 @@ It lives in an `ArrayList` in memory inside a singleton bean, and memory is wipe
 | **`ResponseEntity`** | A return type letting you set the status code, headers and body yourself |
 | **SOAP** | The older, XML-based, heavyweight alternative to REST. Still found in banking and telecom |
 | **OpenAPI** | The standard for describing an API's shape. **Swagger UI** renders it as a browsable page |
-| **Postman** | A GUI client for sending any HTTP verb with any body. Needed because browsers only send GET |
+| **Swagger UI** | An interactive page generated from your controllers, for sending any HTTP verb with any body. Needed because a browser address bar only sends GET |
+| **springdoc** | The library that generates Swagger UI and the OpenAPI spec for a Spring Boot app |
 
 ---
 
@@ -1136,7 +1247,7 @@ It lives in an `ArrayList` in memory inside a singleton bean, and memory is wipe
 ## The three demos that matter most
 
 1. **Delete a getter.** Watch that field silently disappear from the JSON response. Makes the getter → JSON-key relationship concrete.
-2. **Send POST as "Text" in Postman.** Get `415`. Switch to "JSON". Works. **Do this *before* the lab** — it's the single most common lab blocker.
+2. **Show the pre-filled request body.** Click "Try it out" on the POST and point out that Swagger built the JSON from their `Student` class — including the placeholder `"id": 0` they should ignore. Saves a dozen questions.
 3. **Create three students, restart, `GET`.** Empty array. That felt loss is the best possible motivation for Session 3.
 
 ## Questions your associates will actually ask
@@ -1144,7 +1255,7 @@ It lives in an `ArrayList` in memory inside a singleton bean, and memory is wipe
 <details>
 <summary><b>"Why can't I test POST in the browser?"</b></summary>
 
-The address bar can only issue `GET`. There's no UI for choosing a verb or attaching a body. Hence Postman / curl / Swagger.
+The address bar can only issue `GET`. There's no UI for choosing a verb or attaching a body. Hence Swagger UI (or curl).
 </details>
 
 <details>

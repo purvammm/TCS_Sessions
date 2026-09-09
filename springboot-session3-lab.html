@@ -672,7 +672,7 @@
       <div class="arch-box">
         <h3>📌 Today's architecture — keep this in view</h3>
         <div class="arch-flow">
-          <div class="arch-node">Client<span class="p">Postman</span></div>
+          <div class="arch-node">Client<span class="p">Swagger UI</span></div>
           <span class="arch-arrow">→</span>
           <div class="arch-node">Controller<span class="p">DTOs in/out</span></div>
           <span class="arch-arrow">→</span>
@@ -709,7 +709,7 @@
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext"><strong>7 · Controller</strong> — six endpoints, and no error handling inside it.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>8 · All six endpoints tested</strong> in Postman, including a clean <code>404</code>.</span></label>
+              <span class="ctext"><strong>8 · All six endpoints tested</strong> in Swagger UI, including a clean <code>404</code>.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext"><strong>9 · H2 console explored</strong> — I've seen my rows in the actual table.</span></label>
           </div>
@@ -730,8 +730,8 @@
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman ready</strong>
-                <span class="verify">Needed for POST and PUT again today. curl commands are given as an alternative in every lab.</span>
+              <span class="ctext"><strong>A web browser</strong> — that's the whole tooling requirement
+                <span class="verify">All testing is done in <strong>Swagger UI</strong>, the same as Session 2. Your app generates the page itself, so there is nothing to install.</span>
               </span>
             </label>
             <label class="check">
@@ -767,7 +767,7 @@
                 <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.posts</code> &nbsp;← <strong>read this before clicking Generate</strong></td></tr>
                 <tr><th>Packaging</th><td><code>Jar</code></td></tr>
                 <tr><th>Java</th><td><code>17</code> (or <code>21</code>)</td></tr>
-                <tr><th>Dependencies</th><td><strong>four</strong> today: <code>Spring Web</code> · <code>Spring Data JPA</code> · <code>H2 Database</code> · <code>Validation</code></td></tr>
+                <tr><th>Dependencies</th><td><strong>four</strong> today: <code>Spring Web</code> · <code>Spring Data JPA</code> · <code>H2 Database</code> · <code>Validation</code><br><span class="muted">(plus Swagger UI, added to <code>pom.xml</code> by hand in a moment — it isn't on the Initializr list)</span></td></tr>
               </table>
               Click <strong>Generate</strong>, unzip, and import into your IDE.
             </div>
@@ -848,18 +848,43 @@ spring.application.name=posts</code></pre></div>
               <div class="prop-row"><code>spring.jpa.show-sql=true</code><span class="pd">Prints the generated SQL to the console — the best way to see that ORM isn't magic.</span></div>
             </div>
 
+            <h3>Add Swagger UI — your testing tool, same as Session 2</h3>
+            <div class="concept">
+              <span class="lbl">Why now</span>
+              Swagger UI is how you'll test all six endpoints today. It isn't on the Initializr list (it's a
+              third-party library), so add it to <code>pom.xml</code> by hand — <strong>one dependency</strong>, and
+              your app serves the page itself. Nothing to install.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Keep the version number</span>
+              springdoc is <strong>not</strong> managed by the Spring Boot parent POM, so it needs an explicit
+              <code>&lt;version&gt;</code>. <strong>2.8.6</strong> is tested against Spring Boot 3.5.x. Older versions
+              such as 2.5.x fail at startup on Boot 3.5 — if the app won't boot, check this number first.
+            </div>
+
             <div class="runbox">
               <span class="lbl">Sanity check</span>
               <ol>
+                <li>Save <code>pom.xml</code> and let Maven refresh (IntelliJ does it automatically; Eclipse:
+                    right-click → Maven → Update Project).</li>
                 <li>Run <code>PostsApplication</code>.</li>
-                <li>Wait for <strong>"Tomcat started on port 8080"</strong>.</li>
-                <li>You should <em>also</em> see H2 and Hibernate start up in the log. There's no table yet — we haven't
-                    written the entity.</li>
+                <li>Wait for <strong>"Tomcat started on port 8080"</strong>. You should <em>also</em> see H2 and
+                    Hibernate start up in the log. There's no table yet — we haven't written the entity.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span> — it should load and say
+                    <strong>"No operations defined in spec!"</strong>, which is correct: no controller yet.</li>
                 <li>Stop the app.</li>
               </ol>
             </div>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext">App starts cleanly with the four new dependencies and the H2 configuration.</span>
+              <span class="ctext">App starts cleanly with all five dependencies, and Swagger UI loads at <code>/swagger-ui.html</code>.</span>
             </label>
           </div>
         </details>
@@ -1721,15 +1746,19 @@ public class PostController {
       <!-- ===== LAB 7: TEST ===== -->
       <section class="section">
         <details class="exp lab7">
-          <summary><span class="lab-tag">LAB 7</span><span class="chevron">▶</span> Test Everything — Postman &amp; the H2 Console</summary>
+          <summary><span class="lab-tag">LAB 7</span><span class="chevron">▶</span> Test Everything — Swagger UI &amp; the H2 Console</summary>
           <div class="exp-body">
             <p>Time to prove it all works. Do these five parts in order — each depends on the previous one.</p>
 
             <div class="testpart">
               <div class="tp-head"><span class="verb-badge post">POST</span> Part 1 · Create three posts</div>
               <div class="tp-body">
-                <p>In Postman: verb <code>POST</code>, URL <code>http://localhost:8080/api/posts</code>,
-                Body → <strong>raw</strong> → <strong>JSON</strong>. Send each of these in turn:</p>
+                <p>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span>. All six of your endpoints are
+                now listed. Expand <strong><code>POST /api/posts</code></strong> → <strong>Try it out</strong>, then
+                paste each body below into the <strong>Request body</strong> box and click <strong>Execute</strong>.</p>
+                <p class="muted" style="font-size:15.5px;">Swagger pre-fills an example built from your
+                <code>PostDTO</code> — replace it. You can leave or delete the <code>"id"</code> field; the database
+                assigns the real one either way.</p>
                 <div class="codewrap"><pre><code>{
   "title": "Learning Spring Boot",
   "content": "Today I built my first REST API with Spring Boot.",
@@ -1761,13 +1790,15 @@ public class PostController {
             <div class="testpart">
               <div class="tp-head"><span class="verb-badge get">GET</span> Part 2 · Read them back</div>
               <div class="tp-body">
+                <p>Same rhythm each time: expand the row → <strong>Try it out</strong> → fill any boxes →
+                <strong>Execute</strong>.</p>
                 <table class="issues">
-                  <thead><tr><th>Request</th><th>Expected</th></tr></thead>
+                  <thead><tr><th>Swagger UI row</th><th>What you enter</th><th>Expected</th></tr></thead>
                   <tbody>
-                    <tr><td><code>GET /api/posts</code></td><td><code>200</code> + a 3-item JSON array</td></tr>
-                    <tr><td><code>GET /api/posts/1</code></td><td><code>200</code> + the "Learning Spring Boot" post</td></tr>
-                    <tr><td><code>GET /api/posts/search?author=Amit</code></td><td><code>200</code> + 2 posts (the derived query at work)</td></tr>
-                    <tr><td><code>GET /api/posts/search?author=Zoya</code></td><td><code>200</code> + <code>[]</code> — an empty result is still a success</td></tr>
+                    <tr><td><code>GET /api/posts</code></td><td>nothing</td><td><code>200</code> + a 3-item JSON array</td></tr>
+                    <tr><td><code>GET /api/posts/{id}</code></td><td><code>id</code> = <code>1</code></td><td><code>200</code> + the "Learning Spring Boot" post</td></tr>
+                    <tr><td><code>GET /api/posts/search</code></td><td><code>author</code> = <code>Amit</code></td><td><code>200</code> + 2 posts (the derived query at work)</td></tr>
+                    <tr><td><code>GET /api/posts/search</code></td><td><code>author</code> = <code>Zoya</code></td><td><code>200</code> + <code>[]</code> — an empty result is still a success</td></tr>
                   </tbody>
                 </table>
                 <label class="check"><input type="checkbox" class="labstep" />
@@ -1779,7 +1810,8 @@ public class PostController {
             <div class="testpart">
               <div class="tp-head"><span class="em-badge s4">404</span> Part 3 · The clean 404 — the pay-off from Lab 4</div>
               <div class="tp-body">
-                <p>Request a post that doesn't exist: <code>GET http://localhost:8080/api/posts/999</code></p>
+                <p>In <code>GET /api/posts/{id}</code>, enter <code>id</code> = <strong><code>999</code></strong> and
+                Execute — a post that doesn't exist.</p>
                 <div class="expected">
                   <span class="lbl">Expected — <code>404 Not Found</code> with a readable body</span>
                   <div class="codewrap"><pre><code>{
@@ -1802,8 +1834,8 @@ public class PostController {
             <div class="testpart">
               <div class="tp-head"><span class="em-badge s4">400</span> Part 4 · Validation in action</div>
               <div class="tp-body">
-                <p>Send a deliberately invalid post — an empty title and a missing author.
-                <code>POST /api/posts</code> with:</p>
+                <p>Go back to <code>POST /api/posts</code> and send a deliberately invalid post — an empty title and
+                no author at all:</p>
                 <div class="codewrap"><pre><code>{
   "title": "",
   "content": "This should be rejected before my service ever runs."
@@ -1832,7 +1864,8 @@ public class PostController {
             <div class="testpart">
               <div class="tp-head"><span class="verb-badge put">PUT</span><span class="verb-badge del">DELETE</span> Part 5 · Update and delete</div>
               <div class="tp-body">
-                <p><code>PUT http://localhost:8080/api/posts/2</code> with Body → raw → JSON:</p>
+                <p>Expand <code>PUT /api/posts/{id}</code> → Try it out → <code>id</code> = <code>2</code> → paste this
+                as the request body:</p>
                 <div class="codewrap"><pre><code>{
   "title": "Understanding JPA and Hibernate",
   "content": "Updated: JPA is the specification, Hibernate the implementation.",
@@ -1950,30 +1983,42 @@ SELECT AUTHOR, COUNT(*) FROM POSTS GROUP BY AUTHOR;</code></pre></div>
               <table class="issues" style="margin-top:6px;">
                 <thead><tr><th>Request</th><th>Before security</th><th>After security</th></tr></thead>
                 <tbody>
-                  <tr><td><code>GET /api/posts</code> in Postman</td><td><code>200</code> + data</td><td><code>401 Unauthorized</code></td></tr>
+                  <tr><td><code>GET /api/posts</code> from Swagger UI</td><td><code>200</code> + data</td><td><code>401 Unauthorized</code></td></tr>
+                  <tr><td><code>/swagger-ui.html</code> itself</td><td>opens</td><td><strong>redirected to a login page</strong> — Swagger is an endpoint too!</td></tr>
                   <tr><td><code>GET /api/posts</code> in a browser</td><td>JSON shown</td><td>redirected to a <strong>login form</strong></td></tr>
                   <tr><td><code>POST /api/posts</code></td><td><code>201</code></td><td><code>401</code> — or <code>403</code>, thanks to CSRF protection</td></tr>
                   <tr><td><code>/h2-console</code></td><td>opens</td><td>blocked</td></tr>
                 </tbody>
               </table>
               <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext">Every endpoint now returns <code>401</code> in Postman, with no config written by me.</span>
+                <span class="ctext">Everything is now locked — including Swagger UI — with no config written by me.</span>
               </label>
             </div>
 
             <div class="dothis">
-              <span class="lbl">Now log in — two ways</span>
+              <span class="lbl">Now log in</span>
               <ol>
-                <li><strong>Browser:</strong> visit <code>http://localhost:8080/api/posts</code>. You're redirected to
-                    a login page. Username <code>user</code>, password = the value from the console. You'll then see
-                    your JSON.</li>
-                <li><strong>Postman:</strong> go to the <strong>Authorization</strong> tab → Type
-                    <strong>Basic Auth</strong> → Username <code>user</code>, Password = the console value → Send. You
-                    get <code>200</code> and your data.</li>
+                <li>Visit <code>http://localhost:8080/swagger-ui.html</code>. You're redirected to a
+                    <strong>login form</strong> that Spring Security generated.</li>
+                <li>Username <code>user</code>, password = <strong>the value from your console</strong>.</li>
+                <li>You land back on Swagger UI, and your endpoints work again — the browser now carries a session
+                    cookie, and Swagger UI sends it with every request.</li>
               </ol>
               <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext">I authenticated successfully with Basic Auth and got <code>200</code> back.</span>
+                <span class="ctext">I logged in through the generated form and Swagger UI works again.</span>
               </label>
+              <div class="observe" style="margin-top:12px;">
+                <span class="lbl">💡 Why logging in once fixes Swagger UI too</span>
+                Because Swagger UI runs <strong>in your browser</strong>, it inherits your browser's session cookie.
+                That's a genuine advantage over an external client, where you'd have to configure credentials
+                separately for every request.
+                <br><br>
+                ⚠️ You may still get <strong><code>403</code></strong> on <code>POST</code>, <code>PUT</code> and
+                <code>DELETE</code> even after logging in. That's <strong>CSRF protection</strong>, which Spring
+                Security enables by default and which Swagger UI doesn't send a token for. It's the correct default for
+                a browser-based app — and one more reason real projects configure security deliberately rather than
+                leaving it on defaults.
+              </div>
             </div>
 
             <div class="observe">

@@ -673,7 +673,7 @@
       <div class="arch-box">
         <h3>📌 Architecture map — keep this in view all session</h3>
         <div class="arch-flow">
-          <div class="arch-node">Client<span class="p">Postman</span></div>
+          <div class="arch-node">Client<span class="p">Swagger UI</span></div>
           <span class="arch-arrow">→</span>
           <div class="arch-node">API Gateway<span class="p">:9393</span></div>
           <span class="arch-arrow">⇄</span>
@@ -744,8 +744,8 @@
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman ready</strong>, plus a browser
-                <span class="verify">All of today's testing is <code>GET</code> requests, so a browser is enough — but Postman makes repeated calls easier.</span>
+              <span class="ctext"><strong>A web browser</strong> — nothing else to install
+                <span class="verify">All of today's testing is <code>GET</code> requests. We'll add <strong>Swagger UI</strong> to the two microservices, exactly as in Sessions 2 and 3, and use it to drive the load-balancing demo.</span>
               </span>
             </label>
 
@@ -963,7 +963,7 @@ eureka.client.fetch-registry=false</code></pre></div>
                 <tr><th>Artifact</th><td><code>student-ms</code></td></tr>
                 <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.studentms</code> &nbsp;← <strong>hyphen dropped</strong></td></tr>
                 <tr><th>Java</th><td><code>17</code> &nbsp;·&nbsp; Packaging <code>Jar</code></td></tr>
-                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong> &nbsp;<span class="muted">(search "Eureka" and pick the <em>Client</em>, not the Server)</span></td></tr>
+                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong> &nbsp;<span class="muted">(search "Eureka" and pick the <em>Client</em>, not the Server)</span><br><span class="muted">(plus Swagger UI, added to <code>pom.xml</code> by hand below)</span></td></tr>
               </table>
               Generate → unzip into a <strong>different folder</strong> from eureka-server → import alongside it.
             </div>
@@ -986,6 +986,13 @@ eureka.client.fetch-registry=false</code></pre></div>
               <code>package com.tcs.training.studentms;</code></strong></span>
             </label>
 
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
             <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">student-ms/src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>server.port=8080
 
@@ -999,6 +1006,39 @@ eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
 
 # Prefer the IP address over the hostname — avoids DNS oddities on laptops
 eureka.instance.prefer-ip-address=true</code></pre></div>
+
+            <div class="concept">
+              <span class="lbl">⭐ One extra annotation — this is what makes the Lab 7 payoff work</span>
+              By default, Swagger UI sends its requests to <strong>the app that served the page</strong> — so
+              student-ms's Swagger UI would call <code>localhost:8080</code> <em>directly</em>, bypassing the gateway
+              entirely. That's fine for testing one instance, but it would make the load-balancing demo impossible.
+              <br><br>
+              The fix is one annotation on the main class listing <strong>both</strong> addresses. Swagger UI then shows
+              a <strong>Servers dropdown</strong>, and you can choose to send requests <em>through the gateway</em>.
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/src/main/java/com/tcs/training/studentms/StudentMsApplication.java</span><span class="fb-tag">replace the whole file</span></div>
+            <div class="codewrap"><pre><code>package com.tcs.training.studentms;
+
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.servers.Server;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+// Offer BOTH addresses in Swagger UI's "Servers" dropdown:
+//   9393 = through the API Gateway  -> load balanced across all instances
+//   8080 = straight to this one instance
+@OpenAPIDefinition(servers = {
+        @Server(url = "http://localhost:9393", description = "Through the API Gateway (load balanced)"),
+        @Server(url = "http://localhost:8080", description = "Direct to this instance")
+})
+@SpringBootApplication
+public class StudentMsApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(StudentMsApplication.class, args);
+    }
+}</code></pre></div>
 
             <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">student-ms/src/main/java/com/tcs/training/studentms/controller/StudentController.java</span><span class="fb-tag">create this — paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.studentms.controller;
@@ -1131,7 +1171,7 @@ public class StudentController {
                 <tr><th>Artifact</th><td><code>customer-ms</code></td></tr>
                 <tr class="keyrow"><th>Package name</th><td><code>com.tcs.training.customerms</code></td></tr>
                 <tr><th>Java</th><td><code>17</code> &nbsp;·&nbsp; Packaging <code>Jar</code></td></tr>
-                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong></td></tr>
+                <tr><th>Dependencies</th><td><strong>Spring Web</strong> + <strong>Eureka Discovery Client</strong><br><span class="muted">(plus the same Swagger UI dependency as student-ms)</span></td></tr>
               </table>
               Generate → unzip into its own folder → import.
             </div>
@@ -1153,6 +1193,13 @@ public class StudentController {
               <span class="ctext"><strong>First line of <code>CustomerMsApplication.java</code> reads
               <code>package com.tcs.training.customerms;</code></strong></span>
             </label>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">customer-ms/pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
 
             <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">customer-ms/src/main/resources/application.properties</span><span class="fb-tag">paste the WHOLE file</span></div>
             <div class="codewrap"><pre><code>server.port=8081
@@ -1377,6 +1424,17 @@ java -jar target/student-ms-0.0.1-SNAPSHOT.jar --server.port=8083</code></pre></
                 <tr><th>Dependencies</th><td><strong>Gateway</strong> <span class="muted">(may be listed as "Reactive Gateway" in newer Initializr versions)</span> + <strong>Eureka Discovery Client</strong></td></tr>
               </table>
               Generate → unzip → import.
+            </div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ And do NOT add Swagger UI to the gateway either</span>
+              The dependency you used on the two microservices is
+              <code>springdoc-openapi-starter-web<strong>mvc</strong>-ui</code> — the servlet version. The gateway is
+              <strong>reactive</strong>, so that starter is wrong here, and it would drag the servlet stack in with it.
+              <br><br>
+              There's also nothing to document: the gateway has <strong>no controllers</strong>, only routes. You'll
+              test <em>through</em> the gateway using the microservices' own Swagger UI — that's what the Servers
+              dropdown you configured in Lab 2 is for.
             </div>
 
             <div class="warnbox">
@@ -1618,15 +1676,19 @@ management.endpoint.gateway.access=unrestricted</code></pre></div>
             </div>
 
             <div class="dothis">
-              <span class="lbl">Do this — send the SAME request six times</span>
+              <span class="lbl">Do this — send the SAME request six times, in Swagger UI</span>
               <ol>
-                <li>Open <code>http://localhost:9393/api/students</code>.</li>
-                <li><strong>Reload it six times</strong>, reading <code>servedByPort</code> each time. In Postman just
-                    click <strong>Send</strong> repeatedly.</li>
-                <li><strong>Important:</strong> if your browser caches the response and the port never changes, do a
-                    hard reload (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>)
-                    or use Postman / curl instead.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span> — student-ms instance 1's
+                    Swagger UI.</li>
+                <li>⭐ <strong>At the top, set the <em>Servers</em> dropdown to
+                    <code>http://localhost:9393 - Through the API Gateway (load balanced)</code>.</strong>
+                    <br><em>This is the critical step.</em> Leave it on <code>:8080</code> and every request goes
+                    straight to this one instance, bypassing the gateway — and the port will never change.</li>
+                <li>Expand <code>GET /api/students</code> → <strong>Try it out</strong>.</li>
+                <li>Click <strong>Execute</strong> <strong>six times</strong>, reading
+                    <code>servedByPort</code> in the response each time.</li>
               </ol>
+              💡 Swagger UI never caches, so unlike a browser reload the value changes every time.
             </div>
 
             <div class="filebar"><span class="fb-icon">💻</span><span class="fb-name">Or automate it from a terminal — much more convincing</span><span class="fb-tag">Mac / Linux</span></div>
@@ -1656,12 +1718,17 @@ done</code></pre></div>
             </div>
 
             <div class="observe">
-              <span class="lbl">If the port never changes</span>
+              <span class="lbl">🚨 If the port never changes</span>
               <ol style="margin:6px 0 0;">
-                <li><strong>Browser caching</strong> — the most common cause. Use curl or Postman instead.</li>
+                <li><strong>Check the Servers dropdown.</strong> By far the most common cause — if it still reads
+                    <code>:8080 - Direct to this instance</code>, you're talking to one instance and skipping the
+                    gateway entirely. It must say <strong><code>:9393</code></strong>.</li>
                 <li><strong>Only one instance is actually registered.</strong> Check Eureka shows
                     <code>UP (3)</code>.</li>
-                <li><strong>Not enough requests.</strong> Send at least six.</li>
+                <li><strong>Not enough requests.</strong> Execute at least six times.</li>
+                <li><strong>Using a browser tab instead?</strong> Then it's caching — hard-refresh with
+                    <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>, or use the
+                    terminal loop below.</li>
                 <li>The exact starting point of the cycle is arbitrary — <code>8082, 8083, 8080…</code> is equally
                     correct. What matters is that it <em>rotates</em>.</li>
               </ol>
@@ -2242,9 +2309,14 @@ logging.level.org.springframework.cloud.gateway=DEBUG</code></pre></div>
                   <td>It must be a <strong>program</strong> argument (not a VM option) with two leading dashes.</td>
                 </tr>
                 <tr>
+                  <td>Swagger UI's Servers dropdown only offers <code>:8080</code></td>
+                  <td>The <code>@OpenAPIDefinition(servers = …)</code> annotation is missing from <code>StudentMsApplication</code>.</td>
+                  <td>Add it (Lab 2). Without it Swagger targets the app's own port and the gateway is bypassed.</td>
+                </tr>
+                <tr>
                   <td><code>servedByPort</code> never changes through the gateway</td>
-                  <td>Browser caching, or only one instance registered.</td>
-                  <td>Use curl or Postman. Check Eureka shows <code>UP (3)</code>. Send at least six requests.</td>
+                  <td>Servers dropdown still set to <code>:8080</code>, browser caching, or only one instance registered.</td>
+                  <td>Set the Swagger UI <strong>Servers dropdown to <code>:9393</code></strong>, not <code>:8080</code>. Check Eureka shows <code>UP (3)</code>. Execute at least six times.</td>
                 </tr>
                 <tr>
                   <td><code>503 Service Unavailable</code> from the gateway</td>

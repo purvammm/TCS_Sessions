@@ -1347,7 +1347,7 @@ That ordering is deliberate: **forgetting to protect an endpoint can't accidenta
 
 ## 🔬 Try it — then remove it
 
-In the lab you'll add the dependency, watch every endpoint start returning `401`, log in with the generated password (Postman → Authorization → **Basic Auth**, user `user`), and then **remove it again**.
+In the lab you'll add the dependency, watch every endpoint start returning `401`, log in with the generated password through the form Spring Security generates (user `user`), and then **remove it again**.
 
 ⚠️ **Do remove it** — security interferes with the rest of the lab and with Session 4.
 

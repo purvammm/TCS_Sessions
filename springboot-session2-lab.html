@@ -662,8 +662,9 @@
           Today you build a <strong>complete Student API</strong> — all four CRUD operations — one endpoint at a time.
           Work top to bottom; each lab adds methods to the same two files, and every snippet is the
           <strong>whole file</strong> so you can always paste over what you had. Use the <strong>Copy</strong> button
-          rather than retyping, and tick each checkbox as you go. From Lab 6 onwards you'll need
-          <strong>Postman</strong> (a browser cannot send POST, PUT or DELETE). If you fall behind, the
+          rather than retyping, and tick each checkbox as you go. All testing is done in
+          <strong>Swagger UI</strong> — a page your own app generates, so there is <strong>nothing to install</strong>
+          and it runs in the browser you already have. If you fall behind, the
           <strong>Complete Files Reference</strong> at the bottom has every finished file.
         </div>
       </section>
@@ -672,25 +673,27 @@
       <div class="section-band">Today's checklist</div>
       <section class="section">
         <details class="exp" open>
-          <summary><span class="chevron">▶</span> 8-step progress tracker</summary>
+          <summary><span class="chevron">▶</span> 9-step progress tracker</summary>
           <div class="exp-body">
             <p>Tick each milestone as you reach it. The bar at the top fills to 100% when everything is done.</p>
             <label class="check"><input type="checkbox" class="labstep" />
               <span class="ctext"><strong>1 · Project created &amp; base package verified</strong> — <code>com.tcs.training.students</code>.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>2 · <code>Student</code> model class</strong> written, with getters, setters and a no-arg constructor.</span></label>
+              <span class="ctext"><strong>2 · Swagger UI loads</strong> at <code>localhost:8080/swagger-ui.html</code> — your testing tool is ready.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>3 · <code>StudentService</code></strong> holding an in-memory list, injected into the controller.</span></label>
+              <span class="ctext"><strong>3 · <code>Student</code> model class</strong> written, with getters, setters and a no-arg constructor.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>4 · <code>GET /api/students</code></strong> returns a JSON array.</span></label>
+              <span class="ctext"><strong>4 · <code>StudentService</code></strong> holding an in-memory list, injected into the controller.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>5 · <code>GET /api/students/{id}</code></strong> returns one student, and <code>404</code> for a missing id.</span></label>
+              <span class="ctext"><strong>5 · <code>GET /api/students</code></strong> returns a JSON array.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>6 · <code>GET /api/students/search?grade=A</code></strong> filters the list.</span></label>
+              <span class="ctext"><strong>6 · <code>GET /api/students/{id}</code></strong> returns one student, and <code>404</code> for a missing id.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>7 · <code>POST /api/students</code></strong> creates a student and returns <code>201 Created</code>.</span></label>
+              <span class="ctext"><strong>7 · <code>GET /api/students/search?grade=A</code></strong> filters the list.</span></label>
             <label class="check"><input type="checkbox" class="labstep" />
-              <span class="ctext"><strong>8 · <code>PUT</code> and <code>DELETE</code></strong> both working with correct status codes.</span></label>
+              <span class="ctext"><strong>8 · <code>POST /api/students</code></strong> creates a student and returns <code>201 Created</code>.</span></label>
+            <label class="check"><input type="checkbox" class="labstep" />
+              <span class="ctext"><strong>9 · <code>PUT</code> and <code>DELETE</code></strong> both working with correct status codes.</span></label>
           </div>
         </details>
       </section>
@@ -709,8 +712,8 @@
             </label>
             <label class="check">
               <input type="checkbox" class="prereq" />
-              <span class="ctext"><strong>Postman installed</strong> — download from <code>postman.com/downloads</code>
-                <span class="verify">Essential from Lab 6 onwards. A browser address bar can only send GET requests, so you cannot test POST, PUT or DELETE without it. Free; no account needed for local testing.</span>
+              <span class="ctext"><strong>A web browser</strong> — Chrome, Edge, Firefox, anything
+                <span class="verify">That is the <em>whole</em> tooling requirement. Swagger UI is a page your own application generates, so there is nothing to download, no account and no separate app to learn.</span>
               </span>
             </label>
             <label class="check">
@@ -719,11 +722,18 @@
                 <span class="verify">If "controllers must live under the main class's package" doesn't sound familiar, re-read Session 1's golden rule slide before starting.</span>
               </span>
             </label>
-            <div class="observe">
-              <span class="lbl">No Postman? Two fallbacks</span>
-              <strong>curl</strong> works from any terminal (every lab below shows the curl command too), and
-              <strong>Swagger UI</strong> — set up in the bonus lab — lets you send every verb straight from your
-              browser. Postman is still the smoothest option.
+            <div class="concept">
+              <span class="lbl">Why Swagger UI, and not Postman?</span>
+              A browser address bar can only ever send a <code>GET</code>, so from Lab 6 (creating data with
+              <code>POST</code>) you need a proper API client. Many teams use <strong>Postman</strong>, but it's a
+              separate install. <strong>Swagger UI</strong> is better for us for three reasons:
+              <ul style="margin:8px 0 0;">
+                <li><strong>Nothing to install</strong> — you add one dependency and your app serves the page itself.</li>
+                <li><strong>It reads your code.</strong> Every endpoint you write appears automatically, with the
+                    request body pre-filled from your <code>Student</code> class. Nothing to type by hand.</li>
+                <li><strong>It shows you everything at once</strong> — the status code, the response body, the
+                    response headers, <em>and</em> the equivalent <code>curl</code> command.</li>
+              </ul>
             </div>
           </div>
         </details>
@@ -792,14 +802,96 @@
               <span class="ctext">All three packages created, sitting beside <code>StudentsApplication.java</code>.</span>
             </label>
 
+            <h3>Now add Swagger UI — your testing tool</h3>
+            <div class="concept">
+              <span class="lbl">Why this goes in now, not at the end</span>
+              Swagger UI is how you'll test <em>every</em> endpoint today, so we set it up before writing any code.
+              It isn't offered on the Initializr page (it's a third-party library), so you add it to
+              <code>pom.xml</code> by hand — <strong>one dependency, and you're done</strong>.
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — step by step</span>
+              <ol>
+                <li>Open <code>pom.xml</code>.</li>
+                <li>Find the existing <code>&lt;dependencies&gt;</code> block — it already contains
+                    <code>spring-boot-starter-web</code>.</li>
+                <li>Paste the dependency below <strong>inside</strong> that block, just before the closing
+                    <code>&lt;/dependencies&gt;</code>.</li>
+                <li>Save. IntelliJ downloads it automatically; if not, click the small Maven <strong>reload</strong>
+                    icon that appears (Eclipse: right-click the project → Maven → Update Project).</li>
+              </ol>
+            </div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Keep that version number</span>
+              Unlike the Spring starters, springdoc is <strong>not</strong> managed by the Spring Boot parent POM, so
+              it needs an explicit <code>&lt;version&gt;</code>. <strong>2.8.6</strong> is tested against Spring Boot
+              3.5.x, which is what Initializr gives you. Older versions such as 2.5.x <em>fail at startup</em> on Boot
+              3.5 with a <code>ControllerAdviceBean</code> error — so if you hit that, check this number first.
+            </div>
+
             <div class="runbox">
-              <span class="lbl">Sanity check before you continue</span>
+              <span class="lbl">Now run it and confirm Swagger UI works</span>
               <ol>
                 <li>Run <code>StudentsApplication</code>.</li>
                 <li>Wait for <strong>"Tomcat started on port 8080"</strong> in the console.</li>
-                <li>Stop it again. You now have a clean, verified starting point.</li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span> in your browser.</li>
               </ol>
             </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — the Swagger UI page loads</span>
+              You'll see the Swagger header, a title reading <strong>"OpenAPI definition"</strong>, and a
+              <strong>Servers</strong> dropdown showing <code>http://localhost:8080</code>.
+              <br><br>
+              Below that it will say <strong>"No operations defined in spec!"</strong> — and that is
+              <strong>exactly right</strong>. We haven't written a controller yet, so there are no endpoints to
+              document. From Lab 3 onwards, each endpoint you write will appear on this page automatically.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext">Swagger UI loads at <code>/swagger-ui.html</code> and reports "No operations defined in spec!".</span>
+              </label>
+            </div>
+
+            <div class="observe">
+              <span class="lbl">Two other URLs worth knowing</span>
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>URL</th><th>What it is</th></tr></thead>
+                <tbody>
+                  <tr><td><code>/swagger-ui.html</code></td><td>The interactive page. Redirects to <code>/swagger-ui/index.html</code> — either works</td></tr>
+                  <tr><td><code>/v3/api-docs</code></td><td>The raw <strong>OpenAPI</strong> specification as JSON — the machine-readable contract Swagger UI reads</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3>Common issues</h3>
+            <table class="issues">
+              <thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td><strong>404</strong> at <code>/swagger-ui.html</code></td>
+                  <td>The dependency wasn't downloaded, or the app wasn't restarted.</td>
+                  <td>Refresh Maven, then restart. Also try <code>/swagger-ui/index.html</code>.</td>
+                </tr>
+                <tr>
+                  <td>App fails to start after adding the dependency</td>
+                  <td>springdoc version too old for your Spring Boot version.</td>
+                  <td>Use <code>2.8.6</code> (or newer <code>2.8.x</code>) with Spring Boot 3.5.x.</td>
+                </tr>
+                <tr>
+                  <td>An <code>INFO</code> line saying <code>Failed to set up a Bean Validation provider</code></td>
+                  <td>springdoc pulls in the validation <em>API</em> but no implementation.</td>
+                  <td><strong>Harmless — ignore it.</strong> It's INFO, not an error. Session 3 adds the real validation starter.</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </details>
       </section>
@@ -1110,16 +1202,48 @@ public class StudentController {
 }</code></pre></div>
 
             <div class="runbox">
-              <span class="lbl">Now run it</span>
+              <span class="lbl">Now run it — and meet Swagger UI properly</span>
               <ol>
                 <li><strong>Stop</strong> any previous run (the red square).</li>
                 <li><strong>Run</strong> <code>StudentsApplication</code>.</li>
-                <li>Visit <code>http://localhost:8080/api/students</code></li>
+                <li>Open <span class="kbd">http://localhost:8080/swagger-ui.html</span></li>
               </ol>
             </div>
 
             <div class="expected">
-              <span class="lbl">Expected output — <code>200 OK</code></span>
+              <span class="lbl">Expected — your endpoint has appeared, on its own</span>
+              Where it said "No operations defined in spec!" a minute ago, you now have a clickable row:
+              <div class="dash-mock">
+                <div class="dm-top">📘 Swagger UI &nbsp;·&nbsp; http://localhost:8080/swagger-ui.html</div>
+                <table>
+                  <thead><tr><th>Verb</th><th>Path</th></tr></thead>
+                  <tbody>
+                    <tr><td class="app">GET</td><td><code>/api/students</code></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <strong>You wrote no documentation.</strong> Swagger read your controller at startup and generated
+              that. Every endpoint you add today will show up the same way.
+              <label class="check"><input type="checkbox" class="labstep" />
+                <span class="ctext"><code>GET /api/students</code> appears as a row in Swagger UI.</span>
+              </label>
+            </div>
+
+            <div class="dothis">
+              <span class="lbl">Do this — the four clicks you'll repeat all session</span>
+              <ol>
+                <li><strong>Click the row</strong> (<code>GET /api/students</code>) to expand it.</li>
+                <li>Click <strong>"Try it out"</strong> — the button at the top right of the panel that just opened.</li>
+                <li>Click the big blue <strong>Execute</strong> button.</li>
+                <li>Scroll down to the <strong>Responses</strong> section and read the result.</li>
+              </ol>
+              <strong>Learn this four-click rhythm now</strong> — expand → Try it out → Execute → read. Every lab from
+              here is that same loop with different values.
+            </div>
+
+            <div class="expected">
+              <span class="lbl">Expected — <code>200</code> and three students</span>
+              In the Responses panel you'll see <strong>Code <code>200</code></strong> and this response body:
               <div class="codewrap"><pre><code>[
   { "id": 1, "name": "Amit Shah",  "email": "amit@tcs.com", "grade": "A" },
   { "id": 2, "name": "Neha Patel", "email": "neha@tcs.com", "grade": "B" },
@@ -1128,30 +1252,46 @@ public class StudentController {
               Note the <strong>square brackets</strong> — returning a Java <code>List</code> produced a JSON array
               automatically.
               <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext"><code>GET /api/students</code> returns all three students as a JSON array.</span>
+                <span class="ctext">Executing it in Swagger UI returns <code>200</code> with all three students.</span>
               </label>
             </div>
 
             <div class="observe">
-              <span class="lbl">🚨 Whitelabel 404? Work through these in order</span>
+              <span class="lbl">Three things in that response panel worth noticing</span>
               <ol style="margin:6px 0 0;">
-                <li><strong>Did you restart?</strong> New classes are only found at startup.</li>
-                <li><strong>Check the package line.</strong> It must be
-                    <code>package com.tcs.training.students.controller;</code> — with <code>.students.</code> in the
-                    middle. Missing that means Spring never scanned the file.</li>
-                <li><strong>Check the URL.</strong> <code>/api/students</code> — plural, and with the
-                    <code>/api</code> prefix from the class-level annotation.</li>
-                <li><strong>Is <code>@RestController</code> there?</strong> Not <code>@Controller</code> — that would
-                    treat your return value as a page name.</li>
+                <li><strong>The status code is displayed prominently</strong> (<code>200</code>). Get into the habit of
+                    reading it <em>before</em> the body — it tells you whether to debug your request or your server.</li>
+                <li><strong>Response headers</strong> are listed underneath, including
+                    <code>content-type: application/json</code>. That's Spring telling the client what it sent.</li>
+                <li><strong>A "Curl" box</strong> shows the exact command equivalent to what you just clicked. That's
+                    genuinely useful — it's how you'd script this, or paste it to a colleague.</li>
               </ol>
             </div>
 
-            <div class="concept">
-              <span class="lbl">Also try it in Postman now — get familiar before you need it</span>
-              Set the verb to <code>GET</code>, URL <code>http://localhost:8080/api/students</code>, hit
-              <strong>Send</strong>. Notice the <strong>status code</strong> in the top right (<code>200 OK</code>)
-              and the neatly formatted JSON. Reading that status code is a habit worth building now — from Lab 6 it's
-              the main thing you'll be checking.
+            <div class="tryit">
+              <span class="lbl">Also try the plain URL</span>
+              A <code>GET</code> works fine straight in the address bar too:
+              <code>http://localhost:8080/api/students</code>. Worth seeing once, so you know Swagger isn't doing
+              anything magic — it's just sending an ordinary HTTP request. From Lab 6 the address bar stops being
+              enough, which is exactly why we set Swagger up.
+            </div>
+
+            <div class="observe">
+              <span class="lbl">🚨 Endpoint missing from Swagger UI, or a 404? Work through these in order</span>
+              <ol style="margin:6px 0 0;">
+                <li><strong>Did you restart?</strong> Swagger reads your controllers <em>at startup</em>, so a new
+                    endpoint is invisible until you restart — then <strong>hard-refresh the page</strong>
+                    (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>).</li>
+                <li><strong>Check the package line.</strong> It must be
+                    <code>package com.tcs.training.students.controller;</code> — with <code>.students.</code> in the
+                    middle. Missing that means Spring never scanned the file, so there's nothing for Swagger to find.</li>
+                <li><strong>Is <code>@RestController</code> there?</strong> Not <code>@Controller</code> — that would
+                    treat your return value as a page name.</li>
+                <li><strong>Check the URL</strong> if you're calling it directly: <code>/api/students</code> — plural,
+                    and with the <code>/api</code> prefix from the class-level annotation.</li>
+              </ol>
+              💡 <strong>Swagger UI is itself a diagnostic:</strong> if your endpoint isn't listed on that page, Spring
+              never registered it — so the problem is your class, not your URL.
             </div>
           </div>
         </details>
@@ -1232,24 +1372,39 @@ public class StudentController {
               <span class="lbl">Now run it</span>
               <ol>
                 <li>Stop the app, then run it again.</li>
-                <li>Visit each URL below. For the 404 case, <strong>watch the status code in Postman</strong> — a
-                    browser shows an empty page and hides the code from you.</li>
+                <li>Refresh <span class="kbd">http://localhost:8080/swagger-ui.html</span> — a
+                    <strong>second row</strong> has appeared: <code>GET /api/students/{id}</code>.</li>
+                <li>Expand it → <strong>Try it out</strong>. Notice you now get an <strong>input box labelled
+                    <code>id</code></strong>, because your method has a <code>@PathVariable</code>.</li>
+                <li>Type <code>2</code> → <strong>Execute</strong>. Then repeat with <code>99</code>, then
+                    <code>abc</code>.</li>
               </ol>
             </div>
 
             <div class="expected">
-              <span class="lbl">Expected output</span>
+              <span class="lbl">Expected output — three different outcomes from one endpoint</span>
               <table class="issues" style="margin-top:6px;">
-                <thead><tr><th>Request</th><th>Status</th><th>Body</th></tr></thead>
+                <thead><tr><th>You type</th><th>Code</th><th>Response body</th></tr></thead>
                 <tbody>
-                  <tr><td><code>GET /api/students/2</code></td><td><code>200 OK</code></td><td><code>{"id":2,"name":"Neha Patel","email":"neha@tcs.com","grade":"B"}</code></td></tr>
-                  <tr><td><code>GET /api/students/99</code></td><td><code>404 Not Found</code></td><td><em>empty</em></td></tr>
-                  <tr><td><code>GET /api/students/abc</code></td><td><code>400 Bad Request</code></td><td>type-conversion error</td></tr>
+                  <tr><td><code>2</code></td><td><code>200</code></td><td><code>{"id":2,"name":"Neha Patel","email":"neha@tcs.com","grade":"B"}</code></td></tr>
+                  <tr><td><code>99</code></td><td><code>404</code></td><td><em>empty — no such student</em></td></tr>
+                  <tr><td><code>abc</code></td><td><code>400</code></td><td>type-conversion error</td></tr>
                 </tbody>
               </table>
               <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext">Valid id returns <code>200</code> with the student; id <code>99</code> returns <code>404</code>.</span>
+                <span class="ctext">Id <code>2</code> returns <code>200</code> with the student; id <code>99</code> returns <code>404</code>.</span>
               </label>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">This is where Swagger UI earns its keep over a browser</span>
+              Try <code>/api/students/99</code> in the address bar and you get a <strong>blank white page</strong> —
+              the browser renders the empty body and <em>hides the status code from you</em>. It looks broken, and you
+              can't tell <code>404</code> from a crash.
+              <br><br>
+              In Swagger UI the same request shows <strong><code>404</code> in large text</strong>, so the outcome is
+              unmistakable. Since half of good API design <em>is</em> choosing the right status code, you need a tool
+              that shows them to you.
             </div>
 
             <div class="observe">
@@ -1268,10 +1423,14 @@ public class StudentController {
             </div>
 
             <div class="tryit">
-              <span class="lbl">curl equivalents, if you prefer the terminal</span>
-              <div class="codewrap"><pre><code># -i shows the response headers, including the status line
-curl -i http://localhost:8080/api/students/2
-curl -i http://localhost:8080/api/students/99</code></pre></div>
+              <span class="lbl">💡 Where to find the curl equivalent</span>
+              After any <strong>Execute</strong>, Swagger UI shows a <strong>Curl</strong> box containing the exact
+              command it just ran — for example:
+              <div class="codewrap"><pre><code>curl -X 'GET' \
+  'http://localhost:8080/api/students/2' \
+  -H 'accept: application/json'</code></pre></div>
+              You never have to write these by hand. Copy one when you want to script a call or share a reproduction
+              with a colleague.
             </div>
           </div>
         </details>
@@ -1325,21 +1484,24 @@ curl -i http://localhost:8080/api/students/99</code></pre></div>
             <div class="runbox">
               <span class="lbl">Now run it</span>
               <ol>
-                <li>Stop, restart the app.</li>
-                <li>Visit <code>http://localhost:8080/api/students/search?grade=A</code></li>
-                <li>Then <code>?grade=B</code>, then <code>?grade=Z</code>, then no parameter at all.</li>
+                <li>Stop, restart the app, and refresh Swagger UI.</li>
+                <li>Expand <code>GET /api/students/search</code> → <strong>Try it out</strong>.</li>
+                <li>Notice the <code>grade</code> box is <strong>pre-filled with <code>A</code></strong> — Swagger read
+                    your <code>defaultValue = "A"</code> straight from the code.</li>
+                <li><strong>Execute</strong> with <code>A</code>, then <code>B</code>, then <code>Z</code>, then clear
+                    the box entirely and execute again.</li>
               </ol>
             </div>
 
             <div class="expected">
               <span class="lbl">Expected output</span>
               <table class="issues" style="margin-top:6px;">
-                <thead><tr><th>Request</th><th>Response</th></tr></thead>
+                <thead><tr><th>Value in the <code>grade</code> box</th><th>Response</th></tr></thead>
                 <tbody>
-                  <tr><td><code>/api/students/search?grade=A</code></td><td>Amit and Ravi — a 2-item array</td></tr>
-                  <tr><td><code>/api/students/search?grade=B</code></td><td>Neha only — a 1-item array</td></tr>
-                  <tr><td><code>/api/students/search?grade=Z</code></td><td><code>[]</code> — an <strong>empty array</strong>, with status <code>200</code></td></tr>
-                  <tr><td><code>/api/students/search</code></td><td>Grade A students (the <code>defaultValue</code>)</td></tr>
+                  <tr><td><code>A</code></td><td>Amit and Ravi — a 2-item array</td></tr>
+                  <tr><td><code>B</code></td><td>Neha only — a 1-item array</td></tr>
+                  <tr><td><code>Z</code></td><td><code>[]</code> — an <strong>empty array</strong>, with status <code>200</code></td></tr>
+                  <tr><td><em>left empty</em></td><td>Grade A students (the <code>defaultValue</code>)</td></tr>
                 </tbody>
               </table>
               <label class="check"><input type="checkbox" class="labstep" />
@@ -1386,24 +1548,42 @@ curl -i http://localhost:8080/api/students/99</code></pre></div>
             </div>
 
             <div class="warnbox">
-              <span class="lbl">⚠️ From here on, a browser will not work</span>
-              A browser address bar can only send <code>GET</code>. To send a <code>POST</code> with a body you need
-              <strong>Postman</strong>, <strong>curl</strong>, or the Swagger UI from the bonus lab.
+              <span class="lbl">⚠️ From here on, the address bar will not work</span>
+              A browser address bar can only send <code>GET</code> — there is no way to choose a verb or attach a body.
+              <strong>This is the moment Swagger UI becomes essential</strong> rather than merely convenient.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
                 <li>Add the imports and the new method below to <code>StudentController.java</code>.</li>
-                <li>Restart the app.</li>
-                <li>In <strong>Postman</strong>: set the verb to <code>POST</code>, URL
-                    <code>http://localhost:8080/api/students</code>.</li>
-                <li>Go to the <strong>Body</strong> tab → select <strong>raw</strong> → choose
-                    <strong>JSON</strong> from the dropdown on the right. <em>(This step is what sets the
-                    <code>Content-Type</code> header — skip it and you get 415.)</em></li>
-                <li>Paste the JSON body below and click <strong>Send</strong>.</li>
-                <li>Then <code>GET /api/students</code> again to confirm your new student is in the list.</li>
+                <li>Restart the app, then refresh Swagger UI.</li>
+                <li>A <strong>green <code>POST /api/students</code></strong> row has appeared. Expand it →
+                    <strong>Try it out</strong>.</li>
+                <li>You now get a <strong>Request body</strong> editor, <strong>already filled in</strong> with an
+                    example. Replace it with the JSON below (or just edit the placeholder values).</li>
+                <li>Click <strong>Execute</strong>.</li>
+                <li>Then run <code>GET /api/students</code> again to confirm your new student is in the list.</li>
               </ol>
+            </div>
+
+            <div class="concept">
+              <span class="lbl">The request body is pre-filled from your own class — read this bit</span>
+              When you click "Try it out", Swagger offers you something like:
+              <div class="codewrap"><pre><code>{
+  "id": 0,
+  "name": "string",
+  "email": "string",
+  "grade": "string"
+}</code></pre></div>
+              <strong>It built that from your <code>Student</code> class</strong> — one entry per field, with a
+              placeholder for each type (<code>0</code> for the <code>int</code>, <code>"string"</code> for each
+              <code>String</code>). It is a template, not real data: <strong>replace the values.</strong>
+              <br><br>
+              💡 <strong>What about <code>"id": 0</code>?</strong> Leave it or delete it — either works. Your
+              <code>save()</code> method calls <code>setId(nextId++)</code>, so <strong>the server overwrites whatever
+              id you send.</strong> That's deliberate: clients must never choose their own ids, or two clients could
+              pick the same one.
             </div>
 
             <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
@@ -1423,7 +1603,7 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }</code></pre></div>
 
-            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">Postman → Body → raw → JSON</span><span class="fb-tag">paste as the request body</span></div>
+            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">Swagger UI → POST /api/students → Request body</span><span class="fb-tag">replace the example with this</span></div>
             <div class="codewrap"><pre><code>{
   "name": "Priya Desai",
   "email": "priya@tcs.com",
@@ -1447,7 +1627,7 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
   "grade": "A"
 }</code></pre></div>
               Check <strong>both</strong> things: the status code reads <code>201 Created</code> (top right in
-              Postman), and the body now contains <code>"id": 4</code> — assigned by your service.
+              Swagger UI's response panel), and the body now contains <code>"id": 4</code> — assigned by your service.
               <label class="check"><input type="checkbox" class="labstep" />
                 <span class="ctext"><code>POST</code> returns <code>201 Created</code> with the new student and its server-assigned id.</span>
               </label>
@@ -1456,11 +1636,22 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
               </label>
             </div>
 
-            <div class="tryit">
-              <span class="lbl">curl equivalent</span>
-              <div class="codewrap"><pre><code>curl -i -X POST http://localhost:8080/api/students \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Priya Desai","email":"priya@tcs.com","grade":"A"}'</code></pre></div>
+            <div class="concept">
+              <span class="lbl">💡 Look at the Curl box — Swagger set a header for you</span>
+              After executing, the Curl box shows:
+              <div class="codewrap"><pre><code>curl -X 'POST' \
+  'http://localhost:8080/api/students' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{ "name": "Priya Desai", "email": "priya@tcs.com", "grade": "A" }'</code></pre></div>
+              Notice <code>-H 'Content-Type: application/json'</code>. That header tells the server
+              <em>"my body is JSON"</em>, and <strong>without it Spring rejects the request with
+              <code>415 Unsupported Media Type</code></strong>.
+              <br><br>
+              <strong>Swagger UI sets it automatically</strong>, because it knows from your code that the endpoint
+              consumes JSON — which is why you will not hit <code>415</code> today. But you <em>will</em> hit it the
+              first time you use another tool and forget the header, so it's worth knowing the name of that error and
+              what causes it.
             </div>
 
             <h3>Common issues</h3>
@@ -1469,8 +1660,8 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
               <tbody>
                 <tr>
                   <td><strong>415</strong> Unsupported Media Type</td>
-                  <td>The <code>Content-Type: application/json</code> header is missing. <strong>By far the most common issue in this lab.</strong></td>
-                  <td>In Postman: Body → <strong>raw</strong> → pick <strong>JSON</strong> (not Text) from the dropdown. With curl: include <code>-H "Content-Type: application/json"</code>.</td>
+                  <td>The <code>Content-Type: application/json</code> header is missing. Swagger UI sets it for you, so this only appears if you're using another tool.</td>
+                  <td>With curl, add <code>-H "Content-Type: application/json"</code>. In Postman it's Body → raw → JSON.</td>
                 </tr>
                 <tr>
                   <td><strong>400</strong> Bad Request</td>
@@ -1497,7 +1688,7 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
 
             <div class="tryit">
               <span class="lbl">Try it — feel the "not idempotent" problem</span>
-              Click <strong>Send</strong> on the same POST <strong>three times</strong>, then
+              Click <strong>Execute</strong> on the same POST <strong>three times</strong>, then
               <code>GET /api/students</code>. You now have <strong>three identical Priyas</strong> with different ids.
               That's <code>POST</code> not being idempotent, exactly as the theory said — and it's why a mobile app
               can't blindly retry a failed POST after a dropped connection.
@@ -1529,12 +1720,15 @@ import org.springframework.web.bind.annotation.RequestBody;</code></pre></div>
               <span class="lbl">Do this — step by step</span>
               <ol>
                 <li>Add the imports and both methods below to <code>StudentController.java</code>.</li>
-                <li>Restart the app.</li>
-                <li><strong>Test PUT:</strong> verb <code>PUT</code>, URL
-                    <code>http://localhost:8080/api/students/2</code>, Body → raw → JSON, paste the update body.</li>
-                <li><strong>Test DELETE:</strong> verb <code>DELETE</code>, URL
-                    <code>http://localhost:8080/api/students/3</code>, <strong>no body needed</strong>.</li>
-                <li><code>GET /api/students</code> to confirm both changes took effect.</li>
+                <li>Restart the app, then refresh Swagger UI. <strong>Two more rows</strong> appear — an orange
+                    <code>PUT</code> and a red <code>DELETE</code>.</li>
+                <li><strong>Test PUT:</strong> expand <code>PUT /api/students/{id}</code> → Try it out →
+                    <code>id</code> = <code>2</code> → replace the request body with the JSON below →
+                    <strong>Execute</strong>.</li>
+                <li><strong>Test DELETE:</strong> expand <code>DELETE /api/students/{id}</code> → Try it out →
+                    <code>id</code> = <code>3</code> → <strong>Execute</strong>. Notice there's
+                    <strong>no request body box at all</strong> — Swagger knows a <code>DELETE</code> doesn't take one.</li>
+                <li>Run <code>GET /api/students</code> to confirm both changes took effect.</li>
               </ol>
             </div>
 
@@ -1568,7 +1762,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;</code></pre></div>
         return ResponseEntity.noContent().build();      // 204 No Content
     }</code></pre></div>
 
-            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">PUT body → Postman → Body → raw → JSON</span><span class="fb-tag">paste as the request body</span></div>
+            <div class="filebar"><span class="fb-icon">📋</span><span class="fb-name">Swagger UI → PUT /api/students/{id} → Request body</span><span class="fb-tag">replace the example with this</span></div>
             <div class="codewrap"><pre><code>{
   "name": "Neha Patel",
   "email": "neha.patel@tcs.com",
@@ -1605,14 +1799,21 @@ import org.springframework.web.bind.annotation.DeleteMapping;</code></pre></div>
             </div>
 
             <div class="tryit">
-              <span class="lbl">curl equivalents</span>
-              <div class="codewrap"><pre><code># Update
-curl -i -X PUT http://localhost:8080/api/students/2 \
-     -H "Content-Type: application/json" \
-     -d '{"name":"Neha Patel","email":"neha.patel@tcs.com","grade":"A"}'
-
-# Delete
-curl -i -X DELETE http://localhost:8080/api/students/3</code></pre></div>
+              <span class="lbl">💡 Notice how the UI adapts to each verb</span>
+              Swagger UI builds each panel from <em>your method signature</em>:
+              <table class="issues" style="margin-top:6px;">
+                <thead><tr><th>Endpoint</th><th>What Swagger shows you</th><th>Because…</th></tr></thead>
+                <tbody>
+                  <tr><td><code>GET /api/students</code></td><td>Just an Execute button</td><td>no parameters</td></tr>
+                  <tr><td><code>GET /api/students/{id}</code></td><td>An <code>id</code> box</td><td><code>@PathVariable</code></td></tr>
+                  <tr><td><code>GET .../search</code></td><td>A <code>grade</code> box, pre-filled <code>A</code></td><td><code>@RequestParam(defaultValue="A")</code></td></tr>
+                  <tr><td><code>POST /api/students</code></td><td>A request-body editor</td><td><code>@RequestBody</code></td></tr>
+                  <tr><td><code>PUT /api/students/{id}</code></td><td><strong>Both</strong> an id box and a body editor</td><td>it has both annotations</td></tr>
+                  <tr><td><code>DELETE /api/students/{id}</code></td><td>An id box, <strong>no</strong> body editor</td><td>no <code>@RequestBody</code></td></tr>
+                </tbody>
+              </table>
+              You never configured any of that. <strong>The form is generated from your code</strong> — which is also
+              why a wrong annotation shows up here as a wrong-looking form.
             </div>
 
             <div class="concept">
@@ -1626,88 +1827,153 @@ curl -i -X DELETE http://localhost:8080/api/students/3</code></pre></div>
       </section>
 
 
-      <!-- ===== BONUS: SWAGGER ===== -->
+      <!-- ===== BONUS: DOCUMENTING THE API ===== -->
       <div class="section-band">If you finish early</div>
       <section class="section">
         <details class="exp bonus">
-          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Swagger UI — Interactive Docs From Your Own Code</summary>
+          <summary><span class="lab-tag">BONUS</span><span class="chevron">▶</span> Make Your API Document Itself Properly</summary>
           <div class="exp-body">
             <div class="concept">
-              <span class="lbl">Concept</span>
-              Add <strong>one dependency</strong>, write <strong>zero Java</strong>, and get a live documentation page
-              that lists every endpoint you built and lets you <em>execute</em> them from the browser — including
-              POST, PUT and DELETE. It reads your controllers at startup, so the docs can never fall out of date.
+              <span class="lbl">Concept — from "it works" to "someone else can use it"</span>
+              Swagger UI already lists your endpoints, but it's guessing the labels from your method names, and the
+              page title still says the generic <strong>"OpenAPI definition"</strong>. Real teams add a few annotations
+              so the page reads like actual documentation.
+              <br><br>
+              This matters more than it sounds: a front-end developer should be able to open your Swagger page and use
+              your entire API <strong>without asking you a single question</strong>. Getting there costs about ten
+              minutes.
             </div>
 
             <div class="dothis">
               <span class="lbl">Do this — step by step</span>
               <ol>
-                <li>Add the dependency below <strong>inside</strong> the existing <code>&lt;dependencies&gt;</code>
-                    block in <code>pom.xml</code>.</li>
-                <li>Save, then let Maven download it (IntelliJ does this automatically; Eclipse: right-click →
-                    Maven → Update Project).</li>
-                <li>Restart the app.</li>
-                <li>Open <code>http://localhost:8080/swagger-ui.html</code></li>
+                <li>Add the two imports below to <code>StudentController.java</code>.</li>
+                <li>Add <code>@Tag</code> on the <strong>class</strong>, and an <code>@Operation</code> above
+                    <strong>each</strong> method.</li>
+                <li>Restart and refresh Swagger UI.</li>
               </ol>
             </div>
 
-            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">pom.xml</span><span class="fb-tag">add inside &lt;dependencies&gt;</span></div>
-            <div class="codewrap"><pre><code>&lt;dependency&gt;
-    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
-    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
-    &lt;version&gt;2.6.0&lt;/version&gt;
-&lt;/dependency&gt;</code></pre></div>
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — add these imports</span><span class="fb-tag">add to the import block</span></div>
+            <div class="codewrap"><pre><code>import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;</code></pre></div>
+
+            <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">StudentController.java — annotate the class and its methods</span><span class="fb-tag">pattern to apply</span></div>
+            <div class="codewrap"><pre><code>@RestController
+@RequestMapping("/api/students")
+@Tag(name = "Students", description = "Create, read, update and delete students")
+public class StudentController {
+
+    // ... constructor unchanged ...
+
+    @Operation(summary = "Get all students")
+    @GetMapping
+    public List&lt;Student&gt; getAllStudents() {
+        return service.findAll();
+    }
+
+    @Operation(summary = "Search students by grade")
+    @GetMapping("/search")
+    public List&lt;Student&gt; searchByGrade(
+            @RequestParam(defaultValue = "A") String grade) {
+        return service.findByGrade(grade);
+    }
+
+    @Operation(summary = "Get one student by id")
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Create a new student")
+    @PostMapping
+    public ResponseEntity&lt;Student&gt; createStudent(@RequestBody Student student) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Update an existing student")
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;Student&gt; updateStudent(@PathVariable int id,
+                                                 @RequestBody Student student) {
+        // ... unchanged ...
+    }
+
+    @Operation(summary = "Delete a student")
+    @DeleteMapping("/{id}")
+    public ResponseEntity&lt;Void&gt; deleteStudent(@PathVariable int id) {
+        // ... unchanged ...
+    }
+}</code></pre></div>
+
+            <div class="warnbox">
+              <span class="lbl">⚠️ Watch the import — it is <code>v3</code>, and it is <em>not</em> a Spring package</span>
+              The correct package is <code>io.swagger.v3.oas.annotations</code>. Your IDE may also offer
+              <code>io.swagger.annotations</code> (that's the old Swagger 2 package) — <strong>pick the
+              <code>v3</code> one.</strong>
+            </div>
 
             <div class="expected">
-              <span class="lbl">Expected output at <code>/swagger-ui.html</code></span>
-              <p>A page listing all six of your endpoints:</p>
+              <span class="lbl">Expected — the page now reads like documentation</span>
               <div class="dash-mock">
-                <div class="dm-top">📘 Swagger UI &nbsp;·&nbsp; OpenAPI definition</div>
+                <div class="dm-top">📘 Swagger UI</div>
                 <table>
-                  <thead><tr><th>Verb</th><th>Path</th><th>Try it?</th></tr></thead>
+                  <thead><tr><th>Verb</th><th>Path</th><th>Summary</th></tr></thead>
                   <tbody>
-                    <tr><td class="app">GET</td><td><code>/api/students</code></td><td class="up">✓ executable</td></tr>
-                    <tr><td class="app">POST</td><td><code>/api/students</code></td><td class="up">✓ executable</td></tr>
-                    <tr><td class="app">GET</td><td><code>/api/students/{id}</code></td><td class="up">✓ executable</td></tr>
-                    <tr><td class="app">PUT</td><td><code>/api/students/{id}</code></td><td class="up">✓ executable</td></tr>
-                    <tr><td class="app">DELETE</td><td><code>/api/students/{id}</code></td><td class="up">✓ executable</td></tr>
-                    <tr><td class="app">GET</td><td><code>/api/students/search</code></td><td class="up">✓ executable</td></tr>
+                    <tr><td class="app">GET</td><td><code>/api/students</code></td><td>Get all students</td></tr>
+                    <tr><td class="app">POST</td><td><code>/api/students</code></td><td>Create a new student</td></tr>
+                    <tr><td class="app">GET</td><td><code>/api/students/search</code></td><td>Search students by grade</td></tr>
+                    <tr><td class="app">GET</td><td><code>/api/students/{id}</code></td><td>Get one student by id</td></tr>
+                    <tr><td class="app">PUT</td><td><code>/api/students/{id}</code></td><td>Update an existing student</td></tr>
+                    <tr><td class="app">DELETE</td><td><code>/api/students/{id}</code></td><td>Delete a student</td></tr>
                   </tbody>
                 </table>
               </div>
+              All six endpoints are now grouped under a heading reading
+              <strong>"Students — Create, read, update and delete students"</strong>, and each row carries your own
+              description instead of a guessed one.
               <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext">Swagger UI loads and lists all six endpoints.</span>
-              </label>
-            </div>
-
-            <div class="dothis">
-              <span class="lbl">Now use it to send a POST — no Postman required</span>
-              <ol>
-                <li>Click the <strong>POST /api/students</strong> row to expand it.</li>
-                <li>Click <strong>"Try it out"</strong> (top right of that panel).</li>
-                <li>Edit the pre-filled JSON in the "Request body" box.</li>
-                <li>Click the big blue <strong>Execute</strong> button.</li>
-                <li>Scroll down to see the real response — status code, headers and body.</li>
-              </ol>
-              <label class="check"><input type="checkbox" class="labstep" />
-                <span class="ctext">I created a student through Swagger UI and saw <code>201 Created</code>.</span>
+                <span class="ctext">My endpoint descriptions and the "Students" group heading appear in Swagger UI.</span>
               </label>
             </div>
 
             <div class="observe">
-              <span class="lbl">Two other useful URLs</span>
-              <code>/v3/api-docs</code> gives the raw <strong>OpenAPI</strong> specification as JSON — the machine
-              readable contract. Front-end teams feed that file into code generators to produce a typed client
-              automatically. And if <code>/swagger-ui.html</code> 404s, try
-              <code>/swagger-ui/index.html</code> — some versions serve it there.
+              <span class="lbl">One thing that will look odd — and it's fine</span>
+              The rows are <strong>grouped by path</strong>, not in the order you wrote them, so the three
+              <code>/{id}</code> operations sit together. Swagger organises by resource, which is usually what a reader
+              wants. Nothing is wrong with your code.
             </div>
 
             <div class="tryit">
-              <span class="lbl">Stretch goal — describe your endpoints</span>
-              Add <code>@Operation(summary = "Get all students")</code> above a controller method (import
-              <code>io.swagger.v3.oas.annotations.Operation</code>) and <code>@Tag(name = "Students")</code> on the
-              class. Restart and watch your descriptions appear in the Swagger page. This is how real teams document
-              an API — in the code, right next to what it describes.
+              <span class="lbl">Stretch goal 1 — document the status codes</span>
+              Right now Swagger claims every endpoint returns <code>200</code>, because that's the default assumption.
+              You know better. Add <code>@ApiResponses</code> to tell the truth:
+              <div class="codewrap"><pre><code>import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
+@Operation(summary = "Get one student by id")
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Student found"),
+    @ApiResponse(responseCode = "404", description = "No student with that id")
+})
+@GetMapping("/{id}")
+public ResponseEntity&lt;Student&gt; getStudentById(@PathVariable int id) { ... }</code></pre></div>
+              Restart and expand that endpoint — the Responses table now lists <strong>both</strong> outcomes, so a
+              caller knows to handle the <code>404</code> before they write a line of code.
+            </div>
+
+            <div class="tryit">
+              <span class="lbl">Stretch goal 2 — name your API and look at the raw contract</span>
+              Add these to <code>application.properties</code> to title the page:
+              <div class="codewrap"><pre><code>springdoc.swagger-ui.path=/swagger-ui.html
+spring.application.name=students</code></pre></div>
+              Then open <span class="kbd">http://localhost:8080/v3/api-docs</span>. That JSON is the
+              <strong>OpenAPI specification</strong> — the machine-readable contract Swagger UI is rendering. Find your
+              <code>Student</code> schema inside it under <code>components.schemas</code>, and notice it lists exactly
+              the four fields of your class.
+              <br><br>
+              💡 <strong>Why that file matters in industry:</strong> front-end teams feed it into a code generator and
+              get a fully typed client (TypeScript, Java, Python) for your API <em>automatically</em>. That's the real
+              payoff of documenting from code — the docs aren't just readable, they're <em>executable</em>.
             </div>
           </div>
         </details>
@@ -1717,10 +1983,24 @@ curl -i -X DELETE http://localhost:8080/api/students/3</code></pre></div>
       <div class="section-band">Reference</div>
       <section class="section">
         <details class="ref-block">
-          <summary><span class="chevron">▶</span> ✅ Complete Files Reference — all three finished files</summary>
+          <summary><span class="chevron">▶</span> ✅ Complete Files Reference — the finished files</summary>
           <div class="exp-body">
-            <p>If you fell behind, or want to check your work, here are the three files exactly as they should look at
-            the end of the session. Paste each one over yours in full.</p>
+            <p>If you fell behind, or want to check your work, here is everything exactly as it should look at the end
+            of the session. Paste each one over yours in full.</p>
+
+            <div class="filebar"><span class="fb-icon">⚙️</span><span class="fb-name">pom.xml — the two dependencies you need</span><span class="fb-tag">inside &lt;dependencies&gt;</span></div>
+            <div class="codewrap"><pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+&lt;/dependency&gt;
+
+&lt;!-- Swagger UI — your testing tool. Needs an explicit version:
+     springdoc is not managed by the Spring Boot parent POM. --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springdoc&lt;/groupId&gt;
+    &lt;artifactId&gt;springdoc-openapi-starter-webmvc-ui&lt;/artifactId&gt;
+    &lt;version&gt;2.8.6&lt;/version&gt;
+&lt;/dependency&gt;</code></pre></div>
 
             <div class="filebar"><span class="fb-icon">📄</span><span class="fb-name">src/main/java/com/tcs/training/students/model/Student.java</span><span class="fb-tag">file 1 of 3 — complete</span></div>
             <div class="codewrap"><pre><code>package com.tcs.training.students.model;
@@ -1942,7 +2222,7 @@ public class StudentController {
                 <tr>
                   <td><strong>415</strong> Unsupported Media Type on POST/PUT</td>
                   <td>No <code>Content-Type: application/json</code> header. <strong>The most common Session 2 error.</strong></td>
-                  <td>Postman: Body → <strong>raw</strong> → select <strong>JSON</strong> (not Text). curl: add <code>-H "Content-Type: application/json"</code>.</td>
+                  <td>Swagger UI sets this header for you — so if you see 415, you're using a different tool. With curl add <code>-H "Content-Type: application/json"</code>.</td>
                 </tr>
                 <tr>
                   <td><strong>400</strong> Bad Request on POST/PUT</td>
@@ -1962,7 +2242,7 @@ public class StudentController {
                 <tr>
                   <td><strong>405</strong> Method Not Allowed</td>
                   <td>Right path, wrong verb.</td>
-                  <td>Check the Postman verb dropdown matches the annotation you wrote.</td>
+                  <td>Use the row for the verb you mean — in Swagger UI each verb is a separate coloured row.</td>
                 </tr>
                 <tr>
                   <td>Response is <code>{}</code> or fields are missing</td>
@@ -1985,6 +2265,31 @@ public class StudentController {
                   <td>Declare the <code>/search</code> method <strong>above</strong> the <code>/{id}</code> method in the file.</td>
                 </tr>
                 <tr>
+                  <td><strong>404</strong> at <code>/swagger-ui.html</code></td>
+                  <td>The springdoc dependency isn't on the classpath, or Maven hasn't refreshed.</td>
+                  <td>Check <code>pom.xml</code>, refresh Maven, restart. Also try <code>/swagger-ui/index.html</code>.</td>
+                </tr>
+                <tr>
+                  <td>Swagger UI says <strong>"No operations defined in spec!"</strong></td>
+                  <td>Spring found no controllers — either you haven't written one yet, or it's outside the scanned packages.</td>
+                  <td>Expected before Lab 3. After that, check the controller's <code>package</code> line starts <code>com.tcs.training.students</code>.</td>
+                </tr>
+                <tr>
+                  <td>A new endpoint is missing from Swagger UI</td>
+                  <td>Swagger reads controllers <strong>at startup</strong>; the browser also caches the page.</td>
+                  <td>Restart the app, then <strong>hard-refresh</strong> (<span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">R</span>).</td>
+                </tr>
+                <tr>
+                  <td>App won't start after adding springdoc</td>
+                  <td>springdoc version too old for your Spring Boot version.</td>
+                  <td>Use <code>2.8.6</code> or newer <code>2.8.x</code> with Spring Boot 3.5.x.</td>
+                </tr>
+                <tr>
+                  <td><code>INFO … Failed to set up a Bean Validation provider</code> at startup</td>
+                  <td>springdoc brings the validation API without an implementation.</td>
+                  <td><strong>Harmless.</strong> It's an INFO line, not an error. Ignore it.</td>
+                </tr>
+                <tr>
                   <td>All data resets on restart</td>
                   <td>The list lives in memory. Expected behaviour.</td>
                   <td>Nothing to fix — Session 3 introduces a real database.</td>
@@ -2000,7 +2305,7 @@ public class StudentController {
               <span class="lbl">⚠️ The Session 2 debugging order</span>
               <div class="rule">
                 1 · What <strong>status code</strong> came back? (4xx = my request, 5xx = my server code) &nbsp;→&nbsp;
-                2 · Did I set <strong>Body → raw → JSON</strong> in Postman? &nbsp;→&nbsp;
+                2 · Did I <strong>restart and hard-refresh</strong> Swagger UI? &nbsp;→&nbsp;
                 3 · Is the <strong>full path</strong> right (class prefix + method path)? &nbsp;→&nbsp;
                 4 · Did I <strong>restart</strong> after editing?
               </div>
@@ -2016,7 +2321,8 @@ public class StudentController {
           <div class="exp-body">
             <p>Answer these out loud before Session 3. Explaining them is the real test.</p>
             <ol class="steps">
-              <li>Why can't you test <code>POST</code> from a browser address bar?</li>
+              <li>Why can't you test <code>POST</code> from a browser address bar, and what did you use instead?</li>
+              <li>Where did Swagger UI's pre-filled request body come from, and why can you ignore the <code>"id"</code> in it?</li>
               <li>What exactly does <code>@RequestBody</code> do, and which two things must your model class have for it to work?</li>
               <li>Why does <code>POST</code> return <code>201</code> but <code>DELETE</code> return <code>204</code>?</li>
               <li>Why does searching for grade Z return <code>200</code> with <code>[]</code>, while <code>/students/99</code> returns <code>404</code>?</li>
@@ -2058,6 +2364,9 @@ public class StudentController {
                   <tr><td>Group</td><td><code>com.tcs.training</code></td></tr>
                   <tr><td>Artifact</td><td><code>students</code></td></tr>
                   <tr><td><strong>Base package</strong></td><td><code>com.tcs.training.students</code></td></tr>
+                  <tr><td><strong>Swagger UI</strong></td><td><code>/swagger-ui.html</code></td></tr>
+                  <tr><td>OpenAPI spec</td><td><code>/v3/api-docs</code></td></tr>
+                  <tr><td>springdoc version</td><td><code>2.8.6</code></td></tr>
                   <tr><td>Main class</td><td><code>StudentsApplication</code></td></tr>
                 </tbody>
               </table>

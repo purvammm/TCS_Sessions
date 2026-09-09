@@ -104,11 +104,11 @@ Remember that phrase. It comes back as one of the central ideas of this session.
 
 ## 1.3 How the web actually talks
 
-Everything we build is a **server**: a program that sits waiting and answers when asked. The asker is the **client** — a browser, a mobile app, Postman, or another server.
+Everything we build is a **server**: a program that sits waiting and answers when asked. The asker is the **client** — a browser, a mobile app, an API testing tool, or another server.
 
 ```mermaid
 flowchart LR
-    A["Client<br/>browser / Postman / app"] -->|"1. Request<br/>GET /hello"| B["Your Server<br/>Spring Boot app"]
+    A["Client<br/>browser / Swagger UI / app"] -->|"1. Request<br/>GET /hello"| B["Your Server<br/>Spring Boot app"]
     B -->|"2. Response<br/>200 OK · Hello!"| A
 ```
 
@@ -514,7 +514,7 @@ Those two questions are behind nearly every Whitelabel 404 and every "required a
 
 ```mermaid
 flowchart LR
-    A["Client<br/><i>browser / Postman</i>"] --> B["Tomcat<br/><i>embedded server</i>"]
+    A["Client<br/><i>browser / Swagger UI</i>"] --> B["Tomcat<br/><i>embedded server</i>"]
     B --> C["DispatcherServlet<br/><i>Spring's traffic cop</i>"]
     C --> D["Controller<br/><i>@RestController</i>"]
     D --> E["Service<br/><i>@Service</i>"]
@@ -1424,6 +1424,6 @@ Convention over configuration. `spring-boot-starter-web` is on the classpath, so
 
 ## Where next
 
-**Session 2 — REST Web Services.** You'll turn today's single endpoint into a complete CRUD API: all four HTTP verbs, JSON travelling in *both* directions with `@RequestBody`, correct status codes via `ResponseEntity`, and proper testing with Postman and Swagger.
+**Session 2 — REST Web Services.** You'll turn today's single endpoint into a complete CRUD API: all four HTTP verbs, JSON travelling in *both* directions with `@RequestBody`, correct status codes via `ResponseEntity`, and proper testing with Swagger UI.
 
 📄 [`session-2-rest-apis.md`](session-2-rest-apis.md)
