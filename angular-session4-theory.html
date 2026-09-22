@@ -1,0 +1,2552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular 19 Session 4 — Theory Slideshow</title>
+  <style>
+    /* THEME-SYNC START */
+    /*
+      MacBook Theme design tokens — Angular series.
+      This block is the synchronization point and is copied BYTE-IDENTICALLY
+      into every angular-session*-theory.html and angular-session*-lab.html file.
+      Do not edit one copy without the others.
+      Only the accent ramp differs from the Spring Boot series: Angular brand
+      red (#dd0031) replaces the Boot blue, with Angular purple (#9327f0) as the
+      secondary. Everything else — spacing, radii, shadows, type scale — is identical.
+    */
+    :root {
+      --mac-bg: #ececee;
+      --mac-window: #ffffff;
+      --mac-titlebar: #e8e8ea;
+      --mac-text: #1d1d1f;
+      --mac-text-muted: #6e6e73;
+      --mac-accent: #dd0031;
+      --mac-accent-2: #9327f0;
+      --mac-accent-soft: #fff4f6;
+      --mac-border: #d2d2d7;
+      --mac-code-bg: #1e1e2e;
+      --mac-code-text: #f8f8f2;
+      --tl-red: #ff5f57;
+      --tl-yellow: #febc2e;
+      --tl-green: #28c840;
+      --mac-font: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --mac-mono: "SF Mono", ui-monospace, "Menlo", "Consolas", monospace;
+      --slide-anim: 350ms;
+    }
+    .mac-titlebar {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--mac-titlebar);
+      border-bottom: 1px solid var(--mac-border);
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .traffic-light {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+    .tl-red { background: var(--tl-red); }
+    .tl-yellow { background: var(--tl-yellow); }
+    .tl-green { background: var(--tl-green); }
+    .mac-title {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--mac-text-muted);
+      margin-right: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    /* THEME-SYNC END */
+
+    /* === FILE-SPECIFIC STYLES (theory) === */
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--mac-font);
+      color: var(--mac-text);
+      background: var(--mac-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .mac-window {
+      width: 100%;
+      max-width: none;
+      background: var(--mac-window);
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+      overflow: hidden;
+    }
+    .mac-content { padding: 0; }
+
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow: hidden;
+      background: var(--mac-window);
+    }
+    .slide {
+      display: none;
+      padding: 44px 84px 92px;
+      height: calc(100vh - 80px);
+      min-height: 620px;
+      overflow-y: auto;
+    }
+    .slide.active { display: block; }
+
+    /* Persistent footer band on every slide */
+    .slide-footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      background: var(--mac-titlebar);
+      border-top: 1px solid var(--mac-border);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      z-index: 8;
+    }
+    .slide-footer .who { font-weight: 600; color: var(--mac-text); }
+
+    /* Transition animation, with a reduced-motion fallback below. */
+    .slide.animating { animation: slideIn var(--slide-anim) ease both; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .slide.animating { animation-duration: 0s; }
+    }
+
+    .slide h1 { font-size: 44px; margin: 0 0 12px; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 30px; margin: 0 0 16px; letter-spacing: -0.01em; }
+    .slide h3 { font-size: 19px; margin: 18px 0 6px; }
+    .slide .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--mac-accent);
+      margin: 0 0 12px;
+    }
+    .slide p, .slide li { color: var(--mac-text); line-height: 1.55; font-size: 17.5px; }
+    .slide ul, .slide ol { margin: 12px 0; padding-left: 26px; }
+    .slide li { margin: 7px 0; }
+    .slide .muted { color: var(--mac-text-muted); }
+    .slide strong { font-weight: 700; }
+    .slide .lead { font-size: 19px; }
+    .slide code:not(pre code) {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: rgba(221,0,49,0.08);
+      color: #b00027;
+      padding: 2px 6px;
+      border-radius: 5px;
+    }
+
+    /* Callout / key-point box */
+    .keybox {
+      border-left: 4px solid var(--mac-accent);
+      background: rgba(221,0,49,0.05);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .keybox .lbl { font-weight: 700; color: var(--mac-accent); text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .warnbox {
+      border-left: 4px solid var(--tl-yellow);
+      background: rgba(254,188,46,0.10);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .warnbox .lbl { font-weight: 700; color: #b8860b; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Deep-dive explanatory note — for self-study reference text */
+    .note {
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .note .lbl { font-weight: 700; color: var(--mac-text); display:block; margin-bottom: 6px; font-size: 15px; }
+    /* "Ask the batch" — a live discussion prompt for the trainer */
+    .askbox {
+      border-left: 4px solid var(--mac-accent-2);
+      background: rgba(147,39,240,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .askbox .lbl { font-weight: 700; color: #7a13d0; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Analogy box — an everyday mental model for an abstract idea */
+    .analogy {
+      border-left: 4px solid #00b3a4;
+      background: rgba(0,179,164,0.08);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .analogy .lbl { font-weight: 700; color: #00847a; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Plain-English restatement — the same idea again, in the simplest words */
+    .plainbox {
+      border-left: 4px solid #0a84ff;
+      background: rgba(10,132,255,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .plainbox .lbl { font-weight: 700; color: #0a6fd6; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    /* Expected-result box — "this is what success looks like" */
+    .expected {
+      border-left: 4px solid #28c840;
+      background: rgba(40,200,64,0.07);
+      padding: 12px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+      font-size: 16.5px;
+    }
+    .expected .lbl { font-weight: 700; color: #1a9e34; text-transform: uppercase; letter-spacing: 0.05em; font-size: 13px; display:block; margin-bottom: 4px; }
+    .slide .deep { font-size: 16.5px; line-height: 1.62; }
+    /* Numbered procedure list */
+    .slide ol.steps { padding-left: 24px; }
+    .slide ol.steps > li { margin: 12px 0; }
+    .slide ol.steps > li::marker { color: var(--mac-accent); font-weight: 700; }
+    .slide kbd {
+      font-family: var(--mac-mono); font-size: 13.5px; background: #fff;
+      border: 1px solid var(--mac-border); border-bottom-width: 2px;
+      border-radius: 6px; padding: 1px 7px; color: var(--mac-text);
+    }
+    .term { font-weight: 700; color: var(--mac-accent); }
+
+    /* Jargon-buster rows — term on the left, plain-English meaning on the right */
+    .jargon { display: grid; gap: 8px; margin-top: 14px; }
+    .jargon .jrow {
+      display: grid; grid-template-columns: 200px 1fr; gap: 14px; align-items: start;
+      border: 1px solid var(--mac-border); border-radius: 10px;
+      background: #fafafc; padding: 10px 15px;
+    }
+    .jargon .jt { font-weight: 700; color: var(--mac-accent); font-size: 16px; }
+    .jargon .jd { font-size: 15.5px; line-height: 1.5; }
+
+    /* Cover slide */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      background: linear-gradient(135deg, #dd0031 0%, #c3002f 42%, #9327f0 100%);
+      color: #fff;
+      padding: 48px 84px;
+    }
+    .cover h1 { color: #fff; font-size: 60px; }
+    .cover .badge {
+      display: inline-block;
+      align-self: flex-start;
+      background: rgba(255,255,255,0.2);
+      border: 1px solid rgba(255,255,255,0.4);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+    .cover .sub { font-size: 22px; color: rgba(255,255,255,0.92); margin-top: 4px; }
+    .cover .meta { margin-top: 36px; font-size: 16px; color: rgba(255,255,255,0.85); }
+    .cover code:not(pre code) { background: rgba(255,255,255,0.18); color: #fff; }
+
+    /* Cards */
+    .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 16px; }
+    .cards.c3 { grid-template-columns: repeat(3, 1fr); }
+    .card {
+      border: 1px solid var(--mac-border);
+      border-radius: 12px;
+      padding: 16px 18px;
+      background: #fafafc;
+    }
+    .card h3 { margin: 0 0 6px; font-size: 18px; }
+    .card p { font-size: 15.5px; margin: 0; }
+    .card .ic { font-size: 26px; margin-bottom: 6px; }
+
+    /* Agenda tracker */
+    .agenda { list-style: none; padding: 0; margin-top: 10px; }
+    .agenda li {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 16px;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      margin: 8px 0;
+      background: #fafafc;
+      font-size: 17px;
+    }
+    .agenda li .num {
+      flex: 0 0 auto;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--mac-accent);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+    }
+
+    /* Tables */
+    table.cmp { width: 100%; border-collapse: collapse; margin-top: 14px; font-size: 16px; }
+    table.cmp th, table.cmp td {
+      border: 1px solid var(--mac-border);
+      padding: 10px 14px;
+      text-align: left;
+      vertical-align: top;
+    }
+    table.cmp thead th { background: var(--mac-titlebar); font-weight: 700; }
+    table.cmp td.good { background: rgba(40,200,64,0.10); }
+    table.cmp td.bad { background: rgba(255,95,87,0.08); }
+    table.cmp code { font-family: var(--mac-mono); font-size: 14px; }
+    table.cmp.tight { font-size: 15px; }
+    table.cmp.tight th, table.cmp.tight td { padding: 8px 11px; }
+
+    /* Architecture diagram */
+    .arch { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 20px; }
+    .arch-node {
+      border: 2px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 14px;
+      background: var(--mac-accent-soft);
+      text-align: center;
+      min-width: 118px;
+    }
+    .arch-node .t { font-weight: 700; font-size: 15px; }
+    .arch-node .d { font-size: 11.5px; color: var(--mac-text-muted); margin-top: 4px; }
+    .arch-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .arch-fallback { display: none; margin-top: 18px; font-size: 16px; }
+    .arch-failed .arch { display: none; }
+    .arch-failed .arch-fallback { display: block; }
+
+    /* Generic flow diagram */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+    .flow-box {
+      border: 2px solid var(--mac-accent);
+      border-radius: 12px;
+      padding: 13px 18px;
+      background: var(--mac-accent-soft);
+      font-weight: 600;
+      font-size: 16px;
+      text-align: center;
+      min-width: 118px;
+    }
+    .flow-box.alt { border-color: var(--mac-accent-2); background: #f8f1ff; }
+    .flow-box.green { border-color: #28c840; background: #eefcf1; }
+    .flow-box.warn { border-color: var(--tl-red); background: #fff0ef; }
+    .flow-box .sm { display:block; font-size: 12px; color: var(--mac-text-muted); font-weight: 500; margin-top: 4px; }
+    .flow-arrow { color: var(--mac-accent); font-size: 24px; font-weight: 700; }
+    .flow.vert { flex-direction: column; align-items: stretch; }
+    .flow.vert .flow-arrow { text-align: center; }
+
+    /* Component tree visual (Angular's parent-child structure) */
+    .tree-vis {
+      margin-top: 18px;
+      border: 2px dashed var(--mac-accent);
+      border-radius: 16px;
+      padding: 24px 22px 18px;
+      background: var(--mac-accent-soft);
+      position: relative;
+    }
+    .tree-vis::before {
+      content: attr(data-label);
+      position: absolute;
+      top: -12px; left: 20px;
+      background: var(--mac-accent);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 3px 12px;
+      border-radius: 10px;
+    }
+    .tv-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+    .tv-row + .tv-tick { text-align: center; color: var(--mac-accent); font-size: 20px; line-height: 1.1; margin: 6px 0; }
+    .node {
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      min-width: 150px;
+    }
+    .node .bn { font-weight: 700; font-family: var(--mac-mono); font-size: 14px; color: var(--mac-accent); }
+    .node .bd { font-size: 13px; color: var(--mac-text-muted); margin-top: 4px; }
+    .node.root { border-color: var(--mac-accent); border-width: 2px; }
+    .tv-note { text-align:center; color: var(--mac-text-muted); margin-top: 14px; font-size: 14px; }
+
+    /* Before / after split */
+    .ba { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: center; margin-top: 16px; }
+    .ba-col { border-radius: 12px; padding: 14px 18px; }
+    .ba-col.before { background: #fff0ef; border: 1px solid #ffc9c4; }
+    .ba-col.after { background: #eefcf1; border: 1px solid #b9ecc4; }
+    .ba-col h3 { margin: 0 0 8px; font-size: 17px; }
+    .ba-col.before h3 { color: var(--tl-red); }
+    .ba-col.after h3 { color: #1a9e34; }
+    .ba-col ul { margin: 0; padding-left: 18px; }
+    .ba-col li { font-size: 14.5px; margin: 5px 0; }
+    .ba-mid { font-size: 30px; color: var(--mac-accent); }
+
+    /* Layered stack */
+    .stack { margin-top: 16px; }
+    .stack-row {
+      display: flex; align-items: center; gap: 14px;
+      border: 1px solid var(--mac-border);
+      border-left: 6px solid var(--mac-accent);
+      border-radius: 10px;
+      padding: 12px 18px;
+      margin: 8px 0;
+      background: #fafafc;
+    }
+    .stack-row .layer { font-weight: 700; font-size: 16px; min-width: 168px; }
+    .stack-row .desc { color: var(--mac-text-muted); font-size: 15px; }
+    .stack-row.l1 { border-left-color: #dd0031; }
+    .stack-row.l2 { border-left-color: #9327f0; }
+    .stack-row.l3 { border-left-color: #ff9f0a; }
+    .stack-row.l4 { border-left-color: #28c840; }
+
+    /* Two-panel code comparison */
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .panel h3 { margin: 0 0 6px; font-size: 16px; }
+    .panel.bad h3 { color: var(--tl-red); }
+    .panel.good h3 { color: #1a9e34; }
+
+    /* Syntax / concept mapping rows */
+    .anno-map { display: grid; gap: 10px; margin-top: 14px; }
+    .anno-row { display: grid; grid-template-columns: 250px 1fr; gap: 14px; align-items: center; }
+    .anno-tag {
+      font-family: var(--mac-mono);
+      font-size: 15px;
+      background: var(--mac-code-bg);
+      color: var(--mac-code-text);
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Folder tree */
+    .tree {
+      font-family: var(--mac-mono);
+      font-size: 14.5px;
+      line-height: 1.65;
+      background: #fafafc;
+      border: 1px solid var(--mac-border);
+      border-radius: 10px;
+      padding: 16px 22px;
+      margin-top: 12px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .c { color: var(--mac-text-muted); }
+
+    /* Version timeline */
+    .timeline { position: relative; margin-top: 18px; padding: 0; list-style: none; }
+    .timeline::before {
+      content: ""; position: absolute; left: 14px; top: 8px; bottom: 8px;
+      width: 2px; background: linear-gradient(180deg, #dd0031, #9327f0);
+    }
+    .timeline li { position: relative; padding: 7px 0 7px 46px; font-size: 16.5px; margin: 0; }
+    .timeline li::before {
+      content: ""; position: absolute; left: 8px; top: 14px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; border: 3px solid var(--mac-accent);
+    }
+    .timeline li .yr { font-weight: 800; color: var(--mac-accent); margin-right: 10px; font-variant-numeric: tabular-nums; }
+
+    /* Mock browser preview — shows what the associate should SEE */
+    .browser {
+      border: 1px solid var(--mac-border); border-radius: 10px; overflow: hidden;
+      margin-top: 14px; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    }
+    .browser .bar {
+      display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+      background: var(--mac-titlebar); border-bottom: 1px solid var(--mac-border);
+    }
+    .browser .bar .dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+    .browser .url {
+      flex: 1 1 auto; background: #fff; border: 1px solid var(--mac-border);
+      border-radius: 20px; padding: 3px 12px;
+      font-family: var(--mac-mono); font-size: 12.5px; color: var(--mac-text-muted);
+    }
+    .browser .viewport { padding: 16px 18px; font-size: 16px; }
+    .browser .viewport table { border-collapse: collapse; width: 100%; font-size: 14.5px; margin: 0; }
+    .browser .viewport th, .browser .viewport td {
+      border: 1px solid var(--mac-border); padding: 6px 10px; text-align: left;
+    }
+    .browser .viewport th { background: var(--mac-titlebar); font-weight: 700; }
+    .browser .viewport .row-active { background: rgba(40,200,64,0.13); }
+    .browser .viewport .row-inactive { background: rgba(255,95,87,0.12); }
+    .browser .viewport .fld {
+      display: inline-block; border: 1px solid var(--mac-border); border-radius: 6px;
+      padding: 4px 10px; font-family: var(--mac-mono); font-size: 13.5px; min-width: 160px; background: #fff;
+    }
+    .browser .viewport .btn {
+      display: inline-block; background: var(--mac-accent); color: #fff;
+      border-radius: 7px; padding: 5px 14px; font-size: 14px; font-weight: 600;
+    }
+    .browser .viewport .btn.ghost { background: #fff; color: var(--mac-accent); border: 1px solid var(--mac-accent); }
+    .browser .viewport .navbar {
+      display: flex; gap: 16px; flex-wrap: wrap; border-bottom: 2px solid var(--mac-accent);
+      padding-bottom: 8px; margin-bottom: 12px; font-size: 15px; font-weight: 600;
+    }
+    .browser .viewport .navbar .on { color: var(--mac-accent); }
+    .browser .viewport .err { color: #b00027; font-size: 13.5px; }
+    .browser .viewport p { font-size: 15.5px; margin: 6px 0; }
+
+    /* Data-flow direction map (used for the four binding types) */
+    .bindmap { display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center; margin-top: 16px; }
+    .bindmap .side {
+      border: 1px solid var(--mac-border); border-radius: 12px;
+      padding: 14px 16px; background: #fafafc;
+    }
+    .bindmap .side h3 { margin: 0 0 6px; font-size: 16px; }
+    .bindmap .side p { font-size: 14.5px; margin: 0; }
+    .bindmap .dir { text-align: center; color: var(--mac-accent); font-weight: 700; font-size: 13px; min-width: 90px; }
+    .bindmap .dir .a { font-size: 24px; display: block; line-height: 1.1; }
+
+    /* Code blocks */
+    .slide pre {
+      margin: 12px 0;
+      padding: 15px 18px;
+      background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border);
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .slide pre code {
+      font-family: var(--mac-mono);
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--mac-code-text);
+      white-space: pre;
+    }
+    /* Filename strip above a code block */
+    .fname {
+      display: inline-block;
+      font-family: var(--mac-mono); font-size: 13px; font-weight: 700;
+      color: #a6e22e; background: var(--mac-code-bg);
+      border: 1px solid var(--mac-border); border-bottom: none;
+      border-radius: 8px 8px 0 0; padding: 6px 14px; margin: 14px 0 0;
+    }
+    .fname + pre { margin-top: 0; border-top-left-radius: 0; }
+
+    .checklist { list-style: none; padding: 0; margin-top: 12px; }
+    .checklist li { font-size: 17.5px; padding: 9px 0 9px 38px; position: relative; }
+    .checklist li::before {
+      content: "\2713";
+      position: absolute; left: 6px; top: 8px;
+      width: 22px; height: 22px;
+      background: #28c840; color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .pill {
+      display: inline-block;
+      background: rgba(221,0,49,0.09);
+      color: var(--mac-accent);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-family: var(--mac-mono);
+      font-size: 14px;
+    }
+
+    /* Navigation controls */
+    .nav-control {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 10;
+      width: 46px; height: 46px;
+      border: 1px solid var(--mac-border);
+      border-radius: 50%;
+      background: var(--mac-window);
+      color: var(--mac-text);
+      font-size: 22px; line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-control:hover { background: var(--mac-bg); }
+    .nav-control:disabled { opacity: 0.3; cursor: default; }
+    .nav-prev { left: 14px; }
+    .nav-next { right: 14px; }
+
+    /* Slide counter */
+    .slide-counter {
+      position: absolute;
+      bottom: 56px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 5px 14px;
+      border: 1px solid var(--mac-border);
+      border-radius: 14px;
+      background: var(--mac-window);
+      color: var(--mac-text-muted);
+      font-size: 13px;
+      font-variant-numeric: tabular-nums;
+    }
+    .progress-rail {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--mac-border);
+      z-index: 9;
+    }
+    .progress-rail .fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #dd0031, #9327f0);
+      transition: width var(--slide-anim) ease;
+    }
+
+    @media (max-width: 900px) {
+      .slide { padding: 28px 26px 92px; }
+      .cards, .cards.c3, .panels, .bindmap, .ba { grid-template-columns: 1fr; }
+      .anno-row { grid-template-columns: 1fr; }
+      .jargon .jrow { grid-template-columns: 1fr; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mac-window">
+    <div class="mac-titlebar">
+      <span class="traffic-light tl-red"></span>
+      <span class="traffic-light tl-yellow"></span>
+      <span class="traffic-light tl-green"></span>
+      <span class="mac-title">angular-session4-theory.html — Angular 19 · Session 4</span>
+    </div>
+
+    <div class="mac-content" id="app">
+      <div class="slideshow" id="slideshow">
+        <div class="progress-rail"><div class="fill" id="progressFill"></div></div>
+
+        <!-- 1. COVER -->
+        <section class="slide active">
+          <div class="cover">
+            <span class="badge">Session 4 of 4 — Angular 19 Series</span>
+            <h1>Routing &amp; Full CRUD</h1>
+            <div class="sub">Turning a single screen into a real, multi-page application — and building a complete Create, Read, Update, Delete system end to end, the <strong>Angular 19</strong> way: standalone components, <code>provideRouter</code>, signals and built-in control flow.</div>
+            <div class="meta">Presenter: Purvam Prajapati &nbsp;&nbsp;•&nbsp;&nbsp; Faculty, AHD</div>
+          </div>
+        </section>
+
+        <!-- 2. RECAP + ROADMAP -->
+        <section class="slide">
+          <p class="eyebrow">The finale — where we left off, and where we finish</p>
+          <h2>Recap of Session 3, and today's roadmap</h2>
+          <div class="note">
+            <span class="lbl">You should arrive today with</span>
+            Standalone components and bindings (Session 2), two styles of validated form, an <code>EmployeeService</code>
+            obtained with <code>inject()</code>, and live data arriving over HTTP — <code>provideHttpClient()</code> in
+            <code>app.config.ts</code> — with loading and error states (Session 3).
+            <strong>But it is all still one long scrolling page.</strong> Today we fix that, and then build a complete
+            application on top of it.
+          </div>
+          <ul class="agenda">
+            <li><span class="num">1</span> How Angular 19 differs from the <code>NgModule</code> code you'll find in older tutorials</li>
+            <li><span class="num">2</span> Why routing, and what a <strong>route</strong> actually is</li>
+            <li><span class="num">3</span> <code>app.routes.ts</code>, <code>provideRouter()</code>, and the component <code>imports</code> array</li>
+            <li><span class="num">4</span> <code>&lt;router-outlet&gt;</code>, <code>routerLink</code> and <code>routerLinkActive</code> — a real navigation menu</li>
+            <li><span class="num">5</span> A default page, a <strong>404 page</strong>, and why route order matters</li>
+            <li><span class="num">6</span> <strong>Route parameters</strong> — as a signal <code>input()</code>, and via <code>ActivatedRoute</code></li>
+            <li><span class="num">7</span> Navigating from <em>code</em> with <code>Router.navigate()</code></li>
+            <li><span class="num">8</span> The <strong>Customer Management</strong> case study — <code>signal</code>, <code>computed</code>, and full CRUD</li>
+            <li><span class="num">9</span> The same CRUD moved onto a <strong>signal-based service</strong>, then onto <strong>HttpClient</strong></li>
+            <li><span class="num">10</span> Pointing the finished app at <strong>your own Spring Boot API</strong>, then <code>ng build</code> and deployment</li>
+          </ul>
+          <div class="plainbox">
+            <span class="lbl">Today in one sentence</span>
+            Everything you have learned across three sessions gets assembled into <strong>one genuine Angular 19
+            application</strong> — multiple screens, real navigation, and a full set of data operations.
+          </div>
+        </section>
+
+        <!-- 3. THE ANGULAR 19 WAY -->
+        <section class="slide">
+          <p class="eyebrow">Orientation — read this before you Google anything today</p>
+          <h2>The Angular 19 way, versus what you'll find online</h2>
+          <p class="deep">Most Angular tutorials on the internet were written for Angular 8–15. They still <em>work</em>, but
+             they are not how Angular 19 is written. Today's session uses the modern style throughout, so keep this table
+             in your head — it is the translation key for every older article you will ever read.</p>
+          <table class="cmp tight">
+            <thead><tr><th style="width:31%">Older tutorials say</th><th style="width:34%">Angular 19 says</th><th>Why it changed</th></tr></thead>
+            <tbody>
+              <tr><td><code>app.module.ts</code> with <code>@NgModule</code></td><td><code>app.config.ts</code> with a <code>providers</code> array</td><td>No wrapper class needed. A component declares its own dependencies.</td></tr>
+              <tr><td><code>declarations: [ ... ]</code></td><td>nothing — components are <strong>standalone</strong></td><td>In v19 <code>standalone: true</code> is the <em>default</em>; you no longer write it.</td></tr>
+              <tr><td><code>app-routing.module.ts</code> + <code>RouterModule.forRoot()</code></td><td><code>app.routes.ts</code> + <code>provideRouter(routes)</code></td><td>Routing is a provider, not a module.</td></tr>
+              <tr><td><code>HttpClientModule</code> in <code>imports</code></td><td><code>provideHttpClient()</code> in <code>app.config.ts</code></td><td>Same pattern: providers instead of modules.</td></tr>
+              <tr><td><code>*ngIf</code>, <code>*ngFor</code>, <code>ngSwitch</code></td><td><code>&#64;if</code>, <code>&#64;for</code>, <code>&#64;switch</code></td><td>Built into the template language — no import, faster, better type checking.</td></tr>
+              <tr><td><code>constructor(private http: HttpClient)</code></td><td><code>private http = inject(HttpClient)</code></td><td>Works outside constructors too, and reads better with inheritance.</td></tr>
+              <tr><td><code>&#64;Input() name!: string;</code></td><td><code>name = input.required&lt;string&gt;();</code></td><td>Signal inputs — reactive, and <strong>stable</strong> since v19.</td></tr>
+              <tr><td>a plain field <code>customers: Customer[] = []</code></td><td><code>customers = signal&lt;Customer[]&gt;([])</code></td><td>Angular knows exactly what changed, so it updates less of the screen.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Nothing you learned is wasted</span>
+            The <em>concepts</em> are unchanged — components, bindings, DI, services, Observables. Only the
+            <strong>packaging</strong> changed: modules became providers, and directives became language keywords. If you
+            inherit an older Angular codebase at work, everything in the left column will look familiar and you will know
+            what it maps to.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The one thing that will confuse you when copying from the internet</span>
+            In Angular 19 a standalone component must <strong>import what its own template uses</strong>. Paste a snippet
+            containing <code>routerLink</code> into a component that doesn't list <code>RouterLink</code> in its
+            <code>imports: [ ]</code> array and it fails — even though the same snippet worked fine in an
+            <code>NgModule</code> app, because there the module imported it once for everybody.
+          </div>
+        </section>
+
+        <!-- 4. WHY ROUTING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 — the problem</p>
+          <h2>Why routing?</h2>
+          <p class="deep">Look at your app right now. Header, login form, two registration forms, a table, cards, stats —
+             <strong>all stacked on one endless page</strong>. That is not how applications work.</p>
+          <p class="deep">A real app has <em>screens</em>: a home page, a customer list, an add-customer form, an about
+             page. The user moves between them, and — critically — the <strong>URL changes to match</strong>.</p>
+          <div class="cards">
+            <div class="card"><div class="ic">🔗</div><h3>Shareable URLs</h3><p><code>/customers/1002</code> can be bookmarked, emailed, or pasted into a chat — and it opens the right screen.</p></div>
+            <div class="card"><div class="ic">⬅️</div><h3>The Back button works</h3><p>Users expect it. Without routing, Back leaves your application entirely — which feels broken.</p></div>
+            <div class="card"><div class="ic">🧠</div><h3>Only one screen in memory</h3><p>Angular builds the current screen and discards the rest, instead of holding everything at once.</p></div>
+            <div class="card"><div class="ic">⚡</div><h3>Still no page reload</h3><p>The URL changes and the content swaps, but the browser never re-downloads the page. It stays a single-page application.</p></div>
+          </div>
+          <div class="analogy">
+            <span class="lbl">Analogy</span>
+            Without routing your app is <strong>one very long scroll of paper</strong>. With routing it is a
+            <strong>ring binder with tabbed dividers</strong> — same binder, and you flip straight to the section you want.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The trick that makes this possible</span>
+            The Angular <span class="term">router</span> changes the URL <strong>without asking the server for anything</strong>.
+            It updates the address bar, records an entry in the browser's history so Back works, and swaps which component
+            is displayed. No reload, no flicker, no lost state.
+          </div>
+        </section>
+
+        <!-- 5. WHAT IS A ROUTE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 1 continued</p>
+          <h2>What a route actually is</h2>
+          <p class="lead">A <span class="term">route</span> is just a pairing: <strong>this URL path → show that
+             component.</strong> Nothing more.</p>
+          <pre><code>{ path: 'customers', component: CustomerListComponent }</code></pre>
+          <p class="deep">Read it as: <em>"when the URL is <code>/customers</code>, display
+             <code>CustomerListComponent</code>."</em> A routing configuration is simply an array of these pairings —
+             and in Angular 19 that array lives in a plain <code>.ts</code> file, with no class or module around it.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:30%">URL the user is at</th><th>Component Angular displays</th></tr></thead>
+            <tbody>
+              <tr><td><code>localhost:4200/</code></td><td>redirected to <code>/home</code></td></tr>
+              <tr><td><code>localhost:4200/home</code></td><td><code>HomeComponent</code></td></tr>
+              <tr><td><code>localhost:4200/customers</code></td><td><code>CustomerListComponent</code></td></tr>
+              <tr><td><code>localhost:4200/customers/add</code></td><td><code>CustomerFormComponent</code></td></tr>
+              <tr><td><code>localhost:4200/customers/1002</code></td><td><code>CustomerDetailComponent</code> — for customer 1002</td></tr>
+              <tr><td><code>localhost:4200/anything-else</code></td><td><code>NotFoundComponent</code> — your 404 page</td></tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">Notice the paths have no leading slash</span>
+            You write <code>path: 'customers'</code>, not <code>path: '/customers'</code>. Angular adds the slash. Writing
+            it yourself is a common early mistake and produces a route that never matches.
+          </div>
+          <div class="keybox">
+            <span class="lbl">The Spring Boot parallel</span>
+            <code>{ path: 'customers', component: CustomerListComponent }</code> is Angular's
+            <code>@GetMapping("/customers")</code>. One maps a URL to a <em>component</em>; the other maps a URL to a
+            <em>method</em>. Same idea, different side of the wire.
+          </div>
+        </section>
+
+        <!-- 6. DEFINING ROUTES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — setting it up · step 1</p>
+          <h2>Defining your routes — <code>app.routes.ts</code></h2>
+          <p class="deep">If you created your project with <code>ng new hello-world --routing</code>, Angular 19 has
+             <strong>already made these two files for you</strong>. There is no module to generate and no CLI command to
+             run — you just fill in the array.</p>
+          <div class="fname">src/app/app.routes.ts</div>
+          <pre><code>import { Routes } from '@angular/router';
+
+import { HomeComponent } from './pages/home/home.component';
+import { CustomerListComponent } from './pages/customer-list/customer-list.component';
+import { CustomerFormComponent } from './pages/customer-form/customer-form.component';
+import { AboutComponent } from './pages/about/about.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+
+export const routes: Routes = [
+  { path: '',              redirectTo: 'home', pathMatch: 'full' },
+  { path: 'home',          component: HomeComponent },
+  { path: 'customers',     component: CustomerListComponent },
+  { path: 'customers/add', component: CustomerFormComponent },
+  { path: 'about',         component: AboutComponent },
+  { path: '**',            component: NotFoundComponent }
+];</code></pre>
+          <div class="fname">src/app/app.config.ts — where the router is switched on</div>
+          <pre><code>import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes, withComponentInputBinding()),  // ← routing, switched on
+    provideHttpClient()                                  // ← from Session 3
+  ]
+};</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">export const routes: Routes</div><div>An exported array of route objects — no class, no decorator. <code>Routes</code> is just Angular's type for it.</div></div>
+            <div class="anno-row"><div class="anno-tag">provideRouter(routes)</div><div>"Set the router up for this application, using these routes." This one call replaces the whole <code>AppRoutingModule</code> + <code>RouterModule.forRoot()</code> ceremony.</div></div>
+            <div class="anno-row"><div class="anno-tag">withComponentInputBinding()</div><div>An optional extra that lets route parameters arrive as component <strong>inputs</strong>. We use it on slide 14 — turn it on now and forget about it.</div></div>
+          </div>
+          <div class="fname">src/main.ts — unchanged since Session 1, but now it matters</div>
+          <pre><code>import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, appConfig)
+  .catch(err =&gt; console.error(err));</code></pre>
+          <div class="keybox">
+            <span class="lbl">There is no <code>exports: [RouterModule]</code> any more — and that is a real simplification</span>
+            In older Angular, forgetting that one line was <em>the</em> classic routing bug. In Angular 19 the equivalent
+            step moved somewhere far more obvious: each component lists what its own template needs in
+            <code>imports: [ ]</code>. Same responsibility, visible in the file that actually uses it.
+          </div>
+        </section>
+
+
+        <!-- 7. ROUTER-OUTLET -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — setting it up · step 2</p>
+          <h2><code>&lt;router-outlet&gt;</code> — where the screen appears</h2>
+          <p class="deep">You have told Angular <em>which</em> component to show. Now you must tell it <em>where</em> to
+             put it. That is <code>&lt;router-outlet&gt;</code> — a placeholder that the router fills in.</p>
+          <div class="fname">src/app/app.component.ts — the root component, standalone</div>
+          <pre><code>import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { HeaderComponent } from './header/header.component';
+import { FooterComponent } from './footer/footer.component';
+
+@Component({
+  selector: 'app-root',
+  // Everything the TEMPLATE below uses must be listed here. This array is
+  // the Angular 19 replacement for an NgModule's imports + declarations.
+  imports: [RouterOutlet, RouterLink, RouterLinkActive,
+            HeaderComponent, FooterComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'      // note: styleUrl, singular
+})
+export class AppComponent { }</code></pre>
+          <div class="fname">src/app/app.component.html — the entire root template</div>
+          <pre><code>&lt;app-header /&gt;
+
+&lt;nav&gt;
+  &lt;a routerLink="/home"          routerLinkActive="active"&gt;Home&lt;/a&gt;
+  &lt;a routerLink="/customers"     routerLinkActive="active"&gt;Customers&lt;/a&gt;
+  &lt;a routerLink="/customers/add" routerLinkActive="active"&gt;Add Customer&lt;/a&gt;
+  &lt;a routerLink="/about"         routerLinkActive="active"&gt;About&lt;/a&gt;
+&lt;/nav&gt;
+
+&lt;!-- The routed component is rendered HERE, and swapped as the URL changes --&gt;
+&lt;router-outlet /&gt;
+
+&lt;app-footer /&gt;</code></pre>
+          <div class="note">
+            <span class="lbl">Two small syntax notes</span>
+            <strong>1.</strong> <code>&lt;router-outlet /&gt;</code> — the self-closing form is valid in Angular templates
+            (v15.1+) and is the modern style. <code>&lt;router-outlet&gt;&lt;/router-outlet&gt;</code> is equally correct;
+            use whichever your team prefers, but be consistent.<br>
+            <strong>2.</strong> <code>styleUrl</code> (singular) replaced <code>styleUrls: [ ]</code> for the common
+            single-file case. The array form still works.
+          </div>
+          <div class="browser">
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200/customers</span>
+            </div>
+            <div class="viewport">
+              <p style="background:linear-gradient(135deg,#dd0031,#9327f0);color:#fff;padding:8px 14px;border-radius:6px;margin:0 0 8px;font-size:14px;"><strong>app-header</strong> — always visible</p>
+              <div class="navbar"><span>Home</span><span class="on">Customers</span><span>Add Customer</span><span>About</span></div>
+              <p style="border:2px dashed #9327f0;padding:14px;border-radius:8px;margin:0 0 8px;text-align:center;font-size:14px;"><strong>&lt;router-outlet /&gt;</strong><br><span class="muted">CustomerListComponent renders here.<br>Navigate to /about and AboutComponent replaces it — this region only.</span></p>
+              <p style="border-top:1px solid #d2d2d7;padding-top:6px;text-align:center;color:#6e6e73;font-size:13px;margin:0;">app-footer — always visible</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice what stays put</span>
+            The header, the nav bar and the footer are <strong>outside</strong> the outlet, so they never move, never
+            flicker and never reload. Only the region inside the outlet changes. That is how every real application is
+            laid out — a persistent shell around a swappable content area.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The two Angular 19 failure modes</span>
+            <strong>1. You forgot <code>RouterOutlet</code> in <code>imports</code>.</strong> The compiler tells you:
+            <em>"'router-outlet' is not a known element"</em>. This is the good case — you get a real error.<br>
+            <strong>2. You forgot the tag itself.</strong> Your URL changes correctly and <strong>nothing appears on
+            screen</strong> — with no error at all. Angular has a component to show and nowhere to put it.
+          </div>
+        </section>
+
+        <!-- 8. ROUTERLINK -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — setting it up · step 3</p>
+          <h2><code>routerLink</code> — and why never <code>href</code></h2>
+          <p class="deep">This is a small detail with a large consequence, and it is worth thirty seconds.</p>
+          <div class="ba">
+            <div class="ba-col before">
+              <h3>❌ <code>&lt;a href="/customers"&gt;</code></h3>
+              <ul>
+                <li>The <strong>browser</strong> handles it</li>
+                <li>A full page reload — the whole app restarts</li>
+                <li>Visible white flash</li>
+                <li>All your in-memory state is lost</li>
+                <li>Slow, and it defeats the point of an SPA</li>
+              </ul>
+            </div>
+            <div class="ba-mid">→</div>
+            <div class="ba-col after">
+              <h3>✅ <code>&lt;a routerLink="/customers"&gt;</code></h3>
+              <ul>
+                <li>The <strong>Angular router</strong> handles it</li>
+                <li>Only the outlet's contents change</li>
+                <li>Instant, no flash</li>
+                <li>Services keep their data</li>
+                <li>Back and Forward still work</li>
+              </ul>
+            </div>
+          </div>
+          <h3>Two forms of <code>routerLink</code></h3>
+          <pre><code>&lt;!-- Static path — a plain string, no brackets --&gt;
+&lt;a routerLink="/customers"&gt;Customers&lt;/a&gt;
+
+&lt;!-- Dynamic path — an ARRAY of segments, with brackets --&gt;
+&lt;a [routerLink]="['/customers', customer.id]"&gt;View&lt;/a&gt;
+&lt;!-- produces /customers/1002 --&gt;
+
+&lt;!-- also valid, and slightly harder to read --&gt;
+&lt;a [routerLink]="'/customers/' + customer.id"&gt;View&lt;/a&gt;</code></pre>
+          <div class="plainbox">
+            <span class="lbl">The bracket rule, one more time</span>
+            No brackets = a plain string. Brackets = an expression Angular evaluates. Exactly the same rule as
+            <code>src</code> versus <code>[src]</code> from Session 2 — nothing new to learn.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Two things to remember</span>
+            <strong>1.</strong> Prefer the array form: <code>['/customers', id]</code> lets Angular handle the slashes and
+            URL-encode each segment properly. String concatenation breaks the moment a segment contains a space or a
+            special character.<br>
+            <strong>2.</strong> <code>RouterLink</code> must be in the <code>imports</code> array of <em>every</em>
+            standalone component whose template uses it — not just the root one. Miss it and you get
+            <em>"Can't bind to 'routerLink' since it isn't a known property of 'a'"</em>.
+          </div>
+        </section>
+
+        <!-- 9. ROUTERLINKACTIVE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 2 — a small touch that makes it feel finished</p>
+          <h2><code>routerLinkActive</code> — highlight the current page</h2>
+          <p class="deep">Users need to see where they are. <code>routerLinkActive</code> adds a CSS class to a link
+             <strong>automatically</strong> whenever its route is the active one.</p>
+          <pre><code>&lt;nav&gt;
+  &lt;a routerLink="/home"      routerLinkActive="active"&gt;Home&lt;/a&gt;
+  &lt;a routerLink="/customers" routerLinkActive="active"&gt;Customers&lt;/a&gt;
+  &lt;a routerLink="/about"     routerLinkActive="active"&gt;About&lt;/a&gt;
+&lt;/nav&gt;</code></pre>
+          <pre><code>/* in your CSS — an ordinary class, nothing special about the name */
+nav a.active {
+  color: #dd0031;
+  font-weight: 700;
+  border-bottom: 3px solid #dd0031;
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">You write no logic for this at all</span>
+            No <code>&#64;if</code>, no "which page am I on" signal, no click handler. The router already knows the active
+            route, so it maintains the class for you. <strong>This is one attribute for a feature that would otherwise be
+            twenty lines.</strong>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The one gotcha — an always-active Home link</span>
+            <code>routerLinkActive</code> matches by <em>prefix</em> by default, so a link to <code>/</code> counts as
+            active on every page. Fix it with an exact-match option:
+            <pre style="margin:8px 0 0;"><code>&lt;a routerLink="/home"
+   routerLinkActive="active"
+   [routerLinkActiveOptions]="{ exact: true }"&gt;Home&lt;/a&gt;</code></pre>
+          </div>
+          <div class="note">
+            <span class="lbl">Don't forget the import</span>
+            <code>RouterLinkActive</code> is a separate directive from <code>RouterLink</code>, so it needs its own entry:
+            <code>imports: [RouterOutlet, RouterLink, RouterLinkActive]</code>. If the highlight simply never appears and
+            there is no error, check the import list first — Angular treats an unknown <em>attribute</em> as a plain HTML
+            attribute and silently ignores it.
+          </div>
+        </section>
+
+        <!-- 10. DEFAULT AND 404 -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — the two routes everyone forgets</p>
+          <h2>A default page, and a 404</h2>
+          <h3>The default redirect — what shows at <code>/</code></h3>
+          <pre><code>{ path: '', redirectTo: 'home', pathMatch: 'full' }</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">path: ''</div><div>The empty path — the bare <code>localhost:4200</code> with nothing after it.</div></div>
+            <div class="anno-row"><div class="anno-tag">redirectTo: 'home'</div><div>Send them to the home route instead of showing nothing.</div></div>
+            <div class="anno-row"><div class="anno-tag">pathMatch: 'full'</div><div><strong>Required here.</strong> "Only redirect when the <em>whole</em> URL is empty." Without it, the empty path matches the <em>start</em> of every URL and redirects everything to home — an infinite loop.</div></div>
+          </div>
+          <h3>The 404 — what shows for an unknown URL</h3>
+          <pre><code>{ path: '**', component: NotFoundComponent }</code></pre>
+          <p class="deep"><code>**</code> is the <strong>wildcard</strong>: it matches anything at all. So this route
+             catches every URL that none of your other routes matched — a typo, a stale bookmark, a broken link.</p>
+          <div class="fname">not-found.component.html — keep it helpful</div>
+          <pre><code>&lt;div class="not-found"&gt;
+  &lt;h2&gt;404 — Page not found&lt;/h2&gt;
+  &lt;p&gt;We couldn't find the page you asked for.&lt;/p&gt;
+  &lt;a routerLink="/home"&gt;← Back to home&lt;/a&gt;
+&lt;/div&gt;</code></pre>
+          <div class="note">
+            <span class="lbl">That template uses <code>routerLink</code>, so the component must import it</span>
+            <pre style="margin:8px 0 0;"><code>@Component({
+  selector: 'app-not-found',
+  imports: [RouterLink],               // ← easy to forget in a small component
+  templateUrl: './not-found.component.html'
+})
+export class NotFoundComponent { }</code></pre>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Without a wildcard route, a bad URL shows a blank page and a console error</span>
+            <em>"NG04002: Cannot match any routes. URL Segment: 'customerz'"</em> — visible only to you, in the console.
+            Your user just sees nothing at all. <strong>Always add the wildcard.</strong>
+          </div>
+        </section>
+
+        <!-- 11. ROUTE ORDER -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 continued — the rule that causes silent bugs</p>
+          <h2>Route order matters — a lot</h2>
+          <p class="lead">Angular checks routes <strong>top to bottom</strong> and uses the <strong>first</strong> one that
+             matches. It does not look for the best match.</p>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>❌ Broken — wildcard first</h3>
+              <pre><code>export const routes: Routes = [
+  { path: '**',
+    component: NotFoundComponent },
+  { path: 'home',
+    component: HomeComponent },
+  { path: 'customers',
+    component: CustomerListComponent }
+];</code></pre>
+              <p style="font-size:15px;">Every URL matches <code>**</code> first, so <strong>every page shows the 404</strong>.
+                 No error is reported anywhere.</p>
+            </div>
+            <div class="panel good">
+              <h3>✅ Correct — wildcard last</h3>
+              <pre><code>export const routes: Routes = [
+  { path: '', redirectTo: 'home',
+    pathMatch: 'full' },
+  { path: 'home',
+    component: HomeComponent },
+  { path: 'customers',
+    component: CustomerListComponent },
+  { path: '**',
+    component: NotFoundComponent }
+];</code></pre>
+              <p style="font-size:15px;">Specific routes are tried first; the wildcard only catches what is left over.</p>
+            </div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The ordering rule, in one line</span>
+            <strong>Most specific first, wildcard <code>**</code> always last.</strong> Put static paths like
+            <code>customers/add</code> <em>above</em> parameter paths like <code>customers/:id</code> — otherwise
+            <code>/customers/add</code> is read as "customer with id <code>add</code>".
+          </div>
+          <div class="keybox">
+            <span class="lbl">That last point is a real bug you will hit</span>
+            With <code>customers/:id</code> listed first, clicking "Add Customer" opens the <em>detail</em> screen looking
+            for a customer whose id is the string <code>"add"</code>. You get an empty form or a crash, and nothing tells
+            you why. <strong>Static before dynamic.</strong>
+          </div>
+        </section>
+
+        <!-- 12. END TO END -->
+        <section class="slide">
+          <p class="eyebrow">Concept 3 — the recipe</p>
+          <h2>Adding a route, end to end</h2>
+          <p class="deep">Four steps, every time — one fewer than in older Angular, because there are no
+             <code>declarations</code> to maintain. Once you have done it twice it takes about sixty seconds.</p>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">1 · Generate</span>
+              <span class="desc"><code>ng g c pages/reports</code> — creates a <strong>standalone</strong> component. Nothing to register anywhere.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">2 · Import + route</span>
+              <span class="desc">In <code>app.routes.ts</code>: import the class, then add <code>{ path: 'reports', component: ReportsComponent }</code> — <strong>above</strong> the wildcard.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">3 · Add the link</span>
+              <span class="desc"><code>&lt;a routerLink="/reports" routerLinkActive="active"&gt;Reports&lt;/a&gt;</code> in the shell, which already imports <code>RouterLink</code>.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">4 · Test both ways</span>
+              <span class="desc">Click the link <em>and</em> type <code>localhost:4200/reports</code> straight into the address bar. Both must work.</span>
+            </div>
+          </div>
+          <div class="note">
+            <span class="lbl">The lazy alternative, worth knowing from day one</span>
+            Swap <code>component:</code> for <code>loadComponent:</code> and that screen's code is downloaded only when
+            someone first visits it:
+            <pre style="margin:8px 0 0;"><code>{
+  path: 'reports',
+  loadComponent: () =&gt;
+    import('./pages/reports/reports.component').then(m =&gt; m.ReportsComponent)
+}</code></pre>
+            With standalone components this is a <strong>one-line change per route</strong> — in older Angular it meant
+            creating a feature module. On a large app it is the single biggest startup-time win available.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why step 4 matters</span>
+            Clicking a link and typing a URL take different paths through the router. If the link works but a typed URL
+            does not, your route is fine and something else is wrong — usually a missing wildcard, or a deployment that
+            hasn't been told to send unknown URLs to <code>index.html</code>.
+          </div>
+        </section>
+
+        <!-- 13. ROUTE PARAMETERS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 — passing data in the URL</p>
+          <h2>Route parameters</h2>
+          <p class="deep">You cannot write one route per customer. Instead you declare a <strong>placeholder</strong> in the
+             path with a colon:</p>
+          <pre><code>{ path: 'customers/:id', component: CustomerDetailComponent }</code></pre>
+          <p class="deep">Now <code>/customers/1002</code>, <code>/customers/1003</code> and <code>/customers/9999</code>
+             all match this one route, and the router hands you the value that filled the placeholder.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:34%">URL</th><th>Matches</th><th><code>id</code> is</th></tr></thead>
+            <tbody>
+              <tr><td><code>/customers/1002</code></td><td class="good">✔</td><td><code>"1002"</code> — a <strong>string</strong></td></tr>
+              <tr><td><code>/customers/1003</code></td><td class="good">✔</td><td><code>"1003"</code></td></tr>
+              <tr><td><code>/customers</code></td><td class="bad">✖ — no id segment</td><td>—</td></tr>
+              <tr><td><code>/customers/1002/edit</code></td><td class="bad">✖ — one segment too many</td><td>—</td></tr>
+            </tbody>
+          </table>
+          <h3>Linking to it</h3>
+          <pre><code>&#64;for (c of customers(); track c.id) {
+  &lt;tr&gt;
+    &lt;td&gt;{{ c.name }}&lt;/td&gt;
+    &lt;td&gt;&lt;a [routerLink]="['/customers', c.id]"&gt;View&lt;/a&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+}</code></pre>
+          <div class="warnbox">
+            <span class="lbl">The trap that catches everybody: parameters are always strings</span>
+            <code>/customers/1002</code> gives you the string <code>"1002"</code>, never the number <code>1002</code>. So
+            <code>c.id === id</code> is <code>false</code> — <code>1002 === "1002"</code> compares a number with a string.
+            <strong>Always convert first</strong> with <code>Number(...)</code>, then use <code>===</code> as normal.
+            This is the number one route-parameter bug, and Angular 19 has a tidy way to do the conversion for you —
+            next slide.
+          </div>
+        </section>
+
+
+        <!-- 14. READING A PARAMETER -->
+        <section class="slide">
+          <p class="eyebrow">Concept 4 continued — reading the parameter, the Angular 19 way</p>
+          <h2>Route parameter → signal <code>input()</code></h2>
+          <p class="deep">Because we turned on <code>withComponentInputBinding()</code> back in
+             <code>app.config.ts</code>, the router will <strong>hand the parameter to your component as an input</strong>,
+             named after the placeholder. No service to inject, no string to parse by hand.</p>
+          <div class="fname">src/app/pages/customer-detail/customer-detail.component.ts</div>
+          <pre><code>import { Component, computed, inject, input } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CurrencyPipe } from '@angular/common';
+import { CustomerService } from '../../services/customer.service';
+
+@Component({
+  selector: 'app-customer-detail',
+  imports: [RouterLink, CurrencyPipe],
+  templateUrl: './customer-detail.component.html',
+  styleUrl: './customer-detail.component.css'
+})
+export class CustomerDetailComponent {
+
+  private customerService = inject(CustomerService);
+  private router = inject(Router);
+
+  // The name 'id' MUST match the :id in the route path.
+  // &lt;number, string&gt; means: "the template sees a number; the router writes a string".
+  // The transform does the conversion the old code had to remember to do.
+  id = input.required&lt;number, string&gt;({ transform: (raw: string) =&gt; Number(raw) });
+
+  // Derived state: recomputed automatically whenever id() changes.
+  // It is `Customer | undefined`, and the template's &#64;else handles the
+  // undefined case — so there is no separate `notFound` flag to keep in step.
+  customer = computed(() =&gt; this.customerService.getById(this.id()));
+
+  goBack(): void {
+    this.router.navigate(['/customers']);
+  }
+}</code></pre>
+          <div class="fname">customer-detail.component.html</div>
+          <pre><code>&#64;if (customer(); as c) {
+  &lt;h2&gt;{{ c.name }}&lt;/h2&gt;
+  &lt;p&gt;Customer #{{ c.id }} · {{ c.city }} · {{ c.balance | currency:'INR' }}&lt;/p&gt;
+  &lt;button (click)="goBack()"&gt;← Back to the list&lt;/button&gt;
+} &#64;else {
+  &lt;h2&gt;Customer not found&lt;/h2&gt;
+  &lt;p&gt;There is no customer with id &lt;strong&gt;{{ id() }}&lt;/strong&gt;.&lt;/p&gt;
+  &lt;a routerLink="/customers"&gt;← Back to the list&lt;/a&gt;
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">This version fixes a bug the old code had for free</span>
+            With the classic <code>route.snapshot</code> approach, navigating from <code>/customers/1002</code> to
+            <code>/customers/1003</code> <em>without leaving the component</em> changed the URL and left the screen showing
+            the old customer — because Angular reuses the instance and <code>ngOnInit</code> does not run again.
+            <strong>A signal input has no such problem:</strong> <code>id()</code> changes, so every
+            <code>computed()</code> that reads it recalculates, and the screen updates. There is no
+            <code>ngOnInit</code> here at all.
+          </div>
+          <h3>The classic way, which you still need to recognise</h3>
+          <pre><code>export class CustomerDetailComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  customer?: Customer;
+
+  ngOnInit(): void {
+    const raw = this.route.snapshot.paramMap.get('id');   // a STRING, or null
+    const id = Number(raw);                               // convert it — always
+    this.customer = this.customerService.getById(id);
+  }
+}
+
+// …or, to react to parameter changes while staying in the same component:
+this.route.paramMap.subscribe(p =&gt; {
+  this.customer = this.customerService.getById(Number(p.get('id')));
+});</code></pre>
+          <div class="note">
+            <span class="lbl">When you still reach for <code>ActivatedRoute</code></span>
+            When you need more than a parameter value — the resolved <code>data</code>, the <code>fragment</code>, the
+            parent route, or the full URL — or when you are working in a codebase that hasn't enabled
+            <code>withComponentInputBinding()</code>. Both approaches are correct in Angular 19; the input version is
+            shorter and reactive, so prefer it for plain parameters.
+          </div>
+        </section>
+
+        <!-- 15. NAVIGATING FROM CODE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 5 — navigating without a link</p>
+          <h2>Navigating from code with <code>Router</code></h2>
+          <p class="deep"><code>routerLink</code> is for things the user clicks. But sometimes <em>your code</em> needs to
+             navigate: after a successful save, after a login, after a delete. For that you inject the
+             <code>Router</code> service — with <code>inject()</code>, as everywhere else in Angular 19.</p>
+          <pre><code>import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+
+private router = inject(Router);
+
+// simple navigation
+goHome(): void {
+  this.router.navigate(['/home']);
+}
+
+// with a parameter
+viewCustomer(id: number): void {
+  this.router.navigate(['/customers', id]);      // → /customers/1002
+}
+
+// the classic: navigate after a successful save
+onSave(): void {
+  this.customerService.add(this.form.getRawValue()).subscribe({
+    next: () =&gt; {
+      this.router.navigate(['/customers']);      // ← inside next, on SUCCESS only
+    },
+    error: () =&gt; {
+      this.message.set('Save failed — you are still on the form.');
+    }
+  });
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Note where that <code>navigate</code> call sits</span>
+            <strong>Inside <code>next</code></strong>. Navigating immediately after calling <code>subscribe</code> would
+            take the user away <em>before</em> the server had replied — so a failed save would look like a successful one.
+            Navigate on confirmed success, exactly as you updated the screen inside <code>next</code> in Session 3.
+          </div>
+          <h3>The three ways to navigate — a summary</h3>
+          <table class="cmp tight">
+            <thead><tr><th style="width:34%">Way</th><th>Use it when</th></tr></thead>
+            <tbody>
+              <tr><td><code>routerLink="/customers"</code></td><td>The user clicks something. Preferred — it renders a real, right-clickable link.</td></tr>
+              <tr><td><code>[routerLink]="['/customers', id]"</code></td><td>The same, with a dynamic segment.</td></tr>
+              <tr><td><code>this.router.navigate([...])</code></td><td>Your code decides — after a save, a login, a delete, or a timeout.</td></tr>
+            </tbody>
+          </table>
+          <div class="note">
+            <span class="lbl">Query parameters, briefly</span>
+            <code>this.router.navigate(['/customers'], { queryParams: { search: 'anoop' } })</code> produces
+            <code>/customers?search=anoop</code>. With <code>withComponentInputBinding()</code> enabled you read it back as
+            an ordinary input — <code>search = input('')</code> — or the classic way with
+            <code>this.route.snapshot.queryParamMap.get('search')</code>. Use route <em>parameters</em> for "which record"
+            and query <em>parameters</em> for optional extras like search terms, filters and page numbers.
+          </div>
+        </section>
+
+        <!-- 16. CASE STUDY PLAN -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — the case study · the plan</p>
+          <h2>Customer Management — what we're building</h2>
+          <p class="deep">One screen with a complete set of data operations. <span class="term">CRUD</span> stands for the
+             four things every business application does:</p>
+          <div class="cards">
+            <div class="card"><div class="ic">➕</div><h3>C — Create</h3><p>A form adds a new customer. <code>signal.update()</code> locally, <code>POST</code> against an API.</p></div>
+            <div class="card"><div class="ic">📖</div><h3>R — Read</h3><p>A table lists them, with a search box that filters as you type — a <code>computed()</code> locally, <code>GET</code> against an API.</p></div>
+            <div class="card"><div class="ic">✏️</div><h3>U — Update</h3><p>Click a row, the form fills in, edit, save. <code>map()</code> locally, <code>PUT</code> against an API.</p></div>
+            <div class="card"><div class="ic">🗑️</div><h3>D — Delete</h3><p>A confirmation, then removal. <code>filter()</code> locally, <code>DELETE</code> against an API.</p></div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The plan — we build it three times, and that's deliberate</span>
+            <strong>Round 1:</strong> everything inside one component, against a signal holding an array. Simple, all in
+            one place, easy to follow.<br>
+            <strong>Round 2:</strong> move the data operations into a <strong>service</strong> that owns the signal. The
+            component gets smaller.<br>
+            <strong>Round 3:</strong> swap the service's array for <strong><code>HttpClient</code></strong>. The component
+            barely changes at all.<br><br>
+            Seeing the same feature three ways is what makes the value of layering obvious rather than theoretical.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Everything today is something you already know</span>
+            The array methods from Session 1. <code>&#64;for</code>, <code>&#64;if</code> and class bindings from Session 2.
+            Reactive forms, services, <code>inject()</code> and <code>HttpClient</code> from Session 3. <strong>The only
+            genuinely new pieces are the router and <code>computed()</code></strong> — the rest is assembly.
+          </div>
+        </section>
+
+        <!-- 17. THE MODEL AND STATE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · step 1</p>
+          <h2>The model, and state as signals</h2>
+          <div class="fname">src/app/models/customer.ts</div>
+          <pre><code>export interface Customer {
+  id: number;
+  name: string;
+  city: string;
+  email: string;
+  balance: number;
+}</code></pre>
+          <div class="fname">customer-list.component.ts — the state we need</div>
+          <pre><code>import { Component, computed, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { CurrencyPipe } from '@angular/common';
+import { Customer } from '../../models/customer';
+
+@Component({
+  selector: 'app-customer-list',
+  imports: [ReactiveFormsModule, CurrencyPipe],
+  templateUrl: './customer-list.component.html',
+  styleUrl: './customer-list.component.css'
+})
+export class CustomerListComponent {
+
+  // ── the data: ONE source of truth ─────────────────────
+  readonly allCustomers = signal&lt;Customer[]&gt;([]);
+
+  // ── screen state ──────────────────────────────────────
+  readonly searchTerm = signal('');
+  readonly message    = signal('');
+
+  // ── edit mode: null = adding, a number = editing that id
+  readonly editingId = signal&lt;number | null&gt;(null);
+
+  // ── DERIVED state: what the table actually displays ───
+  readonly customers = computed(() =&gt; {
+    const t = this.searchTerm().trim().toLowerCase();
+    if (t === '') { return this.allCustomers(); }
+    return this.allCustomers().filter(c =&gt;
+      c.name.toLowerCase().includes(t) ||
+      c.city.toLowerCase().includes(t) ||
+      c.email.toLowerCase().includes(t)
+    );
+  });
+
+  readonly totalBalance = computed(() =&gt;
+    this.customers().reduce((sum, c) =&gt; sum + c.balance, 0)
+  );
+
+  // ── the form (reactive, from Session 3) ───────────────
+  private fb = inject(FormBuilder);
+
+  readonly custForm = this.fb.nonNullable.group({
+    name:    ['', [Validators.required, Validators.minLength(3)]],
+    city:    ['', [Validators.required]],
+    email:   ['', [Validators.required, Validators.email]],
+    balance: [0,  [Validators.required, Validators.min(0)]]
+  });
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Three design decisions worth explaining</span>
+            <strong>1. One array, not two.</strong> Older Angular code keeps a master list <em>and</em> a filtered list,
+            and must remember to re-filter after every change. Here <code>customers</code> is a
+            <strong><code>computed()</code></strong> derived from <code>allCustomers</code> and
+            <code>searchTerm</code> — so it can never drift out of step, and the classic "I filtered the wrong array"
+            bug is <em>structurally impossible</em>.<br>
+            <strong>2. <code>editingId: signal&lt;number | null&gt;</code>.</strong> One signal carries the whole
+            insert-versus-update distinction: <code>null</code> means "adding a new one", a number means "editing that
+            id". This single value is what lets one form do both jobs.<br>
+            <strong>3. <code>fb.nonNullable.group</code>.</strong> Typed forms: <code>custForm.getRawValue()</code> comes
+            back as <code>{ name: string; city: string; email: string; balance: number }</code> rather than with
+            everything possibly <code>undefined</code>. Fewer casts, real type safety.
+          </div>
+          <div class="analogy">
+            <span class="lbl">Analogy for <code>computed()</code></span>
+            A <code>signal</code> is a cell in a spreadsheet you type into. A <code>computed</code> is a cell containing
+            <code>=SUM(A1:A9)</code> — you never update it by hand, and it is never stale. Changing a source cell
+            recalculates it for you, and only then.
+          </div>
+        </section>
+
+
+        <!-- 18. READ - LIST -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · R for Read</p>
+          <h2>Read: listing the customers</h2>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class</h3>
+              <pre><code>constructor() {
+  // Round 1 only: seed the signal.
+  // Round 3 replaces this with an
+  // HTTP call.
+  this.allCustomers.set([
+    { id: 1001, name: 'Anoop Kumar',
+      city: 'Ahmedabad',
+      email: 'anoop@example.com',
+      balance: 15000 },
+    { id: 1002, name: 'Ajay Sharma',
+      city: 'Pune',
+      email: 'ajay@example.com',
+      balance: 0 },
+    { id: 1003, name: 'Rekha Nair',
+      city: 'Kochi',
+      email: 'rekha@example.com',
+      balance: 42500 }
+  ]);
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;ID&lt;/th&gt;&lt;th&gt;Name&lt;/th&gt;
+      &lt;th&gt;City&lt;/th&gt;&lt;th&gt;Balance&lt;/th&gt;
+      &lt;th&gt;Actions&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &#64;for (c of customers();
+          track c.id) {
+      &lt;tr [class.editing-row]="
+            c.id === editingId()"&gt;
+        &lt;td&gt;{{ c.id }}&lt;/td&gt;
+        &lt;td&gt;{{ c.name }}&lt;/td&gt;
+        &lt;td&gt;{{ c.city }}&lt;/td&gt;
+        &lt;td&gt;{{ c.balance
+                | currency:'INR' }}&lt;/td&gt;
+        &lt;td&gt;
+          &lt;button (click)="startEdit(c)"&gt;
+            Edit&lt;/button&gt;
+          &lt;button (click)="onDelete(c)"&gt;
+            Delete&lt;/button&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    } &#64;empty {
+      &lt;tr&gt;&lt;td colspan="5"&gt;
+        No customers found.
+      &lt;/td&gt;&lt;/tr&gt;
+    }
+  &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+            </div>
+          </div>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">&#64;for (c of customers(); track c.id)</div><div>The Angular 19 loop. Note the <strong><code>()</code></strong> — <code>customers</code> is a signal, so you <em>call</em> it to read its value.</div></div>
+            <div class="anno-row"><div class="anno-tag">track c.id</div><div><strong>Mandatory</strong>, not optional like the old <code>trackBy</code>. It tells Angular which row is which, so it reuses DOM instead of rebuilding the table. You no longer write a <code>trackById</code> method at all.</div></div>
+            <div class="anno-row"><div class="anno-tag">&#64;empty { }</div><div>Built-in empty state. Replaces the separate <code>*ngIf="list.length === 0"</code> block — and it cannot get out of sync with the loop.</div></div>
+            <div class="anno-row"><div class="anno-tag">[class.editing-row]="…"</div><div>Adds one class when the expression is true. Simpler than <code>ngClass</code> for a single class, and needs no import.</div></div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">What you must remember about pipes in Angular 19</span>
+            <code>currency</code> is not global. A standalone component using it must list
+            <code>CurrencyPipe</code> in <code>imports</code>. Forget it and you get
+            <em>"NG0302: The pipe 'currency' could not be found"</em>. Same for <code>DatePipe</code>,
+            <code>UpperCasePipe</code> and friends — or import <code>CommonModule</code> once if you would rather not
+            list them individually.
+          </div>
+        </section>
+
+        <!-- 19. READ - SEARCH -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · R for Read, part two</p>
+          <h2>Read: search and filter</h2>
+          <p class="deep">Here is where signals genuinely change how you write the feature. There is
+             <strong>no <code>onSearch()</code> method</strong>, because there is nothing to re-run: the filtered list is a
+             <code>computed()</code>, so updating the search term is the entire implementation.</p>
+          <div class="panels">
+            <div class="panel">
+              <h3>The class — that's all of it</h3>
+              <pre><code>readonly searchTerm = signal('');
+
+// customers is the computed()
+// from slide 17 — it reads
+// searchTerm() and allCustomers().
+
+clearSearch(): void {
+  this.searchTerm.set('');
+}</code></pre>
+            </div>
+            <div class="panel">
+              <h3>The template</h3>
+              <pre><code>&lt;input #box
+       [value]="searchTerm()"
+       (input)="searchTerm.set(box.value)"
+       placeholder="Search name, city
+                    or email…"&gt;
+
+&lt;button (click)="clearSearch()"
+        [disabled]="!searchTerm()"&gt;
+  Clear
+&lt;/button&gt;
+
+&lt;p&gt;
+  Showing {{ customers().length }}
+  of {{ allCustomers().length }} ·
+  total
+  {{ totalBalance()
+     | currency:'INR' }}
+&lt;/p&gt;</code></pre>
+            </div>
+          </div>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">#box … (input)="…set(box.value)"</div><div><code>#box</code> is a template reference variable — a name for that input element. On every keystroke we push its value into the signal. No <code>FormsModule</code>, no <code>ngModel</code>.</div></div>
+            <div class="anno-row"><div class="anno-tag">[value]="searchTerm()"</div><div>Keeps the box in step when <em>code</em> changes the signal — which is what makes the Clear button work.</div></div>
+          </div>
+          <div class="note">
+            <span class="lbl">If you prefer <code>ngModel</code>, it still works</span>
+            Import <code>FormsModule</code> and bind to a plain field: <code>[(ngModel)]="searchTerm"</code> with
+            <code>searchTerm = ''</code>. Two-way binding does not work directly on a signal in v19 unless you use
+            <code>model()</code> for a component's own input. For local screen state, the
+            <code>#box</code> pattern above is the idiomatic v19 answer, and it is one line shorter.
+          </div>
+          <div class="keybox">
+            <span class="lbl">Why searching in the browser is instant — and when it isn't right</span>
+            The data is <strong>already in memory</strong>, so filtering costs nothing and needs no server round-trip.
+            That is why an Angular search box feels instant next to a JSP page that reloads.<br><br>
+            <strong>The limit:</strong> this only works because we have three customers. With fifty thousand you would not
+            download them all — you would send the search term to the server
+            (<code>GET /customers?search=anoop</code>) and let the database do the work. Knowing <em>which</em> approach
+            a situation needs is the actual skill.
+          </div>
+          <div class="analogy">
+            <span class="lbl">The bug this design removes</span>
+            In the pre-signals version, two arrays were kept by hand and every change had to end with a call to
+            <code>onSearch()</code>. Forget it once and a new customer seems to vanish. Filter the wrong array and
+            deleting a search character never brings rows back. <strong>With <code>computed()</code> neither mistake is
+            expressible</strong> — and code you cannot get wrong beats code you must remember to get right.
+          </div>
+        </section>
+
+        <!-- 20. CREATE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · C for Create</p>
+          <h2>Create: inserting a new customer</h2>
+          <pre><code>onSubmit(): void {
+  if (this.custForm.invalid) {
+    this.custForm.markAllAsTouched();      // reveal every error at once
+    return;
+  }
+
+  const form = this.custForm.getRawValue();  // fully typed, thanks to nonNullable
+
+  if (this.editingId() === null) {
+    // ── ADD MODE ──────────────────────────────────────
+    const newCustomer: Customer = { id: this.nextId(), ...form };
+
+    // update() gets the current value and returns a NEW array.
+    this.allCustomers.update(list =&gt; [...list, newCustomer]);
+    this.message.set('Added ' + newCustomer.name + '.');
+
+  } else {
+    // ── EDIT MODE — slide 22 ─────────────────────────
+  }
+
+  this.resetForm();
+  // No re-filter call needed: `customers` is computed, so the table
+  // has already updated by the time this method returns.
+}
+
+private nextId(): number {
+  const list = this.allCustomers();
+  if (list.length === 0) { return 1001; }
+  return Math.max(...list.map(c =&gt; c.id)) + 1;
+}
+
+resetForm(): void {
+  this.custForm.reset({ name: '', city: '', email: '', balance: 0 });
+  this.editingId.set(null);
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Four details worth copying</span>
+            <strong>1.</strong> Validate first and <code>markAllAsTouched()</code>, so a user who clicks Save on an empty
+            form is told why nothing happened.<br>
+            <strong>2.</strong> <code>[...list, newCustomer]</code> creates a <strong>new</strong> array rather than
+            calling <code>push()</code>. Signals compare by reference, so mutating the existing array in place would leave
+            the screen unchanged — this is the number one signals mistake.<br>
+            <strong>3.</strong> <code>nextId()</code> takes the highest existing id and adds one — never
+            <code>length + 1</code>, which produces duplicates as soon as anything is deleted.<br>
+            <strong>4.</strong> <code>{ id: this.nextId(), ...form }</code> — the spread copies the four validated form
+            fields, so adding a field to the form does not mean editing this line.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">The mutation trap, spelled out</span>
+            <code>this.allCustomers().push(newCustomer);</code> <strong>looks</strong> right and is the most common signals
+            bug there is. It mutates the array the signal is holding, the reference never changes, so no
+            <code>computed()</code> recalculates and <em>nothing appears on screen</em>. Always go through
+            <code>.set()</code> or <code>.update()</code> with a fresh array.
+          </div>
+          <div class="note">
+            <span class="lbl">Generating ids locally is a temporary measure</span>
+            Once a real server is involved, the <strong>database</strong> assigns ids. You will send <code>id: 0</code>
+            and use the id that comes back in the response — exactly as in Session 3's POST stretch task.
+          </div>
+        </section>
+
+        <!-- 21. DELETE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · D for Delete</p>
+          <h2>Delete: with a confirmation step</h2>
+          <pre><code>onDelete(customer: Customer): void {
+
+  // Never delete on a single click. Always confirm.
+  const ok = confirm('Delete ' + customer.name + '? This cannot be undone.');
+  if (!ok) { return; }
+
+  // filter() returns a new array, which is exactly what a signal wants
+  this.allCustomers.update(list =&gt; list.filter(c =&gt; c.id !== customer.id));
+
+  // if we were editing this very customer, get out of edit mode
+  if (this.editingId() === customer.id) {
+    this.resetForm();
+  }
+
+  this.message.set('Deleted ' + customer.name + '.');
+}</code></pre>
+          <div class="anno-map">
+            <div class="anno-row"><div class="anno-tag">confirm(...)</div><div>The browser's built-in Yes/No dialog. Ugly but honest, and it takes one line. Real projects use a styled modal — the <em>logic</em> is identical.</div></div>
+            <div class="anno-row"><div class="anno-tag">update(list =&gt; list.filter(...))</div><div>"Give me every customer except this one." One line, immutable, and it triggers the update. The old <code>findIndex</code> + <code>splice</code> pair still works but mutates in place — wrong for signals.</div></div>
+            <div class="anno-row"><div class="anno-tag">if (this.editingId() === ...)</div><div>An edge case people miss: deleting the customer you are currently editing would leave the form pointing at something that no longer exists.</div></div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Notice what is <em>not</em> here</span>
+            No call to re-filter the table, and no <code>trackBy</code> method. The <code>computed()</code> handles the
+            first and <code>track c.id</code> in the template handles the second. <strong>Four lines of real
+            work.</strong>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Always confirm destructive actions</span>
+            A misplaced click that silently deletes a customer is the kind of thing that ends up in a support ticket.
+            One <code>confirm()</code> prevents it. Session 3's rule also applies once a server is involved: when the
+            delete is an HTTP call, remove the row <strong>inside <code>next</code></strong>, so a failed delete does not
+            leave your screen lying to the user.
+          </div>
+        </section>
+
+        <!-- 22. UPDATE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 · U for Update</p>
+          <h2>Update: click a row, edit, save</h2>
+          <p class="deep">Update is two halves: <strong>load</strong> the row into the form, then <strong>save</strong> the
+             changes back over the original.</p>
+          <div class="fname">Half 1 — loading the row into the form</div>
+          <pre><code>startEdit(customer: Customer): void {
+  this.editingId.set(customer.id);         // remember WHICH one we're editing
+
+  // ONE LINE fills the whole form. This is why we used a reactive form.
+  this.custForm.patchValue({
+    name:    customer.name,
+    city:    customer.city,
+    email:   customer.email,
+    balance: customer.balance
+  });
+
+  this.message.set('Editing ' + customer.name + '. Change the fields and press Save.');
+}
+
+cancelEdit(): void {
+  this.resetForm();                        // sets editingId back to null
+  this.message.set('Edit cancelled.');
+}</code></pre>
+          <div class="fname">Half 2 — saving it back (the <code>else</code> branch from the Create slide)</div>
+          <pre><code>  } else {
+    // ── EDIT MODE ──────────────────────────────────────
+    const id = this.editingId()!;          // not null inside this branch
+
+    this.allCustomers.update(list =&gt;
+      list.map(c =&gt; c.id === id
+        ? { id, ...form }                  // replace this one, KEEPING the id
+        : c)                               // leave every other row alone
+    );
+
+    this.message.set('Updated successfully.');
+  }</code></pre>
+          <div class="keybox">
+            <span class="lbl"><code>map()</code> is the signal-friendly way to update one item</span>
+            Read it as: <em>"rebuild the list; wherever the id matches, substitute the edited version."</em> It returns a
+            new array — so the signal notices — and it needs no index lookup. The older
+            <code>findIndex()</code> then <code>list[i] = {...}</code> pair mutates the array in place and leaves the
+            screen stale.
+          </div>
+          <div class="keybox">
+            <span class="lbl"><code>patchValue</code> is the whole reason Session 3 taught reactive forms</span>
+            Filling an entire form from an object takes <strong>one call</strong>. In a template-driven form you would
+            assign every property by hand, one line each — and remember to add a line every time someone adds a field.
+            <em>This slide is where that lesson pays off.</em>
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Keep the id — always</span>
+            The form has no id field, so you must reuse <code>this.editingId()</code>. Build the replacement object with a
+            fresh or missing id and you have silently created a duplicate rather than updated a record.
+          </div>
+        </section>
+
+        <!-- 23. ONE FORM BOTH JOBS -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — the pattern that keeps the code small</p>
+          <h2>One form doing both jobs</h2>
+          <p class="deep">You do <strong>not</strong> need an "add form" and an "edit form". One form, and a single signal
+             deciding which mode it is in — this is what a JSP application would have needed two separate pages for.</p>
+          <div class="flow vert">
+            <div class="flow-box"><code>editingId() === null</code><span class="sm">ADD MODE — heading says "Add Customer", Save creates a new record</span></div>
+            <span class="flow-arrow">▼ &nbsp; user clicks Edit on a row &nbsp; ▼</span>
+            <div class="flow-box alt"><code>editingId() === 1002</code><span class="sm">EDIT MODE — form is pre-filled, heading says "Edit Customer #1002", Save overwrites</span></div>
+            <span class="flow-arrow">▼ &nbsp; user clicks Save or Cancel &nbsp; ▼</span>
+            <div class="flow-box green">back to <code>editingId() === null</code><span class="sm">form cleared, ready to add again</span></div>
+          </div>
+          <div class="fname">the template adapts itself to the mode</div>
+          <pre><code>&lt;h3&gt;
+  &#64;if (editingId() === null) { Add Customer }
+  &#64;else { Edit Customer #{{ editingId() }} }
+&lt;/h3&gt;
+
+&lt;form [formGroup]="custForm" (ngSubmit)="onSubmit()"&gt;
+  &lt;input formControlName="name" placeholder="Name"&gt;
+  &lt;input formControlName="city" placeholder="City"&gt;
+  &lt;input formControlName="email" placeholder="Email"&gt;
+  &lt;input formControlName="balance" type="number" placeholder="Balance"&gt;
+
+  &lt;button type="submit" [disabled]="custForm.invalid"&gt;
+    {{ editingId() === null ? 'Add' : 'Save changes' }}
+  &lt;/button&gt;
+
+  &#64;if (editingId() !== null) {
+    &lt;!-- Cancel only makes sense while editing --&gt;
+    &lt;button type="button" (click)="cancelEdit()"&gt;Cancel&lt;/button&gt;
+  }
+&lt;/form&gt;</code></pre>
+          <div class="plainbox">
+            <span class="lbl">Read the template again — it is all Session 2, in v19 syntax</span>
+            A <code>&#64;if / &#64;else</code> block for the heading, interpolation with a conditional expression for the
+            button label, property binding on <code>[disabled]</code>, and <code>&#64;if</code> to show Cancel only when
+            relevant. <strong>One signal, <code>editingId</code>, drives all four of those.</strong>
+          </div>
+          <div class="note">
+            <span class="lbl">Why <code>&#64;if</code> is better than <code>*ngIf</code>, in one line each</span>
+            No import needed · <code>&#64;else if</code> / <code>&#64;else</code> without nesting · narrower types inside
+            the block, so <code>&#64;if (customer(); as c)</code> gives you a non-null <code>c</code> ·
+            and it ships less framework code to the browser.
+          </div>
+        </section>
+
+
+        <!-- 24. THE WHOLE THING -->
+        <section class="slide">
+          <p class="eyebrow">Concept 6 — round 1 complete</p>
+          <h2>The complete in-component CRUD</h2>
+          <p class="deep">Here is everything from the last six slides, as one list. Notice how short the method list is:
+             three of the old helpers disappeared into the framework.</p>
+          <table class="cmp">
+            <thead><tr><th style="width:30%">Member</th><th style="width:14%">CRUD</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr><td><code>allCustomers</code> <span class="pill">signal</span></td><td>R</td><td>The single source of truth</td></tr>
+              <tr><td><code>customers</code> <span class="pill">computed</span></td><td>R</td><td>The filtered list the table renders — recalculated automatically</td></tr>
+              <tr><td><code>totalBalance</code> <span class="pill">computed</span></td><td>R</td><td>Sum of the displayed rows</td></tr>
+              <tr><td><code>searchTerm</code> <span class="pill">signal</span></td><td>R</td><td>What the user typed; setting it re-filters the table</td></tr>
+              <tr><td><code>clearSearch()</code></td><td>R</td><td>One line: <code>searchTerm.set('')</code></td></tr>
+              <tr><td><code>onSubmit()</code></td><td>C / U</td><td>Validates, then adds or updates depending on <code>editingId()</code></td></tr>
+              <tr><td><code>nextId()</code></td><td>C</td><td>Highest existing id, plus one</td></tr>
+              <tr><td><code>startEdit(c)</code></td><td>U</td><td>Sets <code>editingId</code> and <code>patchValue()</code>s the form</td></tr>
+              <tr><td><code>cancelEdit()</code></td><td>U</td><td>Back to add mode</td></tr>
+              <tr><td><code>onDelete(c)</code></td><td>D</td><td>Confirms, then <code>update(list =&gt; list.filter(...))</code></td></tr>
+              <tr><td><code>resetForm()</code></td><td>—</td><td>Clears the form and sets <code>editingId</code> to <code>null</code></td></tr>
+              <tr><td class="bad"><s><code>onSearch()</code></s></td><td>—</td><td><strong>Gone</strong> — the <code>computed()</code> replaced it</td></tr>
+              <tr><td class="bad"><s><code>trackById()</code></s></td><td>—</td><td><strong>Gone</strong> — <code>track c.id</code> is inline in <code>&#64;for</code></td></tr>
+            </tbody>
+          </table>
+          <div class="browser">
+            <div class="bar">
+              <span class="dot tl-red"></span><span class="dot tl-yellow"></span><span class="dot tl-green"></span>
+              <span class="url">http://localhost:4200/customers</span>
+            </div>
+            <div class="viewport">
+              <div class="navbar"><span>Home</span><span class="on">Customers</span><span>About</span></div>
+              <p style="margin:0 0 8px;"><span class="fld">Search name, city or email…</span> <span class="btn ghost">Clear</span></p>
+              <table>
+                <thead><tr><th>ID</th><th>Name</th><th>City</th><th>Balance</th><th>Actions</th></tr></thead>
+                <tbody>
+                  <tr><td>1001</td><td>Anoop Kumar</td><td>Ahmedabad</td><td>₹15,000.00</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                  <tr class="row-active"><td>1002</td><td>Ajay Sharma</td><td>Pune</td><td>₹0.00</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                  <tr><td>1003</td><td>Rekha Nair</td><td>Kochi</td><td>₹42,500.00</td><td><span class="btn ghost">Edit</span> <span class="btn">Delete</span></td></tr>
+                </tbody>
+              </table>
+              <p style="font-size:14px;margin-top:8px;"><strong>Edit Customer #1002</strong> — the highlighted row is loaded into the form below</p>
+              <p style="margin:4px 0;"><span class="fld">Ajay Sharma</span> <span class="fld">Pune</span> <span class="btn">Save changes</span> <span class="btn ghost">Cancel</span></p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">That is a complete business screen</span>
+            List, search, add, edit, delete, validation and an empty state — and it replaces the five reloading JSPs from
+            Session 1, slide 12. Go back and look at that slide now; this is the promise it made.
+          </div>
+        </section>
+
+        <!-- 25. CRUD VIA SERVICE -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 — round 2 · the same CRUD, through a service</p>
+          <h2>Moving the operations into a signal-based service</h2>
+          <p class="deep">Round 1 works, and it puts data logic inside a component — exactly what Session 3 taught you not
+             to do. Round 2 fixes it, and the service keeps the signal so that <em>every</em> screen sees the same data.</p>
+          <div class="fname">src/app/services/customer.service.ts</div>
+          <pre><code>import { Injectable, signal } from '@angular/core';
+import { Customer } from '../models/customer';
+
+@Injectable({ providedIn: 'root' })      // ONE instance for the whole app
+export class CustomerService {
+
+  // Private and writable inside the service…
+  private readonly _customers = signal&lt;Customer[]&gt;([
+    { id: 1001, name: 'Anoop Kumar', city: 'Ahmedabad', email: 'anoop@example.com', balance: 15000 },
+    { id: 1002, name: 'Ajay Sharma', city: 'Pune',      email: 'ajay@example.com',  balance: 0 },
+    { id: 1003, name: 'Rekha Nair',  city: 'Kochi',     email: 'rekha@example.com', balance: 42500 }
+  ]);
+
+  // …read-only outside it. Components can READ but never SET.
+  readonly customers = this._customers.asReadonly();
+
+  getById(id: number): Customer | undefined {
+    return this._customers().find(c =&gt; c.id === id);
+  }
+
+  add(customer: Customer): Customer {
+    const created: Customer = { ...customer, id: this.nextId() };
+    this._customers.update(list =&gt; [...list, created]);
+    return created;
+  }
+
+  update(customer: Customer): boolean {
+    if (!this.getById(customer.id)) { return false; }
+    this._customers.update(list =&gt;
+      list.map(c =&gt; c.id === customer.id ? customer : c));
+    return true;
+  }
+
+  delete(id: number): boolean {
+    if (!this.getById(id)) { return false; }
+    this._customers.update(list =&gt; list.filter(c =&gt; c.id !== id));
+    return true;
+  }
+
+  private nextId(): number {
+    const list = this._customers();
+    if (list.length === 0) { return 1001; }
+    return Math.max(...list.map(c =&gt; c.id)) + 1;
+  }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Two things this service does that matter</span>
+            <strong>1. <code>asReadonly()</code> — a real guarantee, not a convention.</strong> Components can read
+            <code>customers()</code> but cannot call <code>.set()</code> on it; the compiler enforces it. Every change must
+            go through a method the service owns, which is where you would later add validation, logging or an audit
+            trail.<br>
+            <strong>2. The method names are a <em>repository</em>.</strong> <code>getById</code>, <code>add</code>,
+            <code>update</code>, <code>delete</code> — deliberately, so round 3 can swap the array for HTTP calls without
+            renaming anything.
+          </div>
+          <div class="note">
+            <span class="lbl">Why the detail screen from slide 14 now works automatically</span>
+            <code>getById</code> reads <code>this._customers()</code>, so when the detail component wraps it in
+            <code>computed(() =&gt; this.customerService.getById(this.id()))</code>, that <code>computed</code> is
+            <strong>subscribed to the service's signal</strong>. Delete a customer on the list screen and any open detail
+            view of it re-evaluates by itself. Nobody wrote a notification mechanism — this is what signals buy you.
+          </div>
+        </section>
+
+        <!-- 26. WHAT CHANGES -->
+        <section class="slide">
+          <p class="eyebrow">Concept 7 continued</p>
+          <h2>What changes in the component</h2>
+          <div class="panels">
+            <div class="panel bad">
+              <h3>Round 1 — inside the component</h3>
+              <pre><code>readonly allCustomers =
+  signal&lt;Customer[]&gt;([ /* data */ ]);
+
+readonly customers = computed(() =&gt; {
+  const t = this.searchTerm()
+                .trim().toLowerCase();
+  if (t === '') {
+    return this.allCustomers();
+  }
+  return this.allCustomers().filter(c =&gt;
+    c.name.toLowerCase().includes(t) ||
+    c.city.toLowerCase().includes(t) ||
+    c.email.toLowerCase().includes(t)
+  );
+});
+
+onDelete(c: Customer): void {
+  if (!confirm('Delete?')) return;
+  this.allCustomers.update(list =&gt;
+    list.filter(x =&gt; x.id !== c.id));
+}</code></pre>
+            </div>
+            <div class="panel good">
+              <h3>Round 2 — via the service</h3>
+              <pre><code>private customerService =
+  inject(CustomerService);
+
+// read straight from the service
+readonly allCustomers =
+  this.customerService.customers;
+
+readonly customers = computed(() =&gt; {
+  const t = this.searchTerm()
+                .trim().toLowerCase();
+  if (t === '') {
+    return this.allCustomers();
+  }
+  return this.allCustomers().filter(c =&gt;
+    c.name.toLowerCase().includes(t) ||
+    c.city.toLowerCase().includes(t) ||
+    c.email.toLowerCase().includes(t)
+  );
+});
+
+onDelete(c: Customer): void {
+  if (!confirm('Delete?')) return;
+  this.customerService.delete(c.id);
+}</code></pre>
+              <p style="font-size:15px;margin-top:10px;">The component no longer knows <em>how</em> anything is stored. It
+                 asks, and displays the answer.</p>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">And once again — the template did not change</span>
+            Not one character. That is now <strong>four times</strong> across this series: hardcoded array → service →
+            HTTP → service-based CRUD, all with the same template. If you have internalised why that keeps working, you
+            have internalised the single most valuable idea in these four sessions.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch</span>
+            The business now wants the same customer list on a dashboard, and in a dropdown on the orders screen. How much
+            work is that? <span class="muted">(Inject the service; read <code>customers()</code>. Two lines per place. And
+            because it is a singleton holding a signal, all three views stay in step automatically — with no refresh
+            call anywhere.)</span>
+          </div>
+        </section>
+
+        <!-- 27. CRUD OVER HTTP -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 — round 3 · the same CRUD over HTTP</p>
+          <h2>The service, talking to a real API</h2>
+          <p class="deep">Now replace the array with network calls. <strong>The method names stay identical</strong> — only
+             the bodies and the return types change.</p>
+          <div class="fname">src/app/services/customer.service.ts</div>
+          <pre><code>import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Customer } from '../models/customer';
+
+@Injectable({ providedIn: 'root' })
+export class CustomerService {
+
+  private http = inject(HttpClient);
+
+  // ONE line to change when you switch backends
+  private baseUrl = 'http://localhost:8080/api/customers';
+
+  getAll(): Observable&lt;Customer[]&gt; {
+    return this.http.get&lt;Customer[]&gt;(this.baseUrl);
+  }
+
+  getById(id: number): Observable&lt;Customer&gt; {
+    return this.http.get&lt;Customer&gt;(`${this.baseUrl}/${id}`);
+  }
+
+  add(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.post&lt;Customer&gt;(this.baseUrl, customer);
+  }
+
+  update(customer: Customer): Observable&lt;Customer&gt; {
+    return this.http.put&lt;Customer&gt;(`${this.baseUrl}/${customer.id}`, customer);
+  }
+
+  delete(id: number): Observable&lt;void&gt; {
+    return this.http.delete&lt;void&gt;(`${this.baseUrl}/${id}`);
+  }
+}</code></pre>
+          <div class="fname">src/app/app.config.ts — the one registration this needs</div>
+          <pre><code>providers: [
+  provideRouter(routes, withComponentInputBinding()),
+  provideHttpClient(withFetch())      // withFetch() is optional but recommended
+]</code></pre>
+          <div class="keybox">
+            <span class="lbl">The one real difference in the service</span>
+            Every method now returns an <strong><code>Observable</code></strong> instead of a value. So every caller must
+            <code>.subscribe()</code>. That is the only structural change — and it is exactly why Session 3 spent time on
+            Observables before we got here.
+          </div>
+          <div class="note">
+            <span class="lbl">There is no <code>HttpClientModule</code> in Angular 19</span>
+            It is deprecated. <code>provideHttpClient()</code> replaces it, interceptors are plain functions passed as
+            <code>provideHttpClient(withInterceptors([authInterceptor]))</code>, and <code>withFetch()</code> switches the
+            underlying implementation from <code>XMLHttpRequest</code> to the browser's <code>fetch</code> API — which is
+            what you want for server-side rendering later.
+          </div>
+        </section>
+
+
+        <!-- 28. COMPONENT OVER HTTP -->
+        <section class="slide">
+          <p class="eyebrow">Concept 8 continued</p>
+          <h2>The component, with <code>subscribe</code></h2>
+          <pre><code>readonly allCustomers  = signal&lt;Customer[]&gt;([]);
+readonly isLoading     = signal(false);
+readonly errorMessage  = signal('');
+
+// `customers` is still the same computed() — it filters whatever
+// allCustomers currently holds, no matter where that came from.
+
+ngOnInit(): void {
+  this.loadCustomers();
+}
+
+loadCustomers(): void {
+  this.isLoading.set(true);
+  this.errorMessage.set('');
+
+  this.customerService.getAll().subscribe({
+    next: (data) =&gt; {
+      this.allCustomers.set(data);          // one line updates the whole table
+      this.isLoading.set(false);
+    },
+    error: (err) =&gt; {
+      this.errorMessage.set('Could not load customers. Is the API running?');
+      this.isLoading.set(false);            // set it in BOTH branches
+      console.error(err);
+    }
+  });
+}
+
+onDelete(c: Customer): void {
+  if (!confirm('Delete ' + c.name + '?')) { return; }
+
+  this.customerService.delete(c.id).subscribe({
+    next: () =&gt; {
+      this.loadCustomers();                 // reload so the screen matches the server
+      this.message.set('Deleted.');
+    },
+    error: () =&gt; this.message.set('Delete failed — the customer is still there.')
+  });
+}
+
+onSubmit(): void {
+  if (this.custForm.invalid) { this.custForm.markAllAsTouched(); return; }
+
+  const customer: Customer = {
+    id: this.editingId() ?? 0,              // 0 for a new one; the server assigns it
+    ...this.custForm.getRawValue()
+  };
+
+  const call = this.editingId() === null
+    ? this.customerService.add(customer)
+    : this.customerService.update(customer);
+
+  call.subscribe({
+    next: () =&gt; { this.resetForm(); this.loadCustomers(); },
+    error: () =&gt; this.message.set('Save failed.')
+  });
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Two patterns to take away from that code</span>
+            <strong>1. Reload after a change.</strong> After a successful add, update or delete, call
+            <code>loadCustomers()</code> again. It guarantees the screen matches the server — including anything a
+            colleague changed a moment ago. Slower than patching locally; far more trustworthy.<br>
+            <strong>2. Choose the call, then subscribe once.</strong> <code>const call = condition ? a() : b();</code> then
+            one <code>.subscribe()</code>. Remember Observables are lazy, so building it without subscribing sends nothing —
+            which makes this pattern safe.
+          </div>
+          <div class="note">
+            <span class="lbl">The signal-native alternative: <code>toSignal()</code></span>
+            For a read-only list you can skip <code>subscribe</code> entirely:
+            <pre style="margin:8px 0 0;"><code>import { toSignal } from '@angular/core/rxjs-interop';
+
+readonly allCustomers = toSignal(this.customerService.getAll(),
+                                 { initialValue: [] as Customer[] });</code></pre>
+            It subscribes for you, exposes the latest value as a signal, and unsubscribes when the component is destroyed.
+            It is less convenient when you need to <em>re-fetch</em> on demand, which is why the CRUD screen above uses
+            explicit <code>subscribe</code>. Know both.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">About unsubscribing</span>
+            <code>HttpClient</code> Observables complete after one response, so they clean themselves up — you do not need
+            to unsubscribe from them. For anything long-lived (a <code>paramMap</code>, a timer, a WebSocket) use
+            <code>takeUntilDestroyed()</code> from <code>@angular/core/rxjs-interop</code>, which is the modern replacement
+            for keeping a <code>Subscription</code> and tearing it down in <code>ngOnDestroy</code>.
+          </div>
+        </section>
+
+        <!-- 29. YOUR SPRING BOOT API -->
+        <section class="slide">
+          <p class="eyebrow">Concept 9 — the full-stack moment</p>
+          <h2>Connecting to <em>your</em> Spring Boot API</h2>
+          <p class="deep">This is the payoff for eight sessions of work. On the Angular side it is <strong>one line</strong>.</p>
+          <pre><code>private baseUrl = 'http://localhost:8080/api/customers';</code></pre>
+          <div class="fname">the Spring Boot side — everything here is Spring Boot Session 2 material</div>
+          <pre><code>@CrossOrigin(origins = "http://localhost:4200")   // ← REQUIRED, or CORS blocks you
+@RestController
+@RequestMapping("/api/customers")
+public class CustomerController {
+
+    @Autowired
+    private CustomerService service;
+
+    @GetMapping
+    public List&lt;Customer&gt; getAll() { return service.findAll(); }
+
+    @GetMapping("/{id}")
+    public Customer getById(@PathVariable Long id) { return service.findById(id); }
+
+    @PostMapping
+    public Customer create(@RequestBody Customer c) { return service.save(c); }
+
+    @PutMapping("/{id}")
+    public Customer update(@PathVariable Long id, @RequestBody Customer c) {
+        c.setId(id);
+        return service.save(c);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id) { service.deleteById(id); }
+}</code></pre>
+          <div class="keybox">
+            <span class="lbl">Read those two code blocks side by side</span>
+            <code>http.get(baseUrl)</code> ↔ <code>@GetMapping</code>.
+            <code>http.post(baseUrl, c)</code> ↔ <code>@PostMapping</code> with <code>@RequestBody</code>.
+            <code>http.delete(`${baseUrl}/${id}`)</code> ↔ <code>@DeleteMapping("/{id}")</code> with
+            <code>@PathVariable</code>.<br><br>
+            <strong>You now know both ends of the wire.</strong> That is what the whole eight-session programme was for.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">Three things to check when it doesn't work first time</span>
+            <strong>1. CORS.</strong> Without <code>@CrossOrigin</code> the browser blocks the request and the message
+            says CORS. Fix it on the <em>server</em>.<br>
+            <strong>2. Field names must match exactly.</strong> Java's <code>customerName</code> arrives as
+            <code>customerName</code> — if your TypeScript interface says <code>name</code>, you get
+            <code>undefined</code>. Check with <code>{{ data | json }}</code> (and import <code>JsonPipe</code>).<br>
+            <strong>3. Is the API actually running?</strong> Open
+            <code>http://localhost:8080/api/customers</code> directly in a browser tab first. If it fails there, the
+            problem is not in Angular.
+          </div>
+        </section>
+
+        <!-- 30. THE WHOLE ARCHITECTURE -->
+        <section class="slide">
+          <p class="eyebrow">The complete picture</p>
+          <h2>Everything you've built, in one diagram</h2>
+          <div class="flow vert">
+            <div class="flow-box"><code>main.ts</code> → <code>bootstrapApplication(AppComponent, appConfig)</code><span class="sm">appConfig provides the router and HttpClient — no NgModule anywhere</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">Browser at <code>localhost:4200/customers</code><span class="sm">the router matched the URL against app.routes.ts and chose a component</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box"><code>&lt;router-outlet /&gt;</code> renders <code>CustomerListComponent</code><span class="sm">inside a persistent shell of header, nav and footer</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box">The <strong>template</strong> displays it<span class="sm">&#64;for · &#64;if · &#64;empty · class bindings · pipes · reactive form · input() / output()</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">The <strong>component</strong> handles the interaction<span class="sm">signals · computed · event bindings · validation · editingId · loading and error state</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box alt">The <strong>service</strong>, obtained with <code>inject()</code><span class="sm">getAll · getById · add · update · delete</span></div>
+            <span class="flow-arrow">▼</span>
+            <div class="flow-box green"><code>HttpClient</code> → your <strong>Spring Boot REST API</strong> → the <strong>database</strong><span class="sm">JSON travels back up the same chain, subscribe's next fires, a signal is set, and only the affected DOM updates</span></div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">Seven layers, and each one knows only about the next</span>
+            That is not accidental complexity — it is what lets you change any single layer without disturbing the others.
+            You proved it four times: the template survived every change to how the data was fetched.
+          </div>
+        </section>
+
+        <!-- 31. BEST PRACTICES -->
+        <section class="slide">
+          <p class="eyebrow">Before you go and build things</p>
+          <h2>Do these, avoid those — the Angular 19 edition</h2>
+          <div class="ba">
+            <div class="ba-col after">
+              <h3>✅ Do</h3>
+              <ul>
+                <li>Put HTTP calls and data logic in a <strong>service</strong></li>
+                <li>Use <code>signal</code> for state and <code>computed</code> for anything derived</li>
+                <li>Always update signals immutably — <code>update(l =&gt; [...l, x])</code></li>
+                <li>Expose service state with <code>asReadonly()</code></li>
+                <li>Use <code>inject()</code> and <code>&#64;if</code> / <code>&#64;for</code> in new code</li>
+                <li>Type everything — <strong>interfaces</strong> for all API data</li>
+                <li>Always provide an <code>error</code> handler in <code>subscribe</code></li>
+                <li>Show loading, error <em>and</em> empty states (<code>&#64;empty</code>)</li>
+                <li>Confirm before anything destructive</li>
+                <li><code>loadComponent</code> for routes you can defer</li>
+                <li>Wildcard <code>**</code> route last, always</li>
+              </ul>
+            </div>
+            <div class="ba-col before">
+              <h3>❌ Avoid</h3>
+              <ul>
+                <li><code>HttpClient</code> directly inside a component</li>
+                <li><code>signal().push(x)</code> — mutation, so nothing renders</li>
+                <li>Reading a signal without <code>()</code> in a template</li>
+                <li>New <code>NgModule</code>s in a v19 app</li>
+                <li><code>any</code> as a habit rather than a note</li>
+                <li>Forgetting <code>.subscribe()</code> — nothing happens</li>
+                <li>Updating the screen <em>before</em> the server confirms</li>
+                <li><code>document.getElementById</code> — bind instead</li>
+                <li>Heavy work inside <code>{{ method() }}</code> — use <code>computed</code></li>
+                <li>Secrets or passwords in front-end code</li>
+                <li><code>href</code> for internal links — use <code>routerLink</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">If you remember only three things from this series</span>
+            <strong>1.</strong> Data flows down, events flow up.<br>
+            <strong>2.</strong> Components display; services fetch.<br>
+            <strong>3.</strong> Change the data and let Angular update the screen — never touch the DOM yourself.
+          </div>
+        </section>
+
+        <!-- 32. ERRORS TODAY -->
+        <section class="slide">
+          <p class="eyebrow">Before the lab — the shortcuts to a working app</p>
+          <h2>The errors you'll hit today</h2>
+          <table class="cmp tight">
+            <thead><tr><th style="width:38%">Symptom</th><th>Cause and fix</th></tr></thead>
+            <tbody>
+              <tr><td>The URL changes but <strong>nothing appears</strong></td><td>You forgot the <code>&lt;router-outlet /&gt;</code> tag in <code>app.component.html</code>. Angular has a component to show and nowhere to put it. No error is reported.</td></tr>
+              <tr><td><code>'router-outlet' is not a known element</code></td><td><code>RouterOutlet</code> is missing from that component's <code>imports: [ ]</code> array. In Angular 19 every standalone component imports what its own template uses.</td></tr>
+              <tr><td><code>Can't bind to 'routerLink'</code></td><td>Same family: add <code>RouterLink</code> to <code>imports</code>. And <code>RouterLinkActive</code> is a third, separate import.</td></tr>
+              <tr><td><code>NG0302: The pipe 'currency' could not be found</code></td><td>Add <code>CurrencyPipe</code> (or <code>CommonModule</code>) to <code>imports</code>.</td></tr>
+              <tr><td><code>Can't bind to 'formGroup'</code></td><td><code>ReactiveFormsModule</code> missing from <code>imports</code>. Yes — a module, imported by a component; that is normal and correct.</td></tr>
+              <tr><td><strong>Every</strong> page shows the 404</td><td>The wildcard <code>**</code> route is listed before your real routes. Move it to the bottom — Angular takes the <em>first</em> match, not the best.</td></tr>
+              <tr><td>Clicking a link reloads the whole app</td><td>You used <code>href</code> instead of <code>routerLink</code>.</td></tr>
+              <tr><td>Infinite redirect loop at startup</td><td><code>{ path: '', redirectTo: 'home' }</code> is missing <code>pathMatch: 'full'</code>.</td></tr>
+              <tr><td>"Add Customer" opens the <em>detail</em> screen</td><td><code>customers/:id</code> is listed above <code>customers/add</code>, so <code>add</code> is being read as an id. Static routes before dynamic ones.</td></tr>
+              <tr><td>The Home link is highlighted on every page</td><td><code>routerLinkActive</code> matches by prefix. Add <code>[routerLinkActiveOptions]="{ exact: true }"</code>.</td></tr>
+              <tr><td>The route parameter input is always <code>undefined</code></td><td>Either you forgot <code>withComponentInputBinding()</code> in <code>provideRouter(...)</code>, or the input name doesn't match the <code>:id</code> in the path exactly.</td></tr>
+              <tr><td>The lookup by id finds nothing, though the id looks right</td><td><strong>Route parameters are strings.</strong> <code>1002 === "1002"</code> is <code>false</code>. Use the input <code>transform</code>, or <code>Number(...)</code>.</td></tr>
+              <tr><td>A row is added but the table doesn't change</td><td>You mutated instead of replacing: <code>allCustomers().push(x)</code>. Use <code>allCustomers.update(l =&gt; [...l, x])</code>.</td></tr>
+              <tr><td>The table shows <code>[object Object]</code> or nothing, and <code>&#64;for</code> looks fine</td><td>You wrote <code>&#64;for (c of customers; ...)</code> without the <code>()</code>. A signal must be <em>called</em> to be read.</td></tr>
+              <tr><td><code>NG5002: &#64;for loop must have a "track" expression</code></td><td><code>track</code> is mandatory in Angular 19. Use <code>track c.id</code>, or <code>track $index</code> if there is no id.</td></tr>
+              <tr><td><code>NG0955: track expression resulted in duplicated keys</code></td><td>Two rows share an id — usually because <code>nextId()</code> used <code>length + 1</code>. Use <code>Math.max(...ids) + 1</code>.</td></tr>
+              <tr><td>Saving an edit creates a duplicate instead of updating</td><td>You lost the original id. Reuse <code>this.editingId()</code> when building the replacement object.</td></tr>
+              <tr><td>Nothing happens on save, and no request is sent</td><td>Missing <code>.subscribe()</code>. Observables are lazy — Session 3's golden rule still applies.</td></tr>
+              <tr><td><code>blocked by CORS policy</code></td><td>Add <code>@CrossOrigin(origins = "http://localhost:4200")</code> to your Spring controller. <strong>Nothing in Angular can fix this.</strong></td></tr>
+              <tr><td>Data arrives but the columns are empty</td><td>Field names don't match between your API and your interface. Check with <code>{{ data | json }}</code>.</td></tr>
+            </tbody>
+          </table>
+          <div class="plainbox">
+            <span class="lbl">The pattern in that list</span>
+            Three families. <strong>Missing imports</strong> — new in v19, and they give you clear compiler errors.
+            <strong>Ordering and string-versus-number</strong> — old friends, and they fail silently.
+            <strong>Mutation instead of replacement</strong> — the signals-era bug, and it also fails silently. When
+            something "doesn't work", check the imports array, then the route order, then whether you mutated.
+          </div>
+        </section>
+
+
+        <!-- 33. NG BUILD -->
+        <section class="slide">
+          <p class="eyebrow">Shipping it</p>
+          <h2>Building for production</h2>
+          <p class="deep">Everything so far has run under <code>ng serve</code>, which is a <strong>development</strong>
+             server — unoptimised, on your machine only. To deploy, you build. In Angular 19 <code>ng build</code> is
+             already a <em>production</em> build; there is no <code>--prod</code> flag any more.</p>
+          <pre><code>ng build</code></pre>
+          <div class="tree">dist/hello-world/browser/
+├── index.html            <span class="c">the one page</span>
+├── main-A1B2C3.js        <span class="c">your whole app, compiled and minified</span>
+├── chunk-XYZ789.js       <span class="c">one per lazily loaded route, if you used loadComponent</span>
+├── polyfills-D4E5F6.js   <span class="c">browser compatibility shims</span>
+└── styles-G7H8I9.css     <span class="c">your global styles</span></div>
+          <table class="cmp tight">
+            <thead><tr><th style="width:26%">What the build does</th><th>Why it matters</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Compiles</strong> TypeScript → JavaScript</td><td>Browsers cannot run TypeScript. No <code>.ts</code> file reaches the user.</td></tr>
+              <tr><td><strong>Minifies</strong></td><td>Strips comments, whitespace and long names. Far smaller download.</td></tr>
+              <tr><td><strong>Tree-shakes</strong></td><td>Removes code nothing uses. This is where standalone components pay off: because each component lists exactly what it imports, the build can prove far more code is unreachable than it could with <code>NgModule</code>s.</td></tr>
+              <tr><td><strong>Hashes filenames</strong></td><td><code>main-A1B2C3.js</code> — when you redeploy, the name changes, so browsers cannot serve a stale cached copy.</td></tr>
+              <tr><td><strong>Checks budgets</strong></td><td><code>angular.json</code> sets a maximum bundle size and the build warns or fails when you exceed it. A cheap, permanent guard against bloat.</td></tr>
+            </tbody>
+          </table>
+          <div class="keybox">
+            <span class="lbl">Deploying it is genuinely simple</span>
+            The contents of that folder are <strong>plain static files</strong>. Copy them to any web server — Apache,
+            Nginx, S3, GitHub Pages, or your Spring Boot app's <code>src/main/resources/static</code> folder, which then
+            serves your Angular app and your API from the same origin and <em>eliminates the CORS problem entirely</em>.
+          </div>
+          <div class="warnbox">
+            <span class="lbl">One deployment gotcha to know about</span>
+            Your server must send <strong>unknown URLs to <code>index.html</code></strong>. Otherwise a user who
+            bookmarks <code>/customers</code> and revisits it gets a server 404 — the server looks for a
+            <em>file</em> called "customers", which does not exist. Angular's router only runs once
+            <code>index.html</code> has loaded. On Nginx that is <code>try_files $uri /index.html;</code>.
+          </div>
+        </section>
+
+        <!-- 34. RECAP -->
+        <section class="slide">
+          <p class="eyebrow">Recap</p>
+          <h2>What you now know</h2>
+          <ul class="checklist">
+            <li>A <strong>route</strong> pairs a URL path with a component, and <code>routes</code> in <code>app.routes.ts</code> is just an exported array of those pairings.</li>
+            <li><code>provideRouter(routes)</code> in <code>app.config.ts</code> switches the router on — replacing <code>AppRoutingModule</code> and <code>RouterModule.forRoot()</code> entirely.</li>
+            <li>Every standalone component <strong>imports what its own template uses</strong>: <code>RouterOutlet</code>, <code>RouterLink</code>, <code>RouterLinkActive</code>, pipes, <code>ReactiveFormsModule</code>.</li>
+            <li><code>&lt;router-outlet /&gt;</code> marks <em>where</em> the routed component appears — everything outside it is a persistent shell.</li>
+            <li><code>routerLink</code> navigates without a reload; <code>href</code> restarts your whole application.</li>
+            <li><code>routerLinkActive</code> highlights the current page with no logic of your own, and needs <code>{ exact: true }</code> for a root-path link.</li>
+            <li>A default <code>redirectTo</code> needs <code>pathMatch: 'full'</code>, and a <code>**</code> wildcard 404 route goes <strong>last</strong>.</li>
+            <li>Routes are matched <strong>top to bottom, first match wins</strong> — so static paths go above dynamic ones.</li>
+            <li><strong>Route parameters</strong> (<code>:id</code>) arrive as a signal <code>input()</code> when <code>withComponentInputBinding()</code> is on, or via <code>ActivatedRoute</code> — and are <strong>always strings</strong>, so convert them.</li>
+            <li><code>this.router.navigate([...])</code> navigates from code, and belongs <strong>inside <code>next</code></strong> so it only runs on genuine success.</li>
+            <li><strong>CRUD</strong> is the array methods you learned in Session 1, used <em>immutably</em>: spread to add, <code>map</code> to update, <code>filter</code> to delete.</li>
+            <li><code>signal()</code> holds state; <code>computed()</code> derives from it — which is what removed the two-array bug, the stale-filter bug and the <code>trackBy</code> method all at once.</li>
+            <li>One form handles both insert and update, driven by a single <code>editingId</code> signal and <code>patchValue()</code>.</li>
+            <li>Moving CRUD onto a <strong>service</strong> and then onto <strong><code>HttpClient</code></strong> left the template unchanged, for the fourth time in this series.</li>
+            <li>Your Angular service's five methods map one-to-one onto your Spring Boot controller's five mappings.</li>
+            <li><code>ng build</code> produces plain static files in <code>dist/</code> — and serving them from Spring Boot removes the CORS problem entirely.</li>
+          </ul>
+        </section>
+
+        <!-- 35. FOUR SESSIONS -->
+        <section class="slide">
+          <p class="eyebrow">Looking back</p>
+          <h2>Four sessions, one application</h2>
+          <div class="stack">
+            <div class="stack-row l1">
+              <span class="layer">Session 1</span>
+              <span class="desc"><strong>TypeScript &amp; Angular 19 basics.</strong> Types, interfaces, unions, arrays, classes. Node, the CLI, <code>ng new</code>, <code>bootstrapApplication</code>, and a running app you edited yourself.</span>
+            </div>
+            <div class="stack-row l2">
+              <span class="layer">Session 2</span>
+              <span class="desc"><strong>Components &amp; data binding.</strong> A component tree of standalone components, all four bindings, <code>&#64;if</code> / <code>&#64;for</code>, pipes, <code>input()</code> / <code>output()</code>, <code>ngOnInit</code>.</span>
+            </div>
+            <div class="stack-row l3">
+              <span class="layer">Session 3</span>
+              <span class="desc"><strong>Forms, services &amp; HTTP.</strong> Both form systems with validation, services with <code>inject()</code>, <code>provideHttpClient()</code>, Observables, loading and error states.</span>
+            </div>
+            <div class="stack-row l4">
+              <span class="layer">Session 4</span>
+              <span class="desc"><strong>Routing &amp; full CRUD.</strong> Multi-screen navigation, route parameters as inputs, signals and <code>computed</code>, a complete Customer Management application, and a live connection to your own Spring Boot API.</span>
+            </div>
+          </div>
+          <div class="keybox">
+            <span class="lbl">Where you started, and where you are</span>
+            Four sessions ago the question was <em>"what even is a framework?"</em>. You now have a routed, validated,
+            service-backed, API-connected single-page application written in current Angular — and, more importantly, you
+            understand <strong>why</strong> each layer exists rather than just how to type it.
+          </div>
+          <div class="askbox">
+            <span class="lbl">Ask the batch — the closing question</span>
+            Go back to Session 1, slide 12: the five reloading JSP pages. What would you say now, in your own words, about
+            what you have replaced them with — and what you gained?
+          </div>
+        </section>
+
+        <!-- 36. BEYOND -->
+        <section class="slide">
+          <p class="eyebrow">What to learn next</p>
+          <h2>Beyond these four sessions</h2>
+          <p class="deep">You have the foundation. Here is the natural order to pick things up, roughly easiest first —
+             and every one of them builds on something you already know.</p>
+          <div class="cards c3">
+            <div class="card"><div class="ic">🛡️</div><h3>Route guards</h3><p>A <code>CanActivateFn</code> is now just a <em>function</em> — <code>() =&gt; inject(AuthService).isLoggedIn()</code>. Block a route unless the user is signed in.</p></div>
+            <div class="card"><div class="ic">🔌</div><h3>HTTP interceptors</h3><p>Also plain functions: <code>provideHttpClient(withInterceptors([authInterceptor]))</code>. Attach a token to every request in one place.</p></div>
+            <div class="card"><div class="ic">📦</div><h3>Lazy loading</h3><p><code>loadComponent</code> per route, and <code>loadChildren</code> for whole feature areas. One line each with standalone components.</p></div>
+            <div class="card"><div class="ic">⏳</div><h3><code>&#64;defer</code></h3><p>Defer a <em>part of a template</em> until it is visible, idle, or hovered. Great for charts and heavy widgets.</p></div>
+            <div class="card"><div class="ic">🔭</div><h3>More signals</h3><p><code>linkedSignal</code>, <code>effect</code>, and the experimental <code>resource()</code> API for async state — all new in v19.</p></div>
+            <div class="card"><div class="ic">🌊</div><h3>More RxJS</h3><p><code>debounceTime</code> for search-as-you-type, <code>switchMap</code>, <code>catchError</code>, plus <code>toSignal</code> / <code>toObservable</code> interop.</p></div>
+            <div class="card"><div class="ic">🎨</div><h3>Angular Material</h3><p>Google's component library — tables, dialogs, date pickers, all accessible out of the box and all standalone.</p></div>
+            <div class="card"><div class="ic">🧪</div><h3>Testing</h3><p>Those <code>.spec.ts</code> files we ignored. Signals and reactive forms are easy to test — that was one reason to prefer them.</p></div>
+            <div class="card"><div class="ic">🚀</div><h3>SSR &amp; a project of your own</h3><p><code>ng add @angular/ssr</code> for server rendering and incremental hydration — but <strong>build something real first</strong>.</p></div>
+          </div>
+          <div class="plainbox">
+            <span class="lbl">The honest advice</span>
+            Do not learn all nine. <strong>Build something.</strong> Pick a small real problem — a leave tracker, an
+            expense log, a reading list — put it in front of your own Spring Boot API, and finish it. You will pick up
+            four of the items above because you <em>needed</em> them, which is the only way any of it sticks.
+          </div>
+        </section>
+
+        <!-- 37. CLOSING -->
+        <section class="slide">
+          <div class="cover">
+            <span class="badge">End of Session 4 — end of the series</span>
+            <h1>Thank you!</h1>
+            <div class="sub">From <code>ng new</code> to a full-CRUD, routed, API-connected Angular 19 application — in four sessions. Now go and build something of your own.</div>
+            <div class="meta">Presenter: Purvam Prajapati — Faculty, AHD &nbsp;&nbsp;•&nbsp;&nbsp; Questions are always welcome, during and after.</div>
+          </div>
+        </section>
+
+        <!-- Navigation controls -->
+        <button type="button" class="nav-control nav-prev" id="navPrev" aria-label="Previous slide">&#8249;</button>
+        <button type="button" class="nav-control nav-next" id="navNext" aria-label="Next slide">&#8250;</button>
+
+        <!-- Persistent footer band, shown on every slide -->
+        <div class="slide-footer">
+          <span class="who">Purvam Prajapati — Faculty, AHD</span>
+          <span>Angular 19 · Session 4 — Routing &amp; Full CRUD</span>
+        </div>
+
+        <!-- Slide counter -->
+        <div class="slide-counter" id="slideCounter">1</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ============================================================
+       Pure functions (canonical, inlined — no external modules).
+       ============================================================ */
+    function clampIndex(i, total) {
+      if (total <= 0) return 0;
+      if (i < 0) return 0;
+      if (i > total - 1) return total - 1;
+      return i;
+    }
+    function formatCounter(current, total) {
+      return current + " of " + total;
+    }
+
+    /* ============================================================
+       Slide navigator. All slides live in the DOM; exactly one
+       carries .active. State is a single integer index.
+       ============================================================ */
+    var state = { index: 0, total: 0, isTransitioning: false };
+    var slides, navPrev, navNext, counterEl, progressFill, reduceMotion;
+
+    function render() {
+      slides.forEach(function (s, i) {
+        s.classList.toggle('active', i === state.index);
+      });
+      var current = state.total === 0 ? 0 : state.index + 1;
+      counterEl.textContent = formatCounter(current, state.total);
+      navPrev.disabled = state.index <= 0;
+      navNext.disabled = state.index >= state.total - 1;
+      var pct = state.total <= 1 ? 100 : Math.round(state.index / (state.total - 1) * 100);
+      progressFill.style.width = pct + '%';
+    }
+
+    function goTo(target) {
+      if (state.isTransitioning) return;           // ignore during transition
+      var next = clampIndex(target, state.total);
+      if (next === state.index) { render(); return; }
+      state.index = next;
+      render();
+      var activeSlide = slides[state.index];
+      if (activeSlide) { activeSlide.scrollTop = 0; }
+      if (activeSlide && !reduceMotion) {
+        state.isTransitioning = true;
+        activeSlide.classList.remove('animating');
+        void activeSlide.offsetWidth;
+        activeSlide.classList.add('animating');
+        var done = function () {
+          state.isTransitioning = false;
+          activeSlide.removeEventListener('animationend', done);
+        };
+        activeSlide.addEventListener('animationend', done);
+        setTimeout(function () { state.isTransitioning = false; }, 900);
+      }
+    }
+    function next() { goTo(state.index + 1); }
+    function prev() { goTo(state.index - 1); }
+
+    function init() {
+      slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+      navPrev = document.getElementById('navPrev');
+      navNext = document.getElementById('navNext');
+      counterEl = document.getElementById('slideCounter');
+      progressFill = document.getElementById('progressFill');
+      reduceMotion = window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      state.total = slides.length;
+      state.index = 0;
+
+      navNext.addEventListener('click', next);
+      navPrev.addEventListener('click', prev);
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight' || e.key === 'PageDown') { next(); }
+        else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { prev(); }
+        else if (e.key === 'Home') { goTo(0); }
+        else if (e.key === 'End') { goTo(state.total - 1); }
+      });
+
+      render();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      try {
+        init();
+      } catch (err) {
+        if (typeof console !== 'undefined' && console.error) {
+          console.error('Initialization failed:', err);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
