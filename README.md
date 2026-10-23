@@ -23,6 +23,10 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 - **Theory files** are interactive slideshows (arrow keys / on-screen controls, slide counter, progress rail).
 - **Lab files** are scrollable companions with a progress checklist and copy-to-clipboard code blocks.
 
+## Interview prep
+
+[`springboot-microservices-interview-qa.md`](springboot-microservices-interview-qa.md) — top 50 Spring Boot & Microservices interview questions with answers and code examples, from Spring Boot fundamentals to Saga, resilience patterns, and system design.
+
 ## The journey
 
 The four Spring Boot sessions build on each other — from a Hello World endpoint to a running microservices architecture:
