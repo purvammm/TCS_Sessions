@@ -19,6 +19,7 @@ Open [`index.html`](index.html) — a landing page that links every slideshow an
 | 2 — REST Web Services | `springboot-session2-theory.html` | `springboot-session2-lab.html` |
 | 3 — DTO, layers & exception handling | `springboot-session3-theory.html` | `springboot-session3-lab.html` |
 | 4 — Microservices with Spring Cloud | `springboot-session4-theory.html` | `springboot-session4-lab.html` |
+| Capstone — Library API in 7 days | — | `springboot-capstone-project.html` |
 
 - **Theory files** are interactive slideshows (arrow keys / on-screen controls, slide counter, progress rail).
 - **Lab files** are scrollable companions with a progress checklist and copy-to-clipboard code blocks.
